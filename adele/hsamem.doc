@@ -1,0 +1,61 @@
+
+
+
+                     MM   MM   EEEEEEE   MM   MM    OOOOO
+                     M MMM M   E         M MMM M   O     O
+     --------------- M  M  M   EEEEEEE   M  M  M   O     O-------------------
+     |               M     M   E         M     M   O     O                  |
+     |               M     M   EEEEEEE   M     M    OOOOO                   |
+     |                                                                      |
+     |                                                                      |
+     |       DATE:  April 22, 1983                                          |
+     |                                                                      |
+     |         TO:  Kevin Gardner            COPIES:  Mike Hinckley         |
+     |                                                                      |
+     |       FROM:  Adele Newman                                            |
+     |                                                                      |
+     |    SUBJECT:  HSA Requirements for TYMCOM-X                           |
+     |                                                                      |
+     |                                                                      |
+     ------------------------------------------------------------------------
+
+
+
+     The products maintained by the Systems Development Section which support
+     HSA devices are BIONIC, SPOOL, and probably LISTER.  A short document on
+     BIONIC may be found on the X's in the file (*6news)bionic.doc.  In
+     addition to a printed SPOOL manual, documentation may be found in the
+     files (*6news)spool.doc and (sysnews)spool.doc; the (sysnews) file
+     contains operator instructions.  The LISTER program handles the PRINT
+     command on the TYMCOM-X.
+
+     SPOOL and LISTER both utilize Katakana as well as "normal" ASCII mode,
+     and SPOOL does blank compression in both modes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      1
+
