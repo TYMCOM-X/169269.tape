@@ -1,0 +1,31 @@
+.Page frame 60 high 77 wide;
+.Area text lines 4 to 57 chars 6 to 77;
+.Title area heading lines 1 to 3;
+.Title area footing line 60;
+.Place text;
+.library |MEMO.LIB|;
+.to |The Tymcom-X Section|;
+.cc |Sherman Gavette|
+.re |System 930 Rebuild|;
+.break;
+.body
+In the midst of a very trying week, a number of section members made
+a special effort to rebuild the file system on 930.
+
+I would like to thank everyone who helped along the way.  There are
+several people who deserve special mention.  Lois worked with ASP
+trying to get a good dump and started the rebuild when the ASP restore
+failed.  She followed that process through later making sure that
+licenses were restored and also worked on a general cleanup of outdated
+directories.  Carl
+also worked on the ASP dump, verify, and restore, devoting considerable
+time through Monday night and Tuesday morning.  Julie mounted "allfiles"
+tapes Wednesday.  Darren supplied much needed consulting and help
+starting the rebuild, and he also
+restored all the incremental tapes.  Bill also supplied much needed
+consulting and wrote the program which notified us of files
+which were not restored from the incremental tapes.
+
+To everyone, thanks again!  It's great to have 930 back.
+.Endbody;
+
