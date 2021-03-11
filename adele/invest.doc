@@ -1,0 +1,301 @@
+District No. Investigation       Adele Gadol                      11 June 1981
+
+
+              This  report is  an  assessment of  the impact  on  the Tymcom-X
+      utilities (and the Utilities Unit) of changing the  three-digit district
+      number to a four-digit  cost code.  This discussion makes  the important
+      assumption that the  cost code, if used  in place of a  district number,
+      would be obtained in the same ways as the current district number.
+
+              The programming effort on  our part is potentially a  large task
+      and is difficult to determine.  Some of the reasons for this are:
+
+      1.  There  seem to  be  several alternatives  for a  solution  with each
+          alternative affecting the involved programs somewhat differently.
+
+      2.  Most  of the  utilities  programs (that  we know  are  involved) are
+          inter-related through the cooperative references and updates  to the
+          batch accounting  files.  In addition,  these files are  also either
+          used by  MIS or processed  into another form  which is used  by MIS.
+          Therefore,  some communication  between the  Utilities Unit  and MIS
+          will be necessary.
+
+      3.  The  various batch  accounting files  are not  completely consistent
+          either with respect  to the usage  of some of  the fields or  to the
+          default handling  of numeric  fields (some are  padded with  0's and
+          other with spaces, for example).  There are other idiosyncrasies not
+          entirely understood.  Expect trouble!
+
+      4.  Several of the utilities are written in SIMPL (a  Tymshare generated
+          but now unsupported compiler).  Expect trouble!
+
+              The  types  of  program  changes that  would  be  forced  by the
+      district number change fall into two main categories.  The first affects
+      programs which check the authority of the user to run the  given program
+      by reading the value of his/her district.  This is by far the  easier of
+      the two types of changes;  however, we'll probably forget about  some of
+      the programs unless  a concerted efforted is  made to find them  all.  A
+      search of LUD reading programs or programs which access  the validations
+      data bases, as was done in an analogous fashion with 940 date calls, may
+      be advised.  The  second category affects  programs which deal  with the
+      SPOOL and BATCH accounting files which now carry the district  number as
+      one of the fields.
+
+              Programs_which_use_district_as_a_validation_check.              
+      The known utilities are  BCHARG, BATCH, and SPOOL.  These  programs also
+      fall into the second category.
+
+              SPOOL/BATCH_accounting_file_related_programs.              
+      The known utilities are  1CLEAR, 370CHG, BATCH, BCHARG,  LISTER, RCHARG,
+      RECPPR,  (*1BATCH)RBCHG,  SPOOL,  SPFIX,  and  TAPCHG.   Each  of  these
+      programs read or write into one or more of the following files,  each of
+      which  carries   the  district  number.    The  files   are  BATsss.mmm,
+      RTMsss.mmm, BAT370.mmm, PARCHG.DAT, PARCHG.BAK,  SPLCHG.DAT, SPLCHG.BAK,
+      PPRBAK.DAT, PPRTMP.DAT, BATCAN.mmm,  and the SPOOL data  base SPOOL.GDF.
+      All except (SPOOL)SPOOL.GDF reside in (*1BATCH).  In each case, there is
+      no  room  for  expansion  of  the  district  field  without   some  file
+
+
+
+                                      1
+District No. Investigation       Adele Gadol                      11 June 1981
+
+
+      restructuring, which can be more  or less depending upon the  desire for
+      consistency.
+
+              There  are two  major solutions  with respect  to  the utilities
+      programs.
+
+      1.  Continue  to carry  the district  number in  the  above "accounting"
+          files, and make the necessary file and consequent program changes.
+
+      2.  Eliminate the district number from these utilities.  It appears that
+          the MIS format for the BATCH data, which is translated from  our raw
+          data, does not contain the district code.  In any case, it shouldn't
+          be necessary  for the utilities  to look up  that information  if it
+          could easily be retrieved later.
+
+          Note that this second  alternative will still require  a programming
+          effort, but  it would be  much less.  The  files could  retain their
+          formats with the exception of  the district, and none would  have to
+          expand.  The programs would be  modified to put a null value  in the
+          district field.
+
+
+
+                          Conclusions_and_Recommendations                          
+
+
+      1.  The total "best case" time necessary to accomplish the changes would
+          be  roughly 13  person-weeks  if the  first solution  were  used and
+          roughly 5 person-weeks if the district number can be eliminated from
+          our batch accounting files.  These times do not include  file design
+          and coordination with MIS.
+
+      2.  Due to programs  written in SIMPL,  lack of good  documentation, and
+          inconsistent  use  of  the  files  in  question,  the   chances  for
+          unexpected disasters are great.
+
+      3.  I am reluctant  to do much reworking  of old programs that  are long
+          overdue to be replaced by a newer, consistent system.  In fact, I am
+          considering an extension to the program which will implement TYMCOM-
+          X special  handling charges which  could replace BCHARG  and RCHARG.
+          Even  this step,  I consider  a stop-gap  measure, since  the entire
+          SPOOL/BATCH system needs redoing.
+
+      4.  We need  to do a  more thorough search  for programs which  read the
+          user's district number.
+
+
+
+
+
+
+
+
+
+
+
+                                      2
+District No. Investigation       Adele Gadol                      11 June 1981
+
+
+                              Detailed_Program_Summary                              
+
+              The times  given do  not include decision  time which  must come
+      first in order to settle  on some consistent file formats and  make sure
+      that what we are doing is acceptable to MIS.
+
+      1CLEAR
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)PPRBAK.DAT
+                                   (*1BATCH)PPRTMP.DAT
+              possible problems:   File information could be inaccurate.
+
+      BATCH
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)PARCHG.DAT
+                                   (*1BATCH)PPRBAK.DAT
+                                   (*1BATCH)PPRTMP.DAT
+              possible problems:   File information could be inaccurate.
+
+      LISTER
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)BATsss.mmm
+                                   (*1BATCH)RMTsss.mmm
+              possible problems:   File information could be inaccurate.  This
+                                   program is very difficult to understand.
+
+      RECPPR
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)PPRBAK.DAT
+                                   (*1BATCH)PPRTMP.DAT
+              possible problems:   File information could be inaccurate.
+
+      SPFIX
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)PARCHG.DAT
+                                   (*1BATCH)SPLCHG.DAT
+                                   (*1BATCH)BATsss.mmm
+                                   (SPOOL)SPOOL.GDF
+              possible problems:   File information could be inaccurate.
+              note:                This is an internal program used by the
+                                   utilities unit.  However, it is critically
+                                   important to our ability to maintain SPOOL.
+
+      SPOOL
+              programming effort:  see TAPCHG
+              files affected:      (*1BATCH)PARCHG.DAT
+                                   (*1BATCH)PARCHG.BAK
+                                   (*1BATCH)SPLCHG.DAT
+                                   (*1BATCH)SPLCHG.BAK
+                                   (*1BATCH)BATsss.mmm
+                                   (SPOOL)SPOOL.GDF
+              possible problems:   File information could be inaccurate.  This
+                                   is a large, complicated program which is
+                                   difficult to understand and maintain.
+
+
+                                      3
+District No. Investigation       Adele Gadol                      11 June 1981
+
+
+      TAPCHG
+              programming effort:  Since the above programs interact with many
+                                   of the same files, Jean Roysden felt it
+                                   difficult to arrive at a separate estimate
+                              for each program.  Therefore she determined
+                                   that the estimate for the entire effort
+                                   (7 programs) would be:
+                                   (1) 2 months, if the district number is
+                                       changed.  In this case, some design
+                                       effort would be necessary for these
+                                       programs.
+                                   (2) 3 weeks, if the district numbers are to
+                                       be eliminated from our batch accounting
+                                       files.
+              files affected:      (*1BATCH)PARCHG.DAT
+                                   (*1BATCH)PARCHG.BAK
+                                   (*1BATCH)SPLCHG.DAT
+                                   (*1BATCH)SPLCHG.BAK
+                                   (*1BATCH)BATsss.mmm
+                                   (SPOOL)SPOOL.GDF
+              possible problems:   File information could be inaccurate.
+
+      BCHARG
+              programming effort:  (1) one week if everything goes smoothly
+                                   (2) two days if everything goes smoothly
+              files affected:      (*1BATCH)PARCHG.DAT
+                                   (*1BATCH)PARCHG.BAK
+                                   (*1BATCH)BATsss.mmm
+                                   (*1BATCH)BATCAN.mmm
+              possible problems:   Written in SIMPL and uncommented.  Compiler
+                                   trouble could force a rewrite in either
+                                   case.  File information may be inaccurate.
+
+      RCHARG
+              programming effort:  (1) one week if everything goes smoothly
+                                   (2) two days if everything goes smoothly
+              files affected:      (*1BATCH)SPLCHG.DAT
+                                   (*1BATCH)SPLCHG.BAK
+                                   (*1BATCH)BATsss.mmm
+                                   (*1BATCH)BATCAN.mmm
+              possible problems:   Written in SIMPL and uncommented.  Compiler
+                                   trouble could force a rewrite in either
+                                   case.  File information may be inaccurate.
+
+      370CHG
+              programming effort:  (1) 4 days
+                                   (2) 2 days
+              files affected:      (*1BATCH)BAT370.mmm
+              possible problems:   File information could be inaccurate.
+
+
+
+
+
+
+
+                                      4
+District No. Investigation       Adele Gadol                      11 June 1981
+
+
+      RBCHG
+              question:            Who uses this program?
+              programming effort:  In either case, 2 days.
+              files affected:      (*1BATCH)BATsss.mmm
+              possible problems:   Written in SIMPL.  However, it is short and
+                                   could probably be rewritten quickly.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      5
+@gÄ
