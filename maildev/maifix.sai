@@ -1,0 +1,188 @@
+begin "mail file fixer"
+
+  require "(sailib)sail.def" source!file;
+  require "nbsmsg.def" source!file;
+! Static stuff.
+;
+
+integer InChan, OutChan, InEOF, OutEOF;
+
+integer FileSize, WordCount;
+integer WordPushed, PushedWord;
+
+integer PacketCount;
+
+boolean QueryMode;
+string reply;
+! Initialization
+;
+
+procedure Initialize;
+  begin
+    integer array FInfo[ 0 : 5 ];
+    string FileName;
+
+    print( "Mail File to Fix?  (<cr> for [MAIL]) : " );
+    FileName := inchwl;
+    if ( not FileName ) then FileName := MAILBOX;
+
+    open( InChan  := getchan,"DSK",'14,2,0,512,0,InEOF );
+    lookup( InChan, FileName, InEOF );
+    if ( InEOF ) then usererr( 0,0,"? Lookup failed for MailBox file","x");
+    FileInfo( FInfo );
+    FileSize := FInfo[5];
+    open( OutChan := getchan,"DSK",'14,0,2,512,0,OutEOF );
+    enter( OutChan, FileName, OutEOF );
+    if ( OutEOF ) then usererr( 0,0,"? Enter failed for MailBox file","x");
+    WordCount := 0;
+    PushedWord := false;
+    PacketCount := 0;
+
+    print( "Query Mode? " );
+    reply := inchwl;
+    QueryMode := kequ( reply[1 to 1],"Y" );
+
+  end;
+! File input with lookahead.
+;
+
+integer procedure GetWord;
+  begin
+    if ( WordPushed ) then
+      begin
+	WordPushed := false;
+	return( PushedWord );
+      end;
+    WordCount := WordCount + 1;
+    return( wordin( InChan ) );
+  end;
+
+
+boolean procedure MoreWords;
+  begin
+    if ( WordPushed ) then return( true );
+    return( WordCount < FileSize );
+  end;
+
+
+procedure PushWord( integer W );
+  begin
+    WordPushed := true;
+    PushedWord := W;
+  end;
+! Dump a packet.
+!
+! PacketBuffer[ -1 ] is old header.
+! PacketBuffer[  0 ] is packet size.
+;
+
+  integer array PacketBuffer[ -1 : 10*512 ];
+
+procedure DumpPacket;
+  begin
+    integer I, C;
+    
+    wordout( OutChan, PacketBuffer[ -1 ] );	! old header ;
+    wordout( OutChan, PacketBuffer[  0 ] );	! count ;
+
+    C := PacketBuffer[ 0 ];
+
+    for I := 1 upto C do
+      begin
+	WordOut( OutChan, PacketBuffer[ I ] );
+      end;
+
+  end;
+! Load the next packet.
+!
+! Assume that the last packet was valid.   Check first for a valid
+! header and count, then eat that many words.  If we (1) run out
+! of words, or (2) run into another header then this packet is
+! damaged and will be discarded.
+;
+
+boolean procedure LoadPacket;
+  begin "load"
+    integer I, W, C;
+
+    PacketCount := PacketCount + 1;
+
+    W := GetWord;
+
+    if ( not ( W land '17 )) then
+      begin
+	print( "% Bad Header - '",cvos( W ), crlf );
+	return( false );
+      end;
+
+    Packetbuffer[ -1 ] := W;
+
+    if ( not MoreWords ) then
+      begin
+        print( "% EOF before Count in LoadPacket", crlf );
+        return( false );
+      end;
+
+    C := GetWord;
+    if ( C land '777777000000 ) then
+      begin
+	print ("% Bad Count - ",C,crlf );
+	return( false );
+      end;
+
+    PacketBuffer[ 0 ] := C;
+    for I := 1 upto C do
+      begin "get packet"
+	if ( not MoreWords ) then
+	  begin
+	    print( "% EOF in LoadPacket", crlf );
+	    return( false );
+	  end;
+	W := GetWord;
+	if ( W land '17 ) then
+	  begin
+	    print( "% Header found in data in LoadPacket", crlf );
+	    return( false );
+	  end;
+	PacketBuffer[ I ] := W;
+      end "get packet";
+
+    if ( not MoreWords ) then return( true );
+
+    W := GetWord;
+    if ( not ( W land '17 )) then
+      begin
+	print( "% Packet not followed by Header", crlf );
+	return( false );
+      end;
+
+    PushWord( W );
+    return( true );
+
+  end "load";
+! Top Level Logic
+;
+
+  Initialize;
+
+  while ( MoreWords ) do
+    begin
+      if ( not LoadPacket ) then done;
+      if ( QueryMode ) then
+	begin
+	  print( "[Envelope #", PacketCount, "]  Purge? " );
+	  reply := inchwl;
+	  if ( not kequ( reply[1 to 1], "Y" )) then DumpPacket;
+	end
+      else
+	begin
+	  print( "[Envelope #", PacketCount, "]", crlf );
+	  DumpPacket;
+	end;
+    end;
+
+  close( OutChan );
+  release( InChan );
+  release( Outchan );
+
+end "mail file fixer";
