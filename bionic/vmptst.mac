@@ -1,0 +1,96 @@
+Title	VMPTST
+Subttl	Definitions
+
+	SEARCH	MACTEN,JOBDAT,UUOSYM
+
+	T1=1				; temp ac 1
+	T2=2				; temp ac 2
+	T3=3				; temp ac 3
+	T4=4
+
+	PAGE=7				; page pointer
+	PG=10				; page number
+	P=17				; stack
+
+	LOG==3				; log channel
+
+	LOGLOG=0			; Offset into page
+
+PDL:	Block	40			; Push down list (Stack)
+
+LOGDEV:	EXP	17			; Dump mode (to be mapped)
+	SIXBIT	/DSK/			; Device DSK
+	EXP	0			; No buffer headers
+
+LOGFILE:EXP	3			; Block length 3
+	EXP	0
+	SIXBIT	/VMPTST/		; File= VMPTST
+	SIXBIT	/LOG/			; Type= LOG
+
+
+Subttl	*** Main-line code ***	SETUP
+
+START:	TDZA	T1,T1			; Watch entry point
+	SETO	T1,			;   normal=0 or CCL=-1
+	RESET				; Reset all
+	MOVE	P,[IOWD 40,PDL]		; Setup Push-down-list
+
+	HRRZ	PAGE,.JBREL		; Get highest address
+	ADDI	PAGE,1000		; Add one page
+	CORE	PAGE,			;  to memory
+	  HALT	.			;    CAN'T
+	HRRZ	PAGE,.JBREL		; Get highest address
+	AOJ	PAGE,			; Add one
+	MOVEM	PAGE,.JBFF		; Setup for other calls
+	LSH	PAGE,-^D9		; Convert to a page number
+	SOJ	PAGE,			; Remember it for later
+	MOVEM	PAGE,PG			;     "    "   "    "
+	LSH	PAGE,^D9		; Convert back to address
+
+	MOVEI	T4,^D10			; 10 pages ?
+LOOP:	PUSHJ	P,BIOLOG
+	SOJG	T4,LOOP
+
+	EXIT
+
+
+BIOLOG:	OPEN	LOG,LOGDEV		; Open device DSK
+	  JRST	BIOREL			; Can't open - finish up
+
+	AOS	LOGLOG(PAGE)		; Count pages / copy
+	MOVE	T1,[.NSUPT,,.GTNSW]	; Get system uptime
+	GETTAB	T1,			;  from the monitor
+	  Seto	T1,			;  using -1 if error
+	MOVEM	T1,1(PAGE)		;  Store it in the page
+
+	LOOKUP	LOG,LOGFILE		; Lookup BIONIC.LOG
+	 OUTSTR	[ASCIZ\
+Can't find VMPTST.LOG\]			; Ignore error - if any
+	ENTER	LOG,LOGFILE		; Enter/supersede file
+	  JRST	[OUTSTR	[ASCIZ\
+Can't UPDATE VMPTST.LOG\]		; Can't enter - finish up
+		 JRST	BIOREL]
+
+	MOVE	T2,PG			; Copy page number
+	HRLI	T2,1			; Get 1,,page#
+	SETO	T3,			;     next-page
+	MOVE	T1,[Xwd 47,LOG]		; Setup .CHVMP,,LOG
+	CHANIO	T1,T2			; Copy page to disk
+	  JRST	[OUTSTR	[ASCIZ\
+.CHVMP failed\]
+		 JRST	BIOREL]		; Skip if error
+	MOVE	T2,PG			; Get page number
+	HRLI	T2,(1B7!1B17)		;  wait - 1 page
+	VALPAG	T2,			;  while it goes to dsk
+	 OUTSTR	[ASCIZ\
+VALPAG failed\]
+	MOVE	T2,PG			; Get page number
+	HRLI	T2,(.PRCW!1B17)		;  c-o-w 1 page
+	VPROT	T2,			;  and change prot
+	 OUTSTR	[ASCIZ\
+VPROT failed\]
+	CLOSE	LOG,			;  Close file
+BIOREL:	RELEASE	LOG,			;  Release channel
+	POPJ	P,			; Return
+
+	END	START
