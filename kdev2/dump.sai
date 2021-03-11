@@ -1,0 +1,75 @@
+define ! = "comment", !! = "comment";
+!! title Mdl Dump ;
+begin
+  require "(klib)sail.hdr" source!file;
+  require "(klib)util.req" source!file;
+  require "(klib)date.req" source!file;
+  require "(klib)time.req" source!file;
+  !version(!ver(1, 0), !edit('010), !date(17-May-1984));
+
+  integer
+    Chan,
+    Eof,
+    Flg,
+    I,
+    Wrd;
+  string
+    File;
+
+  simple string procedure AsciiStr (integer Wrd);
+  begin
+    integer
+      C,
+      I,
+      Ptr;
+    string
+      Str;
+
+    Str _ null;
+    Ptr _ point(7, Wrd, -1);
+
+    for I _ 0 step 1 until 4 do
+    begin
+      C _ ildb(Ptr);
+
+      appnd
+      (
+        Str,
+        (
+          if (SP < C < DEL) then
+            C
+          else
+            "."
+        )
+      );
+    end;
+
+    return(Str);
+  end;
+
+  do.banner("Dump - A File Dumper Hack");
+
+  open((Chan _ getchan), "DSK", '14, 4, 0, 0, 0, (Eof _ -1));
+
+  if (Eof) then
+    usererr(0, 0, "Open Error on Channel " & cvs(Chan) & ".");
+
+  lookup(Chan, (File _ Prompt.User("File to be dumped: ")), (Flg _ 0));
+
+  if (Flg) then
+    usererr(0, 0, "Lookup Error for File " & File & ".");
+
+  Wrd _ wordin(Chan);
+
+  for I _ 0 step 1 while not Eof do
+  begin
+    print(Form.Str(I, 5), ":  ",
+        xwdstr(Wrd), "    :",
+        AsciiStr(Wrd), ":", crlf);
+
+    Wrd _ wordin(Chan);
+  end;
+
+  close(Chan);
+  release(Chan);
+end;
