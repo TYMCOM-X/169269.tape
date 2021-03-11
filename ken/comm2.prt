@@ -1,0 +1,310 @@
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 1-1
+     Prt: 07-Aug-84  13:11               COMM2 - Commands of moderate complexity
+
+     
+     ! *************************************************************************
+     *                                                                         *
+     *                                  COMM2                                  *
+     *                     Commands of moderate complexity                     *
+     *                                                                         *
+     ***************************************************************************
+     
+     
+                This file is required as a source!file in COMAND.SAI.
+     
+     
+     **************************************************************************;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 36-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!ChangeString
+
+     
+     ! Change one string to another.
+     ;
+     
+     procedure C!ChangeString;
+     begin "C!ChangeString" |1|
+       integer
+         ChangeCount,
+         I,
+         SavePoint;    
+       string
+         AbortStr,
+         OldString,
+         Prompt,
+         NewString;
+     
+       Prompt   _ "Change: ";
+       AbortStr _ Prompt & "[Aborted]";
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       if (length(C!String) = 0) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (OldString _ C!String) & " to: ");
+     
+       if (not (C!ReadString(Prompt, ESC, ESC))) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (NewString _ C!String));
+     
+       set(W!MsgF);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+       ChangeCount _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ maxinteger;
+     
+       while (C!ArgV > 0) do
+       begin "each arg" |2|
+         SavePoint _ B!GetP;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 36-2
+     Prt: 07-Aug-84  13:11                                    Rtn C!ChangeString
+
+         ForwardSearch(OldString);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ 0
+         else
+         begin |3|
+           for I _ 1 upto length(OldString) do
+             B!Delete(BACKWARDS);
+     
+           for I _ 1 upto length(NewString) do
+             B!Insert(NewString[i for 1]);
+     
+           incr(ChangeCount);
+           decr(C!ArgV);
+         end; |3|
+       end "each arg"; |2|
+     
+       W!Msg(Prompt & "  [" & cvs(ChangeCount) & "]");
+     
+       C!ArgV _ 0;
+     end "C!ChangeString"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 37-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!QueryChange
+
+     
+     ! "Query Change" - user-friendliness in action.
+     ;
+     
+     simple procedure C!QueryChange;
+     begin "C!QueryChange" |1|
+       string
+         AbortStr,
+         Prompt;
+       own integer
+         I,
+         SavePoint,
+         Response,
+         N;
+     
+     
+       Prompt   _ "Q-Change: ";
+       AbortStr _ Prompt & "[Aborted]";
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       if (length(C!String) = 0) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (C!QOldStr _ C!String) & " to: ");
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (C!QNewStr _ C!String));
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       set(W!MsgF);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       N _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ MaxInteger;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 37-2
+     Prt: 07-Aug-84  13:11                                     Rtn C!QueryChange
+
+     
+       while (C!ArgV > 0) do
+       begin |2|
+         SavePoint _ B!GetP;
+         ForwardSearch(C!QOldStr);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ -1
+         else
+         begin "query" |3|
+           W!Msg(Prompt & " ?");
+           Response _ C!GetC;
+     
+           if (C!Tab[Response] land IsYes) then
+           begin "change" |4|
+             W!Msg(Prompt & " [Yes]");
+             incr(N);
+     
+             for I _ 1 upto length(C!QOldStr) do
+               B!Delete(BACKWARDS);
+     
+             for I _ 1 upto length(C!QNewStr) do
+               B!Insert(C!QNewStr[I for 1]);
+     
+             W!Disp(false);
+           end "change" |4|
+           else
+           begin |4|
+             W!Msg(Prompt & " [No]");
+             W!Disp(false);
+           end; |4|
+     
+           if (C!Tab[Response] land IsAbort) then
+             C!ArgV _ 0
+           else
+             decr(C!ArgV);
+         end "query"; |3|
+       end; |2|
+     
+       W!Msg(Prompt & "  [" & cvs(N) & "]");
+       C!ArgV _ 0;
+     end "C!QueryChange"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 38-1
+     Prt: 07-Aug-84  13:11                                   Rtn C!RepeatQChange
+
+     
+     ! Repeat "Query Change" ;
+     
+     simple procedure C!RepeatQChange;
+     begin "C!RepeatQChange" |1|
+       string
+         Prompt;
+       own integer
+         I,
+         SavePoint,
+         Response,
+         N;
+     
+     
+       if (not length(C!QOldStr)) then
+       begin |2|
+         W!Msg("No Previous Q-Change Command");
+         T!Bell;
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       Prompt _ "Q-Change: " & C!QOldStr & " to: " & C!QNewStr;
+     
+       set(W!MsgF);
+       W!Msg(Prompt);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       N _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ MaxInteger;
+     
+       while (C!ArgV > 0) do
+       begin |2|
+         SavePoint _ B!GetP;
+         ForwardSearch(C!QOldStr);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ -1
+         else
+         begin "query" |3|
+           W!Msg(Prompt & " ?");
+           Response _ C!GetC;
+     
+           if (C!Tab[Response] land IsYes) then
+           begin "change" |4|
+             W!Msg(Prompt & " [Yes]");
+             incr(N);
+     
+             for I _ 1 upto length(C!QOldStr) do
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 38-2
+     Prt: 07-Aug-84  13:11                                   Rtn C!RepeatQChange
+
+               B!Delete(BACKWARDS);
+     
+             for I _ 1 upto length(C!QNewStr) do
+               B!Insert(C!QNewStr[i for 1]);
+     
+             W!Disp(false);
+           end "change" |4|
+           else
+           begin |4|
+             W!Msg(Prompt & " [No]");
+             W!Disp(false);
+           end; |4|
+     
+           if (C!Tab[Response] land IsAbort) then
+             C!ArgV _ 0
+           else
+             decr(C!ArgV);
+         end "query"; |3|
+       end; |2|
+     
+       W!Msg(Prompt & " [" & cvs(N) & "]");
+       C!ArgV _ 0;
+     end "C!RepeatQChange"; |1|
+   
