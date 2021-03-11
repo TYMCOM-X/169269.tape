@@ -1,0 +1,2080 @@
+RCPT To: <Ken@930>
+Received:from 57.Tymnet by 930.Tymnet; Sun, 6 May 84 23:49:33 PST
+Return-path: <WRS@39>
+From: WRS@39
+Date: Sun, 6 May 84 23:48:51 PST
+To: Carl@930,Ken@930,Lois@930,MCH@930,TSUcoop@930,Zonnie@930
+Subject: Tymshare Unofficial Mail System
+
+Its here folks!
+You can send mail with the command
+    SENDMAil name@host,name@host,name@host ... name@host
+It will prompt you for a subject and the body of the message.  While
+you are entering the body, you have the choice of including a file
+or calling an editor.  These options are invoked with ~ commands...type
+~? for a list of valid commands.  The ~ must be in column one.
+
+You can read mail (as you have obviously discovered) by the command
+    RDMAIL
+It will display your mail and append it to the file MAIL in your home
+directory.
+
+You can only send to "known" hosts which currently include:
+    39,57,897,930
+    tymix	(NTD's VAX)
+    OFFICE	(no need to specify which one)
+    ONTYME
+I will add other hosts on request.  Send requests to WRS@39.
+
+Notes on OFFICE:
+    They can't send mail back to us yet (their restriction).
+    Sending to name@host.ARPA will forward via OFFICE-14 to the
+    DARPA internet, however, the OFFICE host tables are not complete
+    so some ARPA hosts may appear to not be there in which case you'll
+    get the mail back with a non-delivery explanation.
+
+Notes on ONTYME:
+    If you wish to receive your ONTYME mail through TUMS, you
+    need to register your account.  If you are self-confident,
+    you can edit (MAIL)ONTYME.DAT - follow the examples exactly!
+    Otherwise, send your ONTYME account name(s) and passwords to
+    me at WRS@39.  Also, if you register, mail that you send will
+    show up as from your account rather than TUMS.GATEWAY which
+    might confuse the more narrow minded Ontyme users.
+
+Features forthcoming:
+    *	more hosts
+    *	better user interface
+    *	automatic forwarding
+    *	mailing lists
+
+Please report bugs, problems, suggestions and praise to
+	    WRS@39
+-Bill
+
+P.S.
+If you find that SENDMAIL doesn't work as a command, you may use
+    R SENDmail
+or, include the line
+    SetSCM( "(XEXEC)MEXEC" );
+in your INIT.SAI.  (you should do this anyway)  If you're not using
+.SAI init file, look at procedure SetSCM in (WRS)SETTRM.SAI and
+duplicate its functionality in whatever you do use.  If you don't
+understand why you should use SCM, call me and I'll tell you, it'd
+be nice to hear from you anyway.  -Bill
+RCPT To: <ken@930>
+Received:from 39.Tymnet by 930.Tymnet; Tue, 8 May 84 12:35:09 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Tue, 8 May 84 12:33:41 PST
+To: ken@930,carl@930
+Subject: editors get a fair slice of the machine
+
+I thought you might be interested in these statistics.  Notice the
+standing of PEAK, VUE and EDITOR.  My experience seems to indicate
+that these pretty well represent the amount of use they get as
+opposed to their relative efficiency.  And by the way, if anyone
+knows how to make the concurrent pascal compiler (39.42%) run any
+faster you could save NTD a great deal of money.  -Bill
+
+PS - this program (WRS:39)TRSTAT won't run on F3's due to its use
+of double precision floating point, it might be fun to run on some
+of the other systems though.
+
+This chart lists the top users of system 39 by program name for the first
+week of May 1984.  I hope that you will find this as intersting as I have.
+I will run the program again later in the month when more data is available.
+
+     trus      percent   program              trus      percent   program
+
+  1255139.70    33.11    CPAS1                2970.39      .08    TBALDR
+   716517.02    18.90    NAD                  2729.24      .07    OPER
+   239125.14     6.31    XCPAS1               2561.40      .07    FIND
+   190091.26     5.01    PEAK                 2527.67      .07    STADDR
+   170564.07     4.50    TITO                 2419.02      .06    DPARSE
+   134059.21     3.54    VUE                  2326.15      .06    LINK11
+    96610.21     2.55    ASM68K               2244.79      .06    DSKRPT
+    89177.94     2.35    LOADII               2238.66      .06    ONTMTP
+    70001.23     1.85    CIAO                 2177.78      .06    PUB
+    69565.97     1.83    SYSTAT               2148.51      .06    MAGNUM
+    65921.20     1.74    LISTER               2016.54      .05    TDB
+    61192.82     1.61    EDITOR               2006.87      .05    GFD
+    60379.42     1.59    CKSUM                1890.83      .05    TBA
+    58797.75     1.55    DSKCLN               1708.50      .05    MACN11
+    49379.72     1.30    EMS                  1665.02      .04    PCOM
+    43465.19     1.15    MAGNRN               1521.42      .04    AFDAUX
+    41383.78     1.09    AUXMOX               1490.11      .04    PDPPSP
+    40814.40     1.08    SPOOL                1482.79      .04    CRSHID
+    36145.85      .95    AUXIO                1444.21      .04    DIRECT
+    29366.70      .77    TELECO               1437.54      .04    KALAHA
+    18567.54      .49    TELAGR               1413.14      .04    MERLIN
+    17927.47      .47    RPG                  1370.22      .04    CT4
+    15773.62      .42    PIP                  1328.18      .04    TAUX
+    15458.87      .41    DIRIT                1246.45      .03    LOADX
+    14960.29      .39    GCROSS               1189.89      .03    GRAB
+    13755.36      .36    EMPIRE               1174.88      .03    TBACMP
+    11234.96      .30    COM                  1101.24      .03    ONTYME
+     7889.24      .21    NCR                  1090.00      .03    MAILER
+     7503.73      .20    LNK68K               1011.65      .03    XEXEC
+     7354.90      .19    ASP                   954.72      .03    RUNOFF
+     7068.79      .19    CROSS                 885.47      .02    ZORK
+     5979.99      .16    OBJNIB                871.43      .02    REMINI
+     5465.71      .14    SAIL                  823.65      .02    FINWAI
+     5285.11      .14    CONCAT                809.98      .02    FORTRA
+     4970.47      .13    FNDFIL                740.11      .02    REFORM
+     4773.09      .13    CT3                   705.18      .02    JOSHUA
+     4659.04      .12    TRSTAT                704.38      .02    RECORD
+     4572.42      .12    LOADER                684.24      .02    REFROY
+     4411.96      .12    FORMAT                648.02      .02    SLVPSP
+     4214.04      .11    FILCOM                646.19      .02    PATH
+     4154.06      .11    INIT                  645.48      .02    SPELL
+     3658.24      .10    CRAM                  640.26      .02    EMSCOM
+     3345.47      .09    UNITAP                626.79      .02    CT5
+     2977.43      .08    AFDCOM                595.64      .02    UNDELE
+RCPT To: <ken@930>
+Received:from 39.Tymnet by 930.Tymnet; Tue, 8 May 84 14:52:39 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Tue, 8 May 84 14:51:45 PST
+To: ken@930
+Subject: compliment
+
+I mean that I believe that its high rank indicates it is prefered.  Most
+of the people I know use it, and the ones that use VUE are planning on
+switching.  Considering that more programmer time is spent editing than
+anything else, using only 5% of the system is great for a full screen
+editor.  -Bill
+Received:from 897.Tymnet by 930.Tymnet; Wed, 9 May 84 23:41:11 PST
+Return-path: <WRS@897.Tymnet>
+From: <WRS@897.Tymnet>
+Date: Wed, 9 May 84 23:40:15 PST
+To: carl@930,ken@930,lois@930,wilkes@930
+Subject: TUMS working on 897
+
+TUMS seems to now be fully installed and operational on 897.
+-Bill
+Received:from 33.Tymnet by 930.Tymnet; Thu, 10 May 84 16:19:30 PST
+Return-path: <WRS@33.Tymnet>
+From: <WRS@33.Tymnet>
+Date: Thu, 10 May 84 16:19:40 PST
+To: wrs@39
+Cc: lois@930,carl@930,ken@930,wilkes@930
+Subject: TUMS now working on 33
+
+TUMS (Tymshare Unofficial Mail System) - the system that brought you
+this message is now working on 33.  -Bill
+From: <LOIS@930.Tymnet>
+Date: Wed, 16 May 84 11:22:59 PST
+To: carl,ken,wrs
+Subject: format for error return line in YAMM
+
+The YAMM presently uses a nice variety of formats for the error return
+line in UUO's etc.  I'm not sure such a variety of formats is either
+helpful or advisable.  Therefore I am soliciting opinions as to the
+preferred form.  The present variety includes
+	  error return		; AC/ error code
+	 error return	<AC> := error code
+	  error return		; ac := error code
+	 error return	;  <ac> := error code
+	 error return	;AC contains <error code>
+	  error return	; c(<ac>) := error code
+	  error return		; ac/ error code
+
+All comments appreciated.
+-Lois
+From: <PARNES@930.Tymnet>
+Date: Thu, 17 May 84 15:28:40 PST
+To: ken
+Subject: testing
+
+just kidding.
+From: <KEN@930.Tymnet>
+Date: Thu, 17 May 84 15:48:32 PST
+To: parnes,grano,ken
+Subject: dump
+
+I've moved a copy of DUMP to both of your directories.  Please pardon the
+banner.
+
+/ken
+Received:from 39.Tymnet by 930.Tymnet; Mon, 21 May 84 8:59:47 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Sun, 20 May 84 23:09:17 PST
+To: ken@930
+Subject: Peak: [bad filespec]
+
+It would be wonderful if PEAK would allow the SAIL coct of
+octal file names as in:
+    (MAIL)'1231312450.MAI
+
+Among other things, this would make maintaining the mail system
+a bit easier.  -Bill
+
+[ Actually, I see no need to check the syntax of a filename,
+the monitor will do this for you and cause the LOOKUP or ENTER
+to fail.  Dave probably didn't think the monitor was qualified
+to decide. ]
+From: <CARL@930.Tymnet>
+Date: Wed, 23 May 84 13:40:13 PST
+To: wilkes@930,ken@930,lois@930,zonnie@930
+Subject: Center personnel list
+
+From our meeting yesterday in Fremont, Rick Daniels has sent a list
+of "key" center personnel from each of the data centers.  I put a
+"revised" version into INFO as a node named "CENTER" and put a copy
+of the list on everyone's desk here in Cupertino.
+
+/Carl
+Received:From EMSAA.Ontyme.Tymnet by 930.Tymnet; Wed, 23 May 84 22:03:37 UT
+From: TXS.L/LINDLEY@Ontyme.Tymnet
+Date: 23 MAY 84 14:47:17  
+To: K/DAWSON@Ontyme.Tymnet
+Message-id: <A54897@EMSAA.Ontyme.Tymnet>
+Subject: test
+
+SUBJ: test
+Here is a test for new mail.
+
+
+
+Received:From EMSAA.Ontyme.Tymnet by 930.Tymnet; Wed, 23 May 84 22:03:58 UT
+From: TXS.K/DAWSON@Ontyme.Tymnet
+Date: 23 MAY 84 14:50:00  
+To: K/DAWSON@Ontyme.Tymnet
+Message-id: <A54903@EMSAA.Ontyme.Tymnet>
+Subject: thi sis a test
+
+SUBJ: thi sis a test
+so there. type-os and all.
+
+
+From: <PARNES@930.Tymnet>
+Date: Wed, 23 May 84 15:15:50 PST
+To: ken
+Subject: xpptest
+
+Ken,
+I have a userid on system 33 (appsup) but when I try to do a gfd to
+xpptest the system deniess
+ me access.  I've requested (through
+validations) a couple of other ids on 33.  What kink 
+
+d of access
+rights do I need to enable me to gfd to xpptest?
+Lu
+Received:From EMSAA.Ontyme.Tymnet by 930.Tymnet; Thu, 24 May 84 15:05:28 UT
+From: INSD.L/PARNES@Ontyme.Tymnet
+Date: 24 MAY 84 08:01:15  
+To: K/DAWSON@Ontyme.Tymnet
+Message-id: <A55855@EMSAA.Ontyme.Tymnet>
+
+Dear Ken,
+ 
+It got to me!!!
+ 
+Lu
+
+From: <CARL@930.Tymnet>
+Date: Thu, 24 May 84 10:53:25 PST
+To: ken
+Subject: /set:SCMODE:(xexec)mexec
+
+Have you tried setting it up?  Does it work per your approval?
+From: <CARL@930.Tymnet>
+Date: Fri, 25 May 84 16:01:04 PST
+To: ken
+Subject: Hmmm.  SY<cr>
+
+I guess you got bit.  If it keeps happening, let me know.  Else, I'd
+say it just couldn't expand the file, or 930 is having free-core problems.
+
+No real answers for you.  I tried it, and it works fine.  /Carl
+Received: from 897.Tymnet by 930.Tymnet; Fri, 25 May 84 17:39:21 PST
+Return-path: <CARL@897.Tymnet>
+From: <CARL@897.Tymnet>
+Date: Fri, 25 May 84 17:39:10 PST
+To: ken@930
+Subject: SY -- / -- MEXEC.SAV
+
+The problem was in MEXEC.SAV.  I copied over the one from 930
+and now it seems to work fine. /Carl
+From: <KEN@930.Tymnet>
+Date: Wed, 30 May 84 12:44:01 PST
+To: oliveb!tolerant!dws@tymix
+Cc: ken
+Subject: mail to ntd vax
+
+   Hi Dave,
+
+   Now in theory, this mail will get to you at tolerant, and you will
+   be able to rely via the path which calls itself
+
+       oliveb!tymix!ken%930.Tymnet
+
+   To send mail to wrs, use the following path:
+
+       oliveb!tymix!wrs
+
+   Let me know if you receive this.  Let me know if you don't.
+
+   /ken
+From: <KEN@930.Tymnet>
+Date: Wed, 30 May 84 13:08:38 PST
+To: ken
+Subject: peak bug in [Fill Paragraph]
+
+   You will note that if the paragraph in question is only one line
+   long, [Fill Paragraph] seems to advance the crown from its current
+   location by the size of the Left Margin.  Successive applications
+   worsen the situation.
+
+   /ken
+From: <KEN@930.Tymnet>
+Date: Wed, 30 May 84 15:18:58 PST
+To: ths.j/mosser@ontyme
+Cc: ken
+Subject: lisp in the new world
+
+    Jon,
+
+    For the record, the fruits of my search for lisp for Tops-20 can
+    be found on the first reel of the decus TOPS-20-LIBRARY, a copy of
+    which Virgil Champlin (of DBSD) has in his office.  The savesets
+    of interest are the following:
+
+        <DECUS.20-0004>                 ; InterLisp
+        <DECUS.20-0015>                 ; Lisp 1.6
+        <DECUS.20-0016>                 ; MLisp
+
+    The file MD:<DBSD.VIRGIL>20-LIBRARY-DISTRIBUTION-NOTES.MEM on
+    system :94 in Fremont has some somewhat brief but nonetheless
+    informative things to say about these products and their
+    worthiness of trust.
+
+    I have no readymade sources for lisp to test the functionality of
+    these products, but Zonnie (or even Jon Goerke) may be of help
+    there.
+
+    :148 has been unavailible these past weeks, and therfore nothing
+    has been done to insure the residency of the any of these on this
+    26KL host.
+
+    Just so you know.
+
+    /ken
+From: <KEN@930.Tymnet>
+Date: Wed, 30 May 84 15:58:19 PST
+To: wrs@39
+Cc: ken
+Subject: emsee@ontyme mail
+
+    Bill,
+
+    It seems that (Mail)Ontyme wants to turn all ontyme-routed mail
+    into
+
+        xxx.y/zzzz@emstxs.ontyme
+
+    even when it is already expanded by the user to
+
+        xxx.y/zzzz@emsee.ontyme
+
+    It seems that Jon Mosser, ersatz manager, has the hapless and
+    solitary id of
+
+        ths.j/mosser@emsee
+
+    and I can't get mail to him. Am I missing something?
+
+    /ken
+~
+Received: from 39.Tymnet by 930.Tymnet; Wed, 30 May 84 23:07:03 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Wed, 30 May 84 23:08:23 PST
+To: ken@930
+Subject: inter-ontyme
+
+Well, if you haven't gotten Eileen's message (5 pages), let me know
+and I'll TUMS you a copy.  Otherwise, it works like this...
+    The list of addresses in (MAIL)ONTYME.DAT in the last column is
+used to decide who you are.  The FROM: field is used for this.  If
+there is no match, it will search all the way to the top (it searches
+bottom up) to TUMS.GATEWAY and use that.  At any rate, when it finds
+an entry that matches, it logs in to the appropriate ONTYME switch
+(after all, you have to use the one you are valid on) and sends the
+message.  If you use <name@EMSEE.Ontyme.Tymnet>, it will try to find
+an entry for that host, but in the case of EMSEE, there aren't any.
+    The long and short of it is that you should use the method
+described in Eileen's memo until the real thing gets implemented.
+-Bill
+
+PS if they take too long to do it, I'll provide the EMSAA program
+with a list of accounts so it can do the right thing
+From: <KEN@930.Tymnet>
+Date: Thu, 31 May 84 0:11:22 PST
+To: wrs@39
+Cc: ken
+Subject: loops concealed from view
+
+    I thought I killed them all; I thought that finally I'd managed to
+    squash every stinking little one of the unsavory vermin.  Yet
+    somehow, like worms on the network, or athletes foot, or
+    crabgrass, despite gallons of very intelligent and very costly
+    pesticide, they seemed to keep marching out into my life in a
+    neatly arranged, evenly spaced single file line, exactly an hour
+    apart, each a near perfect clone of its predecessor.
+
+    I speak of none other than the polite reply letters that
+    (MAIL)ONTYME sends hourly in the event that the person that I
+    addressed in my original message does not exist.  I speak of the
+    ordeal one goes through trying to insure that a past indiscretion
+    is not punished into perpituity.
+
+    I finally deleted (MAIL)ONTYME.Q, and I hope for :930's sake that
+    this will at last be the end of it (there is, after all, only so
+    much disk space availible).  Do you think it might be appropriate
+    for (MAIL)ONTYME a to maybe push the offending message out of the
+    way until the problem with the address can be fixed?  What happens
+    if only one address in a list provided to To:  or Cc:  has a
+    problem?  Is the message re-sent to everyone hourly?  Was this
+    what I saw on your TTY in your office?  Or was that another
+    problem?
+
+    Forgive my tone; I am not angry, just overwhelmed.
+
+    As for the rest (your reply to my previous question), I'll try to
+    understand it in the morning.
+
+    Thanks,
+
+    /ken
+Received: from 39.Tymnet by 930.Tymnet; Thu, 31 May 84 0:34:29 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Thu, 31 May 84 0:35:47 PST
+To: ken@930
+Subject: loops and such
+
+Ooops, there are little problems like that that still need working out.
+Remember what the U in TUMS stands for (unofficial).  Anyway, I'm working
+on it.  Basically, the logic necessary to discern between a failure that
+requires the message to be requeued and tried again later, verses a failure
+that requires returning the unsent message to the sender is obscure at
+best and certainly heuristic.  None the less, there was never any intent
+to both requeue the message AND return it to sender (my, my).
+
+As for the unfortunates who were valid recipients of the message you sent,
+they probably received an equal number of copies.  I suggest you log in
+to ONTYME by hand, check your out list
+    :OUT OLD
+and if they haven't been read, cancel them with
+    :CANCEL message-number
+(sigh)
+
+If you find this amusing, you may also wish to consider the situation
+that arose last week when a bug...
+
+    AuxOut( ":SEND" );
+    while Queue!Not!Empty do begin
+	AuxOut( " "& Top!Of!Queue );
+	Sent!To := Sent!To & Top!Of!Queue;
+    end;
+
+caused roughly 64000 copies of one particular message to get sent to
+Bill Euske.  It only stopped there because the string Sent!To finally
+took over the world and the string garbage collector saw fit to put
+an end to its life.  (upon careful inspection, you'll notice I cleverly
+neglected to "lop" off the top of the queue so it would just loop
+forever sending to the first name on the list)
+Fortunately, Ontyme has its bugs, too, and it ignored most of the line
+because it was too long.
+
+-Bill
+From: <WRS@930.Tymnet>
+Date: Thu, 31 May 84 0:40:50 PST
+To: ken
+Subject: your message
+
+It doesn't appear to have been sent to anyone else, but then
+its not clear.  The problem was that it never got a valid
+response after the :SEND command.  It returned it to sender because
+it couldn't deliver it to the one address.  It requeud it because
+it got a timeout waiting for some reply.  -Bill
+(fixing...)
+From: <CARL@930.Tymnet>
+Date: Thu, 31 May 84 0:50:12 PST
+To: Lois,Ken,Wilkes
+Subject: My arrival
+
+I expect to be at the office sometime around 1PM.  If I happen to
+NOT stop to get my hair cut, maybe earlier... it depends on how late
+it looks.  Sigh a'nara!
+Received: from 39.Tymnet by 930.Tymnet; Thu, 31 May 84 0:57:57 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Thu, 31 May 84 0:59:18 PST
+To: ken@930
+Subject: ontyme loops
+
+Okay, a small oversight in the code.  It now sees
+  NO VALID RECIPIENTS
+and stops looking for 
+   MSG # xxxxxx SENT xx-xxx-xx xx:xx:xx
+which is what it was looking for when it timed out.
+You see, trying to decide when the system has accepted your
+command and is done processing it (that is, when the output
+of one command ends and the next begins) you must have ESP.
+Because: 
+    Ontyme doesn't echo commands
+    There is no prompt
+    There is no uniform message sent when a command is done
+    Ontyme eats yellow balls for breakfast and never spits out orange ones
+        ...
+    etc.
+
+(don't mind me, I just need someone to complain to)  -Bill
+
+ANYWAY - it should be fixed now!
+Received: from 39.Tymnet by 930.Tymnet; Thu, 31 May 84 4:58:25 PST
+Received: from tymix.UUCP by 39.Tymnet; Thu, 31 May 84 4:59:35 PDT
+Received: by tymix.UUCP (4.12/4.7) id AA07712; Thu, 31 May 84 04:59:18 pdt
+Received: from bach.ARPA by handel.ARPA (4.12/3.14) id AA00509; Thu, 31 May 84 04:02:05 pdt
+Received: by bach.ARPA (4.12/3.14) id AA11980; Wed, 30 May 84 14:55:46 pdt
+Return-path: <oliveb!tolerant!dws@bach>
+From: tolerant!dws@bach (Dave W. Smith)
+Date: Wed, 30 May 84 14:55:46 pdt
+To: oliveb!tymix!ken%930.Tymnet@handel
+Message-id: <8405302155.AA11980@bach.ARPA>
+Subject: Re: mail to ntd vax
+
+Loud and clear!  -DWS
+
+From: <KEN@930.Tymnet>
+Date: Thu, 31 May 84 11:07:56 PST
+To: carl
+Cc: ken
+Subject: cra0###.sav on :39
+
+    Carl,
+
+    It seems that :39 is quite low on disk space right now (5000 pages
+    approximately), and there are about 4000 pages of crash files on (sys)
+    dating back to april that lois says you might be interested in.
+
+    /ken
+From: <CARL@930.Tymnet>
+Date: Mon, 4 Jun 84 15:32:18 PST
+To: lois,wilkes,wrs@39,carl,ken,zonnie
+Subject: HOTLINE.LOG; On-line log of hot-line calls
+
+As per a suggestion by LOIS (and others) the file (M33:930)HOTLINE.LOG
+now contains a reverse-chronological log of HOTLINE calls, giving the
+approximate date and time of the call, who it was take by, who is to be
+contacted, system #, description of problem, solution if known, and the
+current status, i.e. PENDING, FIXED, HOLD, etc.
+
+The file is also an INFO node, for somewhat page-able access to recent
+problems.  Anyone taking a call should try to look at the file and update
+it where applicable.  This should help to keep down the incidence of
+multiple people working on the same problem without knowing what has been
+done already.  (The info node is "HOTLINE" under node "SUPPORT").
+
+/Carl
+From: <KEN@930.Tymnet>
+Date: Mon, 4 Jun 84 16:03:49 PST
+To: sppoper
+Cc: ken
+Subject: transfer to NTD
+
+                                                            Ken Dawson
+                                                            6.4.84
+
+    Jon Mosser,
+    Manager, Applications and Languages Unit (ALU)
+    36-bit stuff dept
+    etc
+    Tymshare
+
+    Jon,
+
+    Effective June 11th, 1984, I will be working for Michael Stimac,
+    Manager of the Network Tools Unit of the Network Technology
+    Division of Tymshare, providing support for the runtime package of
+    the Concurrent Pascal cross compiler for Tymnet Engines.  I feel
+    this is best, as this represents a major career change for me, and
+    brings me closer to my beloved languages.
+
+    Yours,
+
+    Ken Dawson
+
+
+From: <KEN@930.Tymnet>
+Date: Tue, 5 Jun 84 7:25:10 PST
+To: sppoper
+Cc: ken
+Subject: lisp in the new world
+
+    Jon,
+
+    For the record, the fruits of my search for lisp for Tops-20 can
+    be found on the first reel of the decus TOPS-20-LIBRARY, a copy of
+    which Virgil Champlin (of DBSD) has in his office.  The savesets
+    of interest are the following:
+
+        <DECUS.20-0004>                 ; InterLisp
+        <DECUS.20-0015>                 ; Lisp 1.6
+        <DECUS.20-0016>                 ; MLisp
+
+    The file MD:<DBSD.VIRGIL>20-LIBRARY-DISTRIBUTION-NOTES.MEM on
+    system :94 in Fremont has some somewhat brief but nonetheless
+    informative things to say about these products and their
+    worthiness of trust.
+
+    I have no readymade sources for lisp to test the functionality of
+    these products, but Zonnie (or even Jon Goerke) may be of help
+    there.
+
+    :148 has been unavailible these past weeks, and therfore nothing
+    has been done to insure the residency of the any of these on this
+    26KL host.
+
+    Just so you know.
+
+    /ken
+
+From: <KEN@930.Tymnet>
+Date: Wed, 6 Jun 84 15:31:53 PST
+To: carl
+Cc: ken
+Subject: fiche
+
+try (peak.bak)*.fsh
+From: <KEN@930.Tymnet>
+Date: Thu, 7 Jun 84 11:11:52 PST
+To: carl
+Cc: ken
+Subject: brain damage
+
+    Am I hallucinating?  I could have sworn that last night I had a
+    bunch of fiche files in (peak.bak).  Today, they are gone.  Did
+    you suck them away onto a tape?  Did FICHE the program never work?
+    Did I delete them?
+
+    /ken
+
+From: <CARL@930.Tymnet>
+Date: Thu, 7 Jun 84 11:15:34 PST
+To: ken
+Subject: I thought you were starting on the Champagne at 10:30 ???
+
+Real Subject: brain damage
+
+No, you're not hallucinating!  You did have a bunch of files on (peak.bak).
+They were sucked away to tape.  Remember, this was a test, and you did say
+that these weren't necessarily the finished version.
+
+FICHE worked.  I deleted them after I wrote them to tape.  If you really
+want them back, when we get the tape back, I'll restore them.  /Carl
+
+See you at lunch.... save me a seat.  /Carl
+From: <KEN@930.Tymnet>
+Date: Fri, 8 Jun 84 11:22:14 PST
+To: wrs@39
+Cc: ken
+Subject: terminals
+
+    I asked Virgil what terminal(s) he might recommend, and his reply
+    (voiced in unison with Ted Marshall) was VT220.  He showed me one,
+    and it seemed to be a Rainbow w/o the processor module (with maybe
+    a larger screen).  It has three varieties of communications
+    interface, setup commands availible in English (as opposed to
+    binary, as availible on the Rainbow), LA50 supported as the slave
+    printer (including single line print capability), and an on/off
+    switch.
+
+    Have you seen one?  What do you think of it?
+
+    /ken
+From: <KEN@930.Tymnet>
+Date: Fri, 8 Jun 84 15:08:28 PST
+To: wrs@39
+Cc: ken
+Subject: sendma and loss of line identity
+
+    When 554 hiccoughs and we are exercising our right to ~v, even
+    though the SENDMA frame is detached, in TI mode, and relatively
+    happy, the PEAK frame is gone, and unless there is a checkpoint
+    file, so is the text of the message.  Is there some quality which
+    the child is missing which might allow it to persist so that I
+    might attach back to my edit on reestablishing my host connection?
+
+    /ken
+Received: from 39.Tymnet by 930.Tymnet; Fri, 8 Jun 84 15:19:11 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Fri, 8 Jun 84 15:19:10 PST
+To: ken@930
+Subject: PEAK under SENDMAIL
+
+Sendmail uses Carl's FRMRUN.  I thus refer the problem to him.
+Actually, I suppose PEAK ought to enable for NTQ and ZAP and force
+a checkpoint.  Note that in order to get ZAP on the command port,
+you must set your mode to CONTINUE RUNNING ON DISCONNECT with SETPRV.
+It would be polite to remember the previous setting and it restore it
+on exit from the program.  -Bill
+From: <CARL@930.Tymnet>
+Date: Fri, 8 Jun 84 16:52:23 PST
+To: ken
+Subject: SAT files.
+
+They disappear generally in the first few weeks of a new month,
+i.e. the ones for one of the previous months.  Generally this is
+to insure that they exist on an all-files tape, although since we
+don't keep all-files for very long, this may or may not be useful.
+
+Lately, since we are not so short of space, I've been trying to
+keep the current quarter on-line.  The beginning of July should see
+the removal of APRIL,MAY and JUNE!
+
+If you need space, say so, and after I run my statistics program, I
+will discard the .SAT files.
+From: <CARL@930.Tymnet>
+Date: Mon, 4 Jun 84 15:32:18 PST
+To: lois,wilkes,wrs@39,carl,ken,zonnie
+Subject: HOTLINE.LOG; On-line log of hot-line calls
+
+As per a suggestion by LOIS (and others) the file (M33:930)HOTLINE.LOG
+now contains a reverse-chronological log of HOTLINE calls, giving the
+approximate date and time of the call, who it was take by, who is to be
+contacted, system #, description of problem, solution if known, and the
+current status, i.e. PENDING, FIXED, HOLD, etc.
+
+The file is also an INFO node, for somewhat page-able access to recent
+problems.  Anyone taking a call should try to look at the file and update
+it where applicable.  This should help to keep down the incidence of
+multiple people working on the same problem without knowing what has been
+done already.  (The info node is "HOTLINE" under node "SUPPORT").
+
+/Carl
+From: <KEN@930.Tymnet>
+Date: Wed, 13 Jun 84 7:23:17 PST
+To: carl,lois
+Cc: ken
+Subject: FYI
+
+    554 was halted (ie, with run light off) when I came in today.  I
+    reloaded it, but thought you'd like to know.  Incidentally, it
+    would be a nice idea to replace the 554 console with something
+    (anything!)  whose scribblings we can understand.
+
+    /ken
+Received: from 39.Tymnet by 930.Tymnet; Wed, 13 Jun 84 14:25:26 PST
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Wed, 13 Jun 84 14:24:57 PST
+To: carl@930
+Cc: ken@930
+Subject: pcom and license passing on :39
+
+    Carl,
+
+    Is it a feature of PCOM or the monitor that license passing does
+    not work on :39?  The only way I can get my tiny little child
+    frame to do grownup things is to explicitly set license in the CTL
+    file.  Naturally, this can be accomplished through watertight and
+    surrepetitious means, so that the security of life an large is not
+    jeopardized, but the discrepency with :930's behaviour is worth
+    noting.
+
+    While we're on the subject, why is it that when I say "init<cr>"
+    on :930 it runs my Init File (ala noname), but on :39 is just says
+    EXIT?
+
+    /ken
+
+    PS, it's weird being here (@39) and sending mail there (@930)!
+From: <LOIS@930.Tymnet>
+Date: Thu, 14 Jun 84 15:10:21 PST
+To: ken
+Subject: Find V23
+
+Ken:
+I discovered that Bill's find does do somethings differently.  Major 
+difference appears to be a case match match rather than case independent.
+Also no double spacing (which is a plus).  First is rather a minus for
+me as I hate worrying about case.
+-Lois
+Received: from 39.Tymnet by 930.Tymnet; Fri, 15 Jun 84 23:08:10 PST
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Fri, 15 Jun 84 23:07:36 PST
+To: ken@39,ken@930,ken@tymix
+Subject: WARP (for PEAK) is here
+
+The file (SAILIB)WARP.DOC is on 39 and 930.  It describes the routine
+WARP, and the program WARPLD.  This is the code I spoke of for PEAK to
+cut down on the initialization delay and increase sharability.  The file
+is included below for reference.
+
+-Bill
+
+
+(SAILIB)WARP.REQ					(SAILIB)WARP.REQ
+
+    Summary:
+	Generate execution checkpoint file for later execution.
+
+    Usage:
+	string filename;
+	WARP( filename );
+
+    Description:
+	Call WARP to create a file that may be loaded and executed by WARPLD.
+	Should be called immediately following initialization.  Restrictions:
+	no files or interrupts may be open, no instantiation dependent code
+	should precede the call to WARP.  Also, no shared or non-private pages
+	may exist in the low segment.  Only one file may be mapped in the high
+	segment.
+
+    Files:
+	(SAILIB)WARP.SAI	- source for WARP library
+	(SAILIB)WARP.DCL	- declaration file
+	(SAILIB)WARP.REQ	- require file
+	(SAILIB)WARP.REL	- object library
+	(SAILIB)WARPLD.MAC	- source for WARP loader
+	(SAILIB)WARPLD.SAV	- WARP loader executable file
+	(SAILIB)WARPT.SAI	- source code for test/example program
+	(SAILIB)WARPT.CTL	- control file for test/example program
+From: <KEN@930.Tymnet>
+Date: Tue, 19 Jun 84 8:38:53 PST
+To: carl
+Cc: ken,lois
+Subject: Usernames, UFDs, et al
+
+    Carl,
+
+    I have noticed that when I do a DUSAGE on :930, sorting by
+    username, that (OSMAN) produces two entries.  Might you know why?
+
+    Also, The same DUSAGE report shows a name (DALE), with 2 pages
+    created since yesterday, where the monitor claims there is no such
+    username.
+
+    Who's confused?
+
+    /ken
+From: <KEN@930.Tymnet>
+Date: Tue, 19 Jun 84 9:01:53 PST
+To: carl
+Cc: ken,lois
+Subject: (sys:897)
+
+    Blech!!!!!  What a nightmare!!!!  I suppose it doesn't matter that
+    almost anything you can name on (sys:897) has a create date
+    shortly after the Big Bang itself?
+
+    yours in perpetuity,
+
+    /ken
+From: <LOIS@930.Tymnet>
+Date: Tue, 19 Jun 84 10:17:24 PST
+To: ken
+Subject: DUSAGE, 897 and 930
+
+Ken:
+Well, all the files have default dates on SYS on 897 due to the way Dave
+Sutton restored SYS last time around (he obviously did not bother to set
+a correct date and time, or some such thing).
+
+It is unreasonable to expect DUSAGE to be accurate on 930 since DUSAGE
+reads the DUL, and the DUL on 930 has many, many usernames that are not
+in the LUD.  Also, since we blit
+hely create and delete usernames, it is
+not surprising to find oddities.
+-Lois
+From: <LOIS@930.Tymnet>
+Date: Tue, 19 Jun 84 10:19:36 PST
+To: carl,ken
+Subject: OSMAN on 930
+
+To Carl and Ken:
+There are two OSMAN's as Carl has moved OSMAN to GAN 3, and, it seems left
+the old OSMAN in the DUL.  Carl, there should be some way we can clean up
+930's DUL and get rid of all the extra names.  Good OSMAN project?  It will
+teach him about the structures of the LUD and DUL, etc.
+-Lois
+From: <LOIS@930.Tymnet>
+Date: Tue, 19 Jun 84 10:21:36 PST
+To: ken
+Subject: Your things
+
+Ken:
+Osman did move the location of your coin collection, so if you come over to
+pick it up, look around.  He is waiting for you to complete moving out all
+your things before he begins rearranging, so would appreciate a final move
+out as soon as is convenient.
+
+Also, I will send over a card for Chia's birthday on Thursday.  Would you\
+please give same to her for me, and wish her a happy birthday for me also.
+Thank you.
+-Lois
+From: <LOIS@930.Tymnet>
+Date: Tue, 19 Jun 84 16:01:32 PST
+To: ken
+Subject: PEAK Tutorial
+
+Ken:
+The present PEAK tutorial says to send mail to LOIS on 33 with comments.
+Under the circumstances that seems unwise.  I want to transmit a new tutorial
+with either a new username to send mail to or without that section entirely,
+ending with logging out. 
+
+Suggestions?  Comments?
+-Lois
+From: <KEN@930.Tymnet>
+Date: Tue, 19 Jun 84 16:24:50 PST
+To: lois
+Cc: ken
+Subject: Peak tutorial
+
+    It seems to me that once TUMS/InterOntyme, and other pies in the
+    collective sky are in place, we should establish a canonical help
+    mail drop (perhaps on Ontyme?).  It seems that once, in Camelot,
+    we had one, and we even occasionally looked at it.  I hesitate to
+    say that Peak problems constitute the National Emergency that -
+    say - DSKCLN getting hungry one rainy night and going on a rampage
+    might pose, but at the same time, asking the Folks At Home to send
+    their cards and letters to the Dead Letter Office is also a bit
+    rude.
+
+    /ken
+From: <LOIS@930.Tymnet>
+Date: Tue, 19 Jun 84 16:39:34 PST
+To: ken
+Subject: PEAK and file size
+
+Ken:
+What is the largest file PEAK can edit?
+-Lois
+P.S.  I miss having you next door.
+From: <LOIS@930.Tymnet>
+Date: Wed, 20 Jun 84 13:54:34 PST
+To: Ken,Carl
+Subject: DALE & DUSAGE
+
+To Ken and Carl:
+Another mystery solved.  DALE is in the DUL, PPN 7,257.  Someone recently
+created a directory TESTING on 930, PPN 257,257.  DUSAGE must just check
+the UUN for its match in the UFD (or some such--I'm not going to check the
+code).  Another instance of "don't-expect-sense-from-930", but it is
+always nice to have mysteries solved.
+-Lois
+From: <LOIS@930.Tymnet>
+Date: Wed, 20 Jun 84 14:44:59 PST
+To: ken
+Subject: Your mail stop
+
+Would you rather get mail on 39?
+-Lois
+From: <KEN@930.Tymnet>
+Date: Thu, 21 Jun 84 8:02:38 PST
+To: carl,lois
+Cc: ken
+Subject: new half-user?
+
+    There are a bunch of files in (OSNF), and one in (LOIS) authored
+    by [3,700777].  This fact, and a subsequent looksee with NONAME
+    reveals that this PPN is not in the DUL.  Who might it be?
+
+    /ken
+From: <LOIS@930.Tymnet>
+Date: Thu, 21 Jun 84 9:28:33 PST
+To: ken
+Subject: 3,700777
+
+Ken:
+That was OSMAN's interim PPN (Carl style).
+-Lois
+From: <LOIS@930.Tymnet>
+Date: Thu, 21 Jun 84 12:44:38 PST
+To: ken
+Subject: paycheck
+
+Shall I just send your paycheck by interoffice mail?
+-Lois
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Mon, 25 Jun 84 17:04:55 UT
+From: TXS.K/DAWSON@Ontyme.Tymnet
+Date: 25 JUN 84 09:43:44  
+To: TXS.PEAK@Ontyme.Tymnet
+Subject: ha ha ha
+
+From: <KEN@930.Tymnet>
+Date: Mon, 25 Jun 84 9:43:44 PST
+To: txs.peak@ontyme
+Subject: ha ha ha
+
+so there
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Mon, 25 Jun 84 21:05:49 UT
+From: TUMS.GATEWAY@Ontyme.Tymnet
+Date: 25 JUN 84 13:54:36  
+To: TXS.PEAK@Ontyme.Tymnet
+Subject: Open Backup Files
+
+From: <KEN@39.Tymnet>
+Date: Mon, 25 Jun 84 13:53:52 PST
+To: txs.peak@ontyme
+Subject: Open Backup Files
+
+    Does ^X^W close the backup file it creates for the edited file?  I
+    seem to notice a lot of .BAK files open on
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Mon, 25 Jun 84 22:08:20 UT
+From: TUMS.GATEWAY@Ontyme.Tymnet
+Date: 25 JUN 84 14:27:42  
+To: TXS.PEAK@Ontyme.Tymnet
+Subject: More on Backup Files.
+
+From: <KEN@39.Tymnet>
+Date: Mon, 25 Jun 84 14:27:05 PST
+To: txs.peak@ontyme
+Subject: More on Backup Files.
+
+    A test reveals that when a file is written using ^X^W, even if it
+    did not exist before, the .BAK file is indiated as open. This is
+Received: from 39.Tymnet by 930.Tymnet; Tue, 26 Jun 84 8:00:49 PDT
+Received: from tymix.UUCP by 39.Tymnet; Tue, 26 Jun 84 4:03:08 PDT
+Received: by tymix.UUCP (4.12/4.7) id AA15985; Tue, 26 Jun 84 04:02:40 pdt
+Received: from bach.ARPA by handel.ARPA (4.12/3.14) id AA19807; Mon, 25 Jun 84 17:32:46 pdt
+Received: by bach.ARPA (4.12/3.14) id AA20206; Mon, 25 Jun 84 17:31:39 pdt
+Return-path: <olivey!tolerant!dws@bach>
+From: tolerant!dws@bach (Dave W. Smith)
+Date: Mon, 25 Jun 84 17:31:39 pdt
+To: oliveb!tymix!KEN%930.Tymnet@handel
+Message-id: <8406260031.AA20206@bach.ARPA>
+Subject: department of interesting statistics
+
+I thought of an interesting statistic that you're in a position
+to gather (if you still have access to Peak now that you're at
+NTD (congrats)).  The average number of characters (from the
+buffer) that are involved in a redisplay.  I.e.  how dense is
+the information on the display?  I'm guessing about 80% for text,
+and maybe 30-40% for programs.
+
+If you're curious ...
+
+Dave
+
+From: <LOIS@930.Tymnet>
+Date: Mon, 25 Jun 84 9:48:57 PST
+To: Ken
+Subject: PEAK & ^W
+
+Ken:
+Got bit by the ^W, Proceed, ^K, Abort bug again, and this time it left me
+with a garbaged file.  File was my mail file, now is mlprb on (lois:930)
+if you care to look.  Thought that got fixed.
+
+Of course, I know you want PEAK bugs....
+
+I do have the peak.tut transmittal ready to go (needs someone's signature).
+-Lois
+From: <TSUCOOP@930.Tymnet>
+Date: Wed, 27 Jun 84 14:45:07 PST
+To: ken@930
+Subject: inventory
+
+Dear Ken,
+     I am doing the equipment inventory report for our section.  I need
+the serial numbers from the DEC equipment which you have at home. Please
+advise.
+                                   Regards,
+                                   Bill Mortensen (tsucoop)
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Fri, 29 Jun 84 19:04:46 UT
+From: TUMS.GATEWAY@Ontyme.Tymnet
+Date: 29 JUN 84 11:10:29  
+To: TXS.PEAK@Ontyme.Tymnet
+Subject: Warped Peak
+
+From: <KEN@39.Tymnet>
+Date: Fri, 29 Jun 84 11:09:03 PST
+To: wrs
+Cc: txs.peak@ontyme
+Subject: Warped Peak
+
+    Peak V2.0(303) on systems :930 and :39 now leads a warped existence.
+    It seems to run, but the results are not as overwhelming as I had
+    expected.
+
+    We should talk about TI mode vs SL mode. I'm going to Lois's lunch
+    at Houlihan's, so we can talk after that.
+
+    /ken
+From: <SPPOPER@930.Tymnet>
+Date: Mon, 2 Jul 84 9:46:13 PST
+To: ken
+Subject: call me
+
+ken please call jon mosser at ex 2490..
+Received: from 39.Tymnet by 930.Tymnet; Tue, 3 Jul 84 15:34:09 PDT
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Tue, 3 Jul 84 15:33:48 PDT
+To: ken
+Subject: hello
+
+hi
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Tue, 3 Jul 84 15:37:41 PDT
+From: NTD.K/DAWSON@Ontyme.Tymnet
+Date: 03 JUL 84 15:36:17  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I83693@EMSNTD.Ontyme.Tymnet
+
+From: <KEN@930.Tymnet>
+Date: Tue
+
+
+
+
+
+
+
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Wed, 4 Jul 84 1:01:31 UT
+From: NTD.H/KANNER@Ontyme.Tymnet
+Date: 03 JUL 84 17:02:23  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I83774@EMSNTD.Ontyme.Tymnet
+
+Let me know if you get this--Herb Kanner
+
+
+
+
+
+
+
+
+From: <KEN@930.Tymnet>
+Date: Thu, 5 Jul 84 7:28:14 PDT
+To: ntd.h/kanner@ontyme
+Cc: ken
+Subject: Reply
+
+Yes, I did get it.
+/ken
+From: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 12:28:03 PDT
+To: ken
+Subject: Fiche!
+
+How would you like the masters and one set of fiche for PEAK?
+I'll be in my office in about an hour, give me a call then. /Carl
+From: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 17:48:54 PDT
+To: ken
+Cc: carl
+Subject: *********** HEY ************
+
+Hey!!! What's this  *** PEAK *** bug that I just found!!!!!!!!!
+
+Meta-X Set Append Kill<esc>
+
+Only sets append for KILLs???
+What about for Wipes (^W) and Copys (Meta ^W) ???????
+
+I didn't check Wipes, but I tried using it for Copies, and spent
+about 20 minutes going through a source to pull out sections of
+text with "Set mark, Position cursor, Set Append Kill, Copy Text"
+again and again.  To my AWFUL surprise, I only got the last 2 lines
+of my COPY (the last one was 2 lines long)!!!!  AAAAARRRRRGGGGHHHHH!!!!!
+
+   AAAAAAAAA       RRRRRRRRRRRR          GGGGGGGGGGGG    HHH         HHH
+   AAAAAAAAA       RRRRRRRRRRRR          GGGGGGGGGGGG    HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRRRRRRRRRRR       GGG                HHHHHHHHHHHHHHH
+AAA         AAA    RRRRRRRRRRRR       GGG                HHHHHHHHHHHHHHH
+AAAAAAAAAAAAAAA    RRR   RRR          GGG   GGGGGGGGG    HHH         HHH
+AAAAAAAAAAAAAAA    RRR   RRR          GGG   GGGGGGGGG    HHH         HHH
+AAA         AAA    RRR      RRR       GGG         GGG    HHH         HHH
+AAA         AAA    RRR      RRR       GGG         GGG    HHH         HHH
+AAA         AAA    RRR         RRRFrom: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 17:48:54 PDT
+To: ken
+Cc: carl
+Subject: *********** HEY ************
+
+Hey!!! What's this  *** PEAK *** bug that I just found!!!!!!!!!
+
+Meta-X Set Append Kill<esc>
+
+Only sets append for KILLs???
+What about for Wipes (^W) and Copys (Meta ^W) ???????
+
+I didn't check Wipes, but I tried using it for Copies, and spent
+about 20 minutes going through a source to pull out sections of
+text with "Set mark, Position cursor, Set Append Kill, Copy Text"
+again and again.  To my AWFUL surprise, I only got the last 2 lines
+of my COPY (the last one was 2 lines long)!!!!  AAAAARRRRRGGGGHHHHH!!!!!
+
+   AAAAAAAAA       RRRRRRRRRRRR          GGGGGGGGGGGG    HHH         HHH
+   AAAAAAAAA       RRRRRRRRRRRR          GGGGGGGGGGGG    HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRR         RRR    GGG                HHH         HHH
+AAA         AAA    RRRRRRRRRRRR       GGG                HHHHHHHHHHHHHHH
+AAA         AAA    RRRRRRRRRRRR       GGG                HHHHHHHHHHHHHHH
+AAAAAAAAAAAAAAA    RRR   RRR          GGG   GGGGGGGGG    HHH         HHH
+AAAAAAAAAAAAAAA    RRR   RRR          GGG   GGGGGGGGG    HHH         HHH
+AAA         AAA    RRR      RRR       GGG         GGG    HHH         HHH
+AAA         AAA    RRR      RRR       GGG         GGG    HHH         HHH
+AAA         AAA    RRR         RRR       GGGGGGGGG       HHH         HHH
+AAA         AAA    RRR         RRR       GGGGGGGGG       HHH         HHH
+
+-Carl
+From: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 21:24:44 PDT
+To: ken
+Subject: TXS.PEAK, TXS.K/DAWSON
+
+Bill has told me that space can be compacted by reducing the
+actual number of directories on ONTYME by using an alias.  I
+would like to know if you would like me to cancel either of
+TXS.PEAK or TXS.K/DAWSON, and/or make PEAK an alias of K/DAWSON?
+(I ask, since you're not really expecting much to be sent to
+ K/DAWSON under TXS, since you have NTD.K/Dawson, right?)
+/Carl
+From: <CARL@930.Tymnet>
+Date: Mon, 9 Jul 84 12:17:53 PDT
+To: ken
+Subject: Did you get my message about Fiche?  (for PEAK)
+
+From: <CARL@930.Tymnet>
+Date: Mon, 9 Jul 84 21:33:00 PDT
+To: ken,wrs@39
+Subject: Fiche %15.0
+
+New questions...			when new
+
+Title Format (type ? for help):		(new in %14)
+Global title:				(new in %14)
+Initial Fiche No.:			(very old - not new)
+Number fiche in top right (Y or N)?	(new in %15) [No means omit ##]
+Headers in TOP row (Y or N)?		(reasonably old)
+Override file titles (Y or N)?		(new in %14)
+Mode (type ? for help):			(reasonably old)
+
+I added the question to omit numbers in the titles at the top of the
+fiche.  It's not really been tested, but will be very soon, I hope.
+If you have another test, (NOT another PEAK) we can run it through as
+a final test, which may turn out as a production run if all goes well.
+
+/Carl
+From: <KEN@930.Tymnet>
+Date: Tue, 10 Jul 84 12:42:58 PDT
+To: ken
+Subject: (305)
+
+pull nopoll from command module to ded.def
+Received: from 39.Tymnet by 930.Tymnet; Wed, 11 Jul 84 10:42:51 PDT
+Return-path: <Postmaster>
+From: Postmaster
+Date: Wed, 11 Jul 84 10:25:25 PDT
+To: <KEN@39.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+RCPT To:<cken@930>
+<cken@930> invalid - not sending mail
+
+
+
+----------
+RCPT To: <cken@930>
+From: <KEN@39.Tymnet>
+Date: Wed, 11 Jul 84 10:25:05 PDT
+To: stimac@tymix
+Cc: c ken@930
+Subject: Home Terminal
+
+    Thanks a lot.  In talking to the one or two remaining indians over
+    at the TymcomX (36-bit) Group, I get the impression that I have
+    been made an example by nodes higher up the tree.  Other
+    transactions of this type in earlier times have succeeded on a
+    much friendlier plane.
+
+    I probably will not remit to them until I have something to plug
+    in at home.
+
+    /Ken
+Received: from 39.Tymnet by 930.Tymnet; Wed, 11 Jul 84 10:42:57 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Wed, 11 Jul 84 10:42:26 PDT
+To: stimac@tymix
+Cc: ken
+Subject: Indians in the Tymcom-X (36-bit) camp
+
+    Also in the process of speaking to the last remaining natives in
+    the 36-bit world, I heard some interest in moving over to NTD.  If
+    you're interested in hearing about the people invloved, let me
+    know.
+
+    /Ken
+Received: from 39.Tymnet by 930.Tymnet; Thu, 12 Jul 84 12:09:22 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Thu, 12 Jul 84 12:09:02 PDT
+To: carl@930,sppoper@930
+Cc: ken
+Subject: COEES Sail problem
+
+    Carl, Jon, whomever:
+
+    A fellow calling himself INSD.J/O'CONNELL ((201)981-2879) called
+    me from Newark New Jersey or some such place complaining that
+    COEES is having trouble recompiling their SAIL INIT programs on
+    :29, even though said programs reportedly compile fine on :36.  A
+    clue is that they use (FTSYS)SAIL.  My guess is they include some
+    horrible module which on :29 was not compiled under the same
+    version of the SAIL compiler as the one on :36.
+
+    I looked at the version of SAIL on both systems, and find no
+    discrepencies.  Since it's not my job to handle this kind of
+    stuff, I'll let you deal with it further.
+
+    /Ken
+From: <LOIS@930.Tymnet>
+Date: Thu, 12 Jul 84 21:23:24 PDT
+To: KEN,CARL
+Subject: HELLO
+
+To Ken and Carl:
+I now have a modem, and a card for the PC so that it works!  I notice that
+N was generated (and all the disk space gone).  Hope things are going well
+for all.  I miss PEAK, but am getting used to Final Word (after a brief,
+miserable time using the screen editor).
+-Lois
+From: <KEN@930.Tymnet>
+Date: Wed, 18 Jul 84 1:04:24 PDT
+To: wrs@39
+Cc: ken
+Subject: Timer-Checkpointing Peak V2.0(311)
+
+    Bill,
+
+    It works!  Let's hope that response improves at least noticably,
+    if not incredibly.
+
+    It seems that there were a few minor type-o's involved in my
+    transcription of the immediate interrupt routine.  This of course
+    paralysed the whole mechanism.  Once those were cleaned up, the
+    rest was history.
+
+    Although I'm not sure, it appears that the routine actually doing
+    the checkpoint - invoked either by the hand-made polling point at
+    the character input UUO or at the top of the command loop - MUST
+    be a nonsimple procedure.  Otherwise, it seems, the string stack
+    gets a bit lost and our [Checkpoint] message never appears.
+
+    A point of disk usage and aesthetics:  The current version will
+    cause a Checkpoint to occur every CheckpointInterval seconds as
+    long as the buffer continues to be modified.  The earlier version
+    of course would Checkpoint only after the keyboard had been idle
+    for that period of time.  Despite its generating higher disk
+    traffic, the former would seem the more reasonable interpretation.
+    I wonder if you can find a basis to disagree.
+
+    Anyway, what fun!  See you later.
+
+    /ken
+From: <KEN@930.Tymnet>
+Date: Wed, 18 Jul 84 1:18:26 PDT
+To: wrs@39
+Cc: ken
+Subject: ps
+
+    The new version is up on 897, 39 and 930.
+    /ken
+From: <LOIS@930.Tymnet>
+Date: Wed, 18 Jul 84 9:12:08 PDT
+To: ken
+Subject: Home terminals
+
+Ken:
+A little thought reveals that all of those who left the section, but
+stayed with Tymshare in the last three years, kept their home terminals.
+More or less in order, that is Scott, Bill, Tim (who just had a modem),
+Greg, Vivian, and Mike.  Rather than an unusual exception, you were the
+norm.  The only thing different about your case, is that you had a
+Rainbow.
+
+It was great seeing you yesterday.  Keep me up on your news.
+-Lois
+From: <KEN@930.Tymnet>
+Date: Wed, 18 Jul 84 10:28:34 PDT
+To: carl,tsucoop,osman
+Cc: ken
+Subject: New Peak
+
+    Yes, it's true!  The latest version of Peak, though lacking the
+    incredible WARPLD fast-start feature, does have timer-generated
+    checkpointing, and therefore spends the bulk of its time in TI
+    (rather than SL) state.  This should result in a greater rapport
+    with the Tymcom-X scheduler, making the Peak experience a bit
+    friskier in loaded situations.
+
+    Let me know if you notice any problems arising from this giant
+    leap in Technology.  Use SENDMA.
+
+    /ken
+From: <KEN@930.Tymnet>
+Date: Thu, 19 Jul 84 11:36:07 PDT
+To: carl
+Cc: ken
+Subject: Redisp & V2.0(313)
+
+    Carl,
+
+    Regretably, in accomplishing the last magic improvment to Peak
+    (Checkpointing by timer), I had to make the redisplay know things
+    about the command module that in other applications it has no
+    business knowing.  To wit:
+
+        o   external procedure C!DoChkPnt
+        o   external boolean   C!TimIntFlg
+
+    The unclean intelligence, fortunately, is confined to the routine
+    T!GetC, which gets the next character(s) from the terminal.  The
+    reason for its existence is that we must simulate a SAIL polling
+    point in order to perform a checkpoint while we are in terminal
+    input wait.  If you are curious about the mechanism, take a look
+    at T!GetC.
+
+    Sorry about the mess.
+
+    /ken
+From: <CARL@930.Tymnet>
+Date: Thu, 19 Jul 84 13:32:15 PDT
+To: ken,osman,wilkes,sppoper
+Subject: My schedule.
+
+Except for a brief trip to the office, I plan on working from home on
+the COEES TRU interrupt code.  If you need me for anything, call me
+at 415-961-1082.  I am working at home in order to decrease the number
+of interruptions so that I can finish the TRU stuff by tomorrow, and
+make sure it is properly tested.  /Carl
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Fri, 20 Jul 84 0:01:15 UT
+From: NTD.J/NEIDRAUER@Ontyme.Tymnet
+Date: 19 JUL 84 16:04:22  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I94489@EMSNTD.Ontyme.Tymnet
+Subject: Request for New Port I/O Operation in Pascal Nucleus
+
+From: <JMARCIN@39.Tymnet>
+Date: Thu, 19 Jul 84 16:00:51 PDT
+To: ntd.k/dawson@ontyme
+Subject: Request for New Port I/O Operation in Pascal Nucleus
+
+Re our conversation today, I am requesting that a new port I/O operation
+be added to the Pascal Nucleus - a Leave Deferred Echo Mode operation.
+I would like it to ONLY send a LDEM message out over the port, and NOT
+affect anything that the Nucleus does in terms of handling echo, deferred
+echo, etc.  I need this to handle echoing through X.25/X.75 gateways in
+the ELF program.
+
+The current Betatest version of ELF (3.08, released July 18, 1984),
+includes a patch to send a LDEM when a "B6" message is received.  A "B6"
+message indicates that an auxilliary circuit has successfully been built.
+I have included the patch here...if you have any questions, contact me...
+
+Thanks - Jill (Ext. 6330, jmarcin@39, ntd.j/neidrauer@ontyme)
+
+Note: The line feeds were removed from the following to make it more
+readable..."stuff to fit in patch" is needed to have the current B6
+code work...
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;; Patch to handle echoing properly thru X.25/X.75 gateways
+
+lo front
+b6msg+2e]j patch2	;use the end of the B6 message as a place to
+			; put the patch
+patch2]lb 0,length,2,	;stuff to
+sis 0,1			;  fit in
+jal 4,flush,,		;    patch
+lis 0,3			;size of message in bytes	
+lr 1,9			;port number
+lhi 2,ldmms
+
+
+
+
+
+
+
+From: <CARL@930.Tymnet>
+Date: Thu, 19 Jul 84 20:09:41 PDT
+To: fletcherc,osman,ken
+Subject: STOCK PLAN TERMINIATION INFO
+
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Fri, 20 Jul 84 0:04:22 UT
+From: FIN.SUP@Ontyme.Tymnet
+Date: 20 JUL 84 00:31:55  
+To: TXS.SUP@Ontyme.Tymnet
+Message-id: A94214@EMSTXS.Ontyme.Tymnet
+Subject: CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+DATE>      19 JUL 84  15:25
+
+TO>        ALL EMPLOYEE STOCK PURCHASE PLAN PARTICIPANTS
+
+COPIES>    
+
+FROM>      SUSAN WOO
+           PAYROLL DEPARTMENT
+
+
+SUBJECT>   CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+
+-----------------------------------------------------------------------
+
+
+THE DISTRIBUTION OF CHECKS TO PARTICIPANTS OF THE EMPLOYEE STOCK PURCHASE
+PLAN IS SCHEDULED TO OCCUR NEXT WEEK.  THEY WILL BE DISBURSED IN THE
+SAME MANNER AS PAYROLL CHECKS AND SHOULD ARRIVE ON FRIDAY JULY 27, 1984.
+THERE ARE A FEW ITEMS OF INTEREST I WOULD LIKE TO MAKE YOU AWARE OF:
+
+1. IF YOU WERE AN EMPLOYEE OF BOTH TYMSHARE AND TYMNET DURING THE PLAN
+   YEAR, YOU WILL RECEIVE TWO CHECKS EACH CALCULATED ON THE YEAR TO DATE
+   DEDUCTIONS FOR EACH COMPANY.
+
+2. THE ORDINARY INCOME PORTION OF YOUR STOCK CHECK WILL BE TAXED FOR
+   FEDERAL AND STATE INCOME TAX PURPOSES.  THE INCOME PORTION AND TAXES
+   WILL BE REFLECTED ON YOUR 1984 W2.
+
+3. THE AUTOMATIC DEPOSIT FUNCTION WILL NOT BE IN EFFECT DUE TO THE
+   SPECIAL HANDLING OF THE STOCK RUN.  THIS WILL NOT INTERFERE WITH
+   THE AUTOMATIC DEPOSIT OF YOUR REGULAR PAYROLL CHECK.
+
+IF THERE ARE ANY QUESTIONS IN THE MEANTIME, PLEASE GIVE ME A CALL.
+I CAN BE REACHED AT (408)446-6740  OR ONTYME    FIN.PAYROLL
+
+
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Tue, 24 Jul 84 0:01:01 UT
+From: SUP.MIKE@Ontyme.Tymnet
+Date: 23 JUL 84 16:16:32  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I96493@EMSNTD.Ontyme.Tymnet
+Subject: Office Changes
+
+                         M E M O R A N D U M
+
+DATE>      23 JUL 84  15:57                                 []T Y M S H A R E
+
+TO>        ALL NTD PERSONNEL
+
+COPIES>    
+
+FROM>      Mike Johnson
+
+
+SUBJECT>   Office Changes
+
+
+-----------------------------------------------------------------------
+
+
+
+
+
+If you have changed offices or phone numbers in the past couple of weeks,
+or do so in the future, please let me know so that I can update the
+NTD user directory.       Thanks, Mike Johnson
+
+
+
+
+
+
+
+
+From: <KEN@930.Tymnet>
+Date: Tue, 24 Jul 84 10:48:40 PDT
+To: tsucoop
+Cc: ken
+Subject: Setting Terminal Type & Peak
+
+    Bill,
+
+    Besides setting the TTY CLASS via the monitor command, as I
+    described to you yesterday, there is a way to set the terminal
+    type while still in Peak.
+
+        $xset terminal type$vt102$
+
+    This will reset the terminal type for the duration of the current
+    edit session, and will not affect the setting of the TTY CLASS
+    "variable" for the current job.
+
+    /ken
+From: <CARL@930.Tymnet>
+Date: Tue, 24 Jul 84 14:18:57 PDT
+To: ken
+Subject: FORTRAN
+
+I know that this sounds like "begging", but did Tim leave any info about
+the whereabouts of various things for F40, LIB40, etc... with anyone?
+I nee to find some sources, and I'm hard pressed to admit that we can't
+get the sources, even if we have to DISREL them from the .REL files!!!
+/Carl
+From: <TSUCOOP@930.Tymnet>
+Date: Wed, 25 Jul 84 13:59:52 PDT
+To: KEN
+Subject: Correspondence
+
+     Ken,
+
+          I am in receipt of your communication of yesterday
+
+     regarding setting the terminal type while still in peak.
+
+     Thank you for this information.
+
+                                Regards,
+                                BillReceived: from 39.Tymnet by 930.Tymnet; Thu, 26 Jul 84 14:03:22 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Thu, 26 Jul 84 14:02:33 PDT
+To: kanner@tymix,stimac@tymix
+Cc: ken
+Subject: where's ken?
+
+    Forgive me, I came in, but my wife became sick, and I had to take
+    her home.  I'll be doing battle with NAD and the genius of La Roy
+    Tymes from my ersatz castle.
+
+    /ken
+Received: from 39.Tymnet by 930.Tymnet; Thu, 26 Jul 84 15:53:06 PDT
+Received: from tymix.UUCP by 39.Tymnet; Thu, 26 Jul 84 15:52:00 PDT
+Received: by tymix.UUCP (4.12/4.7) id AA06463; Thu, 26 Jul 84 15:51:07 pdt
+Return-path: <stimac@tymix.Tymnet>
+From: stimac@tymix.Tymnet (Michael Stimac)
+Date: Thu, 26 Jul 84 15:51:07 pdt
+To: KEN@39.Tymnet, kanner@tymix.Tymnet
+Cc: 39:ken@tymnet
+Message-id: <8407262251.AA06463@tymix.UUCP>
+Subject: Re:  where's ken?
+
+OK, Ken, thanks for letting me know. 
+
+(wanna borrow a two-handed sword for this battle .... ?)
+
+michael
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 22:30:22 PDT
+To: ken
+Subject: CARMEL ?
+
+Hi,
+  do you happen to know **ANYTHING** about CARMEL, the FUDGE2 replacement
+that F40 is setup with?  I can't find **ANY** transmittals or documentation
+on it...   /Carl
+
+From: <KEN@930.Tymnet>
+Date: Thu, 26 Jul 84 22:45:28 PDT
+To: carl
+Cc: ken
+Subject: carmel
+
+Sorry I don't know anything about it.  I take it that it's not embedded
+in F40's transmittal package? How about some other possible embedding?
+
+/ken
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 22:52:01 PDT
+To: ken
+Subject: Faith!
+
+Thanks... I just stopped by the office, & at least there's something in
+Lois' office on CARMEL, albeit not much!
+
+As for other embedding, it might not be a bad idea, except there seem to
+be a couple of "weird" link block-types in some of the .REL files, unless
+that's only the CARMEL stuff... sigh....
+
+Oh!  (the reason for the subject: Faith!)  I don't have any for the actual
+workings of LIB40, F40, et al as far as the people at tymshare who have
+worked (repeat "worked") on it since 1977.  I had Bob Jacobs who works for
+Dave miller show me how to use the ARCHIVE data base, and found old-old-old
+transmittals (and archived FDM files) for soures that have been "presumed"
+LOST for the past 8-10 years.  All I had to do was LOOK, and then restore
+the files to see what they contained!!!!!!!!!!  So, I now have sources to
+many of the so-called LOST LIB40 routines!!!!!!!!!!!!
+
+I have no faith in the work done by certain individuals!!!!!!!!
+
+/Carl
+From: <KEN@930.Tymnet>
+Date: Thu, 26 Jul 84 23:00:26 PDT
+To: carl
+Cc: ken
+Subject: faith[2]
+
+cute. good work. any problems vis-a-vis Peak 2.0(313)?
+/ken
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 23:06:29 PDT
+To: ken
+Subject: peak 2.0(313)
+
+Haven't noticed any, but you know me, I switch between PEAK and VUE
+too much to notice all by the obvious, or the things that I use.
+
+How's life over there?  Do you need any people?  i.e. associate prog-
+rammers, or tech-writers or quality-assurance people????
+
+(Not for me, but for Cherie... she still needs a job... the places she
+has contacted that seem interested, that she is also interested in are
+all the, "let's wait another few weeks for more applications" type.
+GRRRRRRR!!!!  Waiting for here to find a position is all that is holding
+up our loan application...... GRRRRRR!
+So, I'm serious.... talk to your manager if you get a chance...I'd
+appreciate it... I'll be by ther sometime tomorrow to look in on Dave
+Miller.... maybe I'll stop by.
+
+Sometime late last week, Jeri was by... she stopped in to say hi, but
+as you know no-one is left, 'cept moi!
+From: <KEN@930.Tymnet>
+Date: Thu, 26 Jul 84 23:27:37 PDT
+To: carl
+Cc: ken
+Subject: positions
+
+    After our last live discussion, involving yourself and John
+    Wilkes, I checked with my boss and he said he did not have any
+    openings except for experienced language types and Unix/C major
+    product designer(s).  He suggested that I suggest you look at the
+    wall in the cafeteria.  It's his best approximation to current
+    knowlege.  Remember that NTD seems to have a Tech Pubs group of
+    some kind, as well as the Tymnet group to which Pat Morse
+    defected.
+
+    NAD sucks.  I'm not scheduled for ISIS programming class until
+    October, by which time I'll be senile.  The guy I'm learning from
+    is difficult to understand.  The design of the engine is bizarre,
+    and probaly qualifies as Cruel and Unusual. 
+
+    See you later.
+
+    /ken
+From: <CARL@930.Tymnet>
+Date: Fri, 27 Jul 84 0:00:08 PDT
+To: ken
+Subject: Cruel & unusual.
+
+I'll refrain from "frying-pan" vs "fire" comments at
+the moment, since I'm not sure which category I'm in!
+Sigh!
+From: <CARL@930.Tymnet>
+Date: Sat, 28 Jul 84 15:37:00 PDT
+To: ken
+Cc: wrs
+Subject: Name change
+
+Scott had then change SDANIELS to NDT everywhere, so I decided to
+perform that function on 930.  Please search NDT instead of SDANIELS
+in teh future.  /Carl
+
+PS: Fix any SWITCH.INI or other files.
+From: <KEN@930.Tymnet>
+Date: Sun, 29 Jul 84 13:41:20 PDT
+To: carl
+Cc: ken
+Subject: SDANIELS
+
+    NDT?  Do tell.  What does it mean?
+
+    /ken
+From: <CARL@930.Tymnet>
+Date: Sun, 29 Jul 84 14:36:12 PDT
+To: ken
+Subject: NDT
+
+Your guess is as good as mine... maybe Scott just wanted to
+remove his name from the network?  ...All that I know is that
+it was changed.  /Carl
+Received: from 39.Tymnet by 930.Tymnet; Mon, 30 Jul 84 15:04:16 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Mon, 30 Jul 84 12:29:24 PDT
+To: matoka@897
+Cc: ken
+Subject: virgil
+
+    Although he still does not have the right to come near the place,
+    Virgil has asked me to advise you that his new phone number is
+    (408)338-4352. Those who know indicate that this information might
+    be worth something in 2 weeks or so.
+
+    /ken
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Wed, 1 Aug 84 18:03:27 UT
+From: NTD.S/GARDE@Ontyme.Tymnet
+Date: 01 AUG 84 10:27:20  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I02735@EMSNTD.Ontyme.Tymnet
+Subject: New employee - Rai-Ki Huang
+
+                         M E M O R A N D U M
+
+DATE>      01 AUG 84  10:21                                 []T Y M S H A R E
+
+TO>        NTD Personnel
+
+COPIES>    
+
+FROM>      Shrikant Garde
+
+
+SUBJECT>   New employee - Rai-Ki Huang
+
+
+-----------------------------------------------------------------------
+
+
+Please welcome Rai-Ki Huang to the Public Network Planning unit of NTD .
+
+Rai-Ki has several years of applications programming experience in IBM
+and WANG environments. He has recently completed a Master's in Business
+Information Systems from Georgia State University with an emphasis on
+computer networking.
+
+Rai-Ki's networking education and programming experience put him in a 
+strong position to contribute to a variety of traffic analysis ,
+performance measurement and network configuration projects of the 
+Public Network Planning unit.
+
+Please extend your support to Rai-Ki as he goes through the process of
+getting 'on-board'.
+
+Thank you.  
+
+
+
+
+
+
+
+
+
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Wed, 1 Aug 84 19:01:22 UT
+From: NTD.C/LAM@Ontyme.Tymnet
+Date: 01 AUG 84 11:15:45  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I02802@EMSNTD.Ontyme.Tymnet
+Subject: Welcome
+
+Date:    July 31, 1984
+ 
+To:      All NTD
+ 
+From:    Chung Lam
+         Manager, Network Design Tools  Development
+         NTD
+ 
+Subject: Welcome
+ 
+======================================================================
+ 
+         Please welcome Reggie Lee to the Network Design Tools
+Development unit of NTD.
+ 
+         Reggie has joined us from NUTECH Engineers in San Jose,
+where he has been developing complex analysis programs with
+FORTRAN and PASCAL for the last four years. He has a master
+degree in Engineering Mechanics from Michigan State Univeristy
+in 1980.
+ 
+         We look forward to having Reggie in our development
+team, and I am sure you will lend your support to him.
+ 
+         Thank you.
+
+
+
+
+
+
+
+
+Received: From EMSNTD.Ontyme.Tymnet by 930.Tymnet; Thu, 2 Aug 84 20:01:23 UT
+From: NTD.K/DAWSON@Ontyme.Tymnet
+Date: 02 AUG 84 12:06:49  
+To: NTD.K/DAWSON@Ontyme.Tymnet
+Message-id: I03750@EMSNTD.Ontyme.Tymnet
+Subject: yoo hoo!
+
+From: <KEN@39.Tymnet>
+Date: Thu, 2 Aug 84 12:06:02 PDT
+To: k/dawson@ontyme
+Subject: yoo hoo!
+
+you there?
+
+
+
+
+
+
+
+
+Received: from 39.Tymnet by 930.Tymnet; Fri, 3 Aug 84 12:02:42 PDT
+Return-path: <Postmaster>
+From: Postmaster
+Date: Fri, 3 Aug 84 11:57:17 PDT
+To: <KEN@39.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+The request was rejected by EMSII.Ontyme.Tymnet.
+The response was:
+NO SUCH RECIPIENT
+NO VALID RECIPIENT
+
+
+----------
+RCPT To: <NTD.J/MOSSER@EMSII.Ontyme.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Fri, 3 Aug 84 11:56:19 PDT
+To: j/mosser@ontyme
+Subject: Users using Peak?
+
+m-X
+
+
+
+"
+|
+
+Received: from 39.Tymnet by 930.Tymnet; Fri, 3 Aug 84 12:09:06 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Fri, 3 Aug 84 12:08:03 PDT
+To: j/mosser@ontyme
+Cc: ken
+Subject: Users using Peak?
+
+    Jon,
+
+    I got a call from a Ron Vivier about his travels in Europe, and
+    the demand he ran into from the European affiliates for User
+    availibility of Peak on Tymcom-X.  As you know, to date we've had
+    an explicit test for the Tymshare Internal Bit in Peak as a means
+    of preventing real users from using it.  I told Ron that there is
+    no documentation worthy of a general user's consideration, and he
+    said that they (the European Operations types making the request)
+    were aware of that, but these were no normal users.  In fact, they
+    (either the Operations people or the users in question) might very
+    well write their own manual for Peak!
+
+    Our options at present are to either continue our past practice of
+    adding these users to the execption list, or removing the filter
+    altogether, and making it publicly usable.  (In the case of the
+    latter, finding out what the "writing their own manual" really
+    means would be a good idea.)
+
+    I was wondering about your thoughts on the matter.
+
+    /ken
+
+    PS:  Each path is equally easy to implement.
+Received: from 39.Tymnet by 930.Tymnet; Fri, 3 Aug 84 13:02:37 PDT
+Return-path: <Postmaster>
+From: Postmaster
+Date: Fri, 3 Aug 84 12:09:04 PDT
+To: <KEN@39.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+The request was rejected by EMSII.Ontyme.Tymnet.
+The response was:
+NO SUCH RECIPIENT
+NO VALID RECIPIENT
+
+
+----------
+RCPT To: <NTD.J/MOSSER@EMSII.Ontyme.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Fri, 3 Aug 84 12:08:03 PDT
+To: j/mosser@ontyme
+Cc: ken
+Subject: Users using Peak?
+
+    Jon,
+
+    I got a call from a Ron Vivier about his travels in Europe, and
+    the demand he ran into from the European affiliates for User
+    availibility of Peak on Tymcom-X.  As you know, to date we've had
+    an explicit test for the Tymshare Internal Bit in Peak as a means
+    of preventing real users from using it.  I told Ron that there is
+    no documentation worthy of a general user's consideration, and he
+    said that they (the European Operations types making the request)
+    were aware of that, but these were no normal users.  In fact, they
+    (either the Operations people or the users in question) might very
+    well write their own manual for Peak!
+
+    Our options at present are to either continue our past practice of
+    adding these users to the execption list, or removing the filter
+    altogether, and making it publicly usable.  (In the case of the
+    latter, finding out what the "writing their own manual" really
+    means would be a good idea.)
+
+    I was wondering about your thoughts on the matter.
+
+    /ken
+
+    PS:  Each path is equally easy to implement.
+From: <KEN@930.Tymnet>
+Date: Mon, 6 Aug 84 10:28:45 PDT
+To: sppoper
+Cc: ken
+Subject: see for yourself
+
+----------
+RCPT To: <NTD.J/MOSSER@EMSII.Ontyme.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Fri, 3 Aug 84 12:08:03 PDT
+To: j/mosser@ontyme
+Cc: ken
+Subject: Users using Peak?
+
+    Jon,
+
+    I got a call from a Ron Vivier about his travels in Europe, and
+    the demand he ran into from the European affiliates for User
+    availibility of Peak on Tymcom-X.  As you know, to date we've had
+    an explicit test for the Tymshare Internal Bit in Peak as a means
+    of preventing real users from using it.  I told Ron that there is
+    no documentation worthy of a general user's consideration, and he
+    said that they (the European Operations types making the request)
+    were aware of that, but these were no normal users.  In fact, they
+    (either the Operations people or the users in question) might very
+    well write their own manual for Peak!
+
+    Our options at present are to either continue our past practice of
+    adding these users to the execption list, or removing the filter
+    altogether, and making it publicly usable.  (In the case of the
+    latter, finding out what the "writing their own manual" really
+    means would be a good idea.)
+
+    I was wondering about your thoughts on the matter.
+
+    /ken
+
+    PS:  Each path is equally easy to implement.
+  =«
