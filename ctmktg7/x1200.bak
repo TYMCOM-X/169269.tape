@@ -1,0 +1,256 @@
+comment
+
+The X1200 program writes data on magtape for printing on an X1200
+printer (Xerox).  The format used is EBCDIC, 132 byte records,
+30 records per block, 1600 bpi, 9 track, odd parity, blank padded.
+Form feeds are converted to 0C and tabs are converted to multiple
+blanks.
+
+* Program useage:
+    The program will ask for the name of the tape drive to be used.
+    The default is to the logical name X1200:.  The program next asks
+    for the top margin in lines, the deffault is 0.  A margin of 4-6
+    lines is recommended for punched pages.  Next is the left margin
+    in spaces, the default is again 0.  At this point, the program
+    enters file mode where it prints "*" while waiting for the name
+    off a file to be printed.  An indirect file may be given at this
+    point by specifying "@"<filename>, (eg. "@FOO").  The command
+    "QUIT" will end this and cause the program to ask "UNLOAD?".  
+    If the user answers "Y" then the tape will be unloaded, else it
+    will only be rewound.
+
+* Cover pages:
+    The X1200 program provides a means for placing anything of interest
+    on the ffirst page of each file.  The default is for an hourglass
+    in the left corner and the filename in the center.  The user may
+    place a file X1200.CVR on his directory containing the cover that
+    he wishes to appear on the listing.  The center 6 lines will be
+    'windowed' out and replaced with the filename being listed.
+;
+begin "X1200"
+  require 6 version;
+  require "SAIL.DEF" source!file;
+  require "EBCDIC.SAI" source!file;
+  define COVER = true;  ! Cover overlay in file X1200.CVR;
+  integer array BUFFER[1:30,0:32]; ! 30 x 132 byte records;
+  integer REC,EOF,FTA,PAGES,FPAGES,BLOCKS,FBLOCKS,FILES,LINES,EOFT;
+  integer TOP!MARGIN;
+  string F,LEFT!MARGIN;
+  define page!length = 66;
+
+
+
+simple procedure SETUP!BUFFER; begin "SB"
+  ! this will clear buffer to all blanks and init record ptr;
+  integer BLANKS;
+  BLANKS := hex(40) lsh 28 + hex(40) lsh 20
+	+ hex(40) lsh 12 + hex(40) lsh 4;
+  arrclr(BUFFER,blanks);
+  REC:=1;
+  if EOFT then begin "END-OF-TAPE"
+    outstr("End of tape!"&crlf&cvs(FILES)&" files"&crlf
+	&cvs(BLOCKS)&" blocks"&crlf&cvs(PAGES)&" pages"&crlf);
+    mtape(FTA,"E"); mtape(FTA,"E");
+    mtape(FTA,"U");
+    release(FTA);
+    call(0,"EXIT");
+    end;
+  end "SB";
+
+simple procedure WRITE!BUFFER; begin "WB"
+  ! this will write out the contents of the buffer;
+  ! if the buffer is only partially full, trailing records
+    will be nulled;
+  if REC > 1 then begin "DATA-PRESENT"
+    if REC leq 30 then begin "nullify"
+      BUFFER[REC,0]:=0;
+      arrblt(BUFFER[REC,1],BUFFER[REC,0],33*(31-REC)-1);
+      end;
+    arryout(FTA,BUFFER[1,0],30*33);
+    SETUP!BUFFER;
+    FBLOCKS:=FBLOCKS+1;
+    BLOCKS:=BLOCKS+1;
+    end;
+  end "WB";
+
+procedure WRITE!LINE(string S); begin "WL"
+  ! this will write the ascii string to the tape buffer;
+  ! if the tape buffer is full, the buffer will be written;
+  integer PTR,CNT;
+  recursive procedure BYTE(integer CH); begin "BYTE"
+    if CH=ht
+      then
+	do BYTE(" ") until (CNT mod 8)=0
+      else if CNT < 132 then begin
+!	idpb(EBCDIC[CH],PTR);
+	CNT:=CNT+1;
+	end;
+    end "BYTE";
+  PTR:=point(8,BUFFER[REC,0],-1);
+  CNT:=0;
+  while S do byte(lop(S));
+  REC:=REC+1;
+  if REC > 30 then WRITE!BUFFER;
+  LINES:=LINES+1;
+  if LINES geq page!length then begin
+    LINES:=0;
+    FPAGES:=FPAGES+1;
+    PAGES:=PAGES+1;
+    end;
+  end "WL";
+
+procedure WRITE!COVER(string F); begin "WC"
+  string procedure WINDOW(string A,B;integer I,J); begin "WINDOW"
+    integer W;
+    W:=J-I+1;
+    while length(B)<W do B:=B&" ";
+    return((if I>1 then A[1 to I-1] else null)
+	&B[1 for W]
+	&A[J+1 to inf]);
+    end "WINDOW";
+  integer C,E,B,I; string S;
+  open(C_getchan,"DSK",1,5,0,132,B,E);
+  lookup(C,cv6str(calli(hl(-1)+hr(3),'41))&".CVR",E);
+  if E then lookup(C,cv6str(calli(hl(-1)+hr(3),'41))&".CVR"
+	&"["&cvo(lh(calli(hl(-1)+hr(-'25),'41)))&","
+	&cvo(rh(calli(hl(-1)+hr(-'25),'41)))&"]",E);
+  for I:=1 upto page!length do begin "COVER"
+    if E
+      then S:=" "
+      else S:=input(C,1);
+    if (I>30)and(I<36)
+      then S:=window(S,null,45,85);
+    if I=33
+      then S:=window(S,"     File: "&F,45,85);
+    write!line(S);
+    end;
+  write!line(ff);
+  close(C); release(C);
+  end;
+
+simple boolean procedure WRITE!FILE(string F); begin "WF"
+  integer EOF,BRK,DSK;
+  open(DSK_getchan,"DSK",0,5,0,132,BRK,EOF);
+  lookup(DSK,F,EOF);
+  if EOF then begin "NO-READ"
+    outstr("Can't read DSK:"&F&crlf);
+    release(DSK);
+    return(false);
+    end;
+  FPAGES:=FBLOCKS:=0;
+  outstr(F&" ");
+  ifc COVER thenc WRITE!COVER(F) elsec endc;
+  LINES:=0;
+  while not EOF do begin
+    string S;
+    S:=input(DSK,2);
+    if BRK=ff
+      then begin "TOP-OF-FORM"
+	if length(S) then write!line(LEFT!MARGIN&S);
+	LINES:=page!length; ! the FF will make this 0;
+	write!line(ff);
+        while LINES < TOP!MARGIN
+	  do write!line(null);
+	end
+      else write!line(LEFT!MARGIN&S);
+    end;
+  write!buffer;
+  if LINES then begin
+    FPAGES:=FPAGES+1;
+    PAGES:=PAGES+1;
+    end;
+  mtape(FTA,"E");
+  outstr("- "&cvs(FPAGES)&" pages, "&cvs(FBLOCKS)&" blocks."&crlf);
+  close(DSK); release(DSK);
+  FILES:=FILES+1;
+  return(true);
+  end "WF";
+
+integer procedure UGETF(integer CH); begin "UGETF"
+  integer array UG[0:1];
+  UG[0]:=2;
+  chnior(CH,UG[0],'10);
+  return(UG[1]);
+  end "UGETF";
+
+simple procedure INIT!TAPE; begin "FTA"
+  define DIE(S) = {begin outstr(S&crlf); call(0,"EXIT"); end};
+  integer D,U,A,B;
+  outstr("Tape unit: ");
+  F:=inchwl;
+  if F[inf for 1]=":" then F:=F[1 to inf-1];
+  if length(F)=0 then F:="X1200";
+  open(FTA_getchan,F,'17,0,0,0,0,EOFT:=true);
+  if EOFT then die("Unit "&F&" not available");
+  D:=bit(14); ! 1600 BPI;
+  U:=ugetf(FTA);
+  if U land bit(12) then die("Drive is 7-track");
+  if U land bit(0) then die("Unit is write protected");
+  if U land bit(2) then die("Unit is not ready");
+  if not(U land D) then die("Unit not capable of 1600 bpi");
+  outstr("Using density 1600 BPI"&crlf);
+  setsts(FTA,3*bit(28)+'17);
+  mtape(FTA,"W"); ! rewind;
+  mtape(FTA,"I"); ! IBM mode;
+  setup!buffer;
+  end "FTA";
+procedure process(string CMD); begin "PROCESS"
+  if equ(CMD,"QUIT"[1 to length(CMD)]) then begin "QUIT"
+    release(FTA);
+    outstr("Unload? ");
+    if inchwl="Y" then begin
+      open(FTA_getchan,F,0,0,0,0,0,EOF:=true);
+      if EOF
+	then outstr("?Can't unload, device "&F&": not available"&crlf)
+	else mtape(FTA,"U");
+      release(FTA);
+      end;
+    outstr(cvs(FILES)&" files"&crlf
+	&cvs(BLOCKS)&" blocks"&crlf
+	&cvs(PAGES)&" pages"&crlf);
+    call(0,"EXIT");
+    end "QUIT";
+  write!file(CMD);
+  end "PROCESS";
+begin "MAIN"
+  integer I;
+  ttyup(true);
+  setbreak(1,","&lf,cr,"KINS");
+  setbreak(2,ff&cr,lf,"FIPS");
+  outstr("XEROX-1200 tape writer - version "&cvs(memory['137])&crlf);
+  PAGES:=BLOCKS:=LINES:=FILES:=0;
+  init!tape;
+  outstr("Top margin: ");
+  TOP!MARGIN:=cvd(inchwl);
+  outstr("Left margin: ");
+  I:=cvd(inchwl);
+  LEFT!MARGIN:=null;
+  while length(LEFT!MARGIN) < I 
+    do LEFT!MARGIN:=LEFT!MARGIN & " ";
+  while true do begin "COMLOOP"
+  string COM;
+    outstr("*");
+    COM:=inchwl;
+    if length(COM)=0 then continue "COMLOOP";
+    if COM="@" then begin "COMFILE"
+      integer B,E,CMD;
+      open(CMD_getchan,"DSK",1,1,0,256,B,E);
+      lookup(CMD,COM[2 to inf],E);
+      if E then outstr("No command file"&crlf);
+      while not E do begin "GETCOM"
+	COM:=input(CMD,1);
+	if not E then process(COM);
+	end "GETCOM";
+      close(CMD); release(CMD);
+      continue "COMLOOP";
+      end "COMFILE"
+    else if COM="?" then begin "HELP"
+      outstr("Enter file names to store, one to a line, or ""@""
+followed by a file containing the files to be storred,
+one to a line."&crlf);
+      end "HELP"
+    else process(COM);
+    end;
+  end "MAIN";
+end $
+    
