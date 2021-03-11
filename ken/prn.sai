@@ -1,0 +1,714 @@
+define !  = "COMMENT", !! = "COMMENT";
+!! title Module PRN ;
+! *************************************************************************
+*************************************+*************************************
+*                                                                         *
+*                                                                         *
+*				    PRN					  *
+*                                                                         *
+*                                                                         *
+*************************************+*************************************
+
+
+	Filter PRT-format output files according to the user's
+	page-specification list.
+
+	<List>  ->  <Lev1>
+	<Lev1>  ->  list(<semicolon>, <Lev2>)
+	<Lev2>  ->  <Lev3> | <Lev3> - <Lev3>
+	<Lev3>  ->  list(",", <Lev4>)
+	<Lev4>  ->  <Field> | <Field> .. <Field>
+	<Field> ->  (={Integers})
+
+
+	Example:
+
+	  1,3,5-1..4,6..17,20 = 
+
+	      Pages 1, 3, and 5
+		SubPages [1, 4], [6, 17], and 20.
+
+		  (All SubPages apply to each Page.)
+
+
+	! <<  Error-handling in the Parse/Get routines.
+
+
+**************************************************************************;
+
+
+begin "PRN"
+  require "Sail.Hdr" source!file;
+
+  !version(!ver(0, 1), !edit('003), !date(31-July-82));
+
+  require "Brktbl.Da" source!file;
+  require "Date.Da"   source!file;
+  require "Files.Da"  source!file;
+  require "Util.Req"  source!file;
+
+  define
+    $$Debug = true;
+
+
+  define
+    ALL.NO.NO = <'077>;
+
+      ! <<  Temporary until definition is in Files.Da;
+
+
+  integer Dot.Tbl;
+  integer Dash.Tbl;
+  integer SemiColon.Tbl;
+  integer Comma.Tbl;
+
+  integer P.Tbl;
+  integer FF.Tbl;
+  integer White.Sp.Tbl;
+
+
+  record!class PG.Rec
+  (
+    integer L.B;
+    integer U.B;
+    r!p (PG.Rec) SP.Ptr;
+    r!p (PG.Rec) Nxt;
+    r!p (PG.Rec) Prv
+  );
+
+
+  define
+    $L.B    (X)  = <PG.Rec:L.B[X]>,
+    $U.B    (X)  = <PG.Rec:U.B[X]>,
+    $SP.Ptr (X)  = <PG.Rec:SP.Ptr[X]>,
+    $Nxt    (X)  = <PG.Rec:Nxt[X]>,
+    $Prv    (X)  = <PG.Rec:Prv[X]>;
+
+
+! ************************************************************************;
+!! title Rtn Initialize ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			      Rtn Initialize				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  procedure Initialize;
+  begin "Initialize"
+    do.banner("PRN - PRT-file Filter Program");
+
+    setbreak(Dot.Tbl       _ getbreak, ".", null, "INS");
+    setbreak(Dash.Tbl      _ getbreak, "-", null, "INS");
+    setbreak(SemiColon.Tbl _ getbreak, ";", null, "INS");
+    setbreak(Comma.Tbl     _ getbreak, ",", null, "INS");
+
+    setbreak(P.Tbl         _ getbreak, "P", null, "INR");
+    setbreak(FF.Tbl        _ getbreak, ff,  null, "INA");
+    setbreak(White.Sp.Tbl  _ getbreak, (sp & ht & crlf), null, "XNR");
+  end "Initialize";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn SubPage.Lists.Match ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			  Rtn SubPage.Lists.Match			  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  boolean procedure SubPage.Lists.Match (r!p (PG.Rec) Ptr1, Ptr2);
+  begin "SubPage.Lists.Match"
+    if (Ptr1 = Ptr2) then
+      return(true)
+    else
+    begin
+      while (Ptr1 neq n!r) do
+      begin
+	if ($L.B(Ptr1) neq $L.B(Ptr2) or
+	    $U.B(Ptr1) neq $U.B(Ptr2)) then
+	  return(false);
+
+	Ptr1 _ $Nxt(Ptr1);
+	Ptr2 _ $Nxt(Ptr2);
+      end;
+
+      return(Ptr1 = Ptr2);
+    end;
+  end "SubPage.Lists.Match";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Mergable ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			       Rtn Mergable				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  simple boolean procedure Mergable (reference integer Lb, Ub;
+      integer Lb1, Ub1, Lb2, Ub2);
+
+  begin "Mergable"
+    if (Lb1 > Lb2) then
+    begin
+      Lb1 swap Lb2;
+      Ub1 swap Ub2;
+    end;
+
+    if (Lb2 <= Ub1 + 1) then
+    begin
+      Lb _ Lb1;
+      Ub _ Ub1 max Ub2;
+      return(true);
+    end;
+
+    return(false);
+  end "Mergable";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Add.Page.Records ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			   Rtn Add.Page.Records				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  procedure Add.Page.Records (reference r!p (PG.Rec) Hdr;
+      integer Lb.In, Ub.In; r!p (PG.Rec) SbPtr.In (n!r));
+
+  begin "Add.Page.Records"
+    r!p (PG.Rec) Ptr;
+    r!p (PG.Rec) Last.Rec;
+    integer Lb, Ub;
+
+
+    if (Hdr = n!r) then
+    begin
+      Hdr           _ new!record(PG.Rec);
+      $L.B(Hdr)     _ Lb.In;
+      $U.B(Hdr)     _ Ub.In;
+      $SP.Ptr(Hdr)  _ SbPtr.In;
+    end
+    else
+    begin
+      Ptr      _ Hdr;
+      Last.Rec _ n!r;
+
+      while (Ptr neq n!r) do
+      begin
+	if (Mergable(Lb, Ub, Lb.In, Ub.In, $L.B(Ptr), $U.B(Ptr)) and
+	    SubPage.Lists.Match($SP.Ptr(Ptr), SbPtr.In)) then
+	begin
+	  $L.B(Ptr) _ Lb;
+	  $U.B(Ptr) _ Ub;
+
+	  done;
+	end
+	else if ($L.B(Ptr) > Lb) then
+	begin
+	  r!p (PG.Rec) Tmp;
+
+
+	  Tmp             _ new!record(PG.Rec);
+	  $L.B(Tmp)       _ Lb.In;
+	  $U.B(Tmp)       _ Ub.In;
+	  $SP.Ptr(Tmp)    _ SbPtr.In;
+
+	  $Prv(Tmp)       _ $Prv(Ptr);
+	  $Prv(Ptr)       _ Tmp;
+	  $Nxt($Prv(Tmp)) _ Tmp;
+	  $Nxt(Tmp)       _ Ptr;
+
+	  done;
+	end;
+
+	Last.Rec _ Ptr;
+	Ptr      _ $Nxt(Ptr);
+      end;
+
+      if (Ptr = n!r) then
+      begin
+	Ptr _ $Nxt(Last.Rec) _ new!record(PG.Rec);
+	$L.B(Ptr)    _ Lb.In;
+	$U.B(Ptr)    _ Ub.In;
+	$SP.Ptr(Ptr) _ SbPtr.In;
+	$Prv(Ptr)    _ Last.Rec;
+      end;
+    end;
+  end "Add.Page.Records";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Add.SubPage.Records ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			  Rtn Add.SubPage.Records			  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  procedure Add.SubPage.Records (reference r!p (PG.Rec) SbPtr;
+      integer Lb.In, Ub.In);
+
+  begin "Add.SubPage.Records"
+    r!p (PG.Rec) Ptr;
+    r!p (PG.Rec) Last.Rec;
+    integer Lb, Ub;
+
+
+    if (SbPtr = n!r) then
+    begin
+      SbPtr           _ new!record(PG.Rec);
+      $L.B(SbPtr)     _ Lb.I     $U.B(SbPtr)     _ Ub.In;
+    end
+    else
+    begin
+      Ptr      _ SbPtr;
+      Last.Rec _ n!r;
+
+      while (Ptr neq n!r) do
+      begin
+	if (Mergable(Lb, Ub, Lb.In, Ub.In, $L.B(Ptr), $U.B(Ptr))) then
+	begin
+	  $L.B(Ptr) _ Lb;
+	  $U.B(Ptr) _ Ub;
+
+	  done;
+	end
+	else if ($L.B(Ptr) > Lb) then
+	begin
+	  r!p (PG.Rec) Tmp;
+
+
+	  Tmp          _ new!record(PG.Rec);
+	  $L.B(Tmp)    _ Lb.In;
+	  $U.B(Tmp)    _ Ub.In;
+
+	  $Prv(Tmp)       _ $Prv(Ptr);
+	  $Prv(Ptr)       _ Tmp;
+	  $Nxt($Prv(Tmp)) _ Tmp;
+	  $Nxt(Tmp)       _ Ptr;
+
+	  done;
+	end;
+
+	Last.Rec _ Ptr;
+	Ptr _ $Nxt(Ptr);
+      end;
+
+      if (Ptr = n!r) then
+      begin
+	Ptr _ $Nxt(Last.Rec) _ new!record(PG.Rec);
+	$L.B(Ptr)    _ Lb.In;
+	$U.B(Ptr)    _ Ub.In;
+	$Prv(Ptr)    _ Last.Rec;
+      end;
+    end;
+  end "Add.SubPage.Records";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Get.Lev1 ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			       Rtn Get.Lev1				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  string procedure Get.Lev1 (reference string Inp);
+  begin "Get.Lev1"
+    integer Brk;
+
+
+    return(scan(Inp, SemiColon.Tbl, Brk));
+  end "Get.Lev1";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Parse.Lev2 ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			      Rtn Parse.Lev2				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  procedure Parse.Lev2 (reference string Inp, Str1, Str2);
+  begin "Parse.Lev2"
+    integer Brk;
+
+
+    Str1 _ scan(Inp, Dash.Tbl, Brk);
+    Str2 _ Inp;
+  end "Parse.Lev2";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Get.Lev3 ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			       Rtn Get.Lev3				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  simple string procedure Get.Lev3 (reference string Inp);
+  begin "Get.Lev3"
+    integer Brk;
+
+
+    return(scan(Inp, Comma.Tbl, Brk));
+  end "Get.Lev3";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Parse.Lev4 ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			      Rtn Parse.Lev4				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  procedure Parse.Lev4 (reference string Inp, Lb, Ub);
+  begin "Parse.Lev4"
+    integer Brk;
+
+
+    Lb _ scan(Inp, Dot.Tbl, Brk);
+
+    while (Inp = ".") do
+      lop(Inp);
+
+    Ub _ Inp;
+  end "Parse.Lev4";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Create.Page.List ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			   Rtn Create.Page.List				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  r!p (PG.Rec) procedure Create.Page.List (string Inp);
+  begin "Create.Page.List"
+    r!p (PG.Rec) List.Hdr;
+    r!p (PG.Rec) Sb.Ptr;
+    string Str;
+    string Page.Spc;
+    string SbPage.Spc;
+    string Lb;
+    string Ub;
+
+
+    List.Hdr _ n!r;
+    
+    while (length(Str _ Get.Lev1(Inp))) do
+    begin
+print("..Create(1) [", Str, "]", crlf);
+
+      if (length(Str) or kequ(Str, "All")) then
+      begin
+	Parse.Lev2(Str, Page.Spc, SbPage.Spc);
+	Sb.Ptr _ n!r;
+
+	while (length(Str _ Get.Lev3(SbPage.Spc))) do
+	begin
+	  Parse.Lev4(Str, Lb, Ub);
+
+	  if (length(Ub)) then
+	    Add.SubPage.Records(Sb.Ptr, cvs(Lb), cvs(Ub))
+	  else
+	    Add.SubPage.Records(Sb.Ptr, cvs(Lb), cvs(Lb));
+	end;
+
+	while (length(Str _ Get.Lev3(Page.Spc))) do
+	begin
+	  Parse.Lev4(Str, Lb, Ub);
+
+	  if (length(Ub)) then
+	    Add.Page.Records(List.Hdr, cvs(Lb), cvs(Ub), Sb.Ptr)
+	  else
+	    Add.Page.Records(List.Hdr, cvs(Lb), cvs(Lb), Sb.Ptr);
+	end;
+      end
+      else
+      begin
+	List.Hdr _ new!record(PG.Rec);
+	$L.B(List.Hdr) _ $U.B(List.Hdr) _ -1;
+	done;
+      end;
+    end;
+
+    return(List.Hdr);
+  end "Create.Page.List";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn SubPage.Match ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			     Rtn SubPage.Match				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  boolean procedure SubPage.Match (integer Val; r!p (PG.Rec) Ptr);
+  begin "SubPage.Match"
+    while (Ptr neq n!r) do
+    begin
+      if ($L.B(Ptr) <= Val <= $U.B(Ptr)) then
+	return(true);
+
+      Ptr _ $Nxt(Ptr);
+    end;
+
+    return(false);
+  end "SubPage.Match";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Page.Match ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			      Rtn Page.Match				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  boolean procedure Page.Match (string Token; reference r!p (PG.Rec) Ptr);
+  begin "Page.Match"
+    r!p (PG.Rec) Tmp.Ptr;
+    string Page.Spc;
+    string SbPage.Spc;
+    integer Page;
+    integer SbPage;
+
+    
+    if ($L.B(Ptr) = $U.B(Ptr) = -1) then
+      return(true)
+    else
+    begin
+      Parse.Lev2(Token, Page.Spc, SbPage.Spc);
+      Page    _ cvs(Page.Spc);
+      SbPage  _ cvs(SbPage.Spc);
+
+      Tmp.Ptr _ Ptr;
+
+      while (Tmp.Ptr neq n!r) do
+      begin
+	if ($L.B(Tmp.Ptr) <= Page <= $U.B(Tmp.Ptr) and
+	    ($SP.Ptr(Tmp.Ptr) = n!r or
+	    SubPage.Match(SbPage, $SP.Ptr(Tmp.Ptr)))) then
+	begin
+	  Ptr _ Tmp.Ptr;
+	  return(true);
+	end;
+
+	Tmp.Ptr _ $Nxt(Tmp.Ptr);
+      end;
+
+      return(false);
+    end;
+  end "Page.Match";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Mainline Code;
+! ***********************************+*************************************
+*                                                                         *
+*                                                                         *
+*			       Mainline Code				  *
+*                                                                         *
+*                                                                         *
+*************************************+************************************;
+
+
+  begin "Mainline Code"
+    r!p ($File) Src;
+    r!p ($File) Dst;
+    r!p (PG.Rec) Page.List;
+    r!p (PG.Rec) Tmp.Ptr;
+    string Str1;
+    string Tmp;
+    string Inp;
+    string Token;
+    string Src.File.Name;
+    string Dst.File.Name;
+    integer Brk;
+    boolean Same.File.Flag;
+
+    define
+      Tmp.File.Name = <"PRNTMP.DAT">;
+
+
+    Initialize;
+
+
+! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+    Tmp _ scan(Inp _ Prompt.User("Filename: "), Ass.Tbl, Brk);
+
+    if (Brk = "=" or Brk = "_") then
+    begin
+      Dst.File.Name _ Tmp;
+      Src.File.Name _ Inp;
+    end
+    else
+    begin
+      Dst.File.Name _ Tmp.File.Name;
+      Src.File.Name _ Tmp;
+      set(Same.File.Flag);
+    end;
+
+    Src _ Open.File(Src.File.Name, T.INPUT);
+    Dst _ Open.File(Dst.File.Name, T.OUTPUT);
+
+
+! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+    Tmp.Ptr _ Page.List _ Create.Page.List(Prompt.User("Page List: "));
+
+
+ifcr (false) thenc
+    while (true) do
+    begin
+      Str1 _ null;
+
+      while (not $$Eof(Src)) do
+      begin
+	Str1 _ input($$Chan(Src), P.Tbl);
+
+	Str1 _ Str1 & (Token _ Input.Token(Src));
+
+	if (equ(Token, "Page")) then
+	  done;
+      end;
+
+      if ($$Eof(Src)) then
+	done;
+
+      Str1  _ Str1 & input($$Chan(Src), White.Sp.Tbl);
+      Token _ Input.Token(Src);
+      Str1  _ Str1 & Token;
+
+      if (Page.Match(Token, Tmp.Ptr)) then
+      begin
+	Str1 _ Str1 & input($$Chan(Src), FF.Tbl);
+	cprint($$Chan(Dst), Str1);
+      end;
+    end;
+
+    if (Same.File.Flag) then
+    begin
+      rename($$Chan(Src), null, ALL.NO.NO, $$Eof(Src));
+      rename($$Chan(Dst), Src.File.Name, ALL.NO.NO, $$Eof(Dst));
+    end;
+
+    Close.File(ALL.FILES);
+endc
+
+    while (length(Str1 _ Prompt.User("Matching Page Spec: "))) do
+      print("Str1: ", Str1, " ", Page.Match(Str1, Page.List));
+  end "Mainline Code";
+end "PRN";
+
+
+! ***********************************+*************************************
+**************************************************************************;
+    	s%z
