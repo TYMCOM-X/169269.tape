@@ -1,0 +1,12 @@
+$menu ROOT;Summary of available monitor documentation.
+*EXTERN.NFO:EXTERNAL;External monitor documentation.
+*(MONDOC)FORMAT.NFO:FORMAT;System File Formats.
+*IDEAS.nfo:IDEAS;Ideas for Monitor Enhancement.
+*INFO.DOC:INFO;Using the INFO program.
+*INTERN.NFO:INTERNAL;Internal monitor documentation.
+*MONPRO.nfo:PROCEDURES;Monitor Group Procedures.
+*PEOPLE.NFO:PEOPLE;Monitor people.
+*STANDA.NFO:STANDALONE;Stand alone programs.
+*TYMSHR.NFO:TYMSHARE;General information.
+*TYMNET.NFO:TYMNET;Tymnet documentation.
+*USER.NFO:USER;User mode software.
