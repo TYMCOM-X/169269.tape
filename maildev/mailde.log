@@ -1,0 +1,341 @@
+Undated, from CARL:
+<an attempt to use SEND>
+@do send
+To: txs,[7,*]
+Re: X54 File restructuring
+Cc:
+Enter message.  End with ^Z
+
+@(carl)x54.msg
+[(carl)x54.msg loaded]
+
+Only necessary directories will be restored from the all-files
+tapes if there is not enough space to restore what is left on
+tuesday.  So, if you don't wish to restore your own files, please
+delete your unnecessary files before then.
+
+-Carl.
+^Z
+
+LOOKUP OR ENTER: INVALID FILE SPECIFICATION
+Called from 412216  Last SAIL call at 44624
+^
+c% [7 isn't a valid user
+
+LOOKUP OR ENTER: INVALID FILE SPECIFICATION
+Called from 412216  Last SAIL call at 44624
+^
+c% *] isn't a valid user
+
+[Done]
+[mail waiting]
+
+! <<  This can be got around by setting bit 18 in the lookup call in
+      question.
+
+
+
+From: CARL
+Date: SEPTEMBER 15,1982 8:59
+Ken,
+  I found another {feature} of the RDMAIL program which you
+should change.  We already have enough of these ??????.INI
+files around, and since we have a routine to read SWITCH.INI,
+we ought to use it.  Change the reading of RDMAIL.INI to
+use the SW!INI call for ("RDMAIL",null) or "MAIL",null and
+let everyone know when it's working to put a line in their
+switch.ini of:
+
+RDMAIL	command-list <cr>
+
+-Carl.
+
+
+
+From: CARL
+Date: OCTOBER 19,1982 12:56
+Ref: NEW MAIL SYSTEM
+SInce both COEES and MAGNUM want to be able to send messages
+containing bells (^G), please make a note to let both SEND
+and RDMAIL pass ^G's as characters and not as "^" & "G".
+-Carl.
+
+
+
+From: CARL
+Date: OCTOBER 21,1982 10:26
+ref: MAIL
+(as in RDMAIL) needs to allow some kind of beginning and ending
+for ranges.  It's ridiculous to have to know what the "last"
+message number is.   eg. List 1-20   is fine if you have 20 msgs
+If you have 19, you get a "bad range" error.  There doesn't seem
+to be a token which means "last" or "end", and I feel that there
+should be.   eg. List 12-*   or List 12-end
+-Carl.
+
+
+
+From: KEN
+Date: OCTOBER 24,1982 17:58
+Bill,
+
+I noticed that (WRS)NBSNAM.SAI and (WRS)NBSSUB.SAI differ substantially
+from the copies in (DWS), and (MAILDEV) (the directory I created to hold
+the development version of the mail system).  I also note that the source
+on (DWS) doesn't build the current versions of (DWS)RDMAIL.SAV or
+(DWS)SEND.SAV.  Could the source on (WRS) be preferable to thaton
+(MAILDEV) and (DWS)?  Also, do the (SYS) versions of SEND and RDMAIL run
+the (DWS) equivalent?
+
+/Ken
+
+
+
+From: LOIS
+Date: OCTOBER 28,1982 9:00
+Ken,
+
+That certainly is an improvement to rdmail.  But, as long as it takes
+so long to load, and, finding having mail in two locations something of
+a confusion, I think I will go back to using the other mail.
+-Lois
+
+
+
+From: CARL
+Date: OCTOBER 28,1982 18:51
+Huh?
+.do send
+To: txs.c/baltrunas:emsaa
+Re:
+Cc:
+Enter Message.  End with ^Z
+
+foo
+^Z
+% Can't (yet) spool to txs.c/baltrunas:emsaa
+
+[Done]
+- 1 -
+Posted: July 16, 1982 10:46
+To:   TymcomX
+From: DWS:930
+Re:   The new Mail System
+
+As mentioned by Bill, the message '[mail waiting]' on login means
+that you have mail from the new mail system.  The program to read
+new (and old) mail is (DWS)RDMAIL.  It may still have a few bugs
+in it.  Type "?" for help, "list new" for a summary of new mail,
+"list old" for a summary of old mail, "list all" for ...  etc.
+
+The program to send mail is (DWS)SEND.  It doesn't (yet) allow
+command files, but the mail system knows about the "aliases"
+OSU, TSU, TYMCOMX, and MANAGERS.  For example, this message was
+sent to TYMCOMX.  SEND may still have some bugs in it.
+
+Mail ends up sitting in a file called "[MAIL]".  The funny name
+is to prevent people from trying to edit it or type it.  There
+will soon be a facility for "filing" messages in other files.
+
+Your comments on the new mail system will be appreciated.
+
+
+
+- 4 -
+Posted: July 27, 1982 09:41
+To:   WRS, Ken, TJB, DWS
+From: DWS:930
+Re:   New Features in RdMail
+
+(Ignore the last message - it uncovered a bug in SEND).
+
+(DWS)RxMail is a field test version of RdMail.  The following are new:
+
+  o  Commands are first taken from RdMail.Ini  (allowing automatic
+     'list new' or 'delete before -30').
+  o  A few commands now support output files.  I.e. 'list all to foo.log'
+     diverts output to foo.log.
+  o  RdMail is now smarter about having to write out the mail file.
+
+Caveat: The 'copy' command doesn't work yet.
+
+
+
+- 11 -
+Posted: July 30, 1982 17:31
+To:   dws
+From: KEN:930
+Cc:   ken
+Re:   Gfd'd Directories
+
+Just to remind you that RDMAIL writes the mail file in the Gfd'd
+directory.
+
+/Ken
+
+
+
+- 19 -
+Posted: August 17, 1982 14:04
+To:   txs
+From: WRS:930
+Re:   (SYS) additions on 930
+
+The following programs exist on SYS on 930 only:
+   (SYS)SEND.SAV   runs   (DWS)SEND
+   (SYS)RDMAIL.SAV   runs   (DWS)RDMAIL
+   (SYS)PEAK.SAV   runs   (DWS)PEAK
+No additional access rights are implied.
+-Bill
+
+
+
+- 29 -
+Posted: September 2, 1982 09:20
+To:   Ken
+From: DWS:930
+Re:   Mail bug report from Carl
+
+--------
+
+
+- 41 -
+Posted: September 2, 1982 06:32
+To:   dws
+From: CARL:930
+Re:   Mail system
+
+Dave,
+  I found a *BUG* (or feature) which you ought to be aware of
+in the new mail system.  If you get the message [Mail Waiting]
+and run RDMAIL while you are GFD'd someplace else, it doesn't
+do the right thing!
+
+  I did this today and got a new "[MAIL]" file on the GFD'd
+directory.  Now, (without retyping the message) there is not
+anyway to get that one message consolidated with the rest of
+my "[MAIL]" file o--------
+
+Have fun.
+
+
+
+- 37 -
+Posted: September 8, 1982 09:01
+To:   Ken
+From: DWS:930
+Re:   Forwarding MSG from WRS
+
+----------
+
+
+- 48 -
+Posted: September 8, 1982 02:39
+To:   dws
+From: WRS:930
+Cc:   wrs
+Re:   (DWS)SEND and NBS routines
+
+I've made some changes to the NBS stuff on how it handles ALIAS's.  It now
+will handle spooling mail to remote sites in a limited way.  See me for
+details.  I wrote (DWS)SEND.SAV with a version that is loaded with the new
+routines.  The old routines are in (DWS) intact.  New are in (WRS).  We
+should talk to make sure its the way we want to leave it.  -Bill
+
+----------
+
+
+
+- 40 -
+Posted: September 24, 1982 17:34
+To:   ken:930
+From: WRS:930
+Cc:   DWS:930, WRS
+Re:   RDMAIL and GFD'd directories
+
+I understand you now "have" the mail system.  It sure would be nice if
+RDMAIL (and friends) always accessed the mailbox file [MAIL] out of
+your home directory, rather than your GFD'd one.  I've noticed a [MAIL]
+file in (M33) having pieces of mail to and from a large variety of
+people, none of which are M33.  -Bill
+
+
+
+- 45 -
+Posted: September 28, 1982 11:39
+To:   Ken
+From: DWS:930
+Re:   msg forwarded from Todd
+
+
+
+- 41 -
+Posted: September 28, 1982 11:32
+To:   Dws
+From: TODD:930
+Re:   Mail system feature
+
+Is there an easy way to delete an unread letter?  I did it the other day
+by deleting the appropriate file from MAIL.  However, I'm not sure that
+this is safe and it's certainly not your intention that mail be retracted
+in this manner.  /Todd
+
+
+
+- 53 -
+Posted: October 5, 1982 08:45
+To:   txs
+From: WRS:930
+Re:   First names!
+
+One may now send mail to anyone in the section using their first name.
+This of course only holds for the new mail system.  -Bill
+
+
+
+- 67 -
+Posted: October 28, 1982 01:04
+To:   txs
+From: KEN:930
+Re:   Rdmail
+
+There is a somewhat friendlier version of Rdmail being run by the
+".r rdmail" command these days on :930.  It finds the RDMAIL.INI and
+[MAIL] files on the logged-in directory, making it safe to read mail
+while you are GFD'd to some other directory.
+
+/Ken
+
+
+
+
+- 68 -
+Posted: October 28, 1982 01:10
+To:   KEN
+From: CARL:930
+Re:   SWITCH.INI vs RDMAIL.INI  (WHEN?)
+
+
+- 69 -
+Posted: October 28, 1982 03:13
+To:   Ken
+From: WRS:930
+Re:   RDMAIL
+
+Deluxe!  Wunderbar!
+Now all we need is RDMAIL subcommands for
+    SEND
+    REPLY
+    FORWARD
+-Bill
+
+
+
+- 71 -
+Posted: October 29, 1982 18:09
+To:   Ken
+From: DWS:930
+Re:   A Reminder ...
+
+to delete nbs###.* from DWS when you're done with it.
+    
