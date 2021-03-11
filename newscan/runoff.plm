@@ -1,0 +1,2042 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+                           RUNOFF
+
+                    Program Logic Manual
+
+                         Version 10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          ABSTRACT
+
+RUNOFF is a program which formats a file  of  documentation.
+The  file must be a special format consisting of free format
+text mixed with special  control  lines,  which  start  with
+period.
+Program Logic Manual for RUNOFF                       Page 2
+
+
+***COPYRIGHT  1970,  1971,  1972,  1973,  1974,  1975,  1976
+DIGITAL EQUIPMENT CORP., MAYNARD,MASS.*** 
+
+
+
+     this software is furnished under a license and may
+     only be used
+
+          or copied in accordance  with  the  terms  of
+     such license.
+
+          copyright (c) 1976,  1977,  1978  by  digital
+     equipment corporation, maynard, mass.
+Program Logic Manual for RUNOFF                       Page 3
+Table of Contents
+
+
+                     Table of Contents
+
+
+          1.   General Information
+          2.   Default Parameters
+          3.   Revision History
+          4.   Definitions
+                  ACs
+                  Flags
+                  Characters
+                  Macros
+          5.   Impure Storage
+          6.   Terminal Command Scanning
+          7.   Text Input Logic
+          8.   Dot Command Scanner
+          9.   Dot Command Processors
+          10.  Chapter and Section Operations
+          11.  Variable and If Operations
+          12.  Indexing
+          13.  Footnotes
+          14.  Output processing
+          15.  Typeset Output Logic
+          16.  Handy Subroutines
+          17.  Input Character Processing
+          18.  Error Message Handling
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 1
+
+                    GENERAL INFORMATION
+
+
+
+     Assembly instructions:
+
+     .LOAD OPSYS+RUNOFF
+
+     Where OPSYS.MAC contains either:
+
+
+     TOPS==10 ;FOR TOPS-10
+                            -OR-
+
+     TOPS==20 ;FOR TOPS-20
+
+
+
+     Then SSAVE the program and place it on SYS:.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 2
+
+                     DEFAULT PARAMETERS
+
+
+
+     The following parameters can probably be redefined:
+
+AD.CAS,CASEUPPER    ;INITIAL CASE DEFAULT
+AD.CON,0            ;/CONTROL DEFAULT
+AD.UND,""           ;/UNDERLINE CHARACTER DEFAULT
+ADSUND,"-"          ;UNDERLINE         CHARACTER          IF
+                    /UNDERLINE:SEPARATE
+BARWID,3            ;WIDTH OF BAR AREA
+CHAPTB,D12          ;BLANK BEFORE CHAPTER (IF LENGTH IS 64)
+CHAPTC,1            ;BLANK BEFORE CHAPTER TITLE
+CHAPTD,3            ;BLANK AFTER CHAPTER TITLE
+HEADLB,3            ;BLANK BEFORE .HL
+HEADLC,1            ;BLANK AFTER .HL1-2
+HEADLT,4            ;EXTRA TEST PAGE ON .HL
+HRMRG,D72           ;INITIAL RIGHT MARGIN FOR .HLP FILES
+HWPLN,D66           ;HARDWARE PAGE LENGTH
+ILMRG,0             ;INITIAL LEFT MARGIN
+ILPGNO,1            ;INITIAL PAGE NUMBER
+INDEXD,CHAPTD       ;SPACING AFTER INDEX HEADER
+IPARIN,5            ;INITIAL PARAGRAPH INDENT
+IPARTP,2            ;INITIAL PARAGRAPH .TEST PAGE
+IPARVS,-1           ;INITIAL PARAGRAPH VERTICAL SPACING
+L0LMAR,D9           ;INITIAL LEFT MARGIN ON .LIST
+LESPAC,2            ;HORIZ.  SPACE AFTER "." IN LIST ELEMENT
+                    NUMBER
+LFSPAC,1            ;LIST FINAL SPACE
+LSLMAR,D4           ;LEFT MARGIN FOR EMBEDDED .LIST
+LPTLEN,D60          ;SPOOLED HARDWARE PAGE LENGTH
+NASPAC,1            ;SPACING AFTER "NOTE"
+NFSPAC,2            ;SPACING AFTER NOTE (FINAL SPACE)
+NHSPAC,2            ;SPACING BEFORE NOTE
+NPMARG,D15          ;NOTES PRIMARY MARGIN CHANGE
+NSMARG,4            ;NOTES SECONDARY MARGIN CHANGE
+NSPACG,1            ;NOTES SPACING
+PD.TYP,TYPCAT       ;/TYPESET DEFAULTS :CAT
+RHDSPA,2            ;RUNNING HEAD (TITLE) SPACING AFTER
+SINDIN,2            ;INDENT FOR SUB-INDEX
+SPARIN,0            ;PARAGRAPH INDENT IF .SD COMMAND
+DEFAULT PARAMETERS                                  Page 2-2
+
+
+
+TYPSWD,D36          ;WIDTH OF TYPESETTER
+AD.BAR,"|"          ;BAR CHARACTER
+PD.BAR,""           ;BAR CHARACTER IF /BAR
+AD.DWN,0            ;VERTICAL SPACING BEFORE TITLE
+PD.DWN,5            ;VERTICAL SPACING BEFORE TITLE IF /DOWN
+AD.HDR,HEADMIXED ;INITIAL HEADER DEFAULT
+PD.HDR,HEADUPPER ;HEADER DEFAULT IF /HEADER
+AD.LPP,58           ;LINES PER PAGE
+PD.LPP,64           ;LINES PER PAGE IF /LINES
+AD.OVR,0            ;HORIZONTAL SPACING BEFORE LEFT BORDER
+PD.OVR,D20          ;HORIZONTAL SPACING BEFORE  LEFT  BORDER
+                    IF /OVER
+AD.SPC,1            ;INITIAL SPACING
+PD.SPC,2            ;INITIAL SPACING IF /SPACING
+AD.UNL,UNDRLINE     ;/UNDERLINE MODE DEFAULT
+PD.UNL,UNDRCHARACTER ;/UNDERLINE MODE DEFAULT IF /UNDERLINE
+AD.WID,D60          ;INITIAL WIDTH
+PD.WID,D70          ;INITIAL WIDTH IF /WIDTH
+
+The following parameters can not be changed without  risking
+further debugging:   
+
+LN$DRB,6            ;MAX DIRECTORY DEPTH (UFD+SFDS)
+LN$ENT,11           ;LENGTH OF EXTENDED ENTER BLOCK
+LN$LKP,7            ;LENGTH OF EXTENDED LOOKUP BLOCK
+TOPS-10
+LN$DRB,0            ;NO SFD'S ON TOPS-20
+LN$ENT,D30          ;ENTER STRING
+LN$LKP,D30          ;LOOKUP STRING
+LN$IDX,D60          ;MAX/5 LENGTH OF NAME IN INDEX
+LN$LIN,D100         ;MAX/5 LINE LENGTH
+LN$MJP,5            ;LENGTH OF NOTE/LIST PUSH DOWN LIST
+LN$MJS,4            ;LENGTH OF ENTRY ON NOTE/LIST PUSH  DOWN
+                    LIST
+LN$PDL,200          ;PUSH DOWN LIST LENGTH
+LN$RNG,D20          ;NUMBER OF /IRANGE/ORANGE PAIRS
+LN$SEC,6            ;MAX DEPTH OF SECTION LOGIC
+LN$TAB,40           ;MAX NUMBER OF TAB STOPS
+LN$TEC,D20          ;MAX/5 CHARS IN END COMMANDS
+LN$TTL,D50          ;MAX/5 TITLE LENGTH
+LN$UND,D100         ;MAX NUMBER UNDERLINES IN A LINE
+LN$VAR,D20          ;MAX NUMBER OF VARIABLES
+LN$IFS,D32          ;MAX NUMBER OF NESTED .IF'S [244]
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 3
+
+                      REVISION HISTORY
+
+
+
+
+
+#7a -- and previous versions are  lost  in  the  dark  ages.
+     Work  started  on  #10  during  fall,  1971.   Work was
+     resumed after edit 11.
+a.  Change to use twoseg.
+b.  !  and ?  followed by space are treated like .  followed
+     by space.
+c.  All commands may be abbreviated.
+d.  Add new commands:  CENTRE  (=  CENTER),  I  (=INDEX),  P
+     (=PARAGRAPH),  X  (=SUBINDEX), PAGE SIZE (=PAPER SIZE),
+     UPPER CASE (=^^), LOWER CASE (=\\).
+e.  Add SUBINDEX command.  Same as INDEX  except  subindices
+     indicated by >.
+f.  Warn of indents to the left of 0.
+g.  Add  defensive  code  to  footnote  routine  to  recover
+     instead of halt.
+h.  .PAGE clears current line before changing page width and
+     counts as a break.
+i.  Ring bell in PAUSE mode between pages.
+j.  Avoid blank pages.
+k.  Handle multiple lines of INDEX.
+l.  Defend against footnote within a footnote.
+m.  Defend correctly against !  when not in footnote.
+n.  Around footnotes, preserve (and clear)  indentation  and
+     case lock, preserve (and set) JUSTIFY and FILL.
+o.  INDICATE core usage within [].
+p.  TYPE number of pages at end.
+q.  Warn and disregard strange control characters in file.
+r.  Suppress the leading and trailing form  feed  on  output
+     except in PAUSE mode.
+s.  Clear out any final footnotes at EOF.
+t.  "PAGE" in page header is now UPPER/LOWER case.
+(12) Convert  to  use  C,  SCNMAC,  SCAN,  and  WILD.   This
+     includes  full  wild-card  and path usage on both input
+     and output.
+RUNOFF pushed through PGMFMT.
+Default spacing is single, default case is UPPER.
+REVISION HISTORY                                    Page 3-2
+
+
+
+Default output is LPT:same.<MAGIC>[-]
+Default input is DSK:.RNX[-] (file  is  previous  or  output
+     file).  where RNX=RNO+RND+RNP+RNC+<nul> in that order.
+Convert all messages to lower case.  Improve several of them
+     in the process.
+Use LF-VT-FF instead of CR as end of line.
+Detect comments after non-text commands;  junk as error.
+(13) Add /HEADER:X and .HEADER  X  (X=UPPER,LOWER,MIXED)  to
+     control case of "PAGE n" (default is MIXED).
+Detect illegal negative arguments in commands (NUMBER,  LEFT
+     MARGIN,  TEST  PAGE,  SKIP,  BLANK,  TAB STOPS, CENTER,
+     FOOTNOTE).
+Keep Center within PAGE SIZE.
+(10-6912) Fix multiple case indexing correctly.
+Include SUBPAGE in error messages.
+Correct SUBPAGE logic to allow .PAGE inside .SUBPAGE.
+Warn if too many SUBPAGES (gt 26).
+Include SUBPAGES in INDEX.
+(10-6710) Put out sets of pages in INDEX with hyphens.
+Add .LITERAL n and .END LITERAL commands.
+Make !  be comment character, and  ;   be  multiple  command
+     separator (except for TITLE, SUBTITLE, and INDEX).
+Fix error messages to print actual commands
+Include input page and line in error messages.
+Initialize FOOTNOTE case to /CASE:X setting as  modified  by
+     .UPPER CASE and .LOWER CASE.
+14 Implement .SCWLD for full output wildcarding.
+15 Implement > in SUBINDEX.  also ;.
+16 Recognize multiple tab and space in AUTOPARAGRAPH.
+17 Fix bug which kept .X > from printing main entry.
+20 Handle RUNOFF and RUN xxx () commands.
+21 Add .AUTOPARAGRAPH and .NO AUTOPARAGRAPH.
+22 Add /NOAUTOPARAGRAPH/nopause/NOSIMULATE.
+23 Make .<CR> and .<SPACE> be break.   In  particular,  note
+     t  ;text is a new line.
+24 Add default extension .RNH to produce .HLP.
+25 Add .NOPAGING, reset by .PAGING.  This is default if .RNH
+     input.
+26 Add .COMMENT.
+27  Add  optional  second  argument  to  .PARAGRAPH  to  set
+     vertical paragraph spacing.  -1 sets <SPAC+1>/2
+30 Add /SEQUENCE/NOSEQUENCE  to  list  input  file  sequence
+     numbers to left of output.
+31 Add .SUBTTL (identical to .SUBTITLE).
+32 Allow sequence .PAGE;.TITLE to work.
+33 Add .FIRSTTITLE to cause PAGE 1 to be titled.
+34 Add .SELECT,  .NOSELECT,  /SELECT/NOSELECT,  and  default
+     selection on source files.
+35 Correct /PAUSE bug to pause on first page.
+36 Suppress informational typeouts if output to TTY:
+37 Change output device default to DSK:
+40 Add file name to page count message.
+REVISION HISTORY                                    Page 3-3
+
+
+
+41 Add .NO XXX for .NOXXX.
+42 Treat :  and ;  like !  ?  and .
+43 Add  .PERIOD  .NOPERIOD  to  defeat  the  .?!:;   special
+     handling.
+44 Change internal EOF code to -1.
+45 Have .CENTER suppress trailing unquoted spaces.
+46 On .CENTER, treat TAB as a space.
+47 If CCL mode, type "RUNOFF:  " before file in page count.
+50 Correct core messages to round up.
+51 Convert to the error message standard.
+52 Allow multiple spaces and tabs between words in commands.
+53 Allow null numbers on .PARAGRAPH, .TAB STOPS.
+54 Fix .CENTER to work correctly at top of page.
+55 In  .AUTOPARAGRAPH  mode,  a  blank  line  causes  a  new
+     paragraph.
+56 Use the current .SPACING in the INDEX.
+57 Preset .TAB STOPS 9,17,25,...
+60 Allow relative specifications on .CENTER, .NUMBER,  .LEFT
+     MARGIN, .RIGHT MARGIN, .PAGE SIZE.
+61 Add .LEFT and .RIGHT.
+62 Only consider .:;!?  as needing double space if it  comes
+     after two consecutive alphabetics.
+63 Treat spaces before last tab  on  line  as  non-expanding
+     (quoted).
+64 /SEPARATE line for underline;  default /UND to -.
+65 Change command entry point names for consistency.  Change
+     names of LH(F) to L.XXXX.
+66 Add defensive code on all buffers with error E$$IBO.
+67 If source file, then default output to .PLM.
+70 Negative argument to BLANK/SKIP is from bottom of page.
+71  Place  underlined  items  before   identically   spelled
+     ununderlined ones.
+72 Add .FLAGS/.NOFLAGS commands.
+73 Default RIGHT MARGIN to 72 if .HLP.
+74 Default INDEX casing is UPPER  for  first  character  and
+     LOWER for rest.  This is altered by any case controls.
+75 Start FOOTNOTE in case lock of text at definition.
+76 Add .FIGURE DEFER n.
+77 Add _ control character, .CONTROL, /CONTROL.
+100 Add .FLAG CAPITALIZE <.
+101 Add .FLAG INDEX >.
+102 Add .NOHEADER.
+103 Add 1-2 letter abbreviations for each command.
+104 Add .LS, .NOTE, .END, .SD.
+105 Add optional third argument to  .P  for  automatic  test
+     page.
+106 Notice <LF><FF> as not a blank line.
+107 Add /DOWN, /OVER.
+110 Don't justify an exactly full line with no spaces.
+111 Detect absence of command.
+112 Fix the bug in routine which causes spaces  before  tabs
+     to be quoted.
+REVISION HISTORY                                    Page 3-4
+
+
+
+113  Add  CHAPTER  and   HEADER   commands   for   automatic
+     sectioning.
+114 Fix bugs in < and .  logic within text.
+115 Allow "." (current form) as statement  separator  except
+     in comments.
+116 Flag capital and index take up  to  the  next  space  or
+     linefeed.
+117 Add SPARIN and set it on .SD command.
+120 Fix .NOTE to agree with DEC standard.
+121 Fix many minor bugs in above edits.
+122 Centralize start of all error messages.
+123 Change to use C, SCNMAC as universal files.
+124 .CH update title, .HL1 update subtitle.
+125 If .RM is greater than page width, expand page width.
+126 Add .NST.
+127 Fix bugs in implicit skip  logic  which  caused  missing
+     headings.
+130 Introduce internal mode of defaulting capitalization.
+131 Check indent against right margin.
+132 Add .AUTOTABLE.
+133 Include chapter numbers in page numbering.
+134  Add  .DO  INDEX  and  "INDEX-"  in  paging  of  chapter
+     documents.
+135 Add .LIST ELEMENT.
+136 Make "n" optional in .LITERAL.
+137 Add long names for HL, SD, LS.
+140 Add /VARIANT, .VARIABLE, etc.
+141 Add options to .NUMBER.
+142 Add .APPENDIX.
+143 Add /DRAFT.
+144 Add /IRANGE, /ORANGE.
+145 Add /TYPESET.
+146 Clear indent on page/section/paragraph style commands.
+147 Detect illegal commands inside footnote.
+150 Add .NUMBER LEVEL and .NUMBER LIST.
+151 (10-13004) If ^\, etc., use last;  make  ^  followed  by
+     lower case force upper (just one character).
+152  Change  /OVER  to   /RIGHT;    consolidate   /UNDERLINE
+     switches.
+153 Cancel edit 62 as a bad idea.
+154 Add /LINES to set initial page length.
+155 Add .RNE makes .ERR, .RNS makes .STD.
+156 Have angle flags toggle settings.
+157 (QAR 2220) Allow /UNDERLINE:NONE and /UNDER:arg:arg  and
+     /NOUNDERLINE.
+160 Clean up /ORANGE.
+161 Decrease NIA errors.  Issue as warnings.
+162 Add /TYPESET:CAT.
+163 Add .TYPESET.
+164 Fix literal tab bug and wild open bug.
+165 (QAR 2632) Allow period in text type commands.
+166 Fix bug which lost line if footnote defined  at  end  of
+     page.
+REVISION HISTORY                                    Page 3-5
+
+
+
+167 (QAR 2453) Ignore autopar, autotab if no fill.
+170 (QAR 2537) Preserve AC B in routine FIN.
+171 (QAR 2473) Don't clear indent on test page.
+172 (QAR 2473) Allow .NUMBER PAGE 0.
+173 (QAR 2480) Add .END LIST.
+174 (QAR 2483) Underline quoted spaces when underlining.
+175 (QAR 2486) Speed up output by removing unneeded carriage
+     returns.
+176 (QAR 2487) Discard extra space on line overflow when  no
+     fill.
+177 (QAR 2488) Improve justify with no fill.
+200 (QAR 2489) Move indent reset to handle CJL error better.
+201 (QAR 2491) More error tests:  .I and .P to left of  left
+     edge, have .LM update .P if needed.
+202 (QAR 2493) Clear typein before waiting on /PAUSE.
+203 (QAR 2494) When output to TTY:/PAUSE, suppress echo.
+204 (QAR 2499) Return core after print index.
+205 (QAR 2633) Update lines this page more reliably.
+206 Support routine .OSDFS.
+207 Add extensions .RNB and .RNM;  add more languages.
+210 Handle .END LITERAL if in lower case.
+211 (QAR 2635) Add BAR feature.
+212 Add .END FOOTNOTE.
+213 (QAR 2727) Fix relative .NUMBER.
+214 (QAR 2726) TSTPAG was off by 1.
+215 Remove bug of not double space  after  period  at  input
+     eol.
+216 Remove bug in /SEQ if file not sequenced.
+217 Add command .NOSPACE.
+220 Remove bug in /VARIANT table lookup.
+221 Add /NUMBER/PAGING/WIDTH.
+222 (QAR 2784) Don't clear indent on .TP.
+223 (QAR 2785) Remove spurious JEC on .FLAG.
+224 (QAR 2786) Detect .ENDIF after blank line.
+225 Allow subindexes to match shorter form.
+226 (QAR 2845) Allow .PG.NM x to work.
+227 (QAR 2845) Add /CRETURN.
+230 (QAR 2845) Add .END SELECT.
+231 .NT at top of page lost page heading.
+232 Blank lines in .LT lost page heading.
+
+                  VERSION 10(232) RELEASED
+
+233 CONVERT TO RUN ON TOPS-20
+234  RUNOFF DOES NOT JUSTIFY CORRECTLY WHEN THE TITLE  OF  A
+     HEADER (.HL3 OR GREATER) IS UNDERLINED.  [SPR 10-17960]
+235  NOT ENOUGH SPACE ALLOCATED FOR /IRANGE AND /ORANGE.   3
+     WORDS ARE STORED BUT ONLY 2 ALLOCATED.
+236  IF  A  CENTERED  LINE  CONTAINS  SPACES   QUOTED   WITH
+     UNDERLINE   (TO   GET  THE  SPACES  UNDERLINED  ON  THE
+     PRINTOUT), THE LINE IS NOT  CENTERED  CORRECTLY.   [SPR
+     10-17868]
+REVISION HISTORY                                    Page 3-6
+
+
+
+237  ALLOW RUNOFF TO HANDLE BACKSPACE IN THE SOURCE TEXT (TO
+     ALLOW OVERSTRIKES).  RUNOFF WILL NOW JUSTIFY LINES WITH
+     BACKSPACES ASSUMING THAT THE BACKSPACE TAKES  -1  PRINT
+     POSITION.  [SPR 10-17551]
+240  PUT HEADER ON CONTINUATION PAGE OF INDEX [SPR 10-16812]
+241  MAKE .DO INDEX WORK EVEN IF DOCUMENT HAS  NO  CHAPTERS.
+     [SPRS 10-16842 AND 10-17089]
+242  HANDLE QUOTED CHARACTERS IN  INDEXED  ITEMS  CORRECTLY.
+     [SPRS 10-17188 AND 10-17522]
+243  CHANGE RUNOFF SO THAT TYPING JUST THE WORD "RUNOFF"  ON
+     SYSTEMS  WITH  A  RUNOFF  COMMAND PRINTS A * INSTEAD OF
+     RNFNFS ERROR.
+244  NESTED .IF CONDITIONALS DO  NOT  WORK  PROPERLY.   [SPR
+     10-16797]
+245  /SELECT SWITCH FAILS [SPR 10-16820]
+246  ILL.   MEM.    REF.    USING   .NOHEADER/.HEADER   [SPR
+     10-16454]
+247  CORRECT 244
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 4
+
+                        DEFINITIONS
+
+
+
+4.1  AC DEFINITIONS
+
+F=0              ;FLAGS
+A=1              ;WORK
+B=2
+C=3
+D=4
+X=5
+CH=6
+C2=7             ;MUST STAY 7
+S1=10
+S2=11           
+N=12
+N1=13
+PA=15            ;POP ARGS
+P=17             ;STACK
+
+
+
+4.2  FLAGS
+
+4.2.1  FLAGS IN LH OF F
+
+                   ;                    _
+L.PJUS==(1B0)    ;.JUSTIFY
+L.JUST==(1B1)    ;.JUSTIFY BUT NOT .NO FILL
+L.TJUS==(1B2)    ;JUSTIFY THIS LINE
+L.FILL==(1B3)    ;.FILL
+L.NFSP==(1B4)    ;NO FREE SPACE
+L.FOOT==(1B5)    ;ON IF PROCESSING FROM FOOTNOTE STRING
+L.GCIN==(1B6)    ;ON IF CHARS IN GCINP TO READ
+L.ESOL==(1B7)    ;EXTRA SPACES ON LEFT
+L.INDX==(1B8)    ;INDEX THIS WORD
+L.CAPS==(1B9)    ;CAPITALIZE THIS WORD
+L.ULMS==(1B10)   ;ON IF UNDERLINE SHIFT-LOCKED ON
+L.UMOD==(1B11)   ;ON IF UNDERLINE GETS DONE IN ONE PASS
+L.USUP==(1B12)   ;ON IF USER HAS SUPPRESSED UNDERLINING
+L.UBSP==(1B13)   ;ON IF UNDERLINING WITH BACKSPACE (ASCII)
+L.ULIN==(1B14)   ;ON IF UNDERLINING TAKES A SECOND LINE
+L.SUPO==(1B15)   ;SUPPRESS OUTPUT BECAUSE OF /RANGE
+DEFINITIONS                                         Page 4-2
+FLAGS
+
+
+L.IDXC==(1B16)   ;IN INDEX, INDICATES L.IDXD SIGNIFICANT
+L.IDXD==(1B17)   ;IN INDEX, OLD ENTRY COMES FIRST
++
+
+
+
+4.2.2  FLAGS IN RH OF F
+
+                  ;                   _
+R.FSEQ==1B18     ;SEQUENCE NUMBER BEING DISCARDED ON INPUT
+R.LCWV==1B19     ;LAST CHAR INPUT WAS VERT. MOTION
+R.SPPR==1B20     ;LEADING SPACE IMPLIES PARAGRAPH
+R.AUTB==1B21     ;.AUTOTABLE MODE
+R.PGSQ==1B22     ;SEQUENCE OF PAGES DURING INDEX PRINTING
+R.CCOM==1B23     ;READING A COMMAND (DUPLICATE INTO BUFFER)
+R.SEQU==1B24     ;/SEQUENCE
+R.QNIC==1B25     ;QUOTE NEXT INPUT
+R.ALCC==1B26     ;ALLOW ALL CONTROL CHARS
+R.SLCT==1B27     ;SELECT MODE
+R.SLLK==1B28     ;LOOK FOR SELECTION PREFIX
+R.SLRG==1B29     ;IN +- SELECTION RANGE
+R.NPER==1B30     ;.NO PERIOD
+R.MULN==1B31     ;GOING FOR MULTIPLE NUMBERS
+R.NNUL==1B32     ;LAST NUMBER WAS NOT NULL
+;;SPARE         1B33
+R.NFLA==1B34     ;SUPPRESS ALL FLAG CHARACTERS EXCEPT .!
+R.FRCC==1B35     ;CASE CONTROLLED BY USER
++
+
+
+
+4.2.3  OTHER FLAGS (NOT IN F)
+
+;&
+LCHPVT==1B18     ;PREVENT CHARACTER RECOGNITION (FOLLOWS _)
+APPXFL==1B23     ;IN CHAPTER NUMBER, APPENDIX
++
+
+
+
+4.3  OTHER DEFINITIONS
+
+4.3.1  MISCELLANEOUS SYMBOLS
+
+                  ;&
+CNVTOK==-12      ;CONVERT TO K FROM WORDS
+INFIN==377777    ;INFINITY
+PGWID==^D18      ;PAGE WIDTH IN INDEX TABLE
+PGMASK==<1_PGWID>-1 ;PAGE MASK IN INDEX TABLE
+SPWID==5         ;SUB-PAGE WIDTH IN INDEX TABLE
+SPMASK==<1_SPWID>-1 ;SUB-PAGE MASK IN INDEX TABLE
+CHWID==^D36-PGWID-SPWID ;CHAPTER WIDTH IN INDEX TABLE
+CHMASK==<1_CHWID>-1 ;CHAPTER MASK IN INDEX TABLE
+IFE APPXFL&CHMASK,<PRINTX ? CHAPTER MASK DOESN'T INCLUDE
+DEFINITIONS                                         Page 4-3
+OTHER DEFINITIONS
+
+
+APPENDIX FLAG>
+ULCAS==40        ;DIFFERENCE BETWEEN CASES
+CCUCAS==100      ;DIFFERENCE BETWEEN CONTROL AND UPPER
+CHRMSK==177      ;ASCII CHARACTER MASK
+IFN LCHPVT&CHRMSK,<PRINTX ? CHRMSK INCLUDES LCHPVT>
++
+
+
+
+4.3.2  CHARACTERS FOR CREF
+
+                  ;&
+C.SIFI==1        ;SUBINDEX FLAG IN INTERNAL STRING STORAGE
+C.QUTI==2        ;INTERNAL QUOTE IN STORAGE
+C.ULS==3         ;UNDERLINE CHARACTER IN INTERNAL STORAGE
+C.TAT==4         ;TYPESET END OF MACRO ARG IN INTERNAL
+STORAGE
+C.FLGS==" "-3    ;HIGHEST INTERNAL FLAG CHARACTER
+C.QTS==" "-2     ;QUOTED SPACE (INTERNAL FOR #)
+C.NXS==" "-1     ;NON-EXPANDABLE SPACE (INTERNAL)
+C.GRPH==" "      ;LOWEST GRAPHIC
+C.SPC==" "
+C.EXCL=="!"      ;EXCLAMATION (AS PUNCT, NOT FOOTNOTE CUE)
+C.EFNT=="!"      ;END OF FOOTNOTE
+C.COMT=="!"      ;COMMENT FLAG
+C.QS=="#"        ;QUOTED (NONEXPANDABLE) SPACE IN INPUT FILE
+C.ULI=="&"       ;UNDERLINE COMMAND IN INPUT DATA
+C.PLUS=="+"      ;PLUS IN NUMBERS
+C.CMA==","       ;COMMA SEPARATOR IN ARGUMENT LISTS
+C.HYPH=="-"      ;HYPHEN IN SECTION HEADERS
+C.MINS=="-"      ;MINUS IN NUMBERS
+C.CNT=="."       ;CONTROL PREFIX
+C.PD=="."        ;PERIOD. FOR SPECIAL SPACING AFTER PERIOD
+C.COLN==":"      ;COLON IN TEXT
+C.SEMI==";"      ;SEMICOLON
+C.SEMC==";"      ;SEMICOLON IN TEXT
+C.CAP=="<"       ;CAPITALIZE NEXT WORD
+C.IND==">"       ;INDEX NEXT WORD
+C.SIF==">"       ;SUBINDEX FLAG IN INPUT
+C.QM=="?"        ;QUESTION MARK
+C.DN=="\"        ;LOWER CASE INDICATOR
+C.UP=="^"        ;UPPER CASE INDICATOR
+C.QNC=="_"       ;QUOTE NEXT CHARACTER
++
+
+
+
+4.3.3  SOFTWARE CHANNELS
+
+                  ;&
+F.FIN==1         ;COMMAND FILE INPUT
+F.FOUT==2        ;COMMAND FILE OUTPUT
+CREF EOF TESTS +
+DEFINITIONS                                         Page 4-4
+OTHER DEFINITIONS
+
+
+4.3.4  Macros
+
+MSG$ is followed by the three letter error code, one of  the
+indicators  ERR,  WRN, or INF for which class of message, an
+optional S to save all accumulators, and the  message  text.
+It  will  force  out any TTY buffers, issue the file name if
+not yet done, then issue the message correctly prefixed.
+
+ILCM$ is followed by the three letter error code,  and  then
+the  text  of  the  message.  It issues the message with the
+standard prefix as a fatal error message.  It  then  follows
+the  message  with the current command and the page location
+of  the  error.   Finally,  it  jumps  to  end  of   command
+processing.
+
+SAVE$ <list> pushs the list of locations onto the stack.
+
+RSTR$ <list> pops the list of locations from the stack.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 5
+
+                       IMPURE STORAGE
+
+
+
+                        ;&
+;LOCATIONS WHICH ARE SET AT START-UP TIME AND NEVER CLEARED
+CCLF1:  BLOCK   1        ;1 IF CCL ENTRY, 0 IF NORMAL
+INICOR: BLOCK   1        ;SIZE OF CORE BEFORE ANY EXPANSION
+INIFF:  BLOCK   1        ;INITIAL SETTING OF .JBFF
+;SCAN BLOCKS
+SCNFWA:!                ;START OF SCAN BLOCKS
+SCNLOC: BLOCK   1        ;POINTER TO LAST INPUT SCAN BLOCK
+SCNPTR: BLOCK   1        ;WILD-CARD SCAN POINTER
+SINCOR: BLOCK   1        ;LH=.JBFF, RH=.JBREL AT START OF
+FILE
+SCNFIR: BLOCK   1        ;START OF SCAN PARAMETER AREA
+FINI:   BLOCK   1        ;INITIAL F SETTING
+FINIM:  BLOCK   1        ;MASK FOR FINI
+SCNNVR: BLOCK   1        ;/VARIABLE COUNT
+SCNVAR: BLOCK   LN$VAR   ;/VARIABLE LIST
+SCNNIR: BLOCK   1        ;/IRANGE COUNT
+SCNIRG: BLOCK   3*LN$RNG ;/IRANGE FROM:TO PAIRS
+SCNNOR: BLOCK   1        ;/ORANGE COUNT
+SCNORG: BLOCK   3*LN$RNG ;/ORANGE FROM:TO PAIRS
+                         ;(0) FROM PAGE,,LINE
+                         ;(1)  TO  PAGE,,LINE
+                         ;(2) START CHAPTER,,END CHAPTER
+SCMFWA:!                ;START OF SCAN SWITCHES
+SCNBAR: BLOCK   1        ;/BAR SWITCH
+SCNCAS: BLOCK   1        ;/CASE SWITCH
+SCNCRT: BLOCK   1        ;/CRETURN SWITCH
+SCNDRF: BLOCK   1        ;/DRAFT SWITCH
+SCNDWN: BLOCK   1        ;/DOWN SWITCH
+SCNHDR: BLOCK   1        ;/HEADER SWITCH
+SCNLPP: BLOCK   1        ;/LINES SWITCH
+SCNNMB: BLOCK   1        ;/NUMBER SWITCH
+SCNOVR: BLOCK   1        ;/OVER SWITCH
+SCNPAG: BLOCK   1        ;/PAGING SWITCH
+SCNPAU: BLOCK   1        ;/PAUSE SWITCH
+SCNPER: BLOCK   1        ;/PERIOD SWITCH
+SCNSEL: BLOCK   1        ;/SELECT SWITCH VALU
+SCNSIM: BLOCK   1        ;/SIMULATE SWITCH
+SCNSPG: BLOCK   1        ;/SPACING SWITCH
+SCNTYP: BLOCK   1        ;/TYPESET
+IMPURE STORAGE                                      Page 5-2
+
+
+
+SCNWID: BLOCK   1        ;/WIDTH SWITCH
+ULCHO:  BLOCK   1        ;/UNDERLINE CHARACTER
+ULTYPE: BLOCK   1        ;TYPE OF UNDERLINE
+SCMLWA==.-1             ;END OF SCAN SWITCHES
+                         CONT.
+SCNOUT: BLOCK   .FXLEN   ;OUTPUT PARAMETER BLOCK
+OPNBLK: BLOCK   3        ;INPUT OPEN BLOCK
+SCNLWA==.-1
+FILFWA:!                ;START OF AREA TO CLEAR BEFORE EACH
+FILE
+RMARG:  BLOCK   1        ;RIGHT MARGIN
+PRMRG:  BLOCK   1        ;RIGHT PAGE-SIZE
+LMARG:  BLOCK   1        ;LEFT MARGIN
+FILCAS: BLOCK   1        ;INITIAL CASE MODE
+CAS:    BLOCK   1        ;0 OR 40 TO CONVERT TO LOWER CASE
+PAGENO: BLOCK   1        ;PAGE NUMBER FOR OUTPUT FILE
+FRCPAR: BLOCK   1        ;FLAG TO FORCE PARAGRAPH
+PARIND: BLOCK   1        ;INDENTING FOR PARAGRAPHS
+PARSPC: BLOCK   1        ;VERT SPAC FOR PARAGRAPHS
+PARTPG: BLOCK   1        ;TEST PAGE FOR PARAGRAPHS
+LASLS:  BLOCK   1        ;DEPTH OF LAST .LIST COMMAND
+LSTCNT: BLOCK   LN$MJP+1 ;COUNT AT THAT DEPTH
+NSPNG:  BLOCK   1        ;SPACING
+LINEC:  BLOCK   1
+SUBPGE: BLOCK   1        ;0 OR 1+SUBPAGE WE ARE IN
+FILHDR: BLOCK   1        ;.HEADER CASE
+FILOVR: BLOCK   1        ;SPACES IN FROM /OVER
+FILOVT: BLOCK   1        ;TABS IN FROM /OVER
+FLNUMB: BLOCK   1        ;.NONUMBERING
+FLTITL: BLOCK   1        ;TITLE ON NEXT PAGE
+FLNOPG: BLOCK   1        ;.NOPAGING
+FLNHDR: BLOCK   1        ;.NOHEADER
+FLSOPG: BLOCK   1        ;FLAG SOMETHING ON PAGE
+FILNVR: BLOCK   1        ;NUMBER OF VARIABLES
+FILVAR: BLOCK   LN$VAR   ;VARIABLE NAMES
+FILVVR: BLOCK   LN$VAR   ;VARIABLE VALUES (-LN$VAR=FALSE)
+FILFVR: BLOCK   LN$VAR   ;VARIABLE DRAFT FLAGS (IF,,IFN)
+IFSTKP: BLOCK   1        ;[244] STACK POINTER FOR IF STACK
+IFSTK:  BLOCK   3*LN$IFS ;[244] IF STACK
+VRSKIP: BLOCK   1        ;CURRENT VARIABLE INDEX
+FLSKIP: BLOCK   1        ;ASCIZ LISTING FLAGS (/DRAFT)
+IFSKIP: BLOCK   1        ;-1 TO SKIP INPUT
+MJSPDL: BLOCK   1        ;PD POINTER TO MJSPDB
+MJSPDB: BLOCK   LN$MJP*LN$MJS ;PD STORAGE FOR NOTE/LS
+SECNUM: BLOCK   LN$SEC   ;SECTION NUMBERS (FIRST IS CHAPTER)
+LASHL:  BLOCK   1        ;LEVEL OF LAST .HL OR .CH
+CENPOS: BLOCK   1        ;SAVED VALUE FOR CENTERING
+CENTTL: BLOCK   1        ;-1 OR COUNT DOWN OF TITLE IN
+CENTER
+SMINSC: BLOCK   1        ;FLAG SOMETHING IN THIS SECTION
+TABTAB: BLOCK   LN$TAB   ;TAB SETTINGS
+NTABS:  BLOCK   1
+NLPG:   BLOCK   1        ;PAGE LENGTH
+PNLPG:  BLOCK   1        ;PAGE SIZE
+IMPURE STORAGE                                      Page 5-3
+
+
+
+                         CONT.
+; GLOBAL VARIABLES
+PLIST:  BLOCK   LN$PDL+1
+INIFBF: BLOCK   1        ;FIRST VALUE LOADED INTO FOOTBF
+FOOTBF: BLOCK   1        ;ADDRESS OF FOOTNOTE BUFFER (SET AT
+INITIALIZATION)
+FOOTC:  BLOCK   1        ;FOOTNOTE COUNT
+FOOTP1: BLOCK   1
+FOOTP2: BLOCK   1
+FOOTP3: BLOCK   1
+FOOTP4: BLOCK   1
+FOOTWB: BLOCK   LN$LIN   ;LINE HOLDING BUFFER AROUND
+FOOTNOTE OUTPUTTER
+FOOTS1: BLOCK   1        ;POINTERS TO FOOTWB
+FOOTS2: BLOCK   1        ; ..
+ICBUF:  BLOCK   LN$IDX   ;STORAGE FOR INDEXED ITEM
+ICBFE=.-1
+ICBUFC: BLOCK   1        ;UP COUNTER ON ICBUF
+ICBUFP: BLOCK   1        ;BYTE POINTER TO ICBUF
+SUBIDX: BLOCK   1        ;DISTINGUISHES SUBINDEX COMMAND
+XFIRST: BLOCK   1        ;ADDRESS OF ALPHABETICALLY FIRST
+ITEM
+XTOP:   BLOCK   1        ;TOP OF INDEX STORAGE
+XBOT:   BLOCK   1        ;BOTTOM OF INDEX STORAGE
+OIXC:   BLOCK   1        ;CURRENT ITEM IN OUTPUT INDEX
+OIXL:   BLOCK   1        ;INITIAL LETTER IN OUTPUT INDEX
+AUTIDX: BLOCK   1        ;-1 IF > INDEXING
+PAGECT: BLOCK   1        ;COUNT OF REAL PAGES OUTPUT
+LINECT: BLOCK   1        ;COUNT OF LINES ON CURRENT PAGE
+OUTPUT
+DIDSOM: BLOCK   1        ;NON-ZERO IF LINE OUT SINCE LAST
+PAUSE
+INDCT:  BLOCK   1        ;INDENTATION
+NIACNT: BLOCK   1        ;COUNT OF NIA WARNINGS SINCE LM
+DEFFIG: BLOCK   1        ;DEFERRED FIGURE SIZE
+LITCNT: BLOCK   1        ;LITERAL LINE COUNTER
+BARSW:  BLOCK   1        ;BAR ENABLED
+BARON:  BLOCK   1        ;BAR ON
+BARNPY: BLOCK   1        ;BAR WAS ON AT START OF LINE
+                         CONT.
+LKPBLK: BLOCK   LN$LKP   ;LOOKUP BLOCK FOR INPUT FILE
+INEXT:  BLOCK   1        ;INPUT EXTENSION
+OPNOUT: BLOCK   3        ;OPEN BLOCK FOR OUTPUT
+ENTBLK: BLOCK   LN$ENT   ;ENTER BLOCK FOR OUTPUT FILE
+DEFEXT: BLOCK   1        ;DEFAULT EXTENSION FOR OUTPUT
+H.FOUT: BLOCK   3        ;BUFFER HEADER FOR OUTPUT
+; GENERAL
+TT1:    BLOCK   1
+TT2:    BLOCK   1
+TT5:    BLOCK   1
+TT6:    BLOCK   1
+LCH:    BLOCK   1
+PSTRP:  BLOCK   2
+INSEQP: BLOCK   1        ;POINTER TO INPUT SEQUENCE NUMBER
+IMPURE STORAGE                                      Page 5-4
+
+
+
+INSEQN: BLOCK   1        ;CURRENT INPUT SEQUENCE NUMBER
+INSEQL: BLOCK   1        ;INPUT SEQUENCE NUMBER OF LAST LINE
+INLINE: BLOCK   1        ;INPUT LINE COUNT THIS PAGE
+INPAGE: BLOCK   1        ;INPUT PAGE COUNT
+THISEQ: BLOCK   1        ;SEQUENCE AT START OF THIS OUTPUT
+LINE
+THISLN: BLOCK   1        ;LINE COUNT AT START OF OUTPUT LINE
+THISPG: BLOCK   1        ;PAGE COUNT AT START OF OUTPUT LINE
+INEOFP: BLOCK   1        ;INPUT END OF FILE STRING POINTER
+SELPFX: BLOCK   1        ;SELECT PREFIX      ;;KEEP
+SELSNG: BLOCK   1        ;SELECT SINGLE LINE ;; IN
+SELSTR: BLOCK   1        ;SELECT START RANGE ;;THIS
+SELSTP: BLOCK   1        ;SELECT STOP RANGE  ;;ORDER
+ESLCTF: BLOCK   1        ;-1 IF AFTER .END SELECT
+SLINBF: BLOCK   50       ;.END SELECT BUFFER
+SLINBL==.-SLINBF
+SLIN:   BLOCK   4        ;POINTERS TO SLINBF
+TTISOT: BLOCK   1        ;-1 IF OUTPUT TO TTY:
+ISDFLN: BLOCK   1        ;-1 IF ISSUED FILE NAME
+AFTRNC: BLOCK   1        ;IF NON-ZERO, ADDRESS OF STRING TO
+                         ; OUTPUT AFTER NEXT CHARACTER
+TYPMUL: BLOCK   1        ;SPACING MULTIPLIER IF TYPESETTING
+TYPDIV: BLOCK   1        ;SPACING DIVISOR IF TYPESETTING
+FLTYPC: BLOCK   1        ;FLAG THAT IN .TYPESET COMMAND
+FLTYPR: BLOCK   1        ;0=NO FACE CHANGE,
+                         ;  -1=FACE CHANGE, +1=TEXT AFTER
+FACE CHANGE
+FLTYPS: BLOCK   1        ;-1=SUPPRESS NEXT STARTING SPACE
+FOUTCH: BLOCK   1        ;ADDRESS OF ROUTINE TO OUTPUT CHAR
+                         CONT.
+IF TOPS-20,<
+;TOPS-20 STORAGE
+DFIEXT: BLOCK   1        ;DEFAULT INPUT EXTENSION
+PMAPZ:!                  ;CLEARED FOR EACH OUTPUT FILE
+PMAPF:  BLOCK   1        ;NUMBER OF PAGES PMAP'ED
+BYTECT: BLOCK   1        ;OUTPUT FILE BYTE COUNT
+PMAPPG: BLOCK   1        ;PROCESS PAGE FOR START OF WINDOW
+BYTEPT: BLOCK   1        ;BYTE POINTER TO WINDOW
+WINCNT: BLOCK   1        ;ROOM LEFT IN WINDOW
+FILEPG: BLOCK   1        ;FILE PAGE NUMBER TO START NEXT
+WINDOW
+PMAPEZ==.-1              ;LAST WORD CLEARED
+> ;TOPS-20
+                         CONT.
+; LINE TEMPS
+LNINCT: BLOCK   1        ;COUNT OF CHARACTERS IN LINBF
+LINBK:  BLOCK   1
+SPCNT:  BLOCK   1        ;COUNT OF SPACES IN LINBF
+LSTSP:  BLOCK   1        ;CHARACTER ADDRESS OF LAST SPACE IN
+LINBF
+LINNSC: BLOCK   1        ;COUNT OF NON-SPACING CHARS IN
+LINBF
+LNIN1:  BLOCK   1        ;INPUT POINTERS TO LINBF
+LNIN2:  BLOCK   1        ; ..
+IMPURE STORAGE                                      Page 5-5
+
+
+
+LOUT1:  BLOCK   1        ;OUTPUT POINTERS TO LINBF
+LOUT2:  BLOCK   1        ; ..
+LINBF:  BLOCK   LN$LIN   ;LINE BUFFER
+GCINP:  BLOCK   1        ;RE-EAT POINTERS
+GCIN2:  BLOCK   1        ; ..
+GCSCH:  BLOCK   1        ;SAVED CHARACTER (-1=NONE)
+LINDCX: BLOCK   1        ;ADDRESS OF ROUTINE IN LINDCW
+CMSTP:  BLOCK   1
+CMST2:  BLOCK   1
+CMBF:   BLOCK   10
+ECMBF=.-1
+CMEBFP: BLOCK   4        ;READ/WRITE/FIRST/LAST+1 CHAR POINT
+TO CMEBF
+CMEBF:  BLOCK   6        ;LAST COMMAND
+CMEBFL==.-CMEBF
+RINCHR: BLOCK   1        ;ROUTINE TO READ CHAR
+ADRECM: BLOCK   1        ;END ADDRESS MATCH
+TECBFP: BLOCK   4        ;READ/WRITE/FIRST/LAST+4 CHAR PNTR
+TO TECBF
+TECBF:  BLOCK   LN$TEC   ;END COMMAND TEMP STRING BUFFER
+TTLP1:  BLOCK   1        ;TITLES
+TTLP2:  BLOCK   1
+TTLBUF: BLOCK   LN$TTL
+STTLP1: BLOCK   1        ;SUB TITLES
+STTLP2: BLOCK   1
+STTLBF: BLOCK   LN$TTL
+DOSTTL: BLOCK   1        ;INCLUDE SUBTITLE
+                         CONT.
+EXSP1:  BLOCK   1
+EXSP2:  BLOCK   1
+ULMCH:  BLOCK   1
+NSPCH:  BLOCK   1
+LSTNSP: BLOCK   1
+ULPOS:  BLOCK   1
+CPOS:   BLOCK   1
+ULPT1:  BLOCK   1
+ULPBF:  BLOCK   LN$UND   ;COLUMNS TO BE UNDERLINED
+CCTABL:!                ;PARRALLELS FLASTD
+CC.CAP: BLOCK   1        ;.FLAG CAPITALIZE <
+CC.CON: BLOCK   1        ;.FLAG CONTROL  .
+CC.END: BLOCK   1        ;.FLAG ENDFOOTNOTE !
+CC.IND: BLOCK   1        ;.FLAG INDEX  >
+CC.LOW: BLOCK   1        ;.FLAG LOWERCASE \
+CC.QUO: BLOCK   1        ;.FLAG QUOTE  _
+CC.SPA: BLOCK   1        ;.FLAG SPACE  #
+CC.SUB: BLOCK   1        ;.FLAG SUBINDEX  >
+CC.UND: BLOCK   1        ;.FLAG UNDERLINE &
+CC.UPP: BLOCK   1        ;.FLAG UPPERCASE ^
+CCTEND==.-1
+FILLWA==.-1             ;END OF STORAGE CLEARED EACH FILE
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 6
+
+                 TERMINAL COMMAND SCANNING
+
+
+
+The table "SELEXT" is a set of pairs of file  extension  and
+default  .SELECT  mode for that extension.  Every language's
+extension   should   appear   here   in    the    form    of
+'extension',,address  of selection so that the program logic
+manual of any program can be obtained by the RUNOFF  command
+<file  name>.   The  user  does  not  need  to  remember the
+commenting convention  for  each  language  to  extract  the
+program's   documentation.    If   a   program   needs   its
+documentation to be flagged by non-standard  characters,  it
+should  start  with  a  .SELECT  command  under the standard
+convention.  This command will then switch the file  to  its
+own selection mode.
+
+The following are the standard  .SELECT  settings  for  each
+language:
+     switch to -&+- to avoid pattern in selsem
+     most languages      !  & + -
+     neliac              !  !
+     basic               ' & + -
+     assemblers          ;  & + -
+     pal-10              / & + -
+Where the characters are given in the same order as  in  the
+.SELECT command.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 7
+
+                      TEXT INPUT LOGIC
+
+
+
+The main text character  input  loop  starts  at  the  label
+"LIN".  After each character is processed control returns to
+"LIN" if the last character was a tab or space and to "LIN1"
+if  not.   During the text scan, a two entry history is kept
+of the last two characters seen  in  location  "LCH".   This
+text  loop  handles  spaces, tabs, and line feeds specially.
+Everything else is just accumulated until the  input  buffer
+is  full  enough  to generate some output.  When that is so,
+the  output  routine  "OUTLJ"  is  called,  and  then  input
+scanning is resumed.
+
+The routine "SLCH" maintains the history buffer word, "LCH".
+This  always has the last two characters stored in the input
+buffer except that it is cleared at the  beginning  of  each
+input line and after each space and tab.
+
+The routine "LINSET" is used to initialize  the  text  input
+buffer.  It resets the pointers, intializes the counters and
+clears out  any  history  from  the  previous  line.   While
+scanning input text, the following are maintained:
+LINBK     a down counter of output space
+LNINCT    a down counter of input text buffer space
+SPCNT     a count of spaces in the input
+NSPCH     a count of non-spacing characters
+CPOS      the output position counter
+LINNSC    a count of non-spacing  characters  in  the  input
+buffer
+
+When a tab is seen while  processing  the  input  text,  the
+program   transfers   to   location   "LTAB".   The  current
+horizontal position is computed and the tab  stop  table  is
+examined  to  find the next position.  If this tab is beyond
+the table or would be beyond the right margin, it is treated
+as a space by jumping to "LSPAC".  If the tab is reasonable,
+it is then replaced by the right number  of  quoted  spaces.
+Also,  all  previous spaces on the same line are replaced by
+quoted spaces  to  keep  them  from  being  expanded  during
+justification.
+TEXT INPUT LOGIC                                    Page 7-2
+
+
+
+When a space is seen in the  text  input  scan,  control  is
+transfered to location "LSPAC".  Leading spaces and multiple
+spaces are discarded.  If  the  space  was  preceeded  by  a
+period, exclamation, question, colon, or semi-colon and that
+in turn was preceeded by at least two alphabetics, then  the
+space  is  doubled.   In  any  case, the number of spaces is
+counted  and  the  last  space  seen  is  maintained.    The
+character is stored and the scan resumes.
+
+Commands to RUNOFF are given on lines which start  with  the
+flag  character  ".".   This  character  must  be  the first
+character of the line to be recognized.   Multiple  commands
+can be given on one line by separating them by the character
+";" in which case the period flag  character  for  the  next
+command   must   follow  immediately  after  the  semi-colon
+(otherwise,  the  line  would  be  treated  as  text).   For
+compatability   with  earlier  versions  of  RUNOFF,  a  few
+commands (TITLE, SUBTITLE, and INDEX) do not  recognize  the
+semi-colon  as  the  end  of  the  command.  If RUNOFF is in
+.AUTOPARAGRAPH mode, a blank line or a  line  starting  with
+one or more spaces or tabs will be considered the start of a
+new paragraph.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 8
+
+                    DOT COMMAND SCANNER
+
+
+
+Commands to RUNOFF are expressed as one or two key-words  to
+identify  the  command  followed by optional arguments.  The
+keywords may be abbreviated as long as  enough  letters  are
+typed  to  allow  the  word to be recognized uniquely.  This
+form of abbreviation should only be used to drop the end  of
+very   long  commands  because  the  abbreviations  are  not
+guaranteed into new versions of RUNOFF.  Some  commands  are
+used  so  often  that  a single letter abbreviation has been
+defined.  For the rest, a two or three  letter  abbreviation
+has been defined.
+
+The first key-word of a command line must start in the first
+column  following  the  command flag character ".".  If this
+column does not have an  alphabetic  in  it,  it  is  not  a
+key-word command.  In this case, if it is a space or tab, we
+have  the  ultimate  abbreviation  for  a  .BREAK   command.
+Similarly,  if the line consists of only the period (command
+flag character), it is a break.  If the character is "!"  or
+";",  then  the  line  is a comment (".;" is recognized as a
+comment for compatability with previous versions of RUNOFF).
+Finally,  if  the  line starts "..", then this is treated as
+the same as "_." which is a text character ".".
+
+After all the arguments for a command are  found,  the  only
+thing which can remain on the command line are spaces, tabs,
+and  comments  preceeded  by  the  character  "!".   Command
+processors  which  cause an implicit break usually return to
+the location "ENDBCM" which resets the  input  line  buffer,
+skips final blanks and comments and returns to scan the next
+line.  Note that this routine does not  actually  force  out
+the  residual text in the line buffer;  that is accomplished
+by the individual  command  routine's  calling  the  routine
+"OUTNJ".   Command processors which do not cause an implicit
+break normally return to the location  "ENDCM"  which  skips
+final blanks and comments and returns to scan the next line.
+Command processors which have already scanned to the end  of
+the  line  (such as .CENTER) return to the location "ENDCMX"
+which simply clear command mode and scans for the next line.
+DOT COMMAND SCANNER                                 Page 8-2
+
+
+
+The routine "FRCEND" skips  trailing  spaces  and  tabs  and
+comments  starting  with  "!".   If  it  finds anything else
+before the first ";" (multiple command indicator) or end  of
+line, it issues the warning message JEC.
+
+The routine "ENDCMT" skips all characters  until  the  first
+";"  or end of line.  It is usually invoked when the comment
+indicator ("!") is seen in a command.  The routine  "ENDCMN"
+clears command mode.
+
+The routine "STRCMN"  initializes  a  command  line  and  is
+usually called after the command flag (".") is seen.
+
+Most  commands  are  parsed  by  calling  the  command   get
+character   routine   "CMCIN"  which  is  the  standard  get
+character  routine  with  the  addition  that   lower   case
+alphabetics (a-z) are converted to upper case (A-Z).
+
+The routine "CMCFUC" will force a lower case alphabetic into
+upper case.
+
+Incorrect commands can be flagged by jumping to the  routine
+"ILCM"  from  the  top-level  of  any command processor.  It
+discards the rest of the command line and issues  the  fatal
+message  ILC.   Alternatively,  the  command  processor  can
+invoke the macro ILCM$ which will  issue  a  specific  fatal
+message  by  jumping  to  the  location  "ILCMSG" with lh(A)
+containing the error prefix and the rh(A)  pointing  to  the
+message  which  should  be under 28 characters long.  Either
+routine will follow the message with the first 30 characters
+of  the  command  and  the  closing  quote mark.  Finally, a
+second line will be added which gives the input  and  output
+file locations of the error.
+
+The routine "TYPCOM" is called after issuing a message which
+should  end  with the sequence ': "'.  This will be followed
+by the command line text in error up  to  a  maximum  of  30
+characters  followed  by  a quote.  Then the message will be
+followed by another line which gives the  input  and  output
+file locations of the error.  The error message should be no
+more than 28 characters excluding the  standard  prefix  and
+the  ': "'.   This  will ensure that the message fits on one
+72-column line.
+
+Routine "ONPAG" should be called after every  error  message
+to  identify  the  input  and  output  file locations of the
+error.  It starts with  a  carriage-return  line-feed  pair,
+then  tabs  in  and  gives the output page number, the input
+line count for this input page, the line sequence number  if
+the  file  is  sequenced and the input page number.  It ends
+with a carriage-return line-feed pair.
+DOT COMMAND SCANNER                                 Page 8-3
+
+
+
+The routines  "CMGNWD"  and  "CMGWD"  are  used  by  command
+processors  to  scan  alphabetic  words from a command line.
+"CMGWD" reads  the  next  string  of  alphabetics  into  the
+command   buffer   "CMBF"   and   terminates  on  the  first
+non-alphabetic found, which is left in  accumulator  CH  and
+location GCSCH.  "CMGNWD" does the same thing except that it
+first skips any leading spaces or tabs.  Thus,  it  is  used
+for getting the next word in a command.
+
+The routine "CMREC" compares a word  found  by  the  routine
+"CMGWD" against a list of candidates and finds the one which
+matches, allowing for abbreviations.  The list of candidates
+is  passed  as  an AOBJN pointer in accumulator S1 (i.e., in
+the form -length,,location) where the  right  half  of  each
+word  in  the table is the address of an ASCIZ string of the
+words in upper case.  This routine will  take  the  non-skip
+return  if  the  word  is  not  recognized.   If the word is
+recognized, it will skip return with accumulator D  pointing
+to  the successful entry.  Thus, the typical calling pattern
+is:  
+     MOVE    S1,[-LENGTH,,TABLE]
+     PUSHJ   P,CMREC         ;RECOGNIZE WORD
+       JRST  ERROR           ;HERE IF NOT RECOGNIZABLE
+     HLRZ    A,(D)           ;GET VALUE
+
+The routines "RCN", "RCNO", and "RCNR"  all  read  different
+flavors  of the next decimal number.  "RCN" reads the number
+with a possible sign.  If no number is present, it takes the
+non-skip  return.   Otherwise,  it  skips leading spaces and
+tabs, reads the number, and skip returns with the  value  in
+accumulator N and with accumulator N1 set to -1, 0, or +1 if
+the number was preceeded by a minus,  no  sign,  or  a  plus
+respectively.   If  this  routine is called several times in
+succession, it will allow the numbers  to  be  separated  by
+either  spaces  and  tabs  or  by  one  comma  which  may be
+surrounded by any number of spaces and  tabs.   The  routine
+"RCNO"  does  the  same  except  that  it will also take the
+non-skip return if the value was null (i.e.,  no  digit  was
+typed);   whereas  "RCN"  non-skips  only at end of command.
+The routine "RCNR" accepts a relative or absolute value  and
+gives  the  non-skip return anytime the value is absent.  It
+is called with the standard or current value in  accumulator
+N  and  returns with this updated if relative or replaced if
+absolute.  Relative numbers are indicated by  being  signed,
+while absolute numbers have no sign.  If the non-skip return
+is taken, accumulator N will be left unaltered.
+
+The routine RCANO is just like  RCNO  without  signs  except
+that its input is alphabetics, radix 26.
+
+The routine "RSIXN" will read the next word  in  SIXBIT  and
+return  the  first  six  letters in N.  Only alphabetics are
+allowed.
+DOT COMMAND SCANNER                                 Page 8-4
+
+
+
+The routine "RSKIPS" will skip consecutive spaces  and  tabs
+until  it finds a character which is neither.  If it reaches
+the end of the command, it will take  the  non-skip  return,
+otherwise  it  takes  the  skip return with the character in
+accumulator CH and in location GCSCH.
+
+The routine "CMSOME" will check the current character to see
+if  it  is the end of a command.  If so, the non-skip return
+will be taken.  Otherwise, the skip return  will  be  taken.
+The routine CMSOMP is the same except it is used by commands
+which take text arguments.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 9
+
+                   DOT COMMAND PROCESSORS
+
+
+
+Command dispatch addresses are named as follows:
+If it is a one word command, the name is $ followed  by  the
+first  five  characters of the keyword (e.g., $FIGUR for the
+command .FIGURE.
+If it is a two word command, the first word dispatch  is  $$
+followed  by the first four characters of the keyword (e.g.,
+$$RIGH for the commands .RIGHT and .RIGHT MARGIN).  If there
+are both single and double word commands with the same first
+word  then  the  single  command  will  re-dispatch  to  the
+location  $  followed  by the first five letters of the name
+(e.g., $RIGHT in the previous example).
+For two  word  commands,  the  second  word  dispatch  is  $
+followed by the first two letters of the first word followed
+by .  followed by the first two letters of the  second  word
+(e.g., $RI.MA in the previous example).
+Commands which are strict synonyms use  the  main  version's
+name to determine the dispatch location.
+
+
+
+9.1  .NO COMMAND
+
+This command takes a second word to determine  the  command.
+It  then  dispatches on that word.  Each .NO command appears
+in the command table twice, once as a single keyword command
+of  the  form  .NOxxx  and once as a two word command of the
+form .NO xxx.
+
+
+
+9.2  .END COMMAND
+
+This command takes a second keyword to define  the  command.
+It then redispatches based on this second word.
+DOT COMMAND PROCESSORS                              Page 9-2
+TWO WORD COMMANDS
+
+
+9.3  TWO WORD COMMANDS
+
+Each of these commands takes exactly one word as the  second
+keyword.   These  can  even  have  that  word abbreviated to
+nothing!  Processing gets the next word (if null  then  ok),
+then  checks  that whatever was typed was spelled correctly.
+Then it dispatches to the processor.  The commands are:
+.BEGIN BAR
+.CONTROL CHARACTERS
+.DISABLE BAR
+.DO INDEX
+.ENABLE BAR
+.FIRST TITLE
+.LOWER CASE
+.NOCONTROL CHARACTERS
+.PAPER SIZE
+.PRINT INDEX
+.TAB STOPS
+.TEST PAGE
+.UPPER CASE
+
+
+
+9.4  ONE/TWO WORD COMMANDS
+
+These commands have both one word and two word meanings that
+are  different.   The  procedure is the same as above except
+that  the  two  dispatch  addresses  are  different.   These
+commands are:  
+.LEFT (MARGIN)
+.LIST (ELEMENT)
+.PAGE (SIZE)
+.RIGHT (MARGIN)
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 10
+
+               CHAPTER AND SECTION OPERATIONS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 11
+
+                 VARIABLE AND IF OPERATIONS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 12
+
+                          INDEXING
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 13
+
+                         FOOTNOTES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 14
+
+                     OUTPUT PROCESSING
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 15
+
+                 TYPESET TRANSLATION LOGIC
+
+
+
+RUNOFF starts the translation by inserting a  comment  which
+identifies  the  version of RUNOFF, the date it was run, the
+name of the file being processed and its creation  date  and
+time.   Text  is  processed by copying each character to the
+output.  Case control commands are processed, so the  output
+file  is  in  upper  and  lower  case  as appropriate to the
+requested format.  Horizontal spacing commands (explicit and
+implicit)   are   converted   into  the  comparable  TYPESET
+commands.  In particular, RUNOFF breaks the input into lines
+just as if it were doing the final copy itself.  Underlining
+is converted to italics.  The double space after  a  period,
+etc.,  is  dropped  unless the final output is /TYPESET:LPT.
+When  the  various   commands   and   internal   flags   are
+encountered,  if  RUNOFF can not complete processing itself,
+it generates the appropriate TYPESET-10 command.   If  there
+is  no  perfect  command,  then  RUNOFF generates a macro to
+TYPESET-10.  If the macro corresponds to a  RUNOFF  command,
+then  the  macro  name  is  the  same as the standard RUNOFF
+command abbreviation (e.g., [*TP] for any test page  whether
+a user command or an implicit one).
+
+Commands which relate to horizontal spacing are  treated  as
+follows.   The  comparable commands are issued to TYPESET-10
+but  the  spacing  is  modified  in  order  to   achieve   a
+typesetting  width of 36 unless /TYPESET:LPT is selected (in
+which case, the RUNOFF spacing is kept).  The conversion  to
+width  36  is  achieved  by  multiplying the input number by
+36/page width as set in the  last  PAPER  SIZE  or  STANDARD
+command.  The result is issued as picas and points.
+
+Commands relating to pagination are converted to  TYPESET-10
+macros  and  are  ignored.   Similarly,  the output does not
+include sequence numbers, change bars, or variable flagging.
+Since  the  paging  will  be  chosen  by  the  final editor,
+footnotes are dumped as soon as  possible.   In  particular,
+they  are  output at the next break surrounded by horizontal
+lines to help break them up.  RUNOFF produces the  following
+macros  when  translating to TYPESET-10.  They are generally
+issued right in line without any free line feeds.
+TYPESET TRANSLATION LOGIC                          Page 15-2
+
+
+
+[*ACUTE]        output acute accent
+
+[*AX]           center  appendix  heading;   first  arg   is
+                letter, second is title
+
+[*BB]           begin change bar
+
+[*BKSLSH]       output backslash character
+
+[*CAT]          used at start of file when /TYPESET:CAT
+
+[*CH]           center  chapter  heading;   first   arg   is
+                number, second is title
+
+[*CONTRL]       represents control character in input;   arg
+                is  one  character  in  upper  case  for the
+                control with "?" representing delete
+
+[*CRCFLX]       output circumflex accent
+
+[*DB]           disable change bars
+
+[*DX]           center index heading;  arg is header
+
+[*EB]           end change bar
+
+[*EBB]          enable change bars
+
+[*ELS]          end list
+
+[*EN]           end note
+
+[*HLn]          header level n (1-5);  arg is numbered title
+
+[*LE]           list element (no argument;  followed by
+
+the element number, then "./N/N".
+
+[*LFTANG]       output left angle bracket
+
+[*LFTBRC]       output left brace
+
+[*LS]           start list
+
+[*LPTR]         used at start of file when /TYPESET:LPT
+
+[*NT]           note heading;  argument  is  heading  to  be
+                centered
+TYPESET TRANSLATION LOGIC                          Page 15-3
+
+
+
+[*PG]           force a new page
+
+[*RHTANG]       output right angle bracket
+
+[*RHTBRC]       output right brace
+
+[*TILDE]        output tilde
+
+[*TP]           test page;  arg is number of lines
+
+[*TXT6]         used at start of file when /TYPESET:TXT
+
+[*UNDRLN]       output underline (do not overprint)
+
+[*VRTBAR]       output vertical bar
+TYPESET TRANSLATION LOGIC                          Page 15-4
+
+
+
+RUNOFF uses the following TYPESET commands  when  converting
+the  input  to  TYPESET-10.   In general, they are issued in
+line without a free line feed.  /L is usually followed by  a
+line feed except when it is a SKIP or BLANK command.
+
+
+/A              center on a tab stop (used for .CENTER  with
+                arg)
+
+/C              center on page  (used  for  .CENTER  without
+                arg)
+
+/J              ends a line under .JUSTIFY.NOFILL
+
+/L              force a new line  (used  on  break  and  for
+                blank lines)
+
+/N              fixed space (" ")
+
+/R              right adjust
+
+/U              tabulate (for input tabs)
+
+/?              break if something on line
+
+++              output "+"
+
++A              output "@"
+
++[              output "["
+
++]              output "]"
+
++/              output "/"
+
+[Cn]            set column width (right margin)
+
+[FB]            bold face (.TYPESET BOLD)
+
+[FI]            italics   face   (underline   and   .TYPESET
+                ITALICS)
+
+[FM]            slant face (.TYPESET SLANT)
+
+[FR]            regular face
+
+[FS]            smallcaps face (.TYPESET SMALLCAPS)
+TYPESET TRANSLATION LOGIC                          Page 15-5
+
+
+
+[HLn,0,1] indent next line
+
+[HRn,0,1] adjust next line to right margin
+
+[ILn]           set left margin
+
+[P8,10]         size of footnotes
+
+[P10,12]        size of normal text
+
+[RR]            ragged right (.NOJUSTIFY)
+
+[R%]            justify
+
+[TSi,j,...] set tab stops
+
+[T%]            clear tab stops
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 16
+
+                     HANDY SUBROUTINES
+
+
+
+The routine "TSTECM" looks at the line about to be input and
+checks  it  to see if it is exactly one end command, namely,
+the one which terminates the current text  bracket.   It  is
+used  when  a  command  takes  several  lines  of text as an
+argument and is terminated by a command  of  the  form  .end
+xxx.
+
+This routine is called at the  beginning  of  each  line  of
+text:
+
+1/ address of character input routine to use
+
+2/ address of routine which handles the .end
+
+command of the type desired
+
+pushj   p,tstecm
+
+returns +1 if not end yet
+
+returns +2 if match
+
+See writeup of "RTECMC" for normal character read.
+
+The routine "RTECMC" is to be called for each  character  in
+the  text  bracket.   It reads out the temporary string text
+buffer if any, or else it takes the non-skip return.  call:
+
+pushj   p,rtecmc
+
+return +1 if nothing in buffer
+
+return +2 with next character
+HANDY SUBROUTINES                                  Page 16-2
+
+
+
+SETRNG is a routine to set or update L.SUPO, the flag  which
+suppresses   output  because  of  the  /IRANGE  and  /ORANGE
+switches.  It should be called every time  the  output  line
+counter  or  page  counter  is updated.  If both /IRANGE and
+/ORANGE are set, both must be  satisfied  to  allow  output.
+This routine preserves all accumulators.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 17
+
+                 INPUT CHARACTER PROCESSING
+
+
+
+The routine "LINDCP"  scans  the  incoming  text  for  words
+preceeded  by  the capitalize and index flag characters.  If
+it finds such  a  flag,  it  sets  a  flag  in  F  and  then
+capitalizes  and/or  indexes  the following word as the user
+requested.  For this purpose, a word is defined as a  string
+of  consecutive  characters  excluding  any spaces or end of
+line.
+
+The routines LINDFL, LINDFO, and  LINDFN  preset  LINDCW  to
+force  capitalization  for  all letters in the line, for one
+letter per word on this line, or none.  Each  stores  either
+CPOPJ1,  LINDCT  or  LINDCU  in the location LINDCX.  LINDFO
+also sets the sign bit to flag the need  to  change  between
+LINDCT  and  LINDCU around the first character of each word.
+These conditions are automatically cleared  at  the  end  of
+each line of input.
+
+LINDCU will force a lower case input character to upper case
+unless  the  user  controlled  the  case  on  this character
+explicitly.
+
+LINDCS checks to see if the current character is the end  of
+a  word.  It tests against end of line, and various forms of
+space and tab.
+
+
+
+
+
+
+
+
+
+
+
+
+                         CHAPTER 18
+
+                   ERROR MESSAGE HANDLING
+
+
+
+18.1  ERROR MESSAGE ROUTINES
+
+Routine ERRMSG (and WRNMSG and INFMSG) are  responsible  for
+issuing   error   (and  warning  and  informative)  messages
+complete with the RUNOFF message prefix.  They  are  invoked
+by  the MSG$ macro and clobber accumulators A-D.  They issue
+a ?  (or % or [), then RNF followed by the three letter code
+in  lh(A).   Then they space over and issue the message text
+pointed to from the rh(A).  If necessary, the file  will  be
+identified  and if output is to the TTY:, its buffer will be
+flushed.
+
+ISUFLN is a routine to issue the name  of  the  input  file.
+This is called on each error message and at the end of file.
+It prefixes the message with the word "RUNOFF:"  if  in  CCL
+mode.
+
+
+
+18.2  ERROR MESSAGES AND DESCRIPTIONS
+
+?RNFCJL CAN'T JUSTIFY LINE
+
+     The string of input between spaces (and end of line) is
+     greater  than  the  separation  between  left and right
+     margins and therefore does not fit in the  output  even
+     before any attempt to expand spaces.
+
+?RNFDVN DUPLICATE VARIABLE NAME:  ".command"
+
+     This  variable  command  is  attempting  to  declare  a
+     variable   which   has  already  been  declared.   This
+     declaration will be ignored.
+ERROR MESSAGE HANDLING                             Page 18-2
+ERROR MESSAGES AND DESCRIPTIONS
+
+
+?RNFEFD END FOOTNOTE DOESN'T FOLLOW FOOTNOTE:  ".command"
+
+     This end footnote command appears at  a  place  in  the
+     file  which  is  not  immediately  following a footnote
+     command and the corresponding footnote data.
+
+?RNFELD END LITERAL DOESN'T FOLLOW LITERAL:  ".command"
+
+     This end literal command appears at a place in the file
+     which  is  not  immediately following a literal command
+     and  the  corresponding  literal  text.   It   probably
+     reflects  that  the  count  on  the  literal command is
+     incorrect.
+
+?RNFEVL EXCEEDING VARIABLE LIST:  ".command"
+
+     Only a maximum of 20 variables can be  declared.   This
+     command  is  attempting  to declare the 21-st variable.
+     This and all  further  variable  declarations  will  be
+     ignored, although the message will not be repeated.
+
+?RNFFIF FOOTNOTE INSIDE FOOTNOTE:  ".command"
+
+     This  command  is  attempting  to  start   a   footnote
+     definition only it occurs within a footnote definition,
+     which is  illegal.   It  probably  indicates  that  the
+     previous footnote definition was never terminated.
+
+?RNFIBO INPUT BUFFER OVERFLOW
+
+     A string of characters has been input which is so  long
+     between  spaces  (or the right margin is so large) that
+     it has overflowed  the  internal  line  buffer  storage
+     area.
+
+?RNFIFT ILLEGAL IN FOOTNOTE:  ".command"
+
+     This command is illegal within a footnote.
+
+%RNFIIF ^x IGNORED IN INPUT FILE
+
+     Control characters are  not  normally  allowed  in  the
+     input  file.   This  character  was  input and is being
+     ignored.  If it should be input, then declare ".CONTROL
+     CHARACTERS" in order to make it legal.
+
+?RNFILC ILLEGAL COMMAND:  ".command"
+
+     This command is illegal for some reason.  Most  reasons
+     are  that  a  key  word  was  not recognized or that an
+     argument was out of range.
+ERROR MESSAGE HANDLING                             Page 18-3
+ERROR MESSAGES AND DESCRIPTIONS
+
+
+%RNFJEC JUNK AT END OF COMMAND:  ".command"
+
+     The command, after all its arguments,  still  has  some
+     other characters which are not blanks or comments.
+
+[RNFKCF nK CORE - FOOTNOTE]
+
+     Core was expanded because of  growth  in  the  footnote
+     storage area.  If this repeats indefinitely it probably
+     indicates that the footnote was improperly terminated.
+
+[RNFKCI nK CORE - INDEX]
+
+     Core was  expanded  because  of  growth  in  the  index
+     storage  area.  In a well indexed document this message
+     should be output occasionally as processing progresses.
+
+?RNFLDE LITERAL DOESN'T END WITH .END LITERAL:  ".command"
+
+     After a counted literal, the next line is  not  an  end
+     literal  command.   This  probably  indicates  that the
+     count is wrong.
+
+?RNFNEC NOT ENOUGH CORE nK
+
+     Core has been expanded to the limit of what the monitor
+     is  allowed  to  assign to this job.  The processing is
+     aborted at this point.
+
+?RNFNFS NO FILE SPECIFIED
+
+     The user has specified some switches or an output file,
+     but has not specified an input file.
+
+%RNFNIA NEGATIVE INDENT ATTEMPTED
+
+     The sum of the indent and the left margin is less  than
+     zero, meaning that the line should start to the left of
+     the left edge of the paper.  Either the left margin has
+     been  misset  or the indent is wrong.  The indent might
+     be implicit in a  paragraph  or  table  request.   This
+     message  is output only once until the next left margin
+     or SD command.
+
+%RNFNIC ANOTHER n NEGATIVE INDENTS COUNTED
+
+     This message indicates  how  many  additional  negative
+     indents were discovered since the last NIA message.
+ERROR MESSAGE HANDLING                             Page 18-4
+ERROR MESSAGES AND DESCRIPTIONS
+
+
+?RNFNID NO INPUT DEVICE
+
+     The user has failed to specify either an  input  device
+     or file.
+
+?RNFODE OUTPUT ERROR xxxxxx
+
+     The output file has an I/O error whose  octal  code  is
+     included in the message.
+
+%RNFSPO SUBPAGE OVERFLOW
+
+     While incrementing the subpage counter, it  got  larger
+     than  26.  This probably indicates that the end subpage
+     command is missing.
+
+%RNFTFE TOO FEW END COMMANDS
+
+     When the end of the input was reached  there  were  not
+     the  same  number  of  end  (or  end  list or end note)
+     commands as there had  been  list  and  note  commands.
+     This probably indicates that an end command is missing.
+
+?RNFTMI INSUFFICIENT CORE FOR COMMAND
+
+     The   user   has   specified   so   many   input   file
+     specifications  that  RUNOFF  could  not  fit them into
+     core.   The  command  should  be  split  into   several
+     commands.
+
+?RNFTMR TOO MANY RANGES
+
+     The user has specified too many IRANGE or ORANGE  pairs
+     to  fit  in the storage space assigned (20 pairs each).
+     Fewer ranges should be specified.
+
+?RNFTMV TOO MANY /VARIANTS
+
+     The  user  has  specified  too  many  VARIANTS  in  the
+     command.   Only  20  variants  can  be specified in one
+     command.
+
+%RNFTNN TOO MANY NESTED NOTES
+
+     More than 6 nested notes and lists has  occured.   This
+     probably  indicates  that  one  or more end commands is
+     missing.
+ERROR MESSAGE HANDLING                             Page 18-5
+ERROR MESSAGES AND DESCRIPTIONS
+
+
+?RNFUKV UNKNOWN VARIABLE:  ".command"
+
+     On an if, ifnot, else, or endif command a variable  was
+     referenced   which  was  not  declared  in  a  variable
+     command.  This usually indicates a spelling error or  a
+     missing variable command.
+
+%RNFUME UNMATCHED END COMMAND
+
+     More end  commands  have  occured  than  list  or  note
+     commands.
+
+?RNFVVZ /VARIANT VALUE ZERO
+
+     In a VARIANT  switch,  the  value  was  null  or  zero.
+     Variants always have names.
+                                                Page Index-1
+
+
+
+                              INDEX
+
+
+
+
+
+
+
+[End of RUNOFF.PLM]
+    Ttt!
