@@ -1,0 +1,62 @@
+.page frame 60 high 66 wide;
+.area text lines 6 to 57;
+.title area heading lines 1 to 5;
+.title area footing line 60;
+.place text;
+.Memo;
+.Device TTY;
+.Single Space;
+.indent 0;
+.UnderlineBetween (~~,~);
+.blankline;
+.turn off "%";
+.NoJust;
+~~Job Objectives~
+
+.list (-4,4,0,"1.");
+.item;
+During 1st quarter 1983, I will learn and carry out the following
+tasks:
+.list (-4,4,0,"a.");
+.item;
+Distribution of COEES XCONSULT mail.
+.item;
+Handling and follow through on general support questions which arrive
+as XCONSULT mail.  (This objective proved to be unrealistic and is not
+rated.)
+.item;
+Bringing up the lab systems when necessary.
+.item;
+Performing monthly SPOOL checking and follow-through.
+.endlist;
+.item;
+At the beginning of a project, write a plan for getting started.  This
+will probably consist of a statement of objectives and a list of
+questions which need to be answered.
+.item;
+I will summarize in writing the tests performed to check out a completed
+program.  (This was done for easily "measurable" output.  For the DUMPER
+and DLUSER data bases, discussions took the place of a written summary.)
+.item;
+Finish and release the DUSAGE program.
+.item;
+Design and implement the schema and programs needed to keep a data base
+of the current sets of DUMPER backup tapes for a TOPS-20 system.
+.item;
+Implement a DLUSER data base on TOPS-20.
+.endlist;
+.skip 2;
+
+~~Personal Objectives~
+
+.list (-4,4,0,"1.");
+.item;
+Learn the use of at least two new programming tools per month.
+.item;
+I will increase my programming experience, particularly with respect
+to data structures, by implementing a series of small programs, the
+specifications of which will be worked out with my manager.  The first
+one will be an application for a stack.  (Two such projects were
+accomplished.)
+.endlist;
+
