@@ -1,0 +1,35 @@
+define symbolTable= "record!pointer (symTab)";
+record!class symTab ( integer array table;
+		; integer dataPtr
+		; symbolTable next );
+
+symbolTable procedure newTable( integer size );
+begin	symbolTable table;
+	integer array block[-size:size];
+arrclr(block);
+block[0]_ size;
+table_ new!record(symTab);
+symtab:dataPtr[table]_ location(block[0]);
+COMMENT symtab:next[table]_ null!record;
+memory[location(block)] swap memory[location(symTab:table[table])];
+return(table);
+end;
+
+simple integer procedure vectorLuk( integer target, abjnP );
+start!code
+	move	target;
+	skipge	1,abjp;
+loop:	came	(1);
+	 aobjn	1,loop;
+	hlre	1,1;
+end;
+
+boolean procedure find( integer target; symbolTable table );
+begin
+while table
+   do if 0 > t_ vectorLuk( target, symtab:dataPtr[table] )
+	 then return(true)	! t is the index;
+	 else table_ symtab:next[table];
+return(false);
+end;
+
