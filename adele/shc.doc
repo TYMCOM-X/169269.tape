@@ -1,0 +1,421 @@
+
+
+Special Handling Charges Specification                            Page 1
+
+
+     The following is the functional specification for SHC, a program to
+supplement  BCHARG in  the processing  and charging  of Batch  and Spool
+requests.
+
+     SHC is to be run by the same operator who runs BCHARG in performing
+the bulk of Batch and Spool request processing.  It is intended to  be a
+makeshift  means  of  levying  SHIPPING  and  RECEIVING   charges  which
+heretofore had either gone unassessed, or been erroneously added  to the
+postage charges in BCHARG.
+
+     To simplify operating procedures,  it is possible to  apply postage
+charges along  with special  handling charges  using SHC,  obviating the
+need to re-run  BCHARG to do so.   This will take the  affected requests
+out of "HOLD" status, just as running BCHARG would.
+
+     When the operator runs  SHC, he or she  is prompted for his  or her
+oper name and password, and then for data identifying the  request(s) to
+be charged, as well as the nature of the charges.
+
+     The  commands  which the  operator  can enter  in  response  to the
+"Request(s)" prompt are as follows:
+
+
+     nnnnn             A specific request number, for which SHC searches
+                       first the holding  file, and then  the completion
+                       file(1).
+
+                       This  is  the  command  normally  used  to charge
+                       individual requests.  SHC will prompt for postage
+                       charges  when  it  picks  up  a  record  from the
+                       holding  file,  presuming  that  both   types  of
+                       charges will be known at the time SHC is run.  In
+                       this  event,  SHC  will  complete   the  request,
+                       eliminating the need to re-run BCHARG to do so.
+
+     CHANGE nnnnn      Alters special  handling charges  already applied
+                       to the named request.  It will be used  mainly to
+                       clean up  requests for which  one or more  of the
+                       charges  (SHIPPING,  RECEIVING,  or  POSTAGE) was
+                       incorrect.
+
+     HELP or           Prints a summary of this list of options.
+     ?
+
+     QUIT              Exits SHC to exec level.
+
+---------------
+     (1) When BCHARG  is run,  if the  "HOLD" response  is given  to the
+"POSTAGE" prompt, the request in question is placed in the holding file,
+PARCHG.DAT,  to  await   the  application  of  delivery   charges.   The
+completion  file  is BATsss.mmm  (where  "sss" is  a  three-digit system
+number, and "mmm" a three-character name for the current month).
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 2
+
+
+     STATUS nnnnn      Print the completion status of the named request.
+                       This consists of  a brief summary of  each record
+                       on file pertinent to the named request.
+
+                       This command  is for  use occasionally,  when the
+                       paperwork describing the history of a particiular
+                       request has been lost or mangled, and a  recap is
+                       is needed.
+
+     UNPROCESSED       Charges all requests in the holding file.
+
+
+     In the following annotated  example, emphasized text is  input from
+the operator:
+
+
+     -R SHC       
+
+     SHC - Batch Request Special Handling Charges
+     [Version 1.0 (454) 8-July-82]
+     C33 29-Jul-82 23:45
+
+
+
+     Oper name: MMOUSE                
+     Password:  <operator_enters_password_here>                
+
+
+
+     Request(s):   HELP                   
+
+          The valid replys to this prompt are:
+
+          nnnnn             Charge a specific request number.
+
+          CHANGE nnnnn      Alter the  special handling  charges already
+                            applied to the named request.
+
+          HELP or           Print a copy of this list of options.
+          ?
+
+          QUIT              Exit SHC.
+
+          STATUS nnnnn      Print  the  completion status  of  the named
+                            request.
+
+          UNPROCESSED       Charge all requests in the holding file.
+
+
+
+     Request(s):   33974                   
+
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 3
+
+
+     HOLD FOR POSTAGE:
+     PPR# 33974   (Internal)     UserName:  MUTIL          PPN: [7,7]
+     Requested: 07/12/82 10:48   Proj Code:
+
+     Job Type      5 (Write Tape)
+     Completed     07/12/82
+     Files         140
+     Postage       none
+     Tapes Purch   5
+
+     Do you wish to set Postage?          Y                                          
+     Enter the new Postage:               11.12                                          
+
+     Are there any Shipping charges?      Y                                          
+     Enter the number of items Shipped:   13                                          
+
+     Are there any Receiving charges?     N                                          
+
+     Done.
+
+
+
+     Request(s):   UNPROCESSED                   
+
+     HOLD:
+     PPR# 33004   (Internal)     UserName:  JQPUBLIC       PPN: [6,6]
+     Requested: 07/11/82 13:18   Proj Code: TAPLIC
+
+     Job Type      4 (Read Tape)
+     Completed     07/12/82
+     Files         140
+     Postage       none
+     Tapes Purch   5
+
+     Do you wish to cancel Hold status?   Y                                          
+
+     Do you wish to set Postage?          N                                          
+
+     Are there any Shipping charges?      N                                          
+
+     Are there any Receiving charges?     Y                                          
+     Enter the number of items Received:  14                                          
+
+     Done.
+
+
+
+     Request(s):   STATUS 33006                    
+
+     PPR# 33006   (Customer)     UserName:  DUCKDAFFY      PPN: [5,5]
+     Requested: 07/21/82 12:44   Proj Code: LAFTRAK
+
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 4
+
+
+     Job Type      4 (Read Tape)
+     Completed     07/21/82
+     Files         234
+     Postage       none
+
+     Job Type      5 (Write Tape)
+     Completed     07/21/82
+     Files         17
+     Postage       5.12
+     Tapes Purch   1
+
+     Job Type      14 (Shipping Charge)
+     Completed     07/21/82
+     Items Shipped 1
+
+     Job Type      15 (Receiving Charge)
+     Completed     07/21/82
+     Items Recd    2
+
+
+
+     Request(s):   change 33006                    
+
+     PPR# 33006   (Customer)     UserName:  DUCKDAFFY      PPN: [5,5]
+     Requested: 07/21/82 12:44   Proj Code: LAFTRAK
+
+     Is this the correct record?          Y                                          
+
+     Job Type =                           4 (Read Tape)
+     Old Postage value =                  none
+
+     Job Type =                           5 (Write Tape)
+     Old Postage value =                  5.12
+
+     Do you wish to change Postage?       Y                                          
+     Enter the new Postage:               10.24                                          
+
+     Do you wish to change Shipping       Y                                          
+
+     Old Shipping item count:             1
+     Enter new Shipping item count:       2                                          
+
+     Do you wish to change Receiving?     N                                          
+
+     Done.
+
+
+
+     Request(s):   status 33006                    
+
+     PPR# 33006   (Customer)     UserName:  DUCKDAFFY      PPN: [5,5]
+     Requested: 07/21/82 12:44   Proj Code: LAFTRAK
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 5
+
+
+     Job Type      4 (Read Tape)
+     Completed     07/21/82
+     Files         234
+     Postage       none
+
+     Job Type      5 (Write Tape)
+     Completed     07/21/82
+     Files         17
+     Postage       10.24
+     Tapes Purch   1
+
+     Job Type      14 (Shipping Charge)
+     Completed     07/29/82
+     Items Shipped 2
+
+     Job Type      15 (Receiving Charge)
+     Completed     07/21/82
+     Items Recd    2
+
+
+     Request(s):   QUIT                   
+
+     -
+
+
+
+     Two   new  Batch   job  types   have  been   established   for  the
+implementation  of  special handling  charges.   They are  job  types 14
+(SHIPPING)  and  15  (RECEIVING).   The  following  diagrams  detail the
+formats for these accounting records.  As usual, words 0 through  10 are
+header information, identical for all job types, while words  11 through
+16 are palar to each job type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 6
+
+
+                     Record Layout for Job Type 14
+
+
+      ---------------------------------------------------
+      | System Number or  |                             |
+      |  code  (2 Char)   |   REQUEST NUMBER (3 Char)   |    0
+      ---------------------------------------------------
+      |                                       | (begin  |
+      |    DATE REQUEST SUBMITTED (4 Char)    |   time) |    1
+      ---------------------------------------------------
+      |                             |                   |
+      |   TIME SUBMITTED (4 Char)   | (begin user name) |    2
+      ---------------------------------------------------
+      |                                                 |
+      |       U  S  E  R   N  A  M  E   (12 Char)       |    3
+      ---------------------------------------------------    .
+      |                                                 |
+      |                G  A  N  (6 Char)                |    5
+      ---------------------------------------------------
+      |         |                                       |
+      |(end GAN)|           A  U  N  (6 Char)           |    6
+      ---------------------------------------------------
+      |                   |                             |
+      |     (end AUN)     |  D I S T R I C T  (3 Char)  |    7
+      ---------------------------------------------------
+      |                                                 |
+      |  P  R  O  J  E  C  T   C  O  D  E    (12 Char)  |    8
+      ---------------------------------------------------   ..
+      |                   | customer|                   |
+      |  (end proj code)  | request?| JOB TYPE (2 Char) |   10
+      ---------------------------------------------------
+      |                                                 |
+      |       NUMBER OF ITEMS SHIPPED   (5 Chars)       |   11
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   12
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   13
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   14
+      ---------------------------------------------------
+      |                   |                             |
+      |   [ NOT USED ]    |  COMPLETION DATE (6 Chars)  |   15
+      ---------------------------------------------------
+      |                             |                   |
+      |   ( end completion date )   |   CRLF (2 Char)   |   16
+      ---------------------------------------------------
+
+
+
+
+
+Ken Dawson                                             November 11, 1983
+
+
+Special Handling Charges Specification                            Page 7
+
+
+                     Record Layout for Job Type 15
+
+
+      ---------------------------------------------------
+      | System Number or  |                             |
+      |  code  (2 Char)   |   REQUEST NUMBER (3 Char)   |    0
+      ---------------------------------------------------
+      |                                       | (begin  |
+      |    DATE REQUEST SUBMITTED (4 Char)    |   time) |    1
+      ---------------------------------------------------
+      |                             |                   |
+      |   TIME SUBMITTED (4 Char)   | (begin user name) |    2
+      ---------------------------------------------------
+      |                                                 |
+      |       U  S  E  R   N  A  M  E   (12 Char)       |    3
+      ---------------------------------------------------    .
+      |                                                 |
+      |                G  A  N  (6 Char)                |    5
+      ---------------------------------------------------
+      |         |                                       |
+      |(end GAN)|           A  U  N  (6 Char)           |    6
+      ---------------------------------------------------
+      |                   |                             |
+      |     (end AUN)     |  D I S T R I C T  (3 Char)  |    7
+      ---------------------------------------------------
+      |                                                 |
+      |  P  R  O  J  E  C  T   C  O  D  E    (12 Char)  |    8
+      ---------------------------------------------------   ..
+      |                   | customer|                   |
+      |  (end proj code)  | request?| JOB TYPE (2 Char) |   10
+      ---------------------------------------------------
+      |                                                 |
+      |       NUMBER OF ITEMS RECEIVED  (5 Chars)       |   11
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   12
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   13
+      ---------------------------------------------------
+      |                                                 |
+      |               [ N O T   U S E D ]               |   14
+      ---------------------------------------------------
+      |                   |                             |
+      |   [ NOT USED ]    |  COMPLETION DATE (6 Chars)  |   15
+      ---------------------------------------------------
+      |                             |                   |
+      |   ( end completion date )   |   CRLF (2 Char)   |   16
+      ---------------------------------------------------
+
+
+
+
+
+Ken Dawson                                             November 11, 1983
+    KÑ
