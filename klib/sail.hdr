@@ -1,0 +1,217 @@
+!! title Sail Header;
+! *************************************************************************
+************************************+**************************************
+*                                                                         *
+*                                                                         *
+*                              Sail Header                                *
+*                                                                         *
+*                                                                         *
+************************************+**************************************
+
+
+**************************************************************************;
+
+
+  require "(Sailib)Sail.Def" source!file;
+  require "<><>" delimiters;
+  require "(KLib)Sys.Req"    source!file;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define
+    !ver  (X, Y) = <((((X) lsh 9) lor ((Y) land '777)) land '777777)>,
+    !edit (X)    = <((X) land '777777)>,
+    !date (X)    = <"X">,
+
+    !version (X, Y, Z)  =
+    <
+      define
+	!Ver.Maj = (cvos((X) lsh -9)),
+	!Ver.Min = (cvos((X) land '000777)),
+	!Ver.Eds = (cvos((Y) land '777777)),
+	!Ver.Dat = cvps(Z);
+
+      require (xwd(X, Y)) version
+    >;
+
+
+! ------------------------------------------------------------------------;
+
+
+  let  r!c = record!class;
+  let  r!p = record!pointer;
+  let  n!r = null!record;
+
+
+! ------------------------------------------------------------------------;
+
+
+  redefine
+    cr  = <#cr>,
+    lf  = <#lf>,
+    ff  = <#ff>,
+    sp  = <#sp>,
+    ht  = <#ht>,
+    del = <'177>;
+
+  redefine
+    crlf   = <(cr & lf)>,
+    crlf2  = <(crlf & crlf)>,
+    crlf3  = <(crlf & crlf & crlf)>;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define  exit = <calli(0, '12)>;
+
+    ! To enable us to get out without SAIL's end-of-job message
+      sneaking out;
+
+
+! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+  define
+    set (X, Y) =
+    <
+      X _
+	  ifc (length(cvps(Y))) thenc
+	    Y
+	  elsec
+	    true
+	  endc
+    >,
+
+    clear  (X) = <X _ false>,
+    toggle (X) = <X _ not X>;
+
+
+      ! Switch functions;
+
+
+! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+  define
+    bit (X, Y) =
+    <
+      ifcr (length(cvps(Y))) thenc
+	((X) lsh (35-(Y)))
+      elsec
+	(1 lsh (35-(X)))
+      endc
+    >,
+
+    !mask (N) =
+	<((1 lsh N) - 1)>
+    ,
+
+    xwd (X, Y) =
+	<(((X) lsh 18) lor ((Y) land '777777))>
+    ,
+
+    xwdstr (X) =
+	<("[" &
+	cvos('1000000 + lh(X))[2 to inf] & "," &
+	cvos('1000000 + rh(X))[2 to inf] & "]")>
+    ,
+
+    ascstr (X) =
+	<("[" & cvastr(X) & "]")>
+    ,
+
+    boolstr (X) =
+	<(if (X) then "true" else "false")>
+    ;
+
+
+
+! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+  define
+    lh (X)  = <((X) lsh -18)>		! left-half  of X;,
+    rh (X)  = <((X) land '777777)>	! right-half of X;,
+    hl (X)  = <((X) lsh 18)>		! half-left  of X;,
+    hr (X)  = <((X) land '777777)>	! half-right of X;,
+    sh (X)  = <((X lsh 18) lor (X lsh -18))>
+					! Swap halves;;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define
+    maxinteger   = !mask(35),
+    largeinteger = maxinteger - 1000000;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define
+    inc (X, Y) =
+    <
+      X _ X + 
+	  ifc (length(cvps(Y))) thenc
+	    Y
+	  elsec
+	    1
+	  endc
+    >,
+
+    dcr (X, Y) =
+    <
+      X _ X -
+	  ifc (length(cvps(Y))) thenc
+	    Y
+	  elsec
+	    1
+	  endc
+    >,
+
+    appnd (X, Y) = <X _ X & Y>
+  ;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define
+    get.bounds (L.Bnd, U.Bnd, Arry) =
+    <
+      L.Bnd _ arrinfo(Arry, 1);
+      U.Bnd _ arrinfo(Arry, 2)
+    >;
+
+
+! ------------------------------------------------------------------------;
+
+
+  define
+    do.banner (Str) =
+    <
+      print(crlf, Str, crlf,
+	  "[",
+
+	  ifc (declaration($$Debug)) thenc
+	    if ($$Debug) then
+	      "Debugging "
+	    else
+	      null
+	    ,
+	  endc
+
+	  "Version ", !Ver.Maj, ".", !Ver.Min, " (", !Ver.Eds, ") ",
+	  !Ver.Dat, "]", crlf,
+	  Syswhere, Sysno,
+	  " ", CvS.Date(Get.Date),
+	  " ", CvS.Time(Get.Time), crlf);
+    >;
+
+
+! **********************************+**************************************
+**************************************************************************;
