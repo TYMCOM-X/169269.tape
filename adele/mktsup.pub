@@ -1,0 +1,416 @@
+.StandardSpacing_1;
+.Indent 5;
+.MarginHeadings_true;
+.Every Footing (,,);
+.Device TTY;
+.Single Space;
+.Preface 1;
+.Memo;
+.UnderlineBetween (~~,~);
+.Page Frame 61 High 77 Wide;
+.Area Text Lines 5 to 60 Chars 6 to 77;
+.Title Area Heading Lines 1 to 4;
+.Title Area Footing Line 61;
+.Every Heading (Product Support List,{Day} {Month} {Year},Page {Page});
+.Every Footing (,,);
+.Place Text;
+.ByHand;
+ ** ADES **                   VENDOR:   TYMSHARE
+
+ TYM TECH:  AL MEIER-WEST           608 221-2271
+ TYM MKTG:  SUSAN ESTREM            408 446-6801
+ TYM TECH:  SANDY SZYBISTY-EAST     404 448-9027
+ ---------------
+
+ ** AICPA **                  VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY KIRKMAN            212 490-6774
+ TYM MKTG:  ABE ABELMAN             212 490-6774
+ ---------------
+
+ ** BATCHTYM **               VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** BBL **                    VENDOR:   CORE & CODE
+
+ VEN TECH:  PETER BRUMMEL           617 237-4554
+ VEN MKTG:  TOM SORRELL             617 237-4554
+ ---------------
+
+ ** BMDP **                   VENDOR:   UNIVERSITY OF CALIFORNIA
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** CASH MGMT **              VENDOR:   HANS WYNHOLDS CO.
+
+ VEN TECH:  HANS WYNHOLDS           408 257-4045
+ VEN MKTG:  HANS WYNHOLDS           408 257-4045
+ ---------------
+
+ ** CITIBASE **               VENDOR:   CITIBANK
+
+ TYM TECH:  GEORGE BEIDLER          408 446-7416
+ TYM MKTG:  ROB ALBERTSON           408 446-6298
+ ---------------
+
+ ** COBOL-X **                VENDOR:   TYMSHARE
+
+ TYM TECH:  NONE
+ ---------------
+
+ ** COMARC **                 VENDOR:   COMARC
+
+ VEN TECH:  JAMES BAILEY            415 392-5300
+ VEN MKTG:  MARK LIERMAN            415 392-5300
+ VEN TECH:  MARK LIERMAN            415 392-5300
+ ---------------
+
+ ** COMPACT **                VENDOR:   COMPACT ENGINEERING
+
+ VEN TECH:  MIKE HILLBUN            408 858-1200
+ VEN MKTG:  JIM LINDAUER            408 858-1200
+ ---------------
+
+ ** COPAQUEN **               VENDOR:   COPAQUEN ASSOCIATES INC
+
+ TYM MKTG:  ROB ALBERTSON           408 446-6298
+ VEN TECH:  BRAD KEELER             212 683-3421
+ ---------------
+
+ ** COUNT **                  VENDOR:   LUPFER & LONG
+
+ VEN TECH:  PETER STANZEL           603 643-4503
+ VEN MKTG:  PETER STANZEL           603 643-4503
+ ---------------
+
+ ** CP/CMS **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** CRAM **                   VENDOR:   ENVIRONMENTAL SERVICES
+
+ VEN TECH:  BARRY WHITEAKER         612 854-8414
+ VEN MKTG:  BARRY WHITEAKER         612 854-8414
+ ---------------
+
+ ** DCS **                    VENDOR:   TYMSHARE
+
+ TYM TECH:  DON MACOY               408 446-7254
+ TYM MKTG:  JACK MELNICK            408 446-6357
+ TYM TECH:  JACK MELNICK            408 446-6357
+ ---------------
+
+ ** DELTAK **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  JOANN CLARK             408 446-6264
+ ---------------
+
+ ** DELTATAX **               VENDOR:   TOUCHE ROSS & CO.
+
+ TYM TECH:  GARY KIRKMAN            212 490-6774
+ TYM MKTG:  ABE ABELMAN             212 490-6774
+ VEN TECH:  DAN MORSON              212 489-1600
+ VEN TECH:  JEFF KNEPPER            212 489-1600
+ ---------------
+
+ ** DISSPLA **                VENDOR:   ISSCO
+
+ TYM TECH:  JUDY HOFFMAN            408 446-7944
+ TYM MKTG:  JUDY HOFFMAN            408 446-7944
+ ---------------
+
+ ** EDITOR **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** EXPRESS **                VENDOR:   MANAGEMENT DECISION SYST
+
+ TYM TECH:  JOHN BAXTER             408 446-7161
+ TYM MKTG:  JOHN BAXTER             408 446-7161
+ ---------------
+
+ ** FOCUS **                  VENDOR:   INFORMATION BUILDERS INC
+
+ TYM TECH:  JOHN BAXTER             408 446-7160
+ TYM MKTG:  ALAN CODKIND            408 446-6297
+ VEN TECH:  NICK GIRADANO           212 736-4433
+ VEN MKTG:  MARTY SLAGOWITZ         212 736-4433
+ TYM TECH:  TROY PORTER             408 446-6671
+ ---------------
+
+ ** FORTRAN/10 **             VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** FORTRAN/370 **            VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** HIGH SPEED ACCESS **      VENDOR:   TYMSHARE
+
+ TYM TECH:  RON BATES               408 446-7510
+ TYM MKTG:  RON BATES               408 446-7510
+ ---------------
+
+ ** MAGNUM **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  KATHRYN DAUGHERTY       (408) 446-6849
+ ---------------
+
+ ** MICRO PROCESSOR-X **      VENDOR:   BOSTON SYSTEMS
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** MODEL 1100 **             VENDOR:   TYMSHARE
+
+ TYM TECH:  RON BATES               408 446-7510
+ TYM MKTG:  RON BATES               408 446-7510
+ ---------------
+
+ ** OMNI **                   VENDOR:   HAVERLY SYSTEMS INC.
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** OUTDIAL **                VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ TYM TECH:  RON BATES               408 446-7510
+ ---------------
+
+ ** PASCAL/VS **              VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** PDP-11 **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ ---------------
+
+ ** PERP/DEFER **             VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** PERS **                   VENDOR:   TYMSHARE
+
+ TYM TECH:  BARBARA MCCOY(WEST)     415 941-6010
+ TYM MKTG:  DAVE OLSON              203 655-8961
+ TYM TECH:  SUSAN MANGENO(CENT.)    312 984-8924
+ TYM MKTG:  FRED MANUS(WEST)        415 941-6010
+ TYM MKTG:  LYNN IREDELL(CENT.)     312 984-8922
+ ---------------
+
+ ** PL/1 **                   VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** QOSMAIL **                VENDOR:   TYMSHARE
+
+ TYM TECH:  GEORGE BEIDLER          408 446-7416
+ TYM TECH:  LYNNE JENKINS           408 446-7079
+ ---------------
+
+ ** RAILTRACK **              VENDOR:   TYMSHARE
+
+ TYM TECH:  DAN PETROSKY            612 339-4300
+ TYM MKTG:  BOB LARSON              612 339-4300
+ TYM MKTG:  LARRY BARON             408 446-7131
+ ---------------
+
+ ** RBASIC **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  NONE
+ ---------------
+
+ ** REMOTE PRINTING **        VENDOR:   TYMSHARE
+
+ TYM TECH:  RON BATES               408 446-7510
+ TYM MKTG:  RON BATES               408 446-7510
+ ---------------
+
+ ** RSCS **                   VENDOR:   TYMSHARE
+
+ TYM TECH:  RON BATES               408 446-7510
+ TYM MKTG:  RON BATES               408 446-7510
+ ---------------
+
+ ** SAS **                    VENDOR:   SAS INSTITUTE
+
+ VEN TECH:  CHARLES WHITMAN         919 467-8000
+ VEN MKTG:  CHARLES WHITMAN         919 467-8000
+ ---------------
+
+ ** SCRIPT/VS **              VENDOR:   TYMSHARE
+
+ TYM TECH:  JUDY HOFFMAN            408 446-7944
+ TYM MKTG:  JUDY HOFFMAN            408 446-7944
+ ---------------
+
+ ** SITE SYSTEMS **           VENDOR:   CACI
+
+ TYM TECH:  SUSAN KURTZ             800-538-9350 X6275
+ TYM MKTG:  SUSAN KURTZ             800-538-9350 X6275
+ ---------------
+
+ ** SPOOL **                  VENDOR:   TYMSHARE
+
+ TYM TECH:  RON BATES               408 446-7510
+ TYM MKTG:  RON BATES               408 446-7510
+ ---------------
+
+ ** SPSS **                   VENDOR:   SPSS
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** SRMS **                   VENDOR:   INTERACTIVE LOGIC INC.
+
+ TYM TECH:  DON DE YOUNG            201 645-6800
+ TYM TECH:  PHIL GERENCER           201 645-6800
+ ---------------
+
+ ** SSP **                    VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** SUPPORT **                VENDOR:   TYMSHARE
+
+ TYM TECH:  GEORGE BEIDLER          408 446-7416
+ ---------------
+
+ ** SURVEY **                 VENDOR:   CROSSLEY SURVEYS INC.
+
+ VEN TECH:  BARBARA COLE            212 223-1700
+ VEN MKTG:  STAATS ABRAMS JR.       212 223-1700
+ VEN TECH:  FRANK JAMES             212 223-1700
+ VEN TECH:  MARGARET MCGARRY        212 223-1700
+ VEN TECH:  STAATS ABRAMS JR.       212 223-1700
+ ---------------
+
+ ** S2000 **                  VENDOR:   INTEL SYSTEMS CORPORATIO
+
+ VEN TECH:  CUST SPRT HOTLINE       512 258-5171
+ ---------------
+
+ ** TELAGRAF **               VENDOR:   ISSCO
+
+ TYM TECH:  JUDY HOFFMAN            408 446-7 TYM MKTG:  JUDY HOFFMAN            408 446-7944
+ ---------------
+
+ ** TELECOPY **               VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ TYM MKTG:  JACK MELNICK            408 446-6357
+ TYM TECH:  RON BATES               408 446-7510
+ ---------------
+
+ ** TYMBASIC **               VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** TYMCOM IX **              VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** TYMCOM X **               VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** TYMNET **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ TYM TECH:  RON BATES               408 446-7510
+ ---------------
+
+ ** TYMQUOTE **               VENDOR:   CAPITAL MARKET SYSTEMS
+
+ TYM TECH:  LYNNE JENKINS           408 446-7079
+ TYM MKTG:  ROB ALBERTSON           408 446-6298
+ ---------------
+
+ ** TYMUSE **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  KEN HOLCOMB             408 446-6293
+ ---------------
+
+ ** UWSCRIPT **               VENDOR:   TYMSHARE
+
+ TYM TECH:  JUDY HOFFMAN            408 446-7944
+ TYM MKTG:  JUDY HOFFMAN            408 446-7944
+ ---------------
+
+ ** VALULINE **               VENDOR:   VALUE LINE DATA SERVICES
+
+ TYM TECH:  GEORGE BEIDLER          408 446-7416
+ TYM MKTG:  ROB ALBERTSON           408 446-6298
+ ---------------
+
+ ** VSAM/ISAM/CIDAS **        VENDOR:   TYMSHARE
+
+ TYM TECH:  RON STEVENS             408 446-6587
+ TYM MKTG:  RON STEVENS             408 446-6587
+ ---------------
+
+ ** VSBASIC **                VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** VSCOBOL **                VENDOR:   TYMSHARE
+
+ TYM TECH:  GARY MAULDIN            408 446-6460
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** VS3780 **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ TYM MKTG:  JACK MELNICK            408 446-6357
+ TYM TECH:  RON BATES               408 446-7510
+ ---------------
+
+ ** XBASIC **                 VENDOR:   TYMSHARE
+
+ TYM TECH:  NONE
+ ---------------
+
+ ** X22 **                    VENDOR:   SOFTWARE HOUSE
+
+ TYM MKTG:  GARY MAULDIN            408 446-6460
+ ---------------
+
+ ** 1200 BAUD ACCESS **       VENDOR:   TYMSHARE
+
+ TYM TECH:  JACK MELNICK            408 446-6357
+ TYM TECH:  RON BATES               408 446-7510
+ ---------------
+.EndHand;
+ W
