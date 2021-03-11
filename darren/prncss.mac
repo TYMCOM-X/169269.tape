@@ -1,0 +1,424 @@
+	TITLE	PRNCSS - Allocates a file all on one disk unit
+	SUBTTL	Definitions
+
+	SEARCH	UUOSYM
+
+;Register equates
+
+	S=0
+	T1=1
+	T2=2
+	T3=3
+	T4=4
+	F=5
+	U=6
+
+	P=17
+
+; I/O channel equates
+
+	CH1==1
+	SUBTTL	Get file name and init channel
+
+	TWOSEG
+	RELOC	400000
+
+ST:	JFCL
+	RESET
+	SKIPA	P,[-PDLSIZ,,PDL-1]
+F1INI:	CLRBFI
+	MOVEI	F,F1LKB		;Point to lookup block
+	OUTSTR	[ASCIZ/
+Enter name of file to be created: /]
+	PUSHJ	P,GETFNM	;Get file name from TTY, store in lookup block
+	  JRST	F1INI		;Illegal file name or some such, try again
+	MOVE	T4,[.CHOPN,,CH1]
+	CHANIO	T4,OPNARG	;Open a channel for this file
+	  JRST	OPNERR		;Die
+	HRLI	T4,.CHENT	;Set up args
+	CHANIO	T4,F1LKB	;Enter the file
+	  JRST	ENTERR		;Die
+
+GETSIZ:	OUTSTR	[ASCIZ /
+Number of pages to allocate [512 maximum]: /]
+	PUSHJ	P,RDDEC
+	  JRST	GETSIZ		;User entered garbage
+	  JRST	GETSIZ		;User entered null string (cr-lf)
+	JUMPLE	T1,GETSIZ	;User entered a real number, make 
+	CAILE	T1,MAXFP	; sure it's > 0 and <= 512
+	  JRST	GETSIZ
+	MOVEM	T1,REQSIZ
+
+GETUNI:	OUTSTR	[ASCIZ /
+Number of unit to allocate on (<cr> if no preference): /]
+	PUSHJ	P,RDDEC
+	  JRST	GETUNI		;User entered garbage
+	  SETO	T1,		;User entered null string (cr-lf)
+	MOVEM	T1,REQUNI	;User entered a real number
+
+; Now determine whether there are enough free pages on the requested
+; unit, or on any unit if no preference was indicated.
+
+	SETZB	T1,DSKDB+0	;T1 holds relative physical unit number,
+				; DSKDB is the DSKCHR UUO data block
+UNILP:	MOVE	T2,DSKDB+0	;Name of previous physical unit
+	SYSPHY	T2,		;Get name of next physical unit
+	  JRST	PHYERR		;If name in T2 is bad (should never happen)
+	JUMPE	T2,[MOVEI T1,[ASCIZ /
+Not enough free pages on requested unit
+/]
+		    SKIPGE REQUNI
+		    MOVEI T1,[ASCIZ /
+Not enough free pages on any unit
+/]
+		    OUTSTR (T1)
+		    JRST GETSIZ]
+	MOVEM	T2,DSKDB+0	;Set up for DSKCHR UUO
+	SKIPGE	REQUNI		;Particular unit requested ?
+	  JRST	UNIOK		;No, any unit will do
+	CAME	T1,REQUNI	;Is current unit the one requested ?
+	  AOJA	T1,UNILP	;If not, keep searching the list
+; Current unit is acceptable, check for space available
+UNIOK:	MOVE	T2,[DBLEN,,DSKDB]
+	DSKCHR	T2,
+	  JRST	CHRERR
+	MOVE	T2,DSKDB+3	;Pages left on unit
+	CAMG	T2,REQSIZ	;Enough for our purposes ?
+	  AOJA	T1,UNILP	;If not, keep looking
+
+; Now allocate file pages until we get enough on one unit
+
+GRAB:	MOVE	T3,JOBFF##	;Last location of impure storage
+	ADDI	T3,777		;Round up to next page boundary
+	LSH	T3,-^D9		;Number of page after last used
+	ADDI	T3,1		;For safety
+	HRRZM	T3,PAGPTR	;Right half of AOBJN word
+	MOVEI	T2,(T3)
+	SUBI	T2,400		;Negative page count up to page 377
+	HRLM	T2,PAGPTR	;Left half of AOBJN word
+	MOVNS	T2		;Positive count
+	HRLI	T3,0(T2)	;Count,,start page
+	MOVEM	T3,MAPARG	;Argument for VCREATE/VMOVPG
+	HRLI	T4,47		;CHANIO function code for VMOVPG
+	SETZB	T1,FILPAG	;File page for VMOVPG
+	MOVE	T2,[POINT 6,PAGTAB] ;Byte pointer for unit numbers
+	MOVEM	T2,UNIPTR
+NXTSET:	TLO	T3,(3B7)	;Read/write page status bits
+	VCREAT	T3,
+	  JRST	CREERR
+	MOVE	T3,PAGPTR	;Loop over all new pages
+NXTPAG:	HRRZI	T2,(T3)		;Page number only
+	VDSKPT	T2,		;Get disk retrieval pointer
+	  JRST	VPTERR
+	LDB	U,[POINT 6,T2,16] ;Unit number of file page
+	IDPB	U,UNIPTR	;Remember in next PAGTAB entry
+	AOS	T2,UNITAB(U)	;Count page allocated on this unit
+	ADDI	T1,1		;File page number
+	SKIPL	REQUNI
+	CAMN	U,REQUNI
+	  CAMGE	T2,REQSIZ	;Enough pages assigned to one unit ?
+	    SKIPA
+	      JRST ENOUGH
+	AOBJN	T3,NXTPAG
+	AOS	FILPAG		;Move new pages to old EOF + 1
+	CHANIO	T4,MAPARG	;VMOVPG page set into the file
+	  JRST	VMVERR
+	MOVEM	T1,FILPAG	;Set new highest page
+	MOVE	T3,MAPARG
+	VREMOV	T3,
+	  JRST	RMVERR
+	JRST	NXTSET
+
+ENOUGH:	SUB	T3,PAGPTR	;Now holds count,,count pages used this pass
+	HRLZI	T3,1(T3)	;Correct for off-by-one
+	HRR	T3,MAPARG	;Use this for VMOVPG
+	EXCH	T3,MAPARG	;But save old value for VREMOV
+	AOS	FILPAG
+	CHANIO	T4,MAPARG
+	  JRST	VMVERR
+	MOVEM	T1,FILPAG
+	VREMOV	T3,
+	  JRST	RMVERR
+
+; Now use the information in PAGTAB to shuffle pages from the unit
+; in U to the beginning of the file.
+	CAMG	T1,REQSIZ	;Are there any excess pages ?
+	  JRST	DONE		;Luck out
+	HRLI	T4,.CHXFP	;CHANIO function code for Exchange File Pages
+	MOVE	T3,[POINT 6,PAGTAB]
+	MOVEM	T3,UNIPTR
+	MOVEI	T1,0		;File page
+; Find next page which is not from the unit we want
+	ADDI	T1,1
+	ILDB	T3,UNIPTR
+	CAIN	T3,(U)
+	  JRST	.-3
+; Now find first page after this that is from the right unit
+	MOVEI	T2,(T1)
+	MOVE	T3,UNIPTR
+	MOVEM	T3,SRCPTR	;Place to move pages from
+	ADDI	T2,1
+	ILDB	T3,SRCPTR
+	CAIE	T3,(U)
+	  JRST	.-3
+SHUFFL:	CHANIO	T4,T1		;Exchange pages in T1 & T2
+	  JRST	XFPERR
+	CAML	T1,REQSIZ	;Reached requested size (last page) ?
+	  JRST	DONE		;Exit if so
+	ADDI	T1,1
+	ILDB	T3,UNIPTR
+	CAIN	T3,(U)
+	  JRST	.-3
+	ADDI	T2,1
+	ILDB	T3,SRCPTR
+	CAIE	T3,(U)
+	  JRST	.-3
+	JRST	SHUFFL
+
+DONE:	HRLI	T4,.CHFTR	;CHANIO function code for file truncate
+	MOVE	T1,REQSIZ	;File size in pages
+	LSH	T1,^D9		;File size in words
+	CHANIO	T4,T1
+	  OUTSTR [ASCIZ /
+Error from FTRUNC CHANIO
+/]
+XIT:	HRLI	T4,.CHCLS	;Close file
+	CHANIO	T4,
+	  JFCL
+	HRLI	T4,.CHREL
+	CHANIO	T4,		;RELEASE first file I/O channel
+	  JFCL
+	EXIT
+
+	SUBTTL	GETFNM - Get File Name from terminal
+
+GETFNM:
+	SETZM	.LKPPN(F)	;Clear out PPN in lookup block
+	SETZM	USRNAM(F)	;And user name string
+	SETZM	USRNAM+1(F)
+	HRROI	T1,.AXIWL	;INCHWL AUXCAL
+	AUXCAL	T1,T2		;Get char to T2
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Yes, give error return
+	CAIN	T2," "		;Leading blank?
+	  JRST	.-3		;Yes, skip over leading blanks
+	CAIE	T2,"("		;Start of user name?
+	  JRST	FNAME		;No, scan file name
+	MOVE	T3,[POINT 6,USRNAM(F)] ;Byte pointer to user name string
+	MOVSI	T4,-^D12	;Maximum chars allowed in user name
+GETUNM:
+	AUXCAL	T1,T2		;Keep INCHWL-ing
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Illegal here - give error return
+	CAIN	T2,")"		;End of user name?
+	  JRST	GETUN1		;Branch if yes
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - error return
+	IDPB	T2,T3		;Store into user name string
+	AOBJN	T4,GETUNM
+	AUXCAL	T1,T2		;This should be the close paren
+	  POPJ	P,		;Give error return
+	CAIE	T2,")"		;Is it?
+	  POPJ	P,		;Error return - user name too long
+GETUN1:
+	MOVEI	T3,USRNAM(F)	;Address of SIXBIT user name string
+	MOVEM	T3,.LKPPN(F)	;Store into lookup block
+; Parse file name
+
+FNAME:
+	SETZM	.LKNAM(F)	;Clear file name from lookup block
+	SETZM	.LKEXT(F)	;Also file extension
+	MOVE	T3,[POINT 6,.LKNAM(F)] ;Byte pointer to SIXBIT file name
+	MOVSI	T4,-6		;Max length of file name
+	SKIPN	.LKPPN(F)	;Was there a user-name specified?
+	  JRST	FNAME2		;If not, T2 has first char of file name
+FNAME1:
+	AUXCAL	T1,T2		;T1 still has INCHWL args
+	  POPJ	P,		;Give bad return
+FNAME2:
+	CAIN	T2,15		;End of line?
+	  JRST	FNEXIT		;Yes, escape from this routine
+	CAIN	T2,"."		;End of file name?
+	  JRST	FEXT		;Yes, scan for extension
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Store next char of file name
+	AOBJN	T4,FNAME1	;Loop up to 6
+
+; Have scanned 6 chars of file-name, now look for "." or c-r,
+; ignoring intermediate blanks.
+
+	AUXCAL	T1,T2
+	  POPJ	P,
+	CAIN	T2," "
+	  JRST	.-3		;Ignore blanks
+	CAIN	T2,15		;Carriage return?
+	  JRST	FNEXIT		;Escape if so
+	CAIE	T2,"."		;Seperator?
+	  POPJ	P,		;No, give error return
+
+; Here to scan file extension
+FEXT:
+	MOVE	T3,[POINT 6,.LKEXT(F)]
+	MOVSI	T4,-3		;Max length
+FEXT1:
+	AUXCAL	T1,T2
+	  POPJ	P,		;Give error return
+	CAIN	T2,15		;End-of-line?
+	  JRST	FNEXIT		;Escape if so
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Add to file extension string
+	AOBJN	T4,FEXT1	;Loop up to 3 times
+FNEXIT:	AUXCAL	T1,T2		;Scan to end-of-line
+	  POPJ	P,
+	CAIE	T2,12		;Exit loop if have reached it
+	  JRST	FNEXIT
+	SKIPE	.LKNAM(F)	;Did we actually get some sort of file-name?
+CPOPJ1:	AOS	(P)		;General purpose success return
+	POPJ	P,		;Error return
+
+; Routine to fold lower-case ASCII to upper case and convert to SIXBIT
+; Entered with char in T2, no other AC's used.
+
+CVT726:
+	CAIL	T2,40		;Check for legal range for SIXBIT conversion
+	CAILE	T2,"z"
+	  POPJ	P,		;Give error return
+	CAIL	T2,"a"		;Within range of lower-case
+	ADDI	T2,"A"-"a"	;Fold to upper case
+	SUBI	T2,40		;Adjust to SIXBIT character codes
+	ANDI	T2,77		;And leave only six bits
+	JRST	CPOPJ1		;Give good return
+
+; Routine to read decimal numbers from the terminal, terminated
+; by a cr-lf.
+; Returns binary value of decimal number in T1.
+; Returns at call+1 if error (illegal char)
+;	call + 2 if null digit string (cr-lf only)
+;	call + 3 if T1 has actual binary input in it
+
+RDDEC:	PUSH	P,T2
+	MOVEI	T1,0		;Binary will be accumulated here
+RDDEC1:	INCHWL	T2
+	CAIN	T2,15		;End of line?
+	  JRST	RDDEC2		;Whip out if so
+	CAIL	T2,"0"
+	CAILE	T2,"9"
+	  JRST	RDERR		;Illegal character, error out
+	SUBI	T2,"0"
+	TLZ	T1,400000	;Clear "digit entered" flag
+	IMULI	T1,^D10
+	ADDI	T1,(T2)
+	TLO	T1,400000	;Flag indicates at least one digit typed
+	JRST	RDDEC1
+
+; Heree reached end-of-line without any illegal characters.
+
+RDDEC2:	AOS	-1(P)		;Returns at least at call + 2
+	TLZE	T1,400000	;If any digits typed (clear flag),
+	AOS	-1(P)		; returns at call + 3
+; Scan to end-of-line & exit
+RDERR:	INCHWL	T2
+	CAIE	T2,12
+	  JRST	RDERR
+	POP	P,T2
+	POPJ	P,
+	SUBTTL	Error message routines
+
+OPNERR:	OUTSTR	[ASCIZ /
+Error on OPEN for channel
+/]
+	JRST	XIT
+
+ENTERR:	OUTSTR	[ASCIZ /
+ENTER error for file
+/]
+	JRST	XIT
+
+PHYERR:	OUTSTR	[ASCIZ /
+Error on SYSPHY UUO
+/]
+	JRST	XIT
+
+CHRERR:	OUTSTR	[ASCIZ /
+Error on DSKCHR UUO
+/]
+	JRST	XIT
+
+CREERR:	OUTSTR	[ASCIZ /
+VCREATE error
+/]
+	JRST	XIT
+
+VMVERR:	OUTSTR	[ASCIZ /
+Error on VMOVPG CHANIO
+/]
+	JRST	XIT
+
+RMVERR:	OUTSTR	[ASCIZ /
+VREMOVE error
+/]
+	JRST	XIT
+
+XFPERR:	OUTSTR	[ASCIZ /
+Error on Exchange File Page
+/]
+	JRST	XIT
+
+VPTERR:	OUTSTR	[ASCIZ /
+Error on VDSKPT UUO
+/]
+	JRST	XIT
+	SUBTTL	Pure storage
+
+OPNARG:	0
+	SIXBIT	/DSK/
+	0
+
+	LIT
+	SUBTTL	Impure storage
+
+	RELOC	0
+
+F1LKB:	PHASE	0
+.LKNAM:	0
+.LKEXT:	0
+.LKPRT:	0
+.LKPPN:	0
+USRNAM:	BLOCK	2
+	DEPHASE
+	LKBLEN==.-F1LKB
+
+REQSIZ:	BLOCK	1
+REQUNI:	BLOCK	1
+
+PAGPTR:	BLOCK	1
+
+MAPARG:	BLOCK	1	;Argument word for VCREATE and VMOVPG
+FILPAG:	BLOCK	1	;Second word for VMOVPG
+
+	DBLEN==4
+DSKDB:	BLOCK	DBLEN
+
+	MAXUNI==77
+UNITAB:	BLOCK	MAXUNI+1
+
+UNIPTR:	BLOCK	1	;Byte pointer into PAGTAB
+SRCPTR:	BLOCK	1	;Second pointer for page swap
+
+	MAXFP==^D512
+PAGTAB:	BLOCK	<MAXFP*<MAXUNI+1>/6>+1	;Six entries per word, MAXFP entries
+			; per unit times MAXUNI+1 units
+
+	PDLSIZ==40
+PDL:	BLOCK	PDLSIZ
+
+	PATSIZ==40
+PATCH:	BLOCK	PATSIZ
+PATEND==.-1
+
+	END	ST
+ Q@¶
