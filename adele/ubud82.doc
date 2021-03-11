@@ -1,0 +1,366 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  T Y M C O M - X   U T I L I T I E S   U N I T
+
+
+
+
+
+
+
+
+
+
+                           Manpower Allocation Summary
+
+                          Summary of On-going Activities
+
+                         Project Requests for 1982 Budget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             DATE:  November 20, 1981        Prepared by:  Adele Gadol
+
+
+
+                           MANPOWER_ALLOCATION_SUMMARY                           
+
+                             Units of Person Quarters
+
+
+     ________________________________________________________________________
+       Activity or Project                | 1981 | 1982 | 1982 | 1982 | 1982
+     _____________________________________|__Q4__|__Q1__|__Q2__|__Q3__|__Q4__     
+                                          |      |      |      |      |
+       Activity                           |      |      |      |      |       
+                                          |      |      |      |      |
+       Misc. utilities maintenance        |      |  .05 |  .10 |  .15 |  .15
+       Misc. IX and X maintenance         |      |      |  .05 |  .05 |  .05
+       General consulting                 |      |      |  .10 |  .10 |  .10
+       Learning                           |      |  .20 |  .08 |  .18 |  .12
+       Unit management                    |      |  .15 |  .50 |  .40 |  .40
+       Miscellaneous non-project time     |      |  .04 |  .10 |  .15 |  .15
+       Time off                           |      |  .04 |  .16 |  .24 |  .24
+                                          |      |      |      |      |
+     __Projects_Less_Than_Six_Months______|______|______|______|______|______     
+                                          |      |      |      |      |
+       X-PERP development (2.00)          |      |  .18 |  .91 |  .91 |
+                                          |      |      |      |      |
+     _____________________________________|______|______|______|______|______
+
+
+
+     __Projects_More_Than_Six_Months______|______|______|______|______|______     
+                                          |      |      |      |      |
+       SNARL and related programs (3.00)  |      |      |      |  .82 | 1.04+
+       SPOOL/BATCH rewrite or overhaul    |      |      |      |      |  .75+
+       FTP TELECOPY                       |      |      |      |      |     +
+     _____________________________________|______|______|______|______|______     
+
+
+      + more time to go
+
+
+     NOTE:  The following manpower assumptions were made:
+             (1) Transfer of Dave Smith to Languages in January.
+             (2) Lang.-Util. manager (3/1/82).
+             (3) Lang.-Util. person (3/1/82).
+             (4) Second utilities person (7/1/82).
+
+                                 PROJECT REQUEST
+
+     requestor _____________Adele_Gadol________________   date Nov._20,_1981_                                                    
+     organization __________TYMCOM-X_Tech._Sup._Unit___    cost code __4011__                                               
+     internal mail address _VG2-B03____________________  phone (408) 446-6232                                                          
+     mail username:system __ADELE:36___________________                            
+
+     current problem or market opportunity:
+       The current PERP/DEFER system is strained beyond capacity.  Some large
+       customers, notably COEES, say they cannot depend on it.
+
+
+
+     current procedure:
+       Everyone does his/her best to cope with the situation.
+
+
+
+
+     project objectives:
+       The product is a TYMCOM-X resident PERP/DEFER system which appears to
+       the user like the current 940 PERP/DEFER.  It would not allow users to
+       submit jobs for systems other than the one on which the user is
+       running, however.  It must include the means to bill users for
+       PERP/DEFER jobs on the same basis as with the current system.
+
+     quantifiable benefits (expected payoffs):
+       The amount of maintenance required should eventually be reduced.  It
+       takes regular clean-up to keep 940 PERP going, especially due to the
+       overload on that system.  A TYMCOM-X resident system should make
+       capabilities available to those who cannot depend on present system.
+
+     qualitative benefits:
+       Reducing the load on the 940 PERP system will remove a great deal of
+       network traffic.
+
+     risk:
+       Implementation of PERP/DEFER billing on the TYMCOM-X may force
+       solution of other problems such as accounting for frames and billing
+       without knowledge of a node of origin.
+
+     impact on other systems (include accounting):
+       The solution to the billing problem will impact the monitor and MIS.
+
+     proposed solution(s):
+       Build the new PERP/DEFER around the newly-developed monitor features
+       of PTY's and PCOM processor.
+
+     alternative solution(s):
+       Overhaul the current 940 PERP/DEFER system.
+
+
+
+     desired date _3Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name _X-PERP_                               
+     Title:  X-PERP development
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The current program (TITO) for archiving and system saves has many
+       problems, is slow, and cannot handle files with "holes".  The lack of
+       a "holey" file feature affects anyone with a large MAGNUM data base.
+       TITO consumes system resources when it runs.  A full system rebuild is
+       a lengthy procedure which results in files being restores which have
+       been deleted in the interim.
+
+     current procedure:
+       Patience . . . The European APL users who deal with a great many files
+       have a program which will compress files after they are restored.  Due
+       to space limitations, they must sometimes go through several rounds of
+       restoring and compressing files when they need files from tape.
+
+     project objectives:
+       A new program (SNARL) to replace the existing TITO and a companion
+       maintenance program (DSNARL) to assist in tape recovery.
+
+     quantifiable benefits (expected payoffs):
+       Completion of SNARL, which uses paged disk I/O should allow somewhat
+       faster operation.  Since a STORE of changed files is done nightly, and
+       a STORE of all the files is currently done once a week, even a small
+       improvement in performance can have substantial benefit.
+       Implementation of a different algorithm for system rebuilds, one which
+       does not cause deleted files to be restored could reduce the rebuild
+       time by reducing the number of files which must be transferred and by
+       eliminating stops and starts needed to acquire additional disk space.
+       Also, the tape format of SNARL will be less wasteful of tape.
+
+     qualitative benefits:
+       Handling for files with "holes" will enable full monitor use of that
+       feature.
+
+     risk:
+       There is a possibility of confusion in implementing new operations
+       procedures.  Although we expect performance improvements, it may not
+       be substantial, due to the necessary disk-bound nature of the data
+       transfers.
+
+     impact on other systems (include accounting):
+       It will change operations procedures somewhat.  There have been a few
+       monitor effects, to date, and monitor impact is still a possibility.
+
+     proposed solution(s):
+       There has been a proposed solution in terms of a design for SNARL that
+       was, in the past, approved.  Considerable effort and accomplishments
+       have been made on the project.  However it has not received full-time
+       support, with the exception of a two-month period of time in 1980.
+
+     alternative solution(s):
+       Modify TITO or forget the problem.  But beware!  TITO has a large,
+       ouding backlog of problems already and is extremely difficult to
+       work with.  It is an old program.  And the problems will not go away.
+       They will become more critical.
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _SNARL and related programs_                                  
+     Title:  SNARL and related programs
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The SPOOL/BATCH system of programs requires time-consuming, regular
+       preventative maintenance in order to keep it running.  SPOOL in
+       particular is extremely difficult, if not impossible, to enhance.
+       Some of its functions, such as the completion of requests moved to
+       tape for printing on a different system, the notification of operators
+       of requests to be printed, and the propagation of the system and
+       center maps needed by SPOOL depend upon programs running in (PJ) and
+       auxiliary circuits.  When these fail, the result is long turn-around
+       times for the completion of users' requests and complaints.
+       Modifications to SPOOL to handle three and four-digit system numbers                                        
+       is inevitable.  This is a major change to SPOOL which may not be
+       feasible with the present code.
+
+     current procedure:
+       A TSU person spends 10-20% of total time fighting "fires" and
+       maintaining SPOOL.
+
+     project objectives:
+       Initially, an investigation should be done which will result in a
+       proposal for a new design of SPOOL.  This should include a complete
+       survey of the current system and its problems from the standpoint of
+       end users, "remote" and "center" operators, links to the accounting
+       files and impact upon MIS software, and new network features (such as
+       local networks).
+
+     quantifiable benefits (expected payoffs):
+       The payoff in revenues would come if a new tool can be successfully
+       implemented.  The study is necessary in order to assure an adequate
+       design.
+
+     qualitative benefits:
+       Eventual elimination of the laborious maintenance would improve
+       morale.
+
+     risk:
+       There should be little risk in an investigation.  A project to
+       implement would be a major one.
+
+     impact on other systems (include accounting):
+       Impacts MIS.  Also impacts users who access SPOOL in a non-interactive
+       manner, such as from MAGNUM, FORTRAN, or command files.  This could be
+       a potentially large impact but could and should be overcome.  The
+       present interface to SPOOL is cumbersome and inflexible, and we could
+       make this feature much more reliable.
+
+     proposed solution(s):
+       This is not clear at this time.  However, assign a person or task
+       force to do the study.  A TYMCOM-X person should be in charge, and the
+       study should end with a proposal and a high-level, preliminary design
+       for the product.
+
+     alternative solution(s):
+
+       Limp along with present SPOOL until everyone becomes exasperated, or
+       work on ways to overhaul the present system or parts of it.
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _SPOOL/BATCH_                               
+     Title:  SPOOL/BATCH rewrite or overhaul
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       In the long term, TELECOPY will not be fixable.  It can already been
+       worked on by many different people; there is no consistency to it; it
+       has been proved to be very difficult to enhance.  It is difficult to
+       use from command files, and it is increasingly being used this way.
+
+     current procedure:
+
+     project objectives:
+       A new file transfer product which can operate more as a tool around
+       which other circuit-dependent programs can be built.
+
+     quantifiable benefits (expected payoffs):
+       Unclear at this time.
+
+     qualitative benefits:
+       A good TELECOPY could save the duplication of effort that occurs in
+       building special purpose transfer tools.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Time the design of this product to coincide with the release of a
+       protocol recommendation from the FTP task force which can be used.
+       Design a new interface to TELECOPY and consider reasonable means to
+       run the program from command files or in a frame.
+
+     alternative solution(s):
+       Leave as is.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _TELECOPY_                               
+     Title:  FTP TELECOPY
+     For instructions see Project Request Procedures document
+ S@`p
