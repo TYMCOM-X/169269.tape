@@ -1,0 +1,199 @@
+
+5/8/81  8:01
+
+
+GLOBAL ACCOUNT: 000003
+
+USER         DIST UUN      LICENSE     MSG INIT FILE
+                   ZONE     DISC    MODE    Q-IN   Q-OUT  CORE GFD  PC
+                                             (IN PAGES)
+
+SPPOPER         0 234620 TYM. ACT.SUP. TYP (MCH         )INIT  
+SPPOPER          PACIF-D    DET-T  PDP10     3750    3750  256 ACC REQ
+LOIS            3 367732 TYM. ACT.SUP. TYP (GLYONS      )INIT  
+LOIS             PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+TJB             3 346701 TYM.          TYP (TJB         )INIT  
+TJB              PACIF-D    DET-T  PDP10     1500    1000  256 NO  REQ
+SFO             3 075214 TYM. ACT.SUP. TYP 
+SFO              PACIF-D    LOG    XEXEC     7500    7500  256 NO  REQ
+DSSDOC          3 330705 TYM.          TYP 
+DSSDOC           PACIF-D    LOG    PDP10     2500    2500  256 ACC REQ
+PROBE           1 000620 TYM.          TYP 
+PROBE            PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+PETERS          3 232631 TYM.          SUP 
+PETERS           PACIF-D    DET    PDP10    25000   25000  256 NO  REQ
+LINK10          3 163564 TYM.          TYP 
+LINK10           PACIF-D    LOG    PDP10     5000    5000  256 NO  REQ
+11OLD           3 351271 TYM.          TYP 
+11OLD            PACIF-D    DET    PDP10     2777    2777  256 ACC REQ
+F3MON           1 020205 TYM.          TYP 
+F3MON            PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+JRR             3 271147 TYM.          TYP (JRR         )INIT  
+JRR              PACIF-D    DET-C  PDP10    34464    1250  256 NO  REQ
+TRWBLOMD        3 120002 TYM.          TYP 
+TRWBLOMD         PACIF-D    LOG    PDP10     2500    2500  256 NO  REQ
+OSBACKUP        3 145107 TYM. ACT.SUP. TYP 
+OSBACKUP         PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+ZORK            0 000005 TYM.          TYP 
+ZORK             PACIF-D    LOG    PDP10     2500    2500  256 ACC REQ
+CARL            3 352477 TYM. ACT.SUP. SUP (CARL        )LOGON 
+CARL             PACIF-D    DET-C  PDP10    25000   25000  256 ACC NO
+MICROCYCLES     3 232134 TYM.          TYP 
+MICROCYCLES      PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+DCPTST          3 777777 TYM.          TYP 
+DCPTST           PACIF-D    DET    PDP10     1111    1111  256 ACC REQ
+TEMP            3 007765 TYM.          TYP 
+TEMP             PACIF-D    LOG    PDP10    25000   25000  256 ACC REQ
+STAMMERS        1 273463 TYM. ACT.SUP. TYP 
+STAMMERS         PACIF-D    DET-T  PDP10    25000   25000  256 ACC REQ
+TSTKSMON        1 202003 TYM. ACT.SUP. TYP 
+TSTKSMON         PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+DARREN          3 330611 TYM. ACT.SUP. TYP (DARREN      )INIT  
+DARREN           PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+SAILTEST        3 242733 TYM.          TYP 
+SAILTEST         PACIF-D    LOG    XEXEC     1250    1250  256 NO  REQ
+NEXNEW          3 077776 TYM.          TYP 
+NEXNEW           PACIF-D    DET    PDP10     1388    1388  256 ACC REQ
+OSCURRENT       3 140674 TYM.          TYP 
+OSCURRENT        PACIF-D    DET    PDP10   250000  250000  256 ACC REQ
+BLOMD           3 231752 TYM. ACT.SUP. SUP 
+BLOMD            PACIF-D    DET-C  PDP10    10000   10000  256 ACC REQ
+11FRONT         1 112020 TYM.          TYP 
+11FRONT          PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+TYMGRIPE        3 235436 TYM.          TYP 
+TYMGRIPE         PACIF-D    LOG    PDP10     1250    1250  256 NO  REQ
+WFW             3 000117 TYM. ACT.SUP. TYP (WFW         )TRMSET
+WFW              PACIF-D    DET-T  PDP10    25000   25000  256 NO  REQ
+KMC             3 142536 TYM. ACT.SUP. TYP (KMC         )INIT  
+KMC              PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+1103FRONT       1 001103 TYM.          TYP 
+1103FRONT        PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+OSNF            3 140673 TYM. ACT.SUP. TYP 
+OSNF             PACIF-D    DET-C  PDP10     2500    2500  256 NO  REQ
+KS              3 042755 TYM.          TYP 
+KS               PACIF-D    LOG    PDP10    25000   25000  256 ACC REQ
+MPL             3 213211 TYM.          TYP 
+MPL              PACIF-D    LOG    XEXEC     1250    1250  256 ACC REQ
+GAZEL           3 367714 TYM.          TYP (GAZEL       )INIT  
+GAZEL            PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+TRWDAN          3 120001 TYM.          TYP 
+TRWDAN           PACIF-D    LOG    PDP10     2500    2500  256 NO  REQ
+POOLE           3 101010 TYM.          TYP 
+POOLE            PACIF-D    DET    PDP10    25000   25000  256 NO  REQ
+WNANCY          3 233114 TYM. ACT.SUP. TYP (WNANCY      )LC    
+WNANCY           PACIF-D    DET-T  PDP10    25000   25000  256 NO  REQ
+SDANIELS        3 211135 TYM.          TYP (SDANIELS    )INIT  
+SDANIELS         PACIF-D    DET-T  PDP10   250000  250000  256 NO  REQ
+TRWKSMON        3 120000 TYM.          TYP 
+TRWKSMON         PACIF-D    LOG    PDP10   250000  250000  256 NO  REQ
+ISHANW          3 356643 TYM. ACT.SUP. TYP (ISHANW      )INIT  
+ISHANW           PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+FOROTS          3 163651 TYM.          TYP 
+FOROTS           PACIF-D    LOG    PDP10     5000    5000  256 NO  REQ
+SAIL            3 212140               TYP 
+SAIL             PACIF-D    LOG    XEXEC    12500   12500  256 NO  REQ
+11BUILD         3 351273 TYM.          TYP 
+11BUILD          PACIF-D    DET    PDP10     2777    2777  256 ACC REQ
+KL10            3 222635 TYM.          TYP 
+KL10             PACIF-D    LOG    XEXEC   250000  250000  256 NO  REQ
+PUB             3 234002 TYM.          TYP 
+PUB              PACIF-D    DET    PDP10       64    6250  256 ACC REQ
+WRS             0 225443 TYM. ACT.SUP. SUP (WRS         )INIT  
+WRS              PACIF-D    DET-T  PDP10  >1000000. >1000000.  256 ACC NO
+20MICRO         1 202002 TYM.          TYP 
+20MICRO          PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+BOWLESM         0 167357 TYM. ACT.SUP. SUP (BOWLESM     )INIT  
+BOWLESM          PACIF-D    DET    PDP10     5000    5000  256 NO  REQ
+JWR             3 265026 TYM. ACT.SUP. TYP (JWR         )INIT  
+JWR              PACIF-D    DET    PDP10    10000   10000  256 ACC REQ
+COBOL10         3 175351 TYM.          TYP 
+COBOL10          PACIF-D    LOG    PDP10     7500    7500  256 NO  REQ
+11CURR          3 351272 TYM.          TYP 
+11CURR           PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+SAILIB          3 212145               TYP 
+SAILIB           PACIF-D    LOG    XEXEC     1250    1250  256 ACC REQ
+NOS             3 314631 TYM. ACT.SUP. TYP 
+NOS              PACIF-D    DET    PDP10      250     250  256 ACC NO
+KS2020          3 230623 TYM.          TYP 
+KS2020           PACIF-D    DET    PDP10    25000   25000  256 NO  REQ
+KMCBAK          3 152637 TYM. ACT.SUP. TYP 
+KMCBAK           PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+SGAVETTE        3 206264 TYM. ACT.SUP. TYP (SGAVETTE    )REMINI
+SGAVETTE         PACIF-D    DET    PDP10    12500   12500  256 NO  REQ
+11BASE          1 277725 TYM. ACT.SUP. TYP (JWR         )INIT  
+11BASE           PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+20TEST          1 202001 TYM.          TYP 
+20TEST           PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+NEXILIS         1 102030 TYM.          TYP 
+NEXILIS          PACIF-D    DET    PDP10    25000   25000  256 ACC REQ
+MCH             0 231227 TYM. ACT.SUP. TYP (MCH         )INIT  
+MCH              PACIF-D    DET-T  PDP10    25000   25000  256 ACC REQ
+11NEW           1 110000 TYM. ACT.SUP. TYP 
+11NEW            PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+F10             3 163562 TYM.          TYP 
+F10              PACIF-D    LOG    PDP10    12500   12500  256 NO  REQ
+GL              3 320632 TYM. ACT.SUP. TYP (GLYONS      )INIT  
+GL               PACIF-D    DET-T  PDP10   100000  100000  256 ACC NO
+ADELE           3 251535 TYM. ACT.SUP. TYP 
+ADELE            PACIF-D    DET    PDP10    20000   20000  256 ACC REQ
+GOBBELR         0 220711 TYM. ACT.SUP. SUP (GOBBELR     )REMCHK
+GOBBELR          PACIF-D    DET-T  PDP10  >1000000. >1000000.  256 ACC REQ
+FALLSW          3 240461 TYM.          TYP 
+FALLSW           PACIF-D    LOG    XEXEC     1250    1250  256 NO  REQ
+F10QA           3 177645 TYM.          TYP 
+F10QA            PACIF-D    DET-T  PDP10     3750    3750  256 NO  REQ
+GINZBURGA       3 120416 TYM. ACT.SUP. TYP 
+GINZBURGA        PACIF-D    DET-T  PDP10    12500   12500  256 NO  REQ
+SOCCI           0 167354 TYM. ACT.SUP. TYP (SOCCI       )ADMINI
+SOCCI            PACIF-D    DET-T  PDP10   250000  250000  256 ACC REQ
+ALLENG          3 152225 TYM. ACT.SUP. TYP 
+ALLENG           PACIF-D    LOG    PDP10    12500   12500  256 NO  REQ
+F40             3 112726 TYM.          TYP 
+F40              PACIF-D    LOG    PDP10     5000    5000  256 NO  REQ
+KSMON           0 123456               TYP 
+KSMON            PACIF-D    DET    PDP10   250000  250000  256 NO  REQ
+WFWCUSP         3 016622 TYM. ACT.SUP. TYP (WFWCUSP     )SEC   
+WFWCUSP          PACIF-D    DET-T  PDP10    25000   25000  256 ACC REQ
+WEBERD          3 212721 TYM.          
+WEBERD           PACIF-D    LOG    XEXEC     1250    1250  256 NO  REQ
+TESTNAME        1 321456 TYM.          TYP 
+TESTNAME         PACIF-D    LOG    PDP10     1000    1000  256 ACC REQ
+FISHMANT        3 240471 TYM.          TYP 
+FISHMANT         PACIF-D    LOG    XEXEC     1250    1250  256 NO  REQ
+M33             3 042754 TYM.          TYP (WFWCUSP     )SEC   
+M33              PACIF-D    DET-T  PDP10    25000   25000  256 ACC REQ
+TODD            0 252045 TYM.          TYP 
+TODD             PACIF-D    DET    PDP10  >1000000. >1000000.  256 ACC REQ
+GLYONS          3 274033 TYM. ACT.SUP. TYP (GLYONS      )INIT  
+GLYONS           PACIF-D    DET-C  PDP10   100000  100000  256 ACC NO
+11RELEASE       3 277636 TYM.          TYP 
+11RELEASE        PACIF-D    DET    PDP10     2750    2750  256 ACC REQ
+PARTY           3 234270 TYM.          SUP (PARTY       )CONFER
+PARTY            NOT SET    LOG    PDP10      250     250  256 NO  REQ
+MADRERUN        0 012345 TYM.          TYP 
+MADRERUN         PACIF-D    LOG    PDP10    25000   25000  256 ACC REQ
+ERNSTD          3 343301 TYM. ACT.SUP. TYP 
+ERNSTD           PACIF-D    DET    PDP10    25000   25000  256 ACC NO
+MARSHALLC       3 246101 TYM.          TYP 
+MARSHALLC        PACIF-D    LOG    XEXEC     1250    1250  256 NO  REQ
+ERRRPT          0 123457               TYP 
+ERRRPT           PACIF-D    DET    PDP10     2500    2500  256 NO  REQ
+CLYDE           3 317142 TYM. ACT.SUP. TYP 
+CLYDE            PACIF-D    DET    PDP10     2500    2500  256 ACC REQ
+MONDOC          3 123054 TYM.          TYP 
+MONDOC           PACIF-D    DET-T  PDP10     2500    2500  256 ACC REQ
+FORTHOFFER      3 235435 TYM.          TYP 
+FORTHOFFER       PACIF-D    DET    PDP10     3750    3750  256 NO  REQ
+BOLTONL         3 233113 TYM. ACT.SUP. TYP (BOLTONL     )INIT  
+BOLTONL          PACIF-D    DET    PDP10     3000    3000  256 ACC NO
+INFO            3 232154 TYM.          TYP 
+INFO             NOT SET    LOG    PDP10    25000   25000  256 ACC REQ
+COBOLQA         3 175764 TYM.          TYP 
+COBOLQA          PACIF-D    LOG    PDP10     3750    3750  256 NO  REQ
+LPQ             0 000003 TYM.          TYP (MPL         )LPTSPL
+LPQ              PACIF-D    DET-C  PDP10    25000   25000  256 ACC NO
+11TOOLS         3 351274 TYM.          TYP 
+11TOOLS          PACIF-D    DET    PDP10     2777    2777  256 ACC REQ
+SFOQA           3 164534 TYM.          TYP 
+SFOQA            PACIF-D    DET-T  XEXEC     3750    3750  256 NO  REQ
+  @?C
