@@ -1,0 +1,17 @@
+gf prt
+r(ken)prt
+
+BRKTBL.DA_(klib)BRKTBL.DA
+DATE.DA_(klib)DATE.DA
+LIC.DA_(klib)LIC.DA
+SYS.DA_(klib)SYS.DA
+TIME.DA_(klib)TIME.DA
+SAIL.HDR_(klib)SAIL.HDR
+BRKTBL.REQ_(klib)BRKTBL.REQ
+DATE.REQ_(klib)DATE.REQ
+LIC.REQ_(klib)LIC.REQ
+SYS.REQ_(klib)SYS.REQ
+TIME.REQ_(klib)TIME.REQ
+UTIL.REQ_(klib)UTIL.REQ
+UTIL.SAI_(klib)UTIL.SAI
+/q
