@@ -1,0 +1,406 @@
+entry;
+begin "NBSSND"
+
+require "(sailib)sail.def" source!file;
+require "nbslib.dcl" source!file;
+
+define DEBUG = {false};
+
+define Ctrl(x) = {#ctrl("}&{x}&{")};
+
+require 4 version;
+!	4	Wm. R. Soley		23-Jan-83
+	3	Carl A. Baltrunas	16-Nov-82
+	2	Carl A. Baltrunas	16-Nov=82
+	1	Dave W. Smith		   Jul-82
+;
+
+! Stuff global to this module
+;
+
+  string TextMessage;		! stuff in 'text' buffer, if any ;
+  string TextLine;		! stuff on a line, also 'send' line ;
+
+  NBS!Pointer NBS;		! pointer to record we're building ;
+  Name!Pointer NL;		! list of recipients ;
+
+
+  integer U!Chan, U!EOF;	! file variables ;
+  integer B!C, B!Crlf, B!Del;	! break table stuff ;
+! "SEND" text commands
+;
+
+  Define SendCommands = {
+
+  CMD( To, "       specify who to send this message to", GetTo )
+  CMD( Copy, "     specify who to send copies to", GetCc )
+  CMD( Subject, "  specify the subject heading", GetSubject )
+  CMD( Reply, "    show that this is a reply message" )
+  CMD( Erase, "    erase the current text and start over" )
+  CMD( Review, "   print out the current text message" )
+  CMD( Send, "     transmit the current message and continue",
+             TransmitPacket )
+  CMD( Done, "     terminate the message and send it (^Z)" )
+  CMD( Help, "     reprints this text" )
+  CMD( Quit, "     terminate this message without sending it" )
+
+    };
+
+! Macro's to setup command lists for easy execution
+;
+
+  Redefine SendLength = 0;
+  Redefine CMD( Nam, Hlp, Alt ) = {
+    Ifcr SendLength > 0 thenc , endc CvPS(Nam)
+    Redefine SendLength = SendLength + 1;};
+  Preset!with SendCommands;
+  Own safe string array SendName[1:SendLength];
+
+  Redefine SendLength = 0;
+  Redefine CMD( Nam, Hlp, Alt ) = {
+    Ifcr SendLength > 0 thenc , endc Cvps(Nam) & Hlp
+    Redefine SendLength = SendLength + 1;};
+  Preset!with SendCommands;
+  Own safe string array SendMessage[1:SendLength];
+
+  Redefine CMD( Nam, Hlp, Alt ) = {
+    Ifcr Length(CvPS(Alt))
+     thenc Alt;
+     elsec SendText}&{Nam}&{;
+    endc};
+
+! Initialization stuff
+;
+
+procedure Init;
+  begin
+
+    NL := null!record;
+
+    open( U!Chan := getchan, "DSK", !bit(23)+0, 1,0, 512, B!C, U!EOF );
+
+    setbreak( B!Crlf := getbreak, '12, '15, "INS" );
+    setbreak( B!Del := getbreak, '177, '0, "INS" );
+
+  end;
+
+require Init initialization;
+! Setup the packet and add our name to it.
+;
+
+procedure SetupPacket;
+  begin "setup packet"
+    string U;
+
+    NBS := new!record( NBS!Rec );
+
+    ! build "name:system" ;
+
+    U := cv6str( call( -'22, "GETTAB" )) &
+	  cv6str( call( -'21, "GETTAB" )) &
+	  ":" & cvs( call( '33000011, "GETTAB" ));
+
+    NBS!Rec:From[NBS] := U;
+
+  end "setup packet";
+! Return the first line of a file ;
+;
+
+string procedure LineFromFile( string FileName );
+  begin "text from file"
+    integer Flag; string L;
+
+    lookup( U!Chan, FileName, Flag );    
+    if ( Flag ) then
+      begin
+	print( "% Lookup error ", cvos( !rh( Flag )),
+	       " for file: ", FileName, crlf );
+	return( NULL );
+      end;
+
+    L := NULL;
+    while ( not U!EOF ) do  L := L & input( U!Chan, B!crlf );
+    close( U!Chan );
+
+    return( L );
+
+  end "text from file";
+! Return the entire file in a string ;
+;
+
+string procedure TextOfFile( string FileName );
+  begin "text from file"
+    integer Flag; string L;
+
+    lookup( U!Chan, FileName, Flag );    
+    if ( Flag ) then
+      begin
+	print( "% Lookup error ", cvos( !rh( Flag )),
+	       " for file: ", FileName, crlf );
+	return( NULL );
+      end;
+
+!    begin
+!	integer array FInfo[0:5];
+!	FileInfo( FInfo );
+!	if ( FInfo[5] > ( MAXPAGESTOINCLUDE * 512 ) ) then begin
+!	    print( "% File is too large to include", crlf );
+!	    close( U!Chan );
+!	    return( NULL );
+!	end;
+!    end;
+
+    print( "[", FileName, ": " );
+    while( not U!EOF ) do L := L & input( U!Chan, B!Del );
+    print( length(L), " chars loaded]"& crlf );
+    close( U!Chan );
+    return( L );
+
+  end "text from file";
+! Get the "To:" field.  If there is stuff left over from the command
+! line use it first, before prompting for any.
+;
+
+procedure GetTo;
+  begin "to"
+    string S;
+    Name!pointer N;
+
+    while ( true ) do
+      begin
+	if ( Length(TextLine) ) then
+	  begin
+	    S := TextLine;
+	    TextLine := NULL;
+	  end
+	else
+	  begin
+	    print( "To: " );
+	    S := inchwl;
+	  end;
+	if ( S = "@" ) then S := LineFromFile( S[2 to inf] );
+	N := CVNList( S );
+	NBS!Rec:To[NBS] := CV0List( N );
+	NLCombine( NL, N );
+	if ( DEBUG ) then print( "--> ", CVList( CV0List( NL )), crlf );
+	if ( NL neq null!record ) then done;
+      end;
+
+  end "to";
+! Get the "Subject" field
+;
+
+procedure GetSubject;
+  begin "re"
+
+    if ( Length( TextLine ) ) then
+      begin
+
+	NBS!Rec:Subject[NBS] := TextLine;
+	TextLine := NULL;
+
+      end
+    else
+      begin
+
+	if ( NBS!Rec:Subject[NBS] ) then return;
+	print( "Re: " );
+	NBS!Rec:Subject[NBS] := inchwl;
+
+      end;
+
+  end "re";
+! Get the "Cc:" field
+;
+
+procedure GetCc;
+  begin "cc"
+    string S;
+    Name!pointer N;
+
+    if ( Length( TextLine ) ) then
+      begin
+	S := TextLine;
+	TextLine := NULL;
+      end
+    else
+      begin
+	if ( NBS!Rec:Cc[NBS] ) then return;
+	print( "Cc: " );
+	S := inchwl;
+      end;
+
+    if ( S = "@" ) then S := LineFromFile( S[2 to inf] );
+
+    N := CVNList( S );
+    NBS!Rec:Cc[NBS] := CV0List( N );
+    NLCombine( NL, N );
+    if ( DEBUG ) then print( "--> ", CVList( CV0List( NL )), crlf );
+
+  end "cc";
+! Perform miscellaneous text function commands
+;
+
+  Simple procedure SendTextReply;
+  NBS!Rec:ReplyTo[NBS] := TextLine;
+
+  Simple procedure SendTextErase;
+  TextMessage := Null;
+
+  Simple procedure SendTextReview;
+  begin
+    If Length( NBS!Rec:PostedDate[NBS] ) then
+      Print( "Posted: ", NBS!Rec:PostedDate[NBS], Crlf );
+    If Length( NBS!Rec:RecievedDate[NBS] ) then
+      Print( "Received: ", NBS!Rec:RecievedDate[NBS], Crlf );
+    If Length( NBS!Rec:Date[NBS] ) then
+      Print( "Date: ", NBS!Rec:Date[NBS], Crlf );
+    Print( Crlf, "From: ", NBS!Rec:From[NBS] );
+    If Length( NBS!Rec:Sender[NBS] ) then
+      Print( "  Sender: ", NBS!Rec:Date[NBS] );
+    Print( Crlf, "To:   ", CVList( NBS!Rec:To[NBS] ), Crlf );
+    If Length( NBS!Rec:Cc[NBS] ) then
+      Print( "CC:   ", CVList( NBS!Rec:Cc[NBS] ), Crlf );
+    If Length( NBS!Rec:Subject[NBS] ) then
+      Print( "Re:   ", NBS!Rec:Subject[NBS], Crlf );
+    If Length( NBS!Rec:ReplyTo[NBS] ) then
+      Print( "Reply-to: ", NBS!Rec:ReplyTo[NBS], Crlf );
+    If Length( NBS!Rec:InReplyTo[NBS] ) then
+      Print( "In Reply-to: ", NBS!Rec:InReplyTo[NBS], Crlf );
+    If Length( TextMessage ) then
+      Print( "--- Message: ---", Crlf, TextMessage,
+	     "-End of Message-", Crlf, Crlf )
+    else Print( "--- Empty Message ---", Crlf, Crlf );
+  end;
+
+  Simple procedure SendTextDone;
+  !skip! := Ctrl(Z);
+
+  Simple procedure SendTextQuit;
+  !skip! := Ctrl(C);
+
+  Simple procedure SendTextHelp;
+  begin
+    integer TextIndex;
+
+    Print( crlf, "Text commands are:", crlf, crlf );
+    For TextIndex := 1 upto SendLength
+      Do Print( SendMessage[ TextIndex ], crlf );
+    Print( crlf );
+  end;
+
+! Setup the packet header
+;
+
+simple procedure SetupHeader;
+  begin
+
+    GetTo;
+    GetSubject;
+    GetCC;
+
+  end;
+
+
+! Transmit the message
+;
+
+procedure TransmitPacket;
+  begin
+
+    ExpandNames( NL );
+
+    NBSXmit( NL, NBS );
+
+    print( crlf, "[Done]", crlf );
+
+  end;
+! Abort the transmission of the packet
+;
+
+  Simple Procedure AbortPacket;
+  begin
+
+    print( crlf, "[Message aborted]", crlf );
+
+  end;
+
+! Get the  "Text:" field
+;
+
+procedure GetText;
+  begin "text"
+    integer TextCmd, TextIndex;
+
+    print( if length( TextMessage ) then
+	     "Continue Message... (type "".ERASE"" to restart.)"
+	   else
+	     "Enter Message.",
+	   "  End with ^Z", crlf, crlf );
+
+    while ( true ) do
+      begin "read text"
+	TextLine := inchwl;
+	if ( TextLine = "@" ) then
+	  begin
+	    TextMessage := TextMessage &
+			   TextOfFile( TextLine[2 for inf] );
+	  end
+	else if ( TextLine = "." ) then
+	  begin "cmd"
+	    TextCmd := 0;
+	    for TextIndex := 1 upto SendLength do
+	      if ( kequ( TextLine[2 for length(SendName[TextIndex])],
+			 SendName[ TextIndex ] )) then
+		If TextCmd = 0 then
+		  TextCmd := TextIndex
+		else TextCmd := -1;
+	    if TextCmd > 0 then
+	      begin "text command"
+		TextLine := TextLine[Length(SendName[TextCmd])+3 to inf];
+		Case TextCmd-1 of
+		  begin
+		    SendCommands
+		  end;
+		If (( !skip! = Ctrl(Z) ) or ( !skip! = Ctrl(C) )) then
+		  done;
+	      end "text command"
+	    else
+	      print( If TextCmd < 0 then "% Ambigious" else "% Bad",
+		      " text command", crlf );
+	  end "cmd"
+	else
+	  begin
+	    TextMessage := TextMessage & TextLine;
+	    if (( !skip! = Ctrl(D) ) or ( !skip! = Ctrl(Z) )) then done;
+	    TextMessage := TextMessage & crlf;
+	  end;
+      end "read text";
+
+    if ( !skip! = Ctrl(C) ) then return;	! message aborted ;
+
+    NBS!Rec:Text[NBS] := TextMessage;
+
+  end "text";
+! Top level logic
+;
+internal procedure NBS!sstring RescanLine );
+begin "send - userface for sending mail"
+
+  InitAliasList;
+
+  SetupPacket;
+
+  TextLine := RescanLine;	! kludge ;
+  SetupHeader;
+
+  SendTextErase;
+  GetText;
+  If ( !skip! neq Ctrl(C) ) then
+	TransmitPacket
+  else
+	AbortPacket;
+
+end "send - userface for sending mail";
+end $
+ % [9
