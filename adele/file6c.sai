@@ -1,0 +1,53 @@
+BEGIN
+REQUIRE "<><>" DELIMITERS;
+DEFINE lf = <('12&NULL)>, cr = <('15&NULL)>, tab = <('11&NULL)>,
+       sp = <('40&NULL)>;
+INTEGER chan1,chan2,brchr1,brchr2,brtab1,brtab2,flag1,flag2,count;
+INTEGER numsp, numemt,eof1,eof2;
+STRING filename,line1,line2,inpt,outpt,iden;
+define debug = true;
+
+ifc debug thenc
+   require "(sys)baipd8.rel" load!module;
+   external procedure bail;
+   bail;
+endc;
+
+OPEN (chan1_ GETCHAN, "dsk", 0, 4, 4, count_ 200,brchr1, eof1);
+WHILE true DO
+  BEGIN "input"
+    PRINT("INPUT FILE NAME *");
+    LOOKUP(chan1, inpt_ INCHWL, flag1);
+    IF not flag1 THEN DONE ELSE
+      PRINT("CANNOT FIND FILE ", filename,"  try again.",cr&lf);
+  END "input";
+
+OPEN(chan2_GETCHAN,"dsk",0,0,4,0,0,eof2);
+  BEGIN "output"
+    PRINT("TYPE NAME OF OUTPUT FILE *");
+    ENTER(chan2,outpt_ INCHWL,flag2);
+    IF LENGTH(outpt) = 0 THEN
+      BEGIN
+        iden_ ".lst";
+	outpt_ inpt&iden;
+      END;
+  END "output";
+PRINT("OUTPUT FILE NAME IS :  ",outpt,cr&lf);       
+
+SETBREAK(brtab1_ GETBREAK,lf,NULL,"ina");
+WHILE NOT eof1  DO
+  BEGIN
+  line1_ INPUT(chan1,brtab1);
+  PRINT("INPUT LINE: ",line1,cr&lf);
+  SETBREAK(brtab2_ GETBREAK,sp&tab,tab,"xnr");
+  line2_ SCAN(line1,brtab2,brchr2);
+  PRINT("LINE1 ",line1);
+  numemt_ LENGTH(line2);
+  PRINT("NUMBER OF EMPTY SPACES: ",numemt);
+  PRINT("   DELETE HOW MANY SPACES AT START OF LINE?  ");
+  numsp_ INCHWL;
+  OUT(chan2,line1); 
+  END;
+RELEASE(chan2);
+
+END;
