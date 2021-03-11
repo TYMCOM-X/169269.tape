@@ -1,0 +1,20 @@
+define	DIE (M) <JRST [outstr [asciz "? M"]
+		EXIT ]>
+
+INITST:
+	MOVE	1,[11,,23]	;get address of CONFIG
+	GETTAB	1,
+	  die 	<unable to GETTAB NUMTAB>
+	ADDI	1,17		;compute address of STATES
+	HRLI	1,(1b0)
+	MOVE	2,[1,,600000]	;mask
+	MOVE	3,[1,,400000]	;data
+	MOVEI	1
+	BITPOK
+	  die	<unable to BITPOK STATES to 1,,600000>
+	MOVSI	2		; begin phase 2
+	SETUUO
+	  die	<unable to start init phase 2>
+	EXIT
+
+end	INITST
