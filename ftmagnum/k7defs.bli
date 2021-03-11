@@ -1,0 +1,442 @@
+SWITCHES NOLIST;
+UNDECLARE $$$$$;
+
+%!      THIS IS THE MAGNUM UNIVERSAL FILE K7DEFS.BLI
+        CONTAINING THE  BINDS, MACROS, AND STRUCTURES
+        FOR THE LOCK ROUTINES AND TABLES. SEE ALSO
+        K3DEFS.BLI FOR SKIM FILE DECLARATIONS.
+%
+
+
+
+undeclare krlpc$;
+external krlpc$;
+
+MACRO $KRMLM=    %  RELEASE MASTER LOCK MACRO %
+   BEGIN
+
+   VREG := .KLUB$;
+   IFSKIP CALLI(VREG,KV$CLBRLI)
+      THEN KLOCK$[K$LHOLDER] := KV$NOENTRY
+      ELSE
+         BEGIN
+         $CPEPM;
+         $KERROR(#776,.VREG,0)
+         END;
+   $CPEPM;
+   .VREG
+   END&;
+
+MACRO $KGMLM=    %  GET MASTER LOCK MACRO  %
+   BEGIN
+
+   $CPPRM;
+   VREG := .KLUB$;
+   IFSKIP CALLI(VREG,KV$CLBINW)
+      THEN KLOCK$[K$LHOLDER] := .KSLOT$
+      ELSE
+         BEGIN
+         $CPEPM;
+         $KERROR(#774,.VREG,0)
+         END;
+
+   IF NOT .VREG<34,1>
+      THEN $KCMEM();   % LAST RELEASE WAS ABNORMAL %
+
+   .VREG
+   END&;
+
+MACRO $KLHASH(F,E,U,P)=((F XOR (E^18 OR U)XOR P)AND (1^30-1))MOD KV$NBUCKETS&;
+
+MACRO $KFIXFIDT= IF .FIDT[K$USER] EQL 0 THEN FIDT[K$USER] := .CPPN$&;
+
+MACRO $KLFIXMAP=
+   IF .KLPGN$ NEQ .KLOCK$[K$LNUMPAGS]
+      THEN $KFXMP()&;
+
+MACRO $KFINDLTE(ENT,LASTFLAG)=
+   WHILE TRUE
+      DO
+         BEGIN
+         IF .ENT EQL 0
+            THEN EXITLOOP KV$NOENTRY;
+         LPT := $KLMAP(.ENT);
+         IF .LPT[K$LFN] EQL .FIDT[K$NAME]
+            THEN IF.LPT[K$LEXT] EQL .FIDT[K$EXT]
+               THEN IF .LPT[K$LUUN] EQL .FIDT[K$USER]<0,18>
+               THEN IF .LPT[K$LP] EQL .PN
+                  THEN EXITLOOP .LPT;
+         IF LASTFLAG
+            THEN LAST := .LPT;
+         ENT := .LPT[K$LNXTPTR]
+         END&;
+
+MACRO $KADDLPT=
+
+   BEGIN
+
+   %  ALLOCATE AN LPT ENTRY  %
+
+   IF .KLOCK$[K$LNUMFREN] EQL 0
+      THEN $KGLPG();
+   DEC(KLOCK$[K$LNUMFREN]);
+   ENT := .KLOCK$[K$LFRENPTR];
+   LPT := $KLMAP(.ENT);
+   KLOCK$[K$LFRENPTR] := .LPT[K$LNXTPTR];
+   $UZERO(KV$LPTESZ,.LPT);
+
+   LPT[K$LNXTPTR] := .LBT[.P];
+   LBT[.P] := .ENT;
+
+   LPT[K$LFN] := .FIDT[K$NAME];
+   LPT[K$LEXT] := .FIDT[K$EXT];
+   LPT[K$LUUN] := .FIDT[K$USER]<0,18>;
+   LPT[K$LP] := .PN;
+   .VREG
+   END&;
+
+MACRO $KFLPL(FCB,PN)=
+   BEGIN
+
+   IF FCB[K$LHEAD] EQL 0
+      THEN EXITCOMPOUND FALSE
+      ELSE LPL := FCB[K$LHEAD];
+
+   UNTIL .LPL[K$LPAGE] EQL PN+1
+      DO IF (LPL := .LPL[K$LNEXT]) EQL 0 THEN EXITCOMPOUND FALSE;
+   TRUE
+   END&;
+
+MACRO $KTIMEROFF=(
+        AC := 01^30;  % DISABLE CHANNEL 5 %
+        IFSKIP CALLI(AC,-#34) THEN .VREG)&;
+
+MACRO $KTIMERON=(
+        AC := 41^30;  % ENABLE CHANNEL 5 %
+        IFSKIP CALLI(AC,-#34) THEN .VREG)&;
+
+MACRO $KADD2Q=
+    (
+    IF (Q := .LPT[K$LPQP]) NEQ 0
+       THEN IF .Q NEQ .KSLOT$
+          THEN WHILE TRUE
+            DO IF .LPQ[K$LPTR,.Q] EQL 0
+               THEN EXITLOOP LPQ[K$LPTR,.Q] := .KSLOT$
+               ELSE IF .Q EQL .KSLOT$
+                  THEN EXITLOOP .VREG
+                  ELSE Q := .LPQ[K$LPTR,.Q]
+          ELSE .VREG
+       ELSE LPT[K$LPQP] := .KSLOT$;
+    LPQ[K$LPTR,.KSLOT$] := 0;
+    LPQ[K$LTYPE,.KSLOT$] := .LOCKTY
+    )&;
+MACRO $KRMOVFROMQ=
+   IF (Q := .LPT[K$LPQP]) NEQ 0
+      THEN IF .Q EQL .KSLOT$
+        THEN LPT[K$LPQP] := .LPQ[K$LPTR,.KSLOT$]
+        ELSE WHILE (NXTENTRY := .LPQ[K$LPTR,.Q]) NEQ 0
+           DO
+              BEGIN
+              IF .NXTENTRY EQL .KSLOT$
+                 THEN
+                    BEGIN
+                    LPQ[K$LPTR,.Q] := .LPQ[K$LPTR,.KSLOT$];
+                    EXITLOOP .VREG
+                    END;
+             Q := .NXTENTRY
+             END&;
+
+MACRO $KDELLPT=
+   BEGIN
+   IF .ENT EQL .LBT[.P]
+      THEN LBT[.P] := .LPT[K$LNXTPTR]
+      ELSE LAST[K$LNXTPTR] := .LPT[K$LNXTPTR];
+
+   INC(KLOCK$[K$LNUMFREN]);
+   LPT[K$LNXTPTR] := .KLOCK$[K$LFRENPTR];
+   KLOCK$[K$LFRENPTR] := .ENT
+   END&;
+
+MACRO $KRELOCK(SLOT,MLOCKFL,CURFL)=
+
+   BEGIN
+
+   LBT := .KLOCK$ + KV$LBTADR;
+   $KLFIXMAP;
+   P := $KLHASH(.FIDT[K$NAME],.FIDT[K$EXT],.FIDT[K$USER]<0,18>,.PN);
+
+   VREG := @.LBT[.P];   %  This causes the lock pages to be touched so
+                           that the chances of a page fault are reduced. %
+
+   IF MLOCKFL NEQ FALSE
+      THEN
+         BEGIN
+         $KGMLM;
+         $KLFIXMAP
+         END;
+
+   ENT := .LBT[.P];
+   LPT := $KFINDLTE(ENT,TRUE);
+   IF .LPT EQL KV$NOENTRY
+      THEN ERROR(#766);
+
+   IF .LPT[K$LPQP] NEQ 0
+      THEN RETURN $KDEQUE(.LPT,SLOT,MLOCKFL);
+
+LAB:
+   BEGIN
+   IF .LPT[K$LWRLOCK] EQL KV$WRLOCK
+     THEN
+      BEGIN
+      IF .LPT[K$LJOBNO] NEQ SLOT
+         THEN ERROR(#766)
+         ELSE LPT[K$LJOBNO] := 0;
+      LPT[K$LWRLOCK] := 0;
+      lpt[k$lconvert] := 0;
+      $KDELLPT;
+      LEAVE LAB
+      END;
+
+   IF .LPT[K$LCVLOCK]
+      THEN IF .LPT[K$LJOBNO] EQL SLOT
+         THEN
+            BEGIN
+            LPT[K$LCVLOCK] := 0;
+            LPT[K$LJOBNO] := 0;
+            lpt[k$lconvert] := 0;
+            IF .LPT[K$LRCOUNT] EQL 0
+               THEN $KDELLPT;
+            LEAVE LAB
+            END;
+
+   IF .LPT[K$LRCOUNT] EQL 0
+      THEN $KCMPC(.LPT);
+
+   IF CURFL EQL TRUE
+      THEN IF .LPT[K$LRLCURJB] NEQ 0
+         THEN LPT[K$LRLCURJB] := 0
+         ELSE ERROR(#766)
+      ELSE IF .LPT[K$LRLHOLDER,SLOT]
+         THEN LPT[K$LRLHOLDER,SLOT] := 0
+         ELSE ERROR(#766);
+
+   IF (LPT[K$LRCOUNT] := .LPT[K$LRCOUNT] -1) EQL 0
+      THEN IF NOT .LPT[K$LCVLOCK]
+         THEN $KDELLPT
+   END;    % OF LAB %
+
+   IF MLOCKFL NEQ FALSE
+      THEN $KRMLM
+   END&;
+
+MACRO $KGETLOCK=
+   BEGIN
+   LABEL GETL;
+
+GETL:
+   BEGIN
+   $KFIXFIDT;
+   $KLFIXMAP;
+   P := $KLHASH(.FIDT[K$NAME],.FIDT[K$EXT],.FIDT[K$USER]<0,18>,.PN);
+
+   VREG := @.LBT[.P];   %  This causes the lock pages to be touched so
+                           that the chances of a page fault are reduced. %
+
+   $KGMLM;    % GET MASTER LOCK %
+
+   $KLFIXMAP;
+   ENT := .LBT[.P];
+   LPT := $KFINDLTE(ENT,FALSE);
+
+   IF .LPT NEQ KV$NOENTRY THEN
+      BEGIN
+      CURRENTYPE := 0;
+      IF .LPT[K$LJOBNO] EQL .KSLOT$
+         THEN IF .LPT[K$LWRLOCK]
+            THEN (CURRENTYPE := 2; LEAVE GETL)
+            ELSE IF .LPT[K$LCVLOCK]
+               THEN (CURRENTYPE := 2;LEAVE GETL)
+               ELSE .VREG
+         ELSE IF .LPT[K$LRCOUNT] GTR 0
+            THEN IF (.VREG SEMICOLON .LPT[K$LRLCURJB])
+               THEN (CURRENTYPE := 2; LEAVE GETL);
+
+      IF .LPT[K$LWRLOCK] THEN LEAVE GETL;
+      CASE .LOCKTY OF
+         SET
+   %RDL% IF .LPT[K$LCONVERT]
+            THEN LEAVE GETL;
+
+   %WRL% IF .LPT[K$LCVLOCK]
+            THEN LEAVE GETL
+            ELSE IF .LPT[K$LRCOUNT] GTR 0
+               THEN LEAVE GETL;
+
+   %CVL% IF .LPT[K$LCVLOCK]
+            THEN LEAVE GETL;
+         TES
+      END
+   ELSE $KADDLPT;
+
+   CASE .LOCKTY OF
+      SET
+%RDL%    (INC(LPT[K$LRCOUNT]); LPT[K$LRLCURJB] := TRUE);
+
+%WRL%    (LPT[K$LWRLOCK] := TRUE; LPT[K$LJOBNO] := .KSLOT$);
+
+%CVL%    (LPT[K$LCVLOCK] := TRUE; LPT[K$LJOBNO] := .KSLOT$);
+      TES;
+
+   CURRENTYPE := 1;
+   .VREG
+   END;
+   .VREG
+   END&;
+% BINDS FOR KLMS$ - MASTER LOCK %
+
+BIND
+        K$LHOLDER       =0,  % INTERLOCK HOLDER %
+        K$LTOTAL        =1,  % TOTAL MEMBERS IN THE CLUB %
+        K$LINTCNT       =2,  % INTERVAL COUNT %
+        K$LNUMPAGS      =3,  % NUMBER OF LOCK ENTRY PAGES %
+        K$LNUMFREN      =4,  % NUMBER OF FREE LOCK ENTRIES %
+        K$LFRENPTR      =5,  % POINTER TO FIRST FREE ENTRTY %
+        K$LSCF          =6,  % SCHEMA COMPILE IN PROGRESS FLAG (CONTAINS SLOT
+                                NUMBER OF JOB WHICH IS COMPILING THE SCHEMA) %
+        K$LMAXSLOT      =7,  % MAXIMUM # OF SLOTS ALLOCATED %                        
+        KV$LMSIZE       =5;  % SIZE OF MASTER LOCK %
+
+% STRUCTURE DEFINTION FOR KLMS$ %
+
+STRUCTURE KLMS$[FIELD]= CASE .FIELD OF
+        SET
+%LHOLDER%  (@.KLMS$  )<0,36>;
+%LTOTAL%   (@.KLMS$+1)<0,18>;
+%LINTCNT%  (@.KLMS$+1)<18,18>;
+%LNUMPAGS% (@.KLMS$+2)<0,36>;
+%LNUMFREN% (@.KLMS$+3)<18,18>;
+%LFRENPTR% (@.KLMS$+3)< 0,18>;
+%LSCF%     (@.KLMS$+4)< 0, 9>;
+%LMAXSLOT% (@.KLMS$+4)< 9, 8>;
+        TES;
+
+%   BINDS FOR KLMT$ - CLUB MEMBER TABLE  %
+BIND
+        K$LID            =0,     % ID NUMBER %
+        K$LJBN           =1,     % JOB NUMBER %
+        KV$LMTSIZE       =150;    % SIZE OF TABLE IN WORDS %
+
+% STRUCTURE DEFINITION FOR KLMT$ %
+
+STRUCTURE KLMT$[FIELD,SLOT] = CASE .FIELD OF
+        SET
+%LID%           (@.KLMT$+.SLOT-1)< 0,27>;
+%LJBN%          (@.KLMT$+.SLOT-1)<27, 9>;
+        TES;
+
+%   BINDS FOR KLPT$ - PAGE LOCK TABLE  %
+
+BIND
+        K$LFN           =0,     % FILE NAME %
+        K$LEXT          =1,     % FILE EXTENSION %
+        K$LUUN          =2,     % FILE UUN %
+        K$LNXTPTR       =3,     % PTR TO NEXT ENTRY ON CHAIN %
+        K$LP            =4,     % PAGE NUMBER %
+        K$LWRLOCK       =5,     % WRITE LOCK FLAG %
+        K$LCVLOCK       =6,     % CONVERTIBLE LOCK FLAG %
+        K$LCONVERT      =7,     % CONVERTION IN PROCESS FLAG %
+        K$LPQP          =8,     % PAGE QUEUE PTR %
+        K$LRCOUNT       =9,     % READ LOCK COUNT %
+        K$LJOBNO        =10,    % SLOT NO OF WRITE LOCK HOLDER %
+        K$LRLHOLDER     =11,    % READ LOCK HOLDER AP %
+        K$LWORD1        =12,    % WORD 1 OF LOCK TABLE ENTRY %
+        K$LWORD2        =13,    % WORD 2 OF LOCK TABLE ENTRY %
+        K$LWORD3        =14,    % WORD 3 OF LOCK TABLE ENTRY %
+        K$LWORD4        =15,    % WORD 4 OF LOCK TABLE ENTRY %
+        K$LWORD5        =16,    % WORD 5 OF LOCK TABLE ENTRY %
+        K$LWORD6        =17,    % WORD 6 OF LOCK TABLE ENTRY %
+	K$LWORD7	=18,	% WORD 7 OF LOCK TABLE ENTRY %
+        K$LRLCURJB      =19,    % PTR FOR CURRENT JOB IN READ LOCK BIT MAP %
+        KV$LPTSIZE      =64,    % NUMBER OF ENTRIES IN PAGE LOCK TABLE PAGE %
+        KV$LPTESZ       =8;     % SIZE OF LPT ENTRY (IN WORDS) %
+
+% STRUCTURE DEFINITION FOR KLPT$ %
+
+STRUCTURE KLPT$[FIELD,SLOT]= CASE .FIELD OF
+        SET
+%LFN%       (@.KLPT$  )< 0,36>;
+%LEXT%      (@.KLPT$+1)<18,18>;
+%LUUN%      (@.KLPT$+1)< 0,18>;
+%LNXPTR%    (@.KLPT$+2)<18,18>;
+%LP%        (@.KLPT$+2)< 0,18>;
+%LWRLOCK%   (@.KLPT$+3)<35, 1>;
+%LCVLOCK%   (@.KLPT$+3)<34, 1>;
+%LCONVERT%  (@.KLPT$+3)<33, 1>;
+%LPQP%      (@.KLPT$+3)<25, 8>;
+%LRCOUNT%   (@.KLPT$+3)<17, 8>;
+%LJOBNO%    (@.KLPT$+3)< 9, 8>;
+%LRLHOLDER% (@.KLPT$+3+(.SLOT+26)/36)<35-(.SLOT+26) MOD 36,1>;
+%LWORD1%    (@.KLPT$+1)< 0,36>;
+%LWORD2%    (@.KLPT$+2)< 0,36>;
+%LWORD3%    (@.KLPT$+3)< 0,36>;
+%LWORD4%    (@.KLPT$+4)< 0,36>;
+%LWORD5%    (@.KLPT$+5)< 0,36>;
+%LWORD6%    (@.KLPT$+6)< 0,36>;
+%LWORD7%    (@.KLPT$+7)< 0,36>;
+%RLCURJB%   (.(.KLPT$)<0,18>+3+.KRLPC$);
+        TES;
+
+%   BIND FOR KLPQ$ - PAGE QUEUE %
+BIND
+        K$LPTR  =0,     % PTR TO NEXT ENTRY IN QUEUE %
+        K$LTYPE =1,     % LOCK TYPE OF CURRENT ENTRY %
+        KV$LPQADR=KV$LMSIZE+KV$LMTSIZE-1, %OFFSET FOR START OF PAGE LOCK QUEUE%
+        KV$LPQEPW=3,    %LOCK JOB TABLE ENTRIES PER WORD %
+        KV$LPQSIZE=150,  % SIZE OF LOCK JOB TABLE IN ENTRIES %
+        KV$LPQLEN=50;   % LENGTH OF LOCK QUEUE TABLE IN WORDS %
+
+% STRUCTURE DEFINITION FOR KLPQ$ %
+
+BIND LPTRBYTPTR = PLIT(0<3,9>,1<27,9>,1<15,9>);
+
+BIND LTYPBYTPTR = PLIT(0<0,3>,1<24,3>,1<12,3>);
+
+STRUCTURE KLPQ$[FIELD,SLOT] = CASE .FIELD OF
+        SET
+%LPTR%          (.LPTRBYTPTR[.SLOT MOD 3]+.SLOT/3+@.KLPQ$);
+%LTYPE%         (.LTYPBYTPTR[.SLOT MOD 3]+.SLOT/3+@.KLPQ$);
+        TES;
+
+% BIND FOR KLPL$ - LOCK PAGE LIST %
+BIND
+   K$LPAGE = 0,
+   K$LNEXT = 1,
+   KV$LPLSIZ = 1;
+
+% STRUCTURE DEFINITION OF KLPL$ %
+STRUCTURE KLPL$[FIELD] = CASE .FIELD OF
+        SET
+%LPAGE%         (@.KLPL$)<18,18>;
+%LNEXT%         (@.KLPL$)<0 ,18>;
+        TES;
+
+% BINDS FOR LOCK BUCKET TABLE %
+
+BIND
+        KV$LBTADR=KV$LMSIZE+KV$LMTSIZE+KV$LPQLEN,   % OFFSET OF BUCKETS %
+        KV$NBUCKETS=613,
+        KV$LBTSIZE=307;
+
+STRUCTURE KLBT$[I]=
+
+        IF .I
+           THEN (@.KLBT$+.I/2)<18,18>
+           ELSE (@.KLBT$+.I/2)< 0,18>;
+
+MACRO $KLMAP(ADDR)=
+      (.(KLOCK$+ADDR<9,9>)<0,18>+ADDR<0,9>)&;
+
+%!      END OF MAGNUM UNIVERSAL FILE K7DEFS.BLI     %
+
+SWITCHES LIST;
+2F(ñ
