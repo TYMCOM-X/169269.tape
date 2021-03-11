@@ -1,0 +1,716 @@
+COMMENT***************************************************************
+*									*
+*			RESTIM
+;
+BEGIN "resp time"
+DEFINE	VERSION "<>" = <"ver-28.2">;
+COMMENT									*
+*									*
+************************************************************************;
+
+    REQUIRE "MONTYPE.DEF" SOURCE!FILE;
+	 REQUIRE "(SAILIB)EXTEND.REQ" SOURCE!FILE;
+    REQUIRE "<><>" DELIMITERS;
+
+    DEFINE d!print(txt) = < BEGIN
+			IF
+			    spooled
+			THEN
+			    CPRINT(o!chan,txt)
+			ELSE
+			    PRINT(txt);
+				END>;
+    DEFINE b!print(txt) = < BEGIN
+				PRINT(txt);
+			    IF
+				spooled
+			    THEN
+				CPRINT(o!chan,txt);
+			    END>;
+    DEFINE sumup(array) = <
+        BEGIN
+        ARRCLR(array);
+        FOR i_0 STEP 1 UNTIL max!elem DO
+            array[script#[i]] _ array[script#[i]]+buffer[i]
+        END
+        >;
+
+    DEFINE script!limit=10,
+        hist!limit = 180,
+        bufsize=102,
+        lf = "('12&null)",
+	tab = "('11&null)",
+        crlf="('15&'12)";
+
+    REAL ARRAY read!value[0:script!limit],
+        msgrx!sum[0:script!limit],
+        msgrx!sum!total[0:script!limit],
+        msgtx!sum[0:script!limit],
+        msgtx!sum!total[0:script!limit],
+        msgrx!ssq[0:script!limit],
+        msgrx!ssq!total[0:script!limit],
+        msgtx!ssq[0:script!limit],
+        msgtx!ssq!total[0:script!limit],
+        msgrx!time[0:script!limit],
+        msgrx!time!total[0:script!limit],
+        msgtx!time[0:script!limit],
+        msgtx!time!total[0:script!limit],
+        read!sum[0:script!limit],
+        read!ssq[0:script!limit],
+        read!min[0:script!limit],
+        read!max[0:script!limit],
+        send!value[0:script!limit],
+        send!sum[0:script!limit],
+        send!ssq[0:script!limit],
+        send!min[0:script!limit],
+        send!max[0:script!limit],
+        get!value[0:script!limit],
+        get!sum[0:script!limit],
+        get!ssq[0:script!limit],
+        get!min[0:script!limit],
+        get!max[0:script!limit];
+    REAL read!avg,send!avg,get!avg,read!dev,send!dev,get!dev,timex,
+        read!sum!total,read!ssq!total,read!min!total,read!max!total,
+        send!sum!total,send!ssq!total,send!min!total,send!max!total,
+        get!sum!total,get!ssq!total,get!min!total,get!max!total,
+        msgrx!basic,msgrx!slope,msgtx!basic,msgtx!slope;
+
+    INTEGER ARRAY buffer[0:bufsize],
+        script#[0:bufsize],
+        read!hist!parm[0:hist!limit],
+        send!hist!parm[0:hist!limit],
+        get!hist!parm[0:hist!limit],
+        read!hist!total[0:hist!limit],
+        send!hist!total[0:hist!limit],
+        get!hist!total[0:hist!limit],
+        read!hist[0:script!limit,0:hist!limit],
+        send!hist[0:script!limit,0:hist!limit],
+        get!hist[0:script!limit,0:hist!limit],
+        read!count!start[0:script!limit],
+        read!time!start[0:script!limit],
+        send!count!start[0:script!limit],
+        send!time!start[0:script!limit],
+        get!count!start[0:script!limit],
+        get!time!start[0:script!limit],
+        msg!start[0:script!limit],
+        bc!start[0:script!limit],
+        read!count!save[0:script!limit],
+        read!time!save[0:script!limit],
+        send!count!save[0:script!limit],
+        send!time!save[0:script!limit],
+        get!count!save[0:script!limit],
+        get!time!save[0:script!limit],
+        msg!save[0:script!limit],
+        msg!count[0:script!limit],
+        bc!save[0:script!limit],
+        bc!count[0:script!limit],
+        read!time[0:script!limit],
+        read!count[0:script!limit],
+        send!time[0:script!limit],
+        send!count[0:script!limit],
+        get!time[0:script!limit],
+        get!count[0:script!limit],
+        read!val!count[0:script!limit],
+        send!val!count[0:script!limit],
+        get!val!count[0:script!limit],
+        user!count[0:script!limit];
+    INTEGER o!chan,spooled,o!eof,type,size,brchar,count,i,channel,test!time,max!elem,
+        time!start,now,bt,test!start,script,j,msg!total,bc!total,
+        read!val!total,send!val!total,get!val!total,msgs;
+
+    STRING file!name,
+        inline;
+  
+    BOOLEAN eof,start!output,start!recorded,print!read,print!send,print!get;
+
+
+COMMENT******************************************************************
+*									*
+*				HMS					*
+*									*
+************************************************************************;
+    STRING PROCEDURE hms(INTEGER sec);
+
+    BEGIN "hms"
+
+        STRING time;
+        INTEGER temp,width,digits;
+
+        GETFORMAT(width,digits);
+        SETFORMAT(2,digits);
+        sec  _ sec/1000;
+        IF sec > 3600 THEN
+            BEGIN
+            time _ CVS(sec DIV 3600) & ":";
+            SETFORMAT(-2,digits);
+            END
+        ELSE
+            time _ "   ";
+        temp _ sec MOD 3600;
+        if sec > 60 THEN
+            BEGIN
+            time _ time & CVS(temp DIV 60) & ":";
+            SETFORMAT(-2,digits);
+            END
+        ELSE
+            time _ time & "   ";
+        time _ time & CVS(temp MOD 60);
+        SETFORMAT(width,digits);
+        RETURN(time);
+
+    END "hms";
+
+
+COMMENT******************************************************************
+*									*
+*				QUANTILE				*
+*									*
+************************************************************************;
+REAL PROCEDURE quantile (INTEGER ARRAY frequency; INTEGER size;
+    REAL lbound,delta,p);
+ 
+    BEGIN "quantile"
+
+    INTEGER count,sum,i;
+
+    count _ 0;
+    FOR i_0 STEP 1 UNTIL size DO
+        count _ count + frequency[i];
+    IF count=0 OR p LEQ 0 THEN RETURN(lbound);
+    IF p GEQ 1 THEN RETURN(lbound+size*delta);
+    sum _ 0;
+    FOR i_0 STEP 1 UNTIL size DO
+        BEGIN
+        IF (sum+frequency[i]) > (count*p) THEN DONE;
+        sum _ sum+frequency[i];
+        END;
+    RETURN(lbound + delta*(i + (count*p-sum)/frequency[i]));
+    END "quantile";
+
+
+COMMENT******************************************************************
+*									*
+*				HISTOGRAM				*
+*									*
+************************************************************************;
+PROCEDURE histogram (INTEGER ARRAY frequency; INTEGER size; REAL lbound,delta;
+    STRING title);
+    BEGIN "histogram"
+
+    DEFINE page!width = 105,
+        crlf = "('15&'12)",
+        lf = "('12&0)";
+
+    INTEGER max!count,trunc,width,digits,i,j,top,bottom;
+    BOOLEAN lbd!found;
+    REAL star!value;
+    STRING inline;
+ 
+    max!count _ 1; lbd!found _ FALSE; bottom _ top _ 0;
+    FOR i_0 STEP 1 UNTIL size DO
+        BEGIN
+        IF frequency[i] NEQ 0 THEN
+            BEGIN
+            IF NOT lbd!found THEN
+                BEGIN
+                lbd!found _ TRUE;
+                max!count _ frequency[i];
+                bottom _ i;
+                END
+            ELSE
+                max!count _ max!count MAX frequency[i];
+            top _ i;
+            END;
+        END;
+    trunc _ 5*max!count/(page!width MIN max!count);
+    IF trunc NEQ (5*max!count/(page!width MIN max!count)) THEN
+        trunc _ trunc+1;    COMMENT compute ceiling;
+    star!value _ trunc/5;
+    GETFORMAT(width,digits);
+    b!print(<crlf,title," SAMPLE DECILES ARE:",crlf,lf>);
+    SETFORMAT(10,1);
+    FOR i_0 STEP 1 UNTIL 10 DO
+        b!print(<CVF(i/10)>);
+    SETFORMAT(10,2);
+    b!print(<crlf,CVF(lbound+delta*bottom)>);
+    FOR i_1 STEP 1 UNTIL 9 DO
+        b!print(<CVF(quantile(frequency,size,lbound,delta,i/10))>);
+    b!print(<CVF(lbound+(top+1)*delta),crlf,lf>);
+    PRINT("Enter lower limit: ");
+    IF (inline _ INCHWL) NEQ NULL THEN
+        IF bottom < (trunc _ (CVD(inline)-lbound)/delta) THEN
+            bottom _ trunc;
+    PRINT("Enter upper limit: ");
+    IF (inline _ INCHWL) NEQ NULL THEN
+        IF top > (trunc _ (CVD(inline)-lbound)/delta) THEN
+            top _ trunc;
+    IF top < bottom THEN RETURN;
+    d!print(<crlf,lf,lf,lf>);
+    IF title NEQ NULL THEN
+        BEGIN
+        FOR i_1 STEP 1 UNTIL (page!width-LENGTH(title))/2 DO
+            d!print(<" ">);
+        d!print(<title,crlf,lf>);
+        END;
+    FOR i_bottom STEP 1 UNTIL top DO 
+        BEGIN
+        IF (i MOD 5) = 0 OR i = bottom OR i = top THEN
+            d!print(<CVF(lbound+i*delta)>)
+        ELSE
+            d!print(<"          ">);
+        d!print(<"|">);
+        FOR j_1 STEP 1 UNTIL frequency[i]/star!value DO
+            d!print(<"*">);
+        d!print(<crlf>);
+        END;
+    d!print(<"          ">);
+    FOR i_0 STEP 1 UNTIL (max!count/star!value) DO d!print(<"-">);
+    SETFORMAT(0,2);
+    d!print(<crlf,"          1 * = ",CVF(star!value)," counts",crlf,lf,lf>);
+    SETFORMAT(width,digits);
+    END "histogram";
+
+
+COMMENT******************************************************************
+*									*
+*				PRINTIT				*
+*									*
+************************************************************************;
+    PROCEDURE printit(INTEGER s);
+
+    BEGIN "printer"
+
+            d!print(<hms(now),"  ",hms(test!time),"  ",
+                CVS(msg!count[s]-msg!save[s]),"  ",
+                CVS(read!count[s]-read!count!save[s]),"  ",
+                CVF(read!value[s] _ (read!time[s]-read!time!save[s])/1000
+                    /(readt[s]-read!count!save[s])),"  ",
+                CVS(bc!count[s]-bc!save[s]),"  ",
+                CVS(send!count[s]-send!count!save[s]),"  ",
+                CVF(send!value[s] _ (send!time[s]-send!time!save[s])/1000
+                    /(send!count[s]-send!count!save[s])),"  ",
+                CVS(get!count[s]-get!count!save[s]),"  ",
+                CVF(get!value[s] _ (get!time[s]-get!time!save[s])/1000
+                    /(get!count[s]-get!count!save[s])),
+                    crlf>);
+
+    END "printer";
+COMMENT****************************************************************
+*									*
+*				OPN!OUT					*
+*									*
+************************************************************************;
+
+INTEGER PROCEDURE OPN!OUT(STRING S; REFERENCE INTEGER EOF);
+
+COMMENT THIS MODULE OPENS AN OUTPUT FILE WHOOSE NAME IS IN STRING S;
+
+BEGIN "oout"
+
+	INTEGER mode,ibuf,obuf,o!chan,count, br,flag,flage;
+
+	BOOLEAN t;
+	mode _ 0;
+	ibuf _ 0;
+	obuf _ 2;
+	t _ TRUE;
+
+	OPEN(o!chan _ GETCHAN, "DSK", mode, ibuf, obuf, count, br, flag);
+
+	IF
+		flag
+	THEN
+	 BEGIN "O"
+		OUTSTR("OPEN OUTPUT ERROR");
+		t _ FALSE;
+	 END "O"
+	ELSE
+	 BEGIN "E"
+		flage _ TRUE;
+		WHILE
+		    flage
+		DO
+		    BEGIN "ENT"
+			ENTER(o!chan,s,flage);
+			IF
+			    flage
+			THEN
+			    BEGIN "LOOP"
+				OUTSTR("FILE " & CVOS(s) &
+					" NOT FOUND" & CRLF);
+				OUTSTR("ENTER FILE NAME:");
+				s _ INCHWL;
+			    END "LOOP";
+		    END "ENT";
+	 END "E";
+	RETURN(o!chan);
+END "oout";
+
+COMMENT******************************************************************
+*									*
+*				MAIN PROGRAM				*
+*									*
+************************************************************************;
+	OUTSTR("RESTIM" & tab);
+	OUTSTR(hms(CALLI(0,'23)) & tab);  COMMENT TIME PRINTED;
+	OUTSTR(STDATE(CALLI(0,'14),0) & CRLF);	COMMENT DAY PRINTED;
+	OUTSTR(VERSION & crlf);
+	OUTSTR("OUTPUT FILE:");
+	inline _ INCHWL;
+	IF
+	    inline NEQ NULL
+	THEN
+	    BEGIN " out put to file "
+		spooled _ TRUE;
+		o!chan _ opn!out(inline,o!eof);
+	    END " out put to file ";
+    read!min!total _ send!min!total _ get!min!total _ 1@12;
+    TTYUP(TRUE);
+    OPEN(channel_GETCHAN,"DSK",8,2,0,count,brchar,eof);
+    SETBREAK(bt_GETBREAK,";,"," ","INK");
+    OUTSTR("Monitor files:");
+    WHILE (inline_INCHWL) NEQ NULL DO
+        BEGIN "input line"
+        WHILE (file!name_SCAN(inline,bt,brchar)) NEQ NULL DO
+            BEGIN "input file"
+            LOOKUP(channel,file!name,eof);
+            IF eof THEN
+                BEGIN
+                PRINT("File ",file!name," not found",crlf);
+                CONTINUE;
+                END
+            ELSE
+                d!print(<"START FILE ",file!name,crlf,lf>);
+            IF brchar = ";" THEN
+                test!start _ CVD(SCAN(inline,bt,brchar))*1000
+            ELSE
+                test!start _ 0;
+            start!recorded _ FALSE;
+            start!output _ FALSE;
+            time!start _ test!time _ 0;
+            ARRCLR(msgrx!sum); ARRCLR(msgrx!ssq); ARRCLR(msgrx!time);
+            ARRCLR(msgtx!sum); ARRCLR(msgtx!ssq); ARRCLR(msgtx!time);
+            ARRCLR(read!hist);
+            ARRCLR(send!hist);
+            ARRCLR(get!hist);
+            ARRCLR(user!count);
+            ARRCLR(read!val!count);
+            ARRCLR(send!val!count);
+            ARRCLR(get!val!count);
+            ARRCLR(read!sum);
+            ARRCLR(read!ssq);
+            ARRCLR(read!max);
+            ARRCLR(read!min,1@12);
+            ARRCLR(send!sum);
+            ARRCLR(send!ssq);
+            ARRCLR(send!max);
+            ARRCLR(send!min,1@12);
+            ARRCLR(get!sum);
+            ARRCLR(get!ssq);
+            ARRCLR(get!max);
+            ARRCLR(get!min,1@12);
+            ARRCLR(read!time);ARRCLR(read!count);
+            ARRCLR(send!time);ARRCLR(send!count);
+            ARRCLR(get!time);ARRCLR(get!count);
+            ARRCLR(msg!COUNT);ARRCLR(bc!COUNT);
+comment	PRINT("PRINTIT:ARRCL: BC!COUNT[0]=",BC!COUNT[0],
+		"BC!COUNT[1]=",BC!COUNT[1],CRLF);
+            SETFORMAT(8,2);
+            d!print(<
+"   TIME     TIME         MSG       #2        #2        MSG       #1        #1        #B        #B "
+                ,crlf,
+"  OF DAY   OF TEST     INPUT     COUNT      TIME    OUTPUT     COUNT      TIME     COUNT      TIME"
+                ,crlf,lf>);
+
+            type _ WORDIN(channel);
+            WHILE NOT eof DO
+                BEGIN
+                size _ WORDIN(channel);
+                IF eof THEN DONE;
+                IF size > bufsize THEN size _ bufsize;
+                ARRYIN(channel,buffer[0],size);
+                IF eof THEN DONE;
+                max!elem _ size-1;
+
+		ifc compiler!switch("B") thenc begin
+			external procedure BAIL;
+			BAIL;
+		end endc;
+                CASE type OF
+                    BEGIN 
+
+                [mon!total] BEGIN
+                    IF start!output AND start!recorded THEN
+                        FOR i_0 STEP 1 UNTIL script!limit DO
+                            IF user!count[i] > 0 THEN
+                                printit(i);
+                    ARRBLT(read!time!save[0],read!time[0],script!limit);
+                    ARRBLT(read!count!save[0],read!count[0],script!limit);
+                    ARRBLT(send!time!save[0],send!time[0],script!limit);
+                    ARRBLT(send!count!save[0],send!count[0],script!limit);
+                    ARRBLT(msg!save[0],msg!count[0],script!limit);
+                    ARRBLT(bc!save[0],bc!count[0],script!limit);
+comment		PRINT("PRINTIT:ARRBLT: SCRIPT!LIMIT=",SCRIPT!LIMIT,
+		" BC!SAVE[0]=",BC!SAVE[0]," BC!SAVE[1]=",BC!SAVE[1],CRLF);
+                    ARRBLT(get!time!save[0],get!time[0],script!limit);
+                    ARRBLT(get!count!save[0],get!count[0],script!limit);
+                    test!time _ (now_buffer[6])-(time!start_buffer[7]);
+		    IF
+			TIME!START = 0
+		    THEN
+			TEST!TIME _ 0;
+                    IF  start!output AND NOT start!recorded THEN
+                        BEGIN
+                        start!recorded _ TRUE;
+                        ARRBLT(msg!start[0],msg!count[0],script!limit);
+                        ARRBLT(read!count!start[0],read!count[0],script!limit);
+                        ARRBLT(read!time!start[0],read!time[0],script!limit);
+                        ARRBLT(bc!start[0],bc!count[0],script!limit);
+                        ARRBLT(send!count!start[0],send!count[0],script!limit);
+                        ARRBLT(send!time!start[0],send!time[0],script!limit);
+                        ARRBLT(get!count!start[0],get!count[0],script!limit);
+                        ARRBLT(get!time!start[0],get!time[0],script!limit);
+                        END;
+                    IF (time!start GEQ 0) AND (test!time GEQ test!start) THEN
+                        start!output _ TRUE;
+                    END;
+
+                [mon!script#]BEGIN
+                    ARRBLT(script#[0],buffer[0],size);
+                    ARRCLR(user!count);
+                    FOR i_0 STEP 1 UNTIL max!elem DO
+                        user!count[script#[i]] _ user!count[script#[i]]+1;
+                    END;
+
+                [mon!sendcount]sumup(send!count);
+
+                [mon!sendtime]sumup(send!time);
+
+                [mon!readcount]sumup(read!count);
+
+                [mon!readtime]sumup(read!time);
+    
+                [mon!filecount]sumup(get!count);
+
+                [mon!filetime]sumup(get!time);
+    
+                [mon!msgcnt]sumup(msg!count);
+
+                [mon!bccnt]sumup(bc!count);
+
+                [mon!readtmx]IF start!output THEN BEGIN
+                    script _ buffer[0]; timex _ buffer[1]/1000;   msgs _ buffer[3];
+                    IF msgs > 0 THEN
+                        BEGIN
+                        msgrx!sum[script] _ msgrx!sum[script] + msgs;
+                        msgrx!ssq[script] _ msgrx!ssq[script] + msgs**2;
+                        msgrx!time[script] _ msgrx!time[script] + msgs*timex;
+                        read!val!count[script] _ read!val!count[script] + 1;
+                        read!sum[script] _ read!sum[script] + timex;
+                        read!ssq[script] _ read!ssq[script] + timex**2;
+                        read!min[script] _ read!min[script]MIN timex;
+                        read!max[script] _ read!max[script] MAX timex;
+                        IF timex > hist!limit THEN timex _ hist!limit;
+                        read!hist[script,timex+.5] _ read!hist[script,timex+.5] + 1;
+                        END;
+                    END;
+
+                [mon!sendtmx]IF start!output THEN BEGIN
+                    script _ buffer[0]; timex _ buffer[1]/1000;
+                    send!sum[script] _ send!sum[script] + timex;
+                    send!ssq[script] _ send!ssq[script] + timex**2;
+                    send!val!count[script] _ send!val!count[script] + 1;
+                    send!min[script] _ send!min[script] MIN timex;
+                    send!max[script] _ send!max[script] MAX timex;
+                    IF timex > hist!limit THEN timex _ hist!limit;
+                    send!hist[script,timex+0.5] _ send!hist[script,timex+0.5] + 1;
+                    END;
+
+                [mon!gettmx]IF start!output THEN BEGIN
+                    script _ buffer[0]; timex _ buffer[1]/1000;
+                    get!sum[script] _ get!sum[script] + timex;
+                    get!ssq[script] _ get!ssq[script] + timex**2;
+                    get!min[script] _ get!min[script] MIN timex;
+                    get!val!count[script] _ get!val!count[script] + 1;
+                    get!max[script] _ get!max[script] MAX timex;
+                    IF timex > hist!limit THEN timex _ hist!limit;
+                    get!hist[script,timex+0.5] _ get!hist[script,timex+0.5] + 1;
+                    END;
+
+                [mon!max]
+
+                    END;
+
+                type _ WORDIN(channel)
+                END;
+
+
+            IF start!output AND start!recorded THEN
+                FOR i_0 STEP 1 UNTIL script!limit DO
+                    IF user!count[i] > 0 THEN
+                        printit(i);
+                d!print(lf);
+            SETFORMAT(10,2);
+            IF start!output THEN FOR i_0 STEP 1 until script!limit DO
+                IF user!count[i] > 0 THEN
+                    BEGIN
+                    read!sum!total _ read!sum!total + read!sum[i];
+                    send!sum!total _ send!sum!total + send!sum[i];
+                    get!sum!total _ get!sum!total + get!sum[i];
+                    read!ssq!total _ read!ssq!total + read!ssq[i];
+                    send!ssq!total _ send!ssq!total + send!ssq[i];
+                    get!ssq!total _ get!ssq!total + get!ssq[i];
+                    read!val!total _ read!val!total + read!val!count[i];
+                    send!val!total _ send!val!total + send!val!count[i];
+                    get!val!total _ get!val!total + get!val!count[i];
+                    msg!total _ msg!total + msg!count[i] - msg!start[i];
+                    bc!total _ bc!total + bc!count[i] - bc!start[i];
+                    read!min!total _ read!min!total MIN read!min[i];
+                    send!min!total _ send!min!total MIN send!min[i];
+                    get!min!total _ get!min!total MIN get!min[i];
+                    read!max!total _ read!max!total MAX read!max[i];
+                    send!max!total _ send!max!total MAX send!max[i];
+                    get!max!total _ get!max!total MAX get!max[i];
+                    FOR j_0 STEP 1 UNTIL hist!limit DO
+                        BEGIN
+                        read!hist!total[j] _ read!hist!total[j] + read!hist[i,j];
+                        send!hist!total[j] _ send!hist!total[j] + send!hist[i,j];
+                        get!hist!total[j] _ get!hist!total[j] + get!hist[i,j];
+                        END;
+                    IF read!min[i] = 1@12 THEN read!min[i] _ 0;
+                    IF send!min[i] = 1@12 THEN send!min[i] _ 0;
+                    IF get!min[i] = 1@12 THEN get!min[i] _ 0;
+                    read!avg _ read!sum[i] / read!val!count[i];
+                    read!dev _ ((read!ssq[i]-read!sum[i]**2/read!val!count[i])
+                      /(read!val!count[i]-1))**0.5;
+                    send!avg _ send!sum[i] / send!val!count[i];
+                    send!dev _ ((send!ssq[i]-send!sum[i]**2/send!val!count[i])
+                      /(send!val!count[i]-1))**0.5;
+                    get!avg _ get!sum[i] / get!val!count[i];
+                    get!dev _ ((get!ssq[i]-get!sum[i]**2/get!val!count[i])
+                      /(get!val!count[i]-1))**0.5;
+                    msgrx!slope _ (msgrx!time[i] _ msgrx!sum[i]*read!sum[i]
+                        / read!val!count[i]) / (msgrx!ssq[i] - 
+                        msgrx!sum[i]**2/read!val!count[i]);
+                    msgrx!basic _ (read!sum[i] - msgrx!slope*msgrx!sum[i]) /
+                        read!val!count[i];
+                    FOR j_0 STEP 1 UNTIL hist!limit DO
+                        read!hist!parm[j] _ read!hist[i,j];
+                    FOR j_0 STEP 1 UNTIL hist!limit DO
+                        send!hist!parm[j] _ send!hist[i,j];
+                    FOR j_0 STEP 1 UNTIL hist!limit DO
+                        get!hist!parm[j] _ get!hist[i,j];
+                    d!print(<"TOTAL             ",msg!count[i]-msg!start[i],
+                        read!count[i]-read!count!start[i],"          ",
+                        bc!count[i]-bc!start[i],
+                        send!count[i]-send!count!start[i],"          ",
+                        get!count[i]-get!count!start[i],crlf>);
+                    SETFORMAT(20,2);
+                    d!print(<
+                        "MINIMUM                     ",CVF(read!min[i]),
+                          "          ",CVF(send!min[i]),CVF(get!min[i]),crlf,
+                        "MAXIMUM                     ",CVF(read!max[i]),
+                          "          ",CVF(send!max[i]),CVF(get!max[i]),crlf,
+                        "AVERAGE                     ",
+                          CVF(read!avg),"          ",CVF(send!avg),CVF(get!avg),crlf,
+                        "STD DEV                     ",
+                          CVF(read!dev),"          ",CVF(send!dev),CVF(get!dev),crlf,
+                        "BASIC RESPONSE TIME         ",msgrx!basic,crlf,
+                        "PER MESSAGE TIME            ",msgrx!slope,crlf,
+                        "SUM OF VALUES               ",
+                          CVF(read!sum[i]),"          ",CVF(send!sum[i]),
+                          CVF(get!sum[i]),crlf,
+                        "SUM OF SQUARED VALUES       ",
+                          CVF(read!ssq[i]),"          ",CVF(send!ssq[i]),
+                          CVF(get!ssq[i]),crlf,lf,
+                        "LOWER QUARTILE              ",
+                          CVF(quantile(read!hist!parm,hist!limit,0,1,0.25)),
+                          "          ",
+                          CVF(quantile(send!hist!parm,hist!limit,0,1,0.25)),
+                          CVF(quantile(get!hist!parm,hist!limit,0,1,0.25)),crlf,
+                        "MEDIAN                      ",
+                          CVF(quantile(read!hist!parm,hist!limit,0,1,0.5)),
+                          "          ",
+                          CVF(quantile(send!hist!parm,hist!limit,0,1,0.5)),
+                          CVF(quantile(get!hist!parm,hist!limit,0,1,0.5)),crlf,
+                        "UPPER QUARTILE              ",
+                          CVF(quantile(read!hist!parm,hist!limit,0,1,0.75)),
+                          "          ",
+                          CVF(quantile(send!hist!parm,hist!limit,0,1,0.75)),
+                          CVF(quantile(get!hist!parm,hist!limit,0,1,0.75)),crlf>);
+                    PRINT("Read resp. histogram? ");
+                    print!read _ "Y" = LOP(INCHWL);
+                    PRINT("Send resp. histogram? ");
+                    print!send _ "Y" = LOP(INCHWL);
+                    PRINT("Get resp. histogram ?  ");
+                    print!get _ "Y" = LOP(INCHWL);
+                    IF print!read THEN
+                        histogram(read!hist!parm,hist!limit,0,1,"READ RESPONSE TIME");
+                    IF print!send THEN
+                        histogram(send!hist!parm,hist!limit,0,1,"SEND RESPONSE TIME");
+                    IF print!get THEN
+                        histogram(get!hist!parm,hist!limit,0,1,"GET RESPONSE TIME");
+                    END;
+            d!print(<crlf,"END FILE ",file!name,crlf>);
+            CLOSE(channel);
+            END "input file";
+        OUTSTR("Monitor files:");
+        END "input line";
+
+    IF read!min!total = 1@12 THEN read!min!total _ 0;
+    IF send!min!total = 1@12 THEN send!min!total _ 0;
+    IF get!min!total  = 1@12 THEN get!min!total  _ 0;
+    read!avg _ read!sum!total / read!val!total;
+    read!dev _ ((read!ssq!total - read!sum!total**2/read!val!total) /
+        (read!val!total - 1))**0.5;
+    send!avg _ send!sum!total / send!val!total;
+    send!dev _ ((send!ssq!total - send!sum!total**2/send!val!total) /
+        (send!val!total - 1))**0.5;
+    get!avg _ get!sum!total / get!val!total;
+    get!dev _ ((get!ssq!total - get!sum!total**2/get!val!total) /
+        (get!val!total - 1))**0.5;
+    SETFORMAT(10,2);
+    d!print(<lf,"GRAND TOTAL       ",msg!total,read!val!total,"          ",
+        bc!total,send!val!total,"          ",get!val!total,crlf>);
+    SETFORMAT(20,2);
+    d!print(<
+        "OVERALL MINIMUM             ",CVF(read!min!total),"          ",
+          CVF(send!min!total),CVF(get!min!total),crlf,
+        "OVERALL MAXIMUM             ",CVF(read!max!total),"          ",
+          CVF(send!max!total),CVF(get!max!total),crlf,
+        "GRAND AVERAGE               ",CVF(read!avg),"          ",
+          CVF(send!avg),CVF(get!avg),crlf,
+        "TOTAL STD DEV               ",CVF(read!dev),"          ",
+          CVF(send!dev),CVF(get!dev),crlf,
+        "OVERALL SUM                 ",CVF(read!sum!total),"          ",
+          CVF(send!sum!total),CVF(get!sum!total),crlf,
+        "OVERALL SUM OF SQUARES      ",CVF(read!ssq!total),"          ",
+          CVF(send!ssq!total),CVF(get!ssq!total),crlf,lf,
+        "OVERALL LOWER QUARTILE      ",
+          CVF(quantile(read!hist!total,hist!limit,0,1,0.25)),"          ",
+          CVF(quantile(send!hist!total,hist!limit,0,1,0.25)),
+          CVF(quantile(get!hist!total,hist!limit,0,1,0.25)),crlf,
+        "OVERALL MEDIAN              ",
+          CVF(quantile(read!hist!total,hist!limit,0,1,0.5)),"          ",
+          CVF(quantile(send!hist!total,hist!limit,0,1,0.5)),
+          CVF(quantile(get!hist!total,hist!limit,0,1,0.5)),crlf,
+        "OVERALL UPPER QUARTILE      ",
+          CVF(quantile(read!hist!total,hist!limit,0,1,0.75)),"          ",
+          CVF(quantile(send!hist!total,hist!limit,0,1,0.75)),
+          CVF(quantile(get!hist!total,hist!limit,0,1,0.75)),crlf,
+        lf,lf,lf,lf>);
+    PRINT("Total read resp. histogram? ");
+    print!read _ "Y" = LOP(INCHWL);
+    PRINT("Total send resp. histogram? ");
+    print!send _ "Y" = LOP(INCHWL);
+    PRINT("Total get resp. histogram?  ");
+    print!get _ "Y" = LOP(INCHWL);
+    IF print!read THEN
+        histogram(read!hist!total,hist!limit,0,1,"TOTAL READ RESPONSE TIME");
+    IF print!send THEN
+        histogram(send!hist!total,hist!limit,0,1,"TOTAL SEND RESPONSE TIME");
+    IF print!get THEN
+        histogram(get!hist!total,hist!limit,0,1,"TOTAL GET RESPONSE TIME");
+    RELEASE(o!chan);
+END "resp time"
+   t?v@`
