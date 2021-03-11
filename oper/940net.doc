@@ -1,0 +1,2497 @@
+
+
+
+                           TYMCOM-X OPERATING SYSTEM
+
+                                MINI-MANUAL #2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                 FEBRUARY, 1978
+
+                            BOB MARTINEZ - EXT 6354
+                                    TRAINING
+
+
+                                         NOTE
+
+           THIS  DOCUMENT  REPLACES  AN  EARLIER  VERSION  TITLED  'TYMCOM-X
+           GLOSSARY AND OPERATING SYSTEM' DATED OCTOBER 1976.
+
+
+                                                                          Page 2
+
+
+                               TABLE OF CONTENTS
+                               ===== == ========
+
+
+               TYMCOM-X LOGICAL CONFIGURATION                  3
+
+               SYSTEM STARTS AND RESTARTS                      4
+                       SENSE SWITCH 4 OFF (NORMAL)             5
+                       SENSE SWITCH 4 ON (SPECIAL)             6
+                       COMMAND DESCRIPTION                     7
+                       RESTART SAMPLE                          9
+                       ERRORS AND RECOVERIES                   10
+
+               TYMCOM-X HUNG SYSTEM RECOVERY                   12
+                       BASE CAUSED HANGUPS                     13
+                       MEMORY CAUSED HANGUPS                   14
+                       DISK CAUSED HANGUPS                     15
+                       RESTART FLOWCHART                       16
+                       BASE CRASH FORM                         17
+                       CONSOLE LIGHTS RECORD FORM              18
+                       DC830 CHECKING FLOWCHART                19
+
+               MEMORY PARITY RECOVERIES                        20
+                       PROCEDURE SUMMARY                       22
+                       MONITOR MODE PARITIES                   23
+                       MANUAL CORE SCAN                        24
+                       ARM-10 CONTROL PANEL                    25
+                       ARM-10LX CONTROL PANEL                  26
+                       DESELECTING AND RECONFIGURING           27
+                       USER MODE PARITY ERRORS                 29
+                       ERRORS AND RECOVERIES                   30
+
+               THE COPYCR PROGRAM                              31
+
+               PAPER TAPE BOOTSTRAPS                           32
+
+               MONITOR BACKUP TAPES                            34
+
+               THE FTALOD PROCEDURE                            36
+
+               THE CHKCLK PROGRAM                              39
+
+               THE SYSTAT UTILITY                              41
+                       COMMANDS                                42
+                       CLARIFICATION OF OUTPUT                 48
+                       SAMPLE RUNS                             52
+
+               ALPHABETICAL INDEX                              55
+                                                                          Page 3
+TYMCOM-X BASIC CONFIGURATION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                          Page 4
+SYSTEM RESTARTS
+
+
+                       STARTS AND RESTARTS AFTER CRASHES
+                       ---------------------------------
+
+       ((INTRODUCTION))
+
+            The TYMCOM-X operating system has  an  automatic  reload  capability
+       which  will occur so long as sense switch 4 on the KI console is off (the
+       normal setting).  When the monitor goes to a 'BOOTS LOADED' condition  it
+       will  automatically do what the operator would normally do:  perform a /D
+       (dump) to move the crash to the disk and a  (carriage-return)  to  reload
+       the  monitor.   If this succeeds a program called INITIA does most of the
+       controlling of which jobs are then run in the auto-restart sequence.
+
+            If sense switch 4 on the console is set at the time the monitor goes
+       to  boots  loaded,  the  automatic  crash dump and system reload will not
+       happen.  In this case the BOOTS program will wait  for  console  terminal
+       input  before  continuing.   If  you  wish  to  dump  the  crash type '/D
+       (carriage return).  Then  to  load  the  monitor  type  another  carriage
+       return.   If  sense  switch 4 is still on, the monitor will branch to the
+       ONCE ONLY code (signified  by  a  '>').   The  operator  can  resume  the
+       automatic restart by typing 'GO'.  If instead the word 'MANUAL' is typed,
+       the system restart processes and  programs  will  have  to  be  done  via
+       operator run procedures.
+
+            If you load BOOTS from paper tape the automatic crash dump will  not
+       happen.   To  accomplish  this  type  a '/D' before you type the carriage
+       return to load the monitor.
+                                                                          Page 5
+SYSTEM RESTARTS
+
+
+       ((COMMAND SUMMARY))
+
+                         SENSE SWITCH 4 IS OFF (NORMAL)
+                         ------------------------------
+
+       1. The system crashes and 'BOOTS LOADED' is typed out;
+
+       2. A /D moves the crash to disk in (SYS) CRASH.SAV;
+
+       3. The monitor is loaded from disk and reports status of offline packs
+          and amount of memory online;
+
+       4. The monitor name, it's version and creation date are typed out;
+
+       5. Date and time are obtained from the Network Supervisor;
+
+       6. DSKCLN is run to verify the integrity of the file system;
+
+       7. COPYCR saves the crash dump on disk into a file given a
+          unique filename in the form CRA00N;
+
+       8. The CHKPNT job is started under username OPER;
+
+       9. SCHED is set automatically to answer lines;
+
+       10. A message is output that the Initialization has completed;
+
+                    (The following steps are done manually)
+
+       11. Check the console terminal for any special messages;
+
+       12. Login to OPER (not the CHKPNT job!) and set OP SY license;
+
+       13. Issue the 'PSP' command to see if DSKCLN caused any disk errors;
+
+       14. If this is the first startup, run the CHKCLK program;
+
+       15. Now type 'SET HAPPY' and complete all logbook entries;
+
+       16. Fill out a MAR to notify Tymshare Maintenance of the crash.
+
+       17. Send mail regarding the crash to @CRALST.
+                                                                          Page 6
+SYSTEM RESTARTS
+
+
+                      SENSE SWITCH 4 IS ON (SPECIAL CASES)
+                      ------------------------------------
+
+       (With SSW4 on the crash routine loads BOOTS and then stops.)
+
+       1. To dump the crash you must type /D';
+
+       2a. If you have reason to believe there may be a
+           hardware problem with the system, protect the disk and turn
+           the system over to Tymshare Maintenance for diagnostics;
+
+                                      (or)
+
+       2b. At this point it might be appropriate to contact the Operating
+           Systems Group to debug a software or file system problem;
+
+       3a. To load the current monitor type a carriage-return;
+
+                                      (or)
+
+       3b. To load a different copy of the current monitor type 'BACKUP(cr);
+           A released monitor will be here if SYSTEM.SAV is a field test
+           monitor.
+
+                                      (or)
+
+       3c. To load a copy of the previous monitor version type 'OLDMON(cr);
+       (If SSW4 is still on you will halt in ONCE ONLY - '>')
+
+       4a. To continue with the automatic bringup type 'GO(CR)'
+           (Routines 3 thru 17 above will occur)
+
+                                      (or)
+
+       4b. To allow OPER to login before the normal routines type 'MANUAL(CR)';
+           (After the monitor loads you can login over the shut. Consult
+            the documents on DSKCLN, COPYCR, CHKPNT and SCHED for the
+            procedures to start these programs manually.)
+
+
+                                         NOTE
+
+           The BACKUP and OLDMON monitors should only be used in
+           extraordinary circumstances and with approval of your Supervisor.
+
+
+                                                                          Page 7
+SYSTEM RESTARTS
+
+
+       ((COMMAND DESCRIPTION))
+
+            The most common form of TYMCOM-X crash is the 'BOOTS  LOADED'  type.
+       Before  the  boots  loaded  message, the monitor may put out one of three
+       other messages if appropriate:
+
+               MESSAGE                 CAUSE
+               -------                 -----
+       'CRASHED BY DEPOSIT IN 30'      (takedown from console)
+       'BASE INITIATED CRASH'          (base caused crash)
+       'HANGUP RUN'                    (R HANGUP by oper on all jobs)
+
+            The first procedure is an attempt to dump the crash.  If a  previous
+       crash has not actually been saved to a file with COPYCR, an error message
+       will be printed and the /D will be aborted.  Then boots will go  back  to
+       command  level  and  allow  the  operator  to  decide  whether  or not to
+       overwrite thvious crash dump or not write a crash file (that is, not
+       overwrite the previous crash dump).  The general guidelines are 1) if the
+       system crashes and then crashes again during bringup, dump  the  original
+       crash  (that  is,  do not overwrite it with the second crash);  2) if the
+       system crashes and there is a dump from some earlier  undetermined  time,
+       then  dump  the  current  crash (overwrite the earlier undetermined crash
+       dump).
+
+            When the system is loaded, the name of the monitor and time  of  its
+       creation  will  be  typed  on the console TTY.  The operating system will
+       will not ask for the time and date to be typed in.  Instead it  will  try
+       to  get  them from the Network Supervisor.  Failing this, it will request
+       the first person to log in to give the time and date.  If so,  the  first
+       login should be OPER.
+
+            The auto-restart sequence continues by running DSKCLN:  Is there any
+       damage  in  the  file  system  that  resulted  from the crash?  If DSKCLN
+       encounters no major errors (see section on  DSKCLN  for  error  typeout),
+       COPYCRASH will be run.  This program will copy the crash dump into a file
+       if one is present and output a message to this effect.  Next CHKPNT  will
+       be started automatically.  When these things have been done, an automatic
+       schedule of 0, 100000, 400000 or 600000 will be set to allow or  disallow
+       logins depending on the sucess of the previous procedures.
+                                                                          Page 8
+SYSTEM RESTARTS
+
+
+            The internal monitor time will be kept in  GMT  and  in  days  since
+       1/1/64.   The  system  converts the date/time so it can give the user the
+       time in the time zone that applies to that  user  in  the  LUD.   If  the
+       date/time  output  with  the  EXEC command 'DATE(CR)' is incorrect notify
+       your Supervisor.  It is possible to  correct  this  with  the  'SET  DATE
+       DD/MM/YYYY' and 'SET TIME HHMM' commands.
+
+            When all jobs are correctly running, INITIA will print the following
+       message on the console TTY.
+
+               INITIALIZATION COMPLETED DATE TIME GMT
+               or
+               INITIALIZATION COMPLETED DATE NOT RECEIVED
+
+            The second message is given if the time and  date  information  have
+       not  yet  been received from the supervisor.  If this occurs then a SCHED
+       400000 is put into effect until the date and time is correct.
+
+       (Note:  In this case the operator will have to set SCHED 0 later.) Loginn
+       will request that they be typed in.  Loginn will type:
+
+       'DATE NOT SET, TYPE DATE AS MM-DD-YYYY'
+       (note that a 4 digit year is required.)
+
+       Loginn will then type:
+
+       'TYPE TIME AS HHMM'
+
+       (If a bad time or date is typed, loginn will type:) 
+
+       'INCORRECT DATE'     or    'INCORRECT TIME'    and make the request
+       again.
+
+            If the user is logging in with a shut override password (i.e.  OPER)
+       and no device OPER is currently set, loginn will type:
+
+       'NO OPER TERMINAL - SET OPER DONE FOR THIS TERMINAL'
+
+            At this point the operator should do a 'SET HAPPY' to counteract the
+       unhappy message that is sent when system initialization completes.
+
+            The DK10 real time  clock  is  checked  next  with  the  'R  CHKCLK'
+       program.   This  procedure  is  documented  elsewhere.  Then the operator
+       should remove any obsolete shutdown letters.
+                                                                          Page 9
+SYSTEM RESTARTS
+
+
+       ((SAMPLE RUN))
+
+       'BOOTS LOADED'                  (a crash has just occurred on the
+       TYMCOM-X)
+
+       '/D'                            (so system dumps core with the crash)
+
+       'C38-P029/DA 6-1-76 MONITOR JUST LOADED'
+
+       '256K OF MEMORY ONLINE'         (is this the correct amount of core?)
+
+       'BPA6 IS OFF-LINE'              (this should not reflect that a needed
+                                       (drive is offline- only that the monitor
+                                       (can handle additional drives. )
+       (DSKCLN, COPYCR, CHKPNT and SCHED 0 take place now...)
+
+       'INITIALIZATION COMPLETED 9-AUGUST-1976 1114 GMT'
+       (OK, now the system is up and you can login over the network)
+
+       'PLEASE LOG IN:' OPER:38;PSWD;;(CR)
+
+       'TYMSHARE  1118 9-AUG-1976'
+
+       'NO OPER TERMINAL SET - SET OPER DONE FOR THIS TERMINAL
+       IS AN OPER TERMINAL SET?'
+       (This message reflects that system messages will be output on your TTY)
+
+       '.'O OP SY                      (set license now)
+       OPERNAME
+       '.'(OPERPASSWORD)
+       '.'PSP
+       '.'SET HAPPY
+       '.'R CHKCLK                     (final procedure in bringup sequence)
+       'THE DK-10 CLOCK IS FUNCTIONING PROPERLY'
+
+
+                                         NOTE
+
+           (BE SURE TO FILL OUT THE APPROPRIATE LOGBOOK ENTRIES AND MAR!)
+
+
+                                                                         Page 10
+SYSTEM RESTARTS
+
+
+       ((ERRORS AND RECOVERIES))
+
+            During the auto-restart process, all error messages will be sent  to
+       the  console  teletype.   If any errors occur which make it impossible to
+       complete the auto-restart sequence, the  system  will  remain  Super-Shut
+       (sched 600000).  It is necessary to crash the system by depositing a 1 in
+       memory address 30 from the system console and get help.  Then reload with
+       the  manual  option  (set  sense  switch  4  on  for this).  There are no
+       operating system error conditions which  are  correctable  by  Operations
+       without help from Operating Systems people.  Notify your Supervisor about
+       ANY and ALL error conditions and/or unexpected messages that occur during
+       auto restart.
+
+            Any errors detected by INITIA will be sent to the console TTY.   For
+       each  of  the  jobs  run  by  auto-restart,  INITIA logs that job into an
+       appropriate user name and starts it.  There is also a  job  which  INITIA
+       runs  to  make sure that the appropriate jobs have started correctly.  If
+       any errors are detected, a message will be output in the form:
+
+        'INITIALIZE FAILURE JOB JOB-NAME REASON'
+
+                                  RESTART JOBS
+
+        The following jobs are currently run:
+
+        DSKCLN
+        CHKPNT
+        INITIA
+
+        DSKCLN, COPYCRASH, and CHKPNT are logged in under the
+        name OPER. The CHKPNT job also makes sure
+        that the user name and directory for UN1 are valid.
+                                                                         Page 11
+SYSTEM RESTARTS
+
+
+                          REASONS FOR RESTART FAILURES
+
+        Reasons which may be given for job failure  are:
+
+        Message                 Meaning
+        -------                 -------
+
+        NO SYS          It is not possible to access directory SYS
+
+        NO LUD          The LUD is not present or not readable
+
+        NO USER         INITIA could not find a user name in the LUD
+                        (currently either OPER or UN1)
+
+        CAN NOT LOGIN   The user INITIA is trying to login under has 
+                        a bit restricting logins under that user name
+
+        INTERLOCK       INITIA has been unable to set the UFD 
+                        interlock which is necessary to the login 
+                        process.
+
+        NO FSN          Something is wrong with one of the file 
+                        structures the LUD says should be set up for
+                        the user job INITIA is trying to start.
+
+        BAD UFD         The file directory for this user is bad
+
+        STRUUO          INITIA has not been able to correctly set up
+                        the file structure access list as indicated
+                        in the LUD.
+
+        GETTAB          INITIA was not able to obtain some needed 
+                        piece of information from the GETTAB UUO
+
+        RUN             The run UUO of a program INITIA was trying to
+                        start failed
+
+        TIMEOUT         This comes from the INITIA job only. It
+                        indicates that the system has not reached
+                        a state where all of the required jobs have 
+                        completed or are running within five minutes.
+                        One cause of this error could be too many
+                        files in directory (OPER). If so, bring the
+                        system up manually, delete the files in
+                        (OPER) and run HANGUP with SSW4 off to
+                        try again.
+                                                                         Page 12
+HUNG SYSTEM RECOVERY
+
+
+                     TYMCOM-X HUNG SYSTEM RECOVERY
+                     -------- ---- ------ --------
+
+
+       ((INTRODUCTION))
+
+            For normal crash situations, the TYMCOM-X  operating  system
+       is  able to halt the system, dump a core image to a fixed area of
+       the disk, initiate a BOOTS LOAD and  restart.   These  situations
+       are described in the previous section of this document.
+
+            Occasionally however, a problem arises  which  disables  the
+       normal  crash  /  auto-restart  sequence.   In  these  cases, the
+       TYMCOM-X will appear to be hung up.  Symptoms  of  this  abnormal
+       situation include:
+
+               -THE NULL JOB ON THE CONSOLE LIGHTS WILL FREEZE
+               -THERE WILL BE NO RESPONSE TO TTY INPUT
+               -ATTEMPTS TO LOGIN TO THE SYSTEM WILL BE UNSUCCESSFUL
+               -CERTAIN INDICATOR LIGHTS MAY BE ON
+
+            The procedures to follow in these cases  is  summarized  and
+       described below:
+
+
+       ((SUMMARY))
+
+       1.  Check to see if the TYMBASE has caused the hangup.   This  is
+       detailed below.
+
+       2.  Memory hangups or  incomplete  memory  cycles  can  hang  the
+       system.  Refer to the description and procedure below.
+
+       3.  Perhaps  the  disk  controller  caused  the  hanging  of  the
+       TYMCOM-X.  If so, follow the procedure described below.
+
+       4.  Attempt to get a normal crash/restart by putting a 1  in  the
+       console data lights, selecting memory address 30 and pressing the
+       DEPOSIT THIS key.  A procedure flow chart is attached  to  assist
+       this and the following steps.
+
+       5.  If this doesn't work, chances are that channel  1  interrupts
+       are  disabled  and  the  crash routine itself may be looping.  In
+       this case, hit RESET, set MA to 147 and hit START.   This  should
+       force a crash and branch to 'BOOTS LOADED'.
+
+       6.  If neither of the above  two  steps  work,  hit  RESET,  then
+       READIN  boots  from paper tape.  Should this be necessary, record
+       as much information as possible.   All  other  crash  information
+       will be lost.
+                                                                 Page 13
+HANGUP CAUSES
+
+
+       ((DESCRIPTION OF POSSIBLE HANGUP CAUSES))
+
+                            BASE HANG/CRASH
+
+            Should the system appear hung  and  the  message  "HOST  NOT
+       AVAILABLE  THROUGH  NET" appear on logging in, log into PROBE and
+       do a node check for that particular base.  Should PROBE report no
+       such node, go to the V73 with that node number.  The following is
+       what to look for on the base:
+
+       STEP LIGHT ON          (THE BASE HAS STOPPED ON AN INSTRUCTION)
+       FLASHING RUN           (INDICATING THE BASE IS IN STEP.)
+       NO LIGHT ACTIVITY      (INDICATING A HALT.)
+
+
+                                     NOTE
+
+           The complete procedure regarding the  TYMCOM-X  base  and
+           PROBE  is contained in the mini-manual titled 'TYMNET AND
+           THE TYMCOM-X' 
+
+
+            In each case record all registers on the base hang sheet and
+       MAR before reloading.  Check the current discmap or the notice on
+       the base door to find the current version of the base code to use
+       in  the  reload.   Should the system become unavailable for short
+       periods of time, log into PROBE and check  the  crash  count  for
+       that  node.   A 1 is usually flagged when the base is brought up,
+       so this should not be cause for  alarm.   If  there  is  a  count
+       greater  than  3, notify TYMNET.  Be advised that on the V73 type
+       base:
+
+              P REGISTER = P (program counter)
+              U REGISTER = I (instruction register)
+              A REGISTER = 0 (primary calculation register)
+              B REGISTER = 1 (secondary calculation register)
+              X REGISTER = 2 (index register)
+
+       MAKE A NOTE OF ALL THE DETAILS OF THE CRASH:  
+
+       -What type of crash did the logger indicate?
+
+       -If this base was dualed, did it's neighbor PDP crash?
+
+       -Was the base in flashing run or did it just halt?
+
+       -Indicate if recently there was a new base code loaded.
+
+       NOTE ANY ACTION TAKEN:  
+
+       -Was the base reloaded by OPER?  From what version?
+
+       -Was the base just restarted?
+
+       -Was TYMSHARE/MAINTENANCE called in?  If so, their action  should
+       also  be  recorded  on  the  appropriate form (a copy of which is
+                                                                 Page 14
+HANGUP CAUSES
+
+
+       attached).
+
+            These forms will be placed on the shelf in the batch control
+       area  near  the  MAR'S, or else given to your lead or supervisor.
+       These do not take the place of MAR'S.  MAR'S should  continue  to
+       be  filled out as before.  You should include the MAR no.  on the
+       form to assist TYMNET  communications  with  T/M  regarding  this
+       crash.
+
+
+                         MEMORY CAUSED HANGUPS
+
+            There are two conditions of memory activity which can  cause
+       the TYMCOM-X to hang.  In the first condition, a sector of memory
+       is hung.  To check for this, open the door to display the  ARM-10
+       control  panel.  Above each 64K sector is a hung light.  If it is
+       lit, make a note of it along with the address  displayed  on  the
+       upper ARM-10 panel display.
+
+
+                                     NOTE
+
+           A thorough description of the ARM-10 console  and  memory
+           related  procedures  can  be  found  further  on  in this
+           manual.
+
+
+            To the right of the sector hung indicator is a  small  reset
+       light.   By  pressing  this light, the cycle which is causing the
+       processor to hang should be cleared.  At this point, a deposit of
+       1   in  MA  30  should  work  to  recycle  the  operating  system
+       gracefully.  If  not,  you  should  toggle  the  'HANG/CONT/CLEAR
+       switch  directly  to  the  right  of  the  memory parity location
+       matrix.  Try again to deposit 1 in 30.
+
+            The second memory caused hangup condition  is  indicated  by
+       the  DATA  WARN  and  ADR ACK lights on the upper console display
+       panel being on solid.  In this instance, the problem is that  the
+       processor had to wait too long for a cycle to memory to complete,
+       or completion was not acknowleged.  Usually,  this  condition  is
+       not reflected on the ARM-10 itself.  In this situation, a deposit
+       of 1 in 30 will not work.  To further test  this  condition,  try
+       pressing  the STOP key on the console.  If the MAN STOP indicator
+       does not come on as a result, you should record as  much  console
+       information lights as possible on the hangup sheet.  Then hit the
+       RESET key an attempt to START from MEMORY ADDRESS location 147.
+
+            For both  of  these  memory  conditions,  a  clear  hardware
+       problem  has  occurred  and  the M.A.R.  should be as detailed as
+       possible.  Prompt maintenance action should be sought.
+                                                                 Page 15
+HANGUP CAUSES
+
+
+                          DISC CONTROLLER/DISC
+
+            This section describes the pertinent info on hanging of  the
+       system  due to clock stopped or check 1 errors on the AMPEX DC830
+       disc controller.  CHECK errors are flagged one of two ways:
+
+       1.  A CHECK- 1 error is a hardware  controller  error  that  will
+       automatically  stop the clock on the disc controller, causing the
+       system to appear hung.
+
+       First you should record as many of the DC830 lights as  possible.
+       A  flowchart  of  what to check is attached to this document.  If
+       maintenace is not available, you should attempt to  'RE-IPL'  the
+       DC830.   If  the  PWR  light  stays  on,  hit  STOP/RESET  on the
+       controller and call T/M.  This procedure  is  documented  in  the
+       mini-manual titled 'TYMCOM-X DISK AND FILES'.  
+
+       If CHECK- 1 is on and the RE-IPL fails to resume the system,  set
+       the  mode  dial on the disc controller to the 'CHK STOP' position
+       (the regular position is NORMAL).  Now put the 'CHANNEL A' switch
+       to  disable.   Set  the  'ENTER/DISPLAY'  dial to the CHECK 1 reg
+       position.  Hit the STOP button on the CPU, then  record  all  the
+       controller lights in the ADDRESS/CHECK/PROGRAM display.  Fill out
+       a MAR and get help from T/M.
+
+       2.  A CHECK- 2 error is a hardware disc error which will not stop
+       the  disc  controller clock.  In most cases the system will reset
+       the error and normal operations will continue.
+
+
+                        DRIVE HANGUP INDICATIONS
+
+            On each disk drive is an orange select light which  normally
+       flashes  randomly as that particular drive is selected.  Should a
+       select light stay lit, that drive is either hung or has been  the
+       last  drive  accessed.   Check  the  disc controller for apparent
+       problems.  Should the  select  light  flash  continually  on  one
+       drive,  we can assume the drive is recalibrating.  This condition
+       may cause the system to hang also.  In this  instance,  you  must
+       stop  the  system to minimize file system damage.  Depositing a 1
+       in MA 30 should accomplish this.
+
+            Any particularly loud noise eminating from a  certain  drive
+       is  reason  enough  to  power that drive down.  The TYMCOM-X will
+       then report that drive off-line to the CTY.  Depositing a 1 IN MA
+       30 will stop the system.  TYMSHARE/MAINTENANCE should be notified
+       at once.
+                                                                 Page 16
+HANGUP RESTART FLOW CHART
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 Page 17
+BASE CRASH FORM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 Page 18
+CONSOLE HANGUP LIGHTS RECORD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 Page 19
+DC830 HANGUP FLOW CHART
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 Page 20
+MEMORY PARITY ON TYMCOM-X
+
+
+                  MEMORY PARITY ERRORS ON THE TYMCOM-X
+                  ------------------------------------
+
+       INTRODUCTION
+       ------------
+
+       BASIC DEFINITIONS
+       -----------------
+
+              MONITOR PARITY: This is an error in some monitor operation which
+                      is critical to the system's data manipulation or
+                      transfer integrity and it will stop the system.  It
+                      is contrasted with a user mode parity which will
+                      abort the user job having the bad parity but will
+                      not stop the system unless a special switch is set.
+
+              "SPURIOUS": An indication to the console TTY (CTY) that when
+                      the automatic core scan occurred, the bad parity was not
+                      found. Either the transmission was somehow garbled or 
+                      the bad parity occurred on a 'read-modify-write' operation
+                      the user job is aborted.  This mechanism is described
+                      below.
+
+              NXM: (stands for Non-existant Memory): This is a reference point
+                      representing the highest current memory address (MA)
+                      on the system plus one. Thus, if the highest memory
+                      module on a system is MM17 with a top address of 777777,
+                      the NXM will occur (MEMORY STOP LIT on the console
+                      and NXM FLAG LIT on the central processor display)
+                      at MA 1000000 with NXM-STOP set.
+
+              PARITY ERROR: The PDP 10s run with odd parity. That is,
+                      for the data words indicated on any and all TYMCOM-X
+                      memory words in all the types of memory, a count of the
+                      bits (plus the parity bit) set should be odd. The num-
+                      ber of lights would be some odd number total. When
+                      this is not bad parity has occurred in that
+                      memory module (assuming all the required lights are
+                      operational).
+
+              INTERLEAVING: This is a method in which sequential addresses are
+                      assigned to alternating physical memory sectors; it has
+                      the effect of reducing access conflicts between various
+                      system components that are competing for the
+                      available memory. If the ARM-10 is in two-way interleaving
+                      sector 0 is interleaved with sector 1 and 2 with 3.
+                      Consecutive addresses from the TYMCOM-X will access sector
+                      0 or 2 if the address ends with 0; they will access sector
+                      1 or sector 3 if the address ends with 1. In four-way 
+                      interleaving all 4 sectors are interleaved together.
+                      On ARM-10 sector size is 64k; for ARM10LX memories
+                      the sector size is increased to 128k each.
+                      For consecutive addresses, those ending in 00
+                      access sector 0; those ending access sector 1; those
+                      ending in 10 access sector 2 and those ending
+                      with 11 access sector 3.
+                                                                         Page 21
+MEMORY PARITY ON TYMCOM-X
+
+
+       CONSOLE SWITCHES
+       ----------------
+
+              NXM STOP, PARITY STOP: These instruct the central processor to
+                      stop if reference is made to some non-existant
+                      memory location or if a word containing incorrect parity
+                      is read. The parity stop switch can slow  down
+                      processing speed by 10%, so it should generally never
+                      be set for normal operations. The system will not run with
+                      the NXM-STOP switch set.
+
+              CONT:   This causes processor execution to resume from stops
+                      including the NXM stop and parity stop.
+
+              STOP:   This switch halts machine operations.
+
+              RESET:  Much like the stop switch except that I/O devices
+                      and the central processor (CP) are cleared.
+
+              REPT:   Causes actions specified by some other switch(s) such
+                      as EXAMINE NEXT or DEPOSIT NEXT, to be repeated
+                      until the action is halted by some stop condition.
+
+              DEPOSIT THIS: On the console, the lower 36 switches are memory
+                      data switches; the upper right hand 22 keys are memory
+                      address switches. DEPOSIT THIS writes the contents
+                      set by the data switches into the address specified
+                      by the memory address switches. For example, an emergency
+                      method of crashing a TYMCOM-X system is to deposit some
+                      non-zero content into memory cell address 30.
+
+              EXAMINE THIS: Causes memory indicator lights on the console
+                      to display the contents of the word whose address has 
+                      been specified by the setting of the memory address
+                      switches. This may be used when the system is running.
+
+              EXAMINE NEXT, DEPOSIT NEXT: These switches cause an increment
+                      of 1 on the current MA and either reads and displays the
+                      memory contents or else writes and displays the data
+                      in the data switches.  If the REPT switch is set, these
+                      switches will repeat the incremented operation until a
+                      stop is caused by either the stop switch or conditions
+                      fulfilling the NXM stop or PAR stop setting.
+                                                                         Page 22
+MEMORY PARITY ON TYMCOM-X
+
+
+       PROCEDURE SUMMARY
+       -----------------
+
+              FOR MONITOR PARITY ERRORS
+              -------------------------
+
+               1) Check the automatic core scan
+
+               2) Call for Tymshare Maintenance
+
+               3) If maintenance is not available follow the core scan
+                  procedure below
+
+               4) Bring the system back up and DO NOT save the crash;
+
+               5) Fill out the system log and write up a MAR on the crash for 
+                  Tymshare Maintenance.
+
+               FOR USER MODE PARITY ERRORS
+               ---------------------------
+
+               1) Gather any output from the console or OPER: TTY pertaining
+                  to the user parity
+
+               2) Run the PSP program for additional information
+
+               3) Fill out a MAR and attach the output gathered above
+
+               4) Notify your Supervisor
+                                                                         Page 23
+MEMORY PARITY ON TYMCOM-X
+
+
+       PROCEDURE DESCRIPTION
+       ---------------------
+
+       PROCEDURES WHEN A MONITOR MODE PARITY OCCURS
+       --------------------------------------------
+
+       1)  When monitor parity occur the system should scan core and stop
+           with the console's program stop light on.  The first thing to do
+           is check the CTY for core scan typeout.  A sample auto core scan
+           is shown:
+
+                       'PARITY ERROR'
+                       'LOC            CONTENTS'
+                       '000000004147   000000,021400'
+                       '000000004243   000000,001000'
+
+                        'END OF CORE SCAN'
+
+                      a) If there is no type out, press CONTINUE to force
+                         another core scan.
+
+                      b) If a core scan has typed out, call for T/M.
+
+                      c) Always contact your Supervisor for help
+
+       2)  If T/M is not available you should manually check core.
+           This analysis begins to isolate the problem to a particular portion
+           of memory.  The core scan will help determine how 'solid' the parity
+           error condition is.  It may be necessary to eventually reconfigure
+           memory and deselect a bad portion of core.  It is better to run
+           with less memory online than to crash again with another parity
+           error in monitor mode.
+                                                                         Page 24
+MEMORY PARITY ON TYMCOM-X
+
+
+       MEMORY CORE SCAN
+       ----------------
+
+       3)  First test core with zeros to determine if any bits are being set
+           in error to cause bad parity.  To accomplish this, push all the data
+           switches off (so the data would equal 0), Press STOP, RESET
+           and DEPOSIT THIS.  All data lights on the console should go
+           off.  Set REPT, PAR stop and NXM stop.  Then press DEPOSIT NEXT.
+           This will clear core by depositing zeros in memory.  Now perform
+           the same steps using the EXAMINE THIS and EXAMINE NEXT
+           switches.  Either a solid error will cause another PAR err or
+           the NXM will be reached.  If you get a parity error on this 
+           test or the two below, be sure to record the memory address and
+           data on the console and the sector and module lights on the
+           ARM-10 parity error display matrix.  Consult the figure on the
+           next page.  Press CONTINUE.  Repeat this step until NXM is
+           reached and then RESET all console switches.
+
+           Now to see if bits are being dropped press all the data switches
+           on.  Press STOP, RESET and DEPOSIT THIS.  At this point all the
+           data lights are on (data would equal 777777777777).  Set PAR stop,
+           NXM stop and REPEAT, then press DEPOSIT NEXT.  Now scan core:
+           Set the console switches to off and press EXAMINE THIS; set
+           RPT, NXM stop and PAR stop on then press EXAMINE NEXT.  There will
+           either be a parity error or the operation will halt with NXM.  In
+           the latter case all the data lights of all on line memory modules
+           should be on.
+
+           RESET all the switches and run the manual core scan a third
+           time.  This time testing the parity bit by depositing a
+           1 throughout core (data would equal 000000000001 - bit position
+           35 on).  Again be sure to record any memory addresses where
+           a parity stop occurs during the scan.
+
+           If none of the manual tests yielded a parity error you should
+           proceed to step 5 and bring the system up.  If however, you
+           had parity stops during the scans follow the ARM-10 deselect
+           procedure (step 4) below.
+                                                                         Page 25
+MEMORY PARITY ON TYMCOM-X
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                         Page 26
+MEMORY PARITY ON TYMCOM-X
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                         Page 27
+MEMORY PARITY ON TYMCOM-X
+
+
+       ARM-10 RECONFIGURATION AND DESELECTING PROCEDURES
+       ------------------------------------------------
+
+       4)  If any parity errors occur during the manual core scan you may have
+              to deselect the module (16k for ARM10, 32k for ARM10LX) or
+              sector (64k for ARM-10, 128k for ARM10LX) containing the solid
+              parity error problem. You should attempt to deselect as little
+              as necessary to make the offending memory offline. Each ARM-10
+              on a 512k configuration may be treated as a seperate unit.
+              The smallest amount that can be deselected is 16k or 32k. See
+              figures of the ARM-10 and ARM10LX control/indicator panels
+              on the previous pages for the following procedures.
+
+               4a) Before anything can be deselected on the ARM-10, the
+                   interleaving switch must be turned to the OFF position.
+                   It is not necessary to change the interleaving switch on the
+                   other ARM-10 in a 512k configuration:  Each ARM-10 is inter-
+                   nally interleaved, not interleaved with the other box.
+
+               4b) From checking the ARM-10 during the manual core scan
+                   especially the parity error display lights on the panel
+                   you should have determined which part of memory must be
+                   deselected.  On a 512k system the low ARM-10 will have
+                   bit 17 on the ARM-10 unit select on.
+
+               4c) The part of memory to be deselected must be configured as the
+                   last (highest) part of the ARM-10. Turn the SECTOR/LAST and
+                   MODULE/LAST switches to reflect the part of memory
+                   that is to be deselected.
+
+               4d1) If all the parity errors have occurred within a single 
+                    module, once this module (and it's sector) have been set to
+                    LAST, set the module SEL/DES switch to DES to deselect
+                    that 16k (32k on ARM10LX'S).
+
+               4d2) If all the parity errors have occurred within a single 
+                    sector, which has been set to LAST, set the sector SEL/DES
+                    switch to DES to deselect that 64k (128k on ARM10LX'S).
+
+               4d3) If the parity errors occurred in more than one sector within
+                    the ARM-10 you must get corrective maintenance help. Do not
+                    deselect more than one sector without Tymshare Maintenance
+                    assistance.
+
+               4e) If anything has been deselected be sure to test for NXM again
+                   (the core scan above) to double check that all core believed
+                   to be online is in fact online.
+                                                                         Page 28
+MEMORY PARITY ON TYMCOM-X
+
+
+       5)  At this point all console switches should be reset to their normal
+              position. Then load the bootstrap from paper tape and bring
+              the system up according to standard operating procedures.
+
+       6)  It is very important that the operator copy all
+              addresses and data contents that have been obtained in
+              step 3 in the system log. Also keep an accurate record if any
+              deselecting and/or reconfiguring was done. A copy of this info
+              should be given to the shift manager or lead operator
+              so that it can be entered into the shift log. It must also
+              be attached to the MAR notifying Tymshare Maintenance of the
+              the crash.
+                                                                         Page 29
+MEMORY PARITY ON TYMCOM-X
+
+
+       USER PARITY ERROR RECOVERY
+       --------------------------
+
+              The TYMCOM-X operating system will attempt to recover from parity
+              errors which occur while the machine is running a user job.
+              Such an error will result in the message to the user:
+
+                      "SWAP READ OR PARITY ERROR"
+
+              The same message will be typed to the operator (either
+              at the CONSOLE or OPER: terminal) along with the
+              location and contents of the first 4 errors detected
+              in a scan of the users core image.  If the error is
+              detected in a high segment its core will be released and
+              all users connected to it will receive the message:
+
+                       "HIGH SEGMENT SWAP OR PARITY ERROR"
+
+              The format of the scan printout is:
+
+                      UPE (LOCATION) = (CONTENTS)
+
+              When a user parity error is detected the word is tested
+              with all ones, all zero's, and a one in bit 35.  If any
+              of these tests cause the parity flag to be set or to return
+              the wrong data, a message indicating that a bit was
+              dropped, picked, or parity bit was picked is typed on
+              the OPER console (only).  This is followed by a message
+              in the form:
+
+                       (ADDRESS) = (TEST CONTENTS) = (PRE-TEST CONTENTS)
+
+              The number in the test contents field together with the
+              dropped, etc. message will indicate what bits were bad.
+              This message is then followed by the normal core scan.
+
+              Also the following PSP info is available on parity
+              errors:
+
+               PARTOT = total number of UPE words detected
+               PARSPR = total number of parity interrupts received
+               PARPC  = PC during which the last parity error occurred
+               PARWRD = contents of cell containg last parity error.
+               PARADR = physical address of last parity error
+
+              Whenever you see a user parity error message you should
+              obtain a PSP. Attach all relevent output to a MAR for
+              Tymshare Maintenance and give it to your Supervisor.
+                                                                         Page 30
+MEMORY PARITY ON TYMCOM-X
+
+
+       ERRORS AND RECOVERIES
+       ---------------------
+
+              One final precaution is that the contents on bits 16-21 in MA
+              on the console should compare with the known highest memory module
+              when a NXM is reached. If it doesn't compare, check the
+              memory modules to see if certain modules are hung. This would
+              show itself by the hang or reset lights on the sector
+              display being on solid. To clear a hung sector press the reset
+              light. To clear the entire ARM-10 move the hang/cont/clear
+              switch to the clear position. Make sure the NXM on your core scan
+              is correct.
+
+               WITH THIS MEMORY        NXM IS AT               MA LIGHT
+               ----------------        ---------               --------
+                   256K                   400000                  18
+                   512K                  1000000                  17
+                   768K                  1400000                 17-18
+                  1024K                  2000000                  16
+
+       On a TYMCOM-X with more than one ARM-10 online, if any part of the  lower
+       ARM-10  is  deselected  you  will  receive the message 'hole in core from
+       addr1-addr2' when you bring the system up.  This may be acceptible:  just
+       a  reflection  that  part of physical memory box 0 is off line because it
+       was deseleted.  However on manual core scans the first NXM will occur  at
+       the  low address of the memory deselected;  to complete the core scan you
+       would have to start again at the highest address of the deselected memory
+       plus  1  (that  is,  skip over the hole in core).  A more straightforward
+       approach would be to make the  low  ARM-10  the  high  box  in  the  512k
+       configuration.   But  the  base  interface  to  that  memory box could be
+       effected  so  it's  best  to  leave  memory  box  switching  to  Tymshare
+       Maintenance.
+
+       If certain of the display lights on the console or  the  ARM-10  are  off
+       even  though  you  expect that they should not be off press the lamp test
+       button.  If they have burned out mark them with tags so they will not  be
+       misinterpreted and can be replaced as soon as possible.
+                                                                         Page 31
+COPYCRASH
+
+
+                                   COPYCRASH
+                                   ---------
+
+       ((INTRODUCTION AND COMMAND DESCRIPTION)) 
+
+       Under the normal automatic restart procedure both the /D  (dump  core  to
+       the disk) and COPYCRASH (move the crash dump into a unique filename) will
+       occur automatically.  However if the sense switch 4 is set on or  if  the
+       system  is hung in a crash loop such that a later crash in the loop would
+       overwrite a previous crash dump, then operator action is required.
+
+       If COPYCRASH is run, other than as a part of the auto-restart  procedure,
+       it  will check the crash file to see if the crash has been copied.  If it
+       has, COPYCRASH will type 'CRASH ALREADY COPIED..  TYPE Y (RETURN) TO MAKE
+       ANOTHER'.   If the operator types Y or the crash has not yet been copied,
+       COPYCRASH will copy it to the next higher numbered crash file.  COPYCRASH
+       will output a message of the form
+
+       'COPY STARTING...  CRA002...  COPY DONE'
+
+       When COPYCRASH runs as part of the auto-restart sequence, it will  simply
+       terminate  if  the  crash  has already been copied.  If the crash has not
+       been copied, it will copy it and output the
+
+       'COPY STARTING.........  COPY DONE' message on the console TTY.
+
+       If there are any input or output errors during the copy,  COPYCRASH  will
+       attempt  to  finish  the  copy  anyway and then output 'OUTPUT ERRORS' or
+       'INPUT ERRORS' after the '...COPY DONE' message.
+
+       ((ERRORS AND RECOVERIES))
+
+       Possible error messages from COPYCRASH are
+
+       CAN NOT INIT DSK
+       OP LICENSE REQUIRED
+       CAN NOT ENTER OUTPUT FILE
+       NO FILE (SYS)CRASH.SAV
+       ALL CRASH FILE NAMES USED
+       THE LAST MESSAGE MEANS THAT  THERE  ARE  FILES  WITH  THE  NAMES  CRA001,
+       CRA002, ...  THROUGH CRA999 ALREADY IN EXISTANCE.
+                                                                         Page 32
+CREATING BOOTSTRAP TAPES
+
+
+                         TYMCOM-X PAPER-TAPE BOOTSTRAPS
+                         ------------------------------
+
+       ((INTRODUCTION)) 
+
+            A bootstrap is a technique of loading the monitor into the  TYMCOM-X
+       by  means  of  certain  preliminary instructions to run programs and read
+       data.  This technique is used with a  paper  tape  "bootstrap"  when  the
+       computer  is  brought up "cold" (e.g., after a maintenance diagnostic has
+       run "stand- alone" on the system).  
+
+            This document describes how to  create  either  single  or  multiple
+       copies  of  the two bootstrap paper tapes which could be used to load the
+       TYMCOM-X operating system:  BOTLOD which bootstraps the monitor from disk
+       and FTALOD which bootstraps the monitor from a monitor backup tape.
+
+
+                                         NOTE
+
+           Use of these tapes is documented in the MANUAL BRINGUP Section of
+           this document.
+
+
+
+       ((COMMAND SUMMARY))
+
+       See the SAMPLE RUN and comments below.
+
+       ((SAMPLE RUNS))
+
+                          CREATING BOTLOD PAPER TAPES
+
+        Set status GD and WF.
+
+        '.'R BOTLOD(CR)         (calls the program)
+
+        'NUMBER OF COPIES TO PUNCH:' N(CR)
+                                (N is the number of seperate
+                                BOTLOD tapes you wish to punch)
+        'EXIT'
+        '.'
+
+
+
+                                      NOTE
+
+               (Label the  tape  clearly  and  leave  all  copies
+               attached.  Place the entire tape in the paper tape
+               reader:  In this way the tape will not have to  be
+               repositioned  each  time  you  manually reload the
+               monitor.)
+
+
+                                                                         Page 33
+CREATING BOOTSTRAP TAPES
+
+
+                          CREATING FTALOD PAPER TAPES
+                          -------- ------ ----- -----
+
+         (Set status    GD and WF.)
+         (Then make sure there is blank tape in the PTP - paper tape
+         punch located to the right of the processor console.)
+
+         To make a single copy of the bootstrap loader, type:
+
+         '.'R PIP
+
+         '*'PTP:/H_FTALOD.REL [1,4] (CR)
+
+         To make several bootstrap loaders, enter the above string
+         for the number of bootstraps desired.
+
+       ((ERRORS AND RECOVERIES))
+
+            Be sure to clearly label all paper tape bootstraps.   If  the  paper
+       tape punch (PTP) fails you should notify Tymshare/Maintenance via a MAR.
+                                                                         Page 34
+MONITOR BACKUP TAPES
+
+
+                         CREATING MONITOR BACKUP TAPES
+                         -----------------------------
+
+       ((INTRODUCTION))
+
+            In the normal operation of the TYMCOM-X,  system  restarts  and  the
+       recycling  of  the  monitor occurs automatically, or at least with little
+       operator intervention.  However, if this capability  is  eliminated  (for
+       instance,  if  a complete rebuild is required due to disk problems) or if
+       it is not possible (for instance,  if  a  new  monitor  and  file  system
+       requires  a  refresh),  we  must rely on monitor files that are stored on
+       tape rather than on the disk.  In these circumstances, the MONITOR BACKUP
+       TAPE  (and  a  TITO  BACKUP  TAPE  as  well)  allow us to reconstruct the
+       operating system and 'start from scratch' to  restore  All  Files  and/or
+       Backup  Tapes.   This  document  describes  the procedures used to create
+       Monitor and Tito Backup Tapes.   It  will  also  discuss  a  checksumming
+       technique  that  provides  us  with  assurance  that  the file on tape is
+       identical to one copied from the disk.  This is a crucial element  within
+       the total system of File Backup:  It means that even in the worst case of
+       file system damage, we have a  starting  point  for  safeguarding  user's
+       files.
+
+       ((COMMAND SUMMARY))
+
+                         CREATING A BACKUP MONITOR TAPE
+
+               1) Get a good tape, mount it, set status and assign the tapedrive
+
+               2) Run the MAGRIM program to put a loader on the tape
+
+               3) Run PIP storing the file [1,4] SYSTEM.SAV/B in binary mode
+
+               4) Run PIP again to rewind the tape and skip over the loader
+
+               5) Restore the monitor file to a file called TEST
+
+               6) Now run the CKSUM program: First check the input file
+                  (SYS)SYSTEM.SAV (you will get a 6 char. checksum)
+
+               7) Next check the input file TEST; the checksum should
+                  match the one you got for SYSTEM.SAV
+
+               8) If so,, remove the tape, delete TEST and label the tape
+                  clearly.  It's a good idea to tape the TTY output to the tape.
+                                                                         Page 35
+MONITOR BACKUP TAPES
+
+
+                          CREATING A BACKUP TITO TAPE
+
+               1) Mount a good tape, set status and from the Exec type
+                  GET (SYS)TITO
+
+               2) Now type SAVE FTAN: TITO
+
+               3) Remove the tape and label it clearly.
+
+       ((COMMAND DESCRIPTION))
+
+       (See the SAMPLE RUN below)
+
+       ((SAMPLE RUN))
+
+       '.' OP GD WF SY                  (SET THIS STATUS FIRST)
+       MARTINEZ
+
+       '.'SYSN                          (CHECK SYSTEM AND MONITOR NUMBERS.)
+       TYMSHARE C33-P029/HA 10-12-76
+
+       '.'DAY                           (USE YOUR TERMINAL OUTPUT FROM THIS TO
+       14-OCT-1976 16:02:39             ACT AS A LABEL FOR THE MONITOR TAPE)
+
+       '.'ATT FTA3
+
+       '.'R MAGRIM                      (THIS STEP ENABLES USE OF TAPE ON MTA'S
+       DRIVE NUMBER 3                   AS WELL AS FTA'S)
+       EXIT
+
+       '.'R PIP
+
+       *FTA3:_[1,4]SYSTEM.SAV/B         (THIS STORES THE MONITOR)
+
+       *FTA3:(M#1B)_                    (ADVANCE TAPE 1 FILE PAST MAGRIM)
+
+       *TEST_FTA3:                      (READ MONITOR ON TAPE TO FILE TEST)
+
+       *FTA3:(MU)                       (NOW UNWIND THE TAPE)
+
+       '*'CKSUM!                        (NOW CHECKSUM TO COMPARE TAPE FILE WITH
+       INPUT: (SYS)SYSTEM.SAV,TEST           THE MONITOR ON DISK)
+       BIZFEB (SYS)SYSTEM.SAV
+       BIZFEB TEST.                     (IF CHECKSUMS ARE THE SAME WE CAN BE
+       INPUT: .                         CONFIDENT OF THE MONITOR TAPE; INPUT A .
+                                        TO QUIT THE PROGRAM)
+
+       '.'DEL TEST                      (DELETE THE TEST FILE TEST)
+       '.'
+                                                                         Page 36
+FTALOD
+
+
+               FTALOD - BOOTSTRAPPING FROM A MONITOR BACKUP TAPE
+               -------------------------------------------------
+
+       ((INTRODUCTION))
+
+            The purpose of FTALOD is to load a monitor from a mag-tape which  is
+       mounted  on  one  of  the  STC  tape  units.   This  provides  us with an
+       additional method of bringing up either the current, field  test  or  old
+       monitor  from  mag-tape (in this regard, always clear any monitor version
+       changes with your Supervisor).
+
+            FTALOD is needed because the PDP-10 hardware  read-in  feature  does
+       not  work with the IBM type of tape units.  Instead, a specially prepared
+       FTALOD paper tape must be mounted in the PTR (Paper Tape Reader) and  the
+       READIN DEVICE switches set to 104 (switch 5 and 9 on).  
+
+            The monitor magtape may be mounted on any of the units  on  the  1st
+       STC tape controller (i.e., on FTA0 through FTA7).
+
+            Then as described below, FTALOD can be used to load the monitor from
+       tape.
+
+       ((COMMAND SUMMARY))
+
+       See the COMMAND DESCRIPTION below.
+
+       ((COMMAND DESCRIPTION))
+
+                   PREPARATION OF THE MAGTAPE USED BY FTALOD
+                   -----------------------------------------
+
+            7 track magtapes are prepared for FTALOD just as they are for normal
+       read-in  from  DEC magtape units:  On 7 track drives MAGRIM is written at
+       556 BPI and the monitor SAV file is written at 800 BPI.   9  track  tapes
+       may  have  MAGRIM  and  the  monitor  SAV  file at any densities that the
+       particular 9 track unit is capable of handling.  9 TRACK and 6250 BPI  is
+       most often used.
+
+            Consult the document on CREATING A MONITOR TAPE  contained  in  this
+       manual.
+
+
+
+                                         NOTE
+
+           FTALOD actually does not use  MAGRIM,  it  just  skips  over  it;
+           MAGRIM  is  only  required so that the same tapes may be used for
+           read-in from both the DEC and STC magtape units, and so that  two
+           procedures are not needed for creating read-in tapes.
+
+
+            You are  also  referred  to  the  document  on  TYMCOM-X  PAPER-TAPE
+       BOOTSTRAPS  (in  this  manual)  for  the  techniques used for creating an
+       FTALOD papertape.
+                                                                         Page 37
+FTALOD
+
+
+                     USING THE FTALOD INITIAL PROGRAM LOAD
+                     -------------------------------------
+
+       1.  It is assumed you have sufficient reason to  load  the  monitor  from
+       magtape.   If  the  system  is up, follow the usual procedures to take it
+       down.
+
+       2.  Mounting the magtape on a unit  with  the  correct  track/density  is
+       important.   The unit must be 7 or 9 track, depending on whether the tape
+       was written on a 7 or 9 track unit,  respectively.   Note  that  7  track
+       units  expect  tapes with MAGRIM at 556 BPI and the monitor 'SAV' file at
+       800 BPI, while 9 track units will accept MAGRIM and the monitor SAV  file
+       at any densities that the unit is capable of reading.
+
+       3.  Set the console data switches as follows:  The left half (LH) of  the
+       data  switches  (0  thru 17) are set to ones, and the right half (18 thru
+       35) to a number from 0 to 7 inclusive reflecting which  drive  number  is
+       being  used.  FTALOD will assume that the FTALOD tape is on the unit FTAN
+       where  N  =RH(SWITCHES);   For  example,  if  the  switches  are  set  to
+       777777,,000003 the unit acccessed by this procedure will be FTA3.
+
+       4.  Put the papertape of FTALOD into the paper tape reader (PTR).
+
+       5.  Set the read-in device select switches to the PTR (104 - 5 and 9 on).
+
+       6.  Depress the STOP, RESET and READIN switches.
+
+       7.  If the papertape does not load properly, reinsert it and try again.
+
+       8.  At this point, if all is well, FTALOD will rewind the  mag-tape  skip
+       over  MAGRIM,  and read the monitor into core;  at successful completion,
+       FTALOD will have positioned the tape after the  monitor  file's  EOF  and
+       started the monitor.
+                                                                         Page 38
+FTALOD
+
+
+       ((ERRORS AND RECOVERIES))
+
+       If FTALOD encounters a  fatal  condition  at  any  point,  it  will  stop
+       processing  and  display  the  condition's  error  - number in the memory
+       display lights on the console.  The CONSOLE TTY will also ring  the  bell
+       the same number of times as the error number.
+
+            Fatal conditions in FTALOD are as follows:
+
+
+               CONDITIONS          ERROR NUMBER   CAUSE
+               ----------          ------------   -----
+
+         FTA CONTROLLER NOT               1       HARDWARE NOT
+         FOUND ON 1ST TWO                         CONFIGURED
+         SA10S ON THE SYSTEM.                     CORRECTLY?
+
+         FTA CONTROLLER FOUND,            2       CHECK CONSOLE DATA
+         BUT THE UNIT IS EITHER                   SETTING AND CONTROLLER
+         NON-EXISTENT OR NOT                      SETTING.
+         READY.
+
+         CANNOT REWIND                    3
+
+         CANNOT SKIP OVER THE             4       TRY ANOTHER DRIVE OR
+         1ST FILE ON THE TAPE.                    MONITOR TAPE WITH THE 
+                                                  SAME MONITOR VERSION.
+
+         WHILE READING THE MONITOR        5       CLEAN/CHECK TAPEDRIVE
+         SAV FILE, SAW AN EOF WHERE
+         IT WAS NOT EXPECTED, OR
+         SAW A LENGTH ERROR FOR A
+         BLOCK WHICH IS NOT THE LAST
+         BLOCK IN THE FILE.
+
+         COULD NOT READ A                 6       WRONG DENSITY OR TRACKS
+         RECORD ON THE TAPE.
+
+         THE TAPE IS WRITTEN              7       (SAME AS ABOVE)
+         A DENSITY WHICH THE UNIT
+         CANNOT READ.  (THIS CAN
+         ONLY BE DETECTED IN A VERY
+         LIMITED NO. OF CASES;  THE
+         OTHER CASES OF THIS WILL
+         EITHER RESULT IN ERROR NO.
+         6 OR IN INCORRECT DATA
+         BEING READ BUT NO ERROR CON-
+         ITION BEING INDICATED).
+                                                                         Page 39
+CHKCLK
+
+
+                          CHKCLK - CHECKING THE DK-10
+                          ---------------------------
+
+       ((INTRODUCTION))
+
+            The DK-10 is the Programmable Real  Time  Clock  for  the  TYMCOM-X.
+       Because  the  clock  is  so  important  to the correct functioning of the
+       TYMCOM-X it should be checked  at  least  once  a  day  with  the  CHKCLK
+       (CHecKCLocK) program.
+
+       ((COMMAND SUMMARY))
+
+            (See the SAMPLE RUN section of this document.)
+
+       ((COMMAND DESCRIPTION))
+
+            On computers the clock is the device used for keeping time, counting
+       pulses, measuring frequencies or synchronizing events.  A real time clock
+       is used to indicate the passage of actual time in a  scale  analogous  to
+       some external event it describes.  It is programmable in that it's values
+       are available to computer programs via an internal register.  
+
+            The program CHKCLK is usually  run  in  the  evening  or  after  the
+       TYMCOM-X  is brought up in the morning.  The program requires no operator
+       input when it is run.  It executes a 17 instruction loop and  checks  the
+       number  of  DK-10  clock  ticks elapsed against a fixed value of how many
+       ticks the loop should take if the clock was functioning correctly.
+
+       ((SAMPLE RUN))
+
+               '.'O OP                 ;set status
+               OPERNAME
+               OPERPSWD
+               '.'R CHKCLK             ;run the program
+               'THE DK-10 CLOCK WORKS CORRECTLY
+               .'
+                                       ;the ticks of the clock compare
+                                       ;acceptably with the stored value
+                                                                         Page 40
+CHKCLK
+
+
+       ((ERRORS AND RECOVERIES))
+
+            If the CHKCLK program finds that the number of clock  ticks  on  the
+       DK-10  is  off by more than 10% from the stored value the following error
+       message is output:
+
+                 'THE DK-10 CLOCK MAY NOT BE WORKING CORRECTLY'
+                 'THE CLOCK RETURNED A VALUE OF NNNNNNN
+                 WHEN IT SHOULD HAVE RETURNED THE VALUE ON ITERATION NNNN'
+
+            This is a serious problem and the system should not  be  allowed  to
+       continue timesharing until the problem has been identified and corrected.
+       Report any such error message to your Supervisor immediately.
+                                                                         Page 41
+SYSTAT
+
+
+                 SYSTAT - SYSTEM STATUS PROGRAM ON THE TYMCOM-X
+                 ----------------------------------------------
+
+          ((INTRODUCTION))
+
+
+          SYSTAT is a versatile Tymshare utility program on the TYMCOM X system.
+          It  displays  at  a  terminal extensive and detailed information about
+          activity on the TYMCOM X system at any time.
+
+          This document supersedes all other Tymshare  documentation  of  SYSTAT
+          and all DEC documentation of SYSTAT which has been used by Tymshare.
+
+          ((COMAND SUMMARY))
+
+          SYSTAT is called from the Monitor or Executive mode with a command  in
+          the following general form:
+
+          -SYSTAT[search command][job status control command(s)]
+                 [system information control command(s)]
+
+          where the bracketed portions are any of those commands listed  in  the
+          COMMAND  DESCRIPTION  below.  Any SYSTAT command can be abbreviated to
+          the shortest  form  which  distinguishes  it  from  any  other  SYSTAT
+          command.  In this manual, a carriage return completes a command unless
+          stated otherwise.
+
+          SYSTAT will, in general, print a preamble followed  by  a  summary  of
+          activity and then return to the executive.  The various commands given
+          to SYSTAT when calling it as well as the license of the user determine
+          the  type  and  quantity  of information which is printed.  The SYSTAT
+          program  leaves  the  terminal  in  the  Executive  or  Monitor   mode
+          throughout  the  operation  of the program.  The activity summary is a
+          combination of the optional reports that can be obtained from  SYSTAT.
+          These  are  a job status display and numerous other system information
+          displays that are selected by the user.
+
+          The following commands to the Monitor also access SYSTAT:
+
+          PSP
+
+          SYSNO
+
+          USERS
+
+          WHERE[names (user or device)]
+
+          WHO
+                                                                         Page 42
+SYSTAT
+
+
+          ((COMMAND DESCRIPTION))
+
+                                   VALID COMMANDS
+
+          SEARCH COMMANDS - CHECK ONLY SPECIFIED JOBS?
+
+          The  following  commands  (options)  select  the  jobs   about   which
+          information  will  be  printed.   Normally, all jobs which the user is
+          authorized to see will be listed.  Using a search command causes a job
+          status  display  to  be done (without headings) subject to the options
+          selected.
+
+          Command                Meaning
+
+          [GAN,UUN]              List all jobs under the specified global
+                                 account number and universal user
+                                 number.  Either the GAN or the UUN may
+                                 be replaced by an asterisk designating a
+                                 wild half; for example: [6], [7,*],
+                                 [*,122], [1,21].
+
+          job number             Prints the specified job number.
+
+          <PROGRAM>              List all jobs running the
+                                 specified program; for example:  <SYSTAT>.
+
+          #teletype number       List job associated with the specified
+                                 teletype number; for example:  #52.
+
+          (user name)            List all jobs under the specified user
+                                 name.
+                                                                         Page 43
+SYSTAT
+
+
+          JOB STATUS REPORT CONTROL COMMANDS - WHAT JOB INFO SHOULD BE
+          DISPLAYED?
+
+          The following commands indicate which fields in the job status  report
+          are  to be printed.  One or more of these commands may be entered at a
+          time, and the fields listed will be an IOR  combination  of  the  ones
+          requested.   The default option is NORMAL.  The job numbers are always
+          listed in the first column.  Some of  the  commands  also  affect  the
+          other reports available from SYSTAT and are described again below.
+
+          Command                Meaning
+
+          PPN                    List GAN-UUN.
+
+          TYMNET                 List TYMNET information.
+
+          PROGRAM                List program nameS.
+
+          SIZE                   List job size in pages.
+
+          STATE                  Print job state information.
+
+          TRU                    Print TRU count.
+
+          LICENSE                List job license information.
+
+          OWNER                  List owner of program run by each job.
+
+          DSKIO                  List DSK I/O count.
+
+          CHARIO                 List TTY I/O count.
+
+          TTY                    List TTY status information.
+
+          CONNECT                List TTY connect time.
+
+          EVERYTHING             A combination of all job status
+                                 fields except PPN.
+
+          JOB                    A combination of TYMNET, PROGRAM,
+                                 SIZE, STATE, TRU, CONNECT, TRU,
+                                 and WHO fields.
+                                 STATE, TRU, and WHO fields.
+
+          TELETYPE               A combination of TYMNET, PROGRAM, SIZE
+                                 STATE, TRU, CONNECT, and WHO fields.
+
+          NOHEAD                 Exclude preamble and heading before
+                                 job status information.
+
+          SHORT                  A combination of TYMNET, PROGRAM,
+                                 SIZE, and WHO fields.
+
+          CHRONIC                A combination of PROGRAM, SIZE,
+                                 STATE, and WHO fields.
+                                                                         Page 44
+SYSTAT
+
+
+          SYSTEM INFORMATION DISPLAY CONTROL COMMANDS - WHAT SYSTEM INFO IS
+          DESIRED?
+
+          The following commands select the desired optional displays  available
+          from  SYSTAT.  One or more of these commands may be entered at a time,
+          and the displays listed will, in general, be  an  IOR  combination  of
+          only   the  ones  requested  with  exceptions  as  noted.   To  obtain
+          information about the system, the user must have SY license.
+
+          Command                Meaning
+
+          SWAP                   List swapper information.
+
+          BUSY                   List busy device information.
+
+          DEVICE                 Same as BUSY.
+
+          DORMANT                List dormant segment status.
+
+          ERRORS                 List system error information.
+
+          STRUCTURE              List system file structure
+                                 information.
+
+          FILES                  List open file information.
+
+          DISK                   List disk information.
+
+          APR                    Print serial number of the PDP-10
+                                 control processor.
+
+          PERFOR                 List system performance data.
+
+          EVERYTHING             List all displays.  (Exception:
+                                 This does not combine as an IOR with
+                                 other system information command
+                                 options.)
+          JOB                    Job status display and, if search
+                                 command is used, FILES and BUSY,
+                                 otherwise PERFOR and shared segment 
+                                 information.
+
+          TELETYPE               List all displays.
+
+          SHORT                  List job status only.
+
+          DISPAT                 List dispatch base status information.
+
+          GENERAL                A combination of STRUCTURE and PERFOR.
+
+          NONJOB                 A combination of SWAP, STRUCTURE, DISK,
+                                 PERFOR and DISPAT.
+
+                                           NOTE
+
+              In general, when a search command  is  used,  BUSY  and  FILES
+              options  will  be  included automatically.  The exceptions are
+              when the GENERAL command or one of the  individual  job  field
+              commands  are  used.   PERFOR  and  shared segment information
+              (which can't be requested specifically)  is  printed  when  no
+              search  command  is  used  and  one  or more of the job status
+              commands for individual fields are used.
+
+
+          LISTING CONTROL COMMANDS - WHERE SHOULD OUTPUT BE DIRECTED?
+
+          LPT                    Output to device LPT:
+
+                                 Indicates to SYSTAT that the
+          DPY                    user is at a display device.
+
+          CONTINUOUS             Requests SYSTAT to repeat its report
+                                 continuously (until the user interrupts it
+                                 with an escape).
+                                                                         Page 46
+SYSTAT
+
+
+          COMMANDS WHICH DON'T COMBINE WITH OTHER OPTIONS
+
+          The following commands must be given to SYSTAT  (not  the  executive),
+          but they are treated as if they were separate monitor level calls.
+
+          SYSTAT UP              Gives system up time.
+
+          SYSTAT ME              Does a WHO command on the user's
+
+          EXECUTIVE OR MONITOR LEVEL COMMANDS
+
+          The  following  commands,  which  access  SYSTAT,  are  given  at  the
+          Executive  level.   A  question mark can be typed following any of the
+          commands listed below in order to obtain help.
+
+          PSP
+
+          This command lists all errors on the system (Prints System Problems).
+
+          SYSNO
+
+          This command prints name of  system,  monitor  number,  and  date  the
+          system was generated.
+
+          USERS
+
+          This command prints information about any users on the system  in  the
+          following format:
+
+          Users=A Det=B [C,D], Queues: RUN=E DIO=F, TIO=G IO=H SPC=I
+
+          where: A = number of jobs logged into the system
+                 B = number of jobs logged in that are detached
+                 C = number of jobs logged in with user's global account
+                 D = number of jobs logged in under your user name
+                 E = jobs running (monitor states:  RN WS TS DS)
+                 F = jobs doing disk I/O (MQ DA CB DI MO)
+                 G = jobs doing TTY I/O or idle (TI ^C)
+                 H = jobs doing non-disk/TTY I/O (DT DC MT IO)
+                 I = jobs in special queues (SL AX)
+
+          WHERE
+
+          This command prints information about a specified device or user name.
+          If  a user name is given, SYSTAT verifies if the user is logged in and
+          prints the job number;  if a  TTY,  SYSTAT  names  the  job  which  is
+          attached to the TTY.
+
+          Arguments to the WHERE command are separated by commas and may be  any
+          of the following:
+
+                 device name:
+                 user name
+                 TTYNN:  where nn is a number
+                 OPR:
+                                                                         Page 47
+SYSTAT
+
+
+          Information is reported in corresponding order to the  arguments.   If
+          the  user  forgets to use arguments or leaves a trailing comma, SYSTAT
+          will prompt for the information by typing "ENTER NAME:  ".
+
+          WHO
+
+          This command lists all users on the system  about  whom  the  user  is
+          authorized to obtain information.  Arguments to the command are:
+
+          nnn            Given job number.
+          nnn-nnn        Any range of job numbers.
+          .              List the user's name and number.
+          *              Same as "."
+
+          The default case is to list all users.
+
+          Obtaining HELP information
+
+          SYSTAT and the Monitor level calls  which  access  SYSTAT  accept  the
+          command  "?" which gives a brief set of instructions and indicates how
+          more information  may  be  obtained.   To  get  a  copy  of  all  HELP
+          documentation available, use the command "HELP".
+                                                                         Page 48
+SYSTAT
+
+
+                       CLARIFICATION OF SYSTAT OUTPUT DISPLAYS
+
+          SPECIAL CHARACTERS
+
+          At the end of each line of the job status report, SYSTAT may print any
+          of the following special characters as messages.
+
+          Character      Meaning
+
+          #              Non-system high segment
+          $              User running RUN ONLY program
+          *              MAIL WAITING message waiting to be typed
+          +              Tymshare in-house user
+          !              Controlled user
+
+          In addition, SYSTAT prints a "*" immediately following the job  number
+          of the user on a job status printout.
+
+          JOB STATUS FIELDS
+
+          TYMNET FIELD
+
+          This  field  identifies  the  node  from  which  the  associated   job
+          originated.  It contains the node name followed by the user's terminal
+          number.
+
+          STATE field
+
+          This field, part of the job status summary, may  contain  any  of  the
+          following  14  abbreviations, in two columns, describing the condition
+          of the listed job.  There is always an  entry  in  the  first  column,
+          showing  the  program condition;  there will be an entry in the second
+          column only when  applicable.   This  second  entry  gives  additional
+          detail about the program condition.
+
+          RN             Running
+          CB             Core block wait
+          MT             Magnetic tape control wait
+          IO             Input/output wait
+          TI             Terminal input wait
+          TO             Terminal output wait
+          DI             Disk input wait
+          SL             Sleep wait
+          NU             Null state
+          ^C             Stop state (not doing anything)
+          DS             Disk input/output wait satisfied
+          MQ             Disk monitor buffer wait
+          DA             Disk storage allocation wait
+          WS             Input/output wait satisfied
+          TS             Terminal input/output wait satisfied
+          OW             Trouble wait for input/output device
+                                                                         Page 49
+SYSTAT
+
+
+          TTY field
+
+          This field is part of the job status summary.  Any  of  the  following
+          abbreviations may appear.
+
+          IM             Image input/output (8-level)
+          BK             Breaking on all characters
+          IX             TYMCOM IX (XEXEC) mode
+          S$             Suppressing $ on Alt Mode Escape
+          NE             Not echoing
+          AC             Full character transmission set
+
+          In addition, two numbers are included within this field, the first  of
+          which  is  the  TTY  data  transmission mode (see PDP-10 Monitor Quick
+          Reference Guide, Section 29), and the second of which is the  position
+          of the TTY on the line.
+
+          LICENSE field
+
+          This field is also included in the job status  summary.   Within  this
+          field, a series of abbreviations may appear.  Any information which is
+          common to both the program and the user's  job  is  listed  after  the
+          notation BH in parentheses.  Any information which is in the job field
+          only is listed after the notation JB in  parentheses.   The  following
+          list shows all valid abbreviations and their meanings:
+
+          TY             XEXEC Mode
+          TP             Tymshare Proprietary
+          AS             Account Supervisor
+          RP             Read in Project
+          RF             Read Files
+          RA             Read Absolute
+          WP             Write in Project
+          WF             Write Files
+          WA             Write Absolute; disk only
+          WC             Write in Core
+          RC             Read in Core
+          OP             OPerator license
+          SY             SYSTAT license; system information
+          GD             Get Devices
+          TD             Transfer Devices
+          ST             Fiddle with STructures
+          HF             Home File access; read and write in SYS
+          JL             JACCT-LOGIN; accounting bit
+          XC             Transaction Charge
+                                                                         Page 50
+SYSTAT
+
+
+          System information displays
+
+          DISK command
+
+          This switch permits users with SYSTAT license to obtain a  summary  of
+          the  system's file structures.  Printed out are the names of each pack
+          (both logical and pack identification), the number of blocks  free  on
+          each  pack, the number of reads and writes performed on that pack, and
+          the errors (if any) which the Monitor has detected on that pack.   The
+          following  table describes the various errors that can be reported and
+          their corresponding abbreviations:
+
+                 BP -  SA10 Controller with AMPEX 230 (3330 TYPE) disk 
+
+          SYSTAT will output a series of  short  messages  followed  by  numbers
+          (except as noted below).  These messages are as follows:
+
+          HDEV           Number of Hard Device errors
+          HDAT           Number of Hard Data errors
+          HCONI          CONI status returned from the last Hard error
+          HDATAI         DATAI status returned from the last Hard error
+          HLBN           Last logical block number of the last Hard error
+          SDEV           Number of Soft Device errors
+          SDAT           Number of Soft Data errors
+          SCONI          CONI status returned fron the last Soft error
+          SDATAI         DATAI status returned fron the last Soft error
+          SLBN           Last logical block number of the last Soft error
+          RET            Number of retries on last error
+          SATFAIL        Number of SAT failures (software)
+          RIBERR         Number of RIB errors (software)
+          CKSERR         Number of Checksum errors (software)
+          THUNG          Number of times unit hung in transfer
+          HUNG           Number of times unit hung (other than THUNG)
+
+          When a hard or soft CONI error is reported, SYSTAT will output  a  "("
+          and  then print a series of self-explanatory messages which "decipher"
+          the CONI.
+
+          When a hard or soft LBN (logical block # of last error)  is  reported,
+          SYSTAT  will  output  a  "(" and then print a series of messages which
+          "decipher" the LBN.  The messages which are not  self-explanatory  are
+          detailed below.
+
+                 BP
+          CYL:#          Cylinder last error occurred on
+          HEAD:#         Head adr last error occurred on
+          RECORD:#       Record last error occurred on
+
+          When a hard or soft DATAI error is reported, SYSTAT will output a  "("
+          and  then  print a series of messages which "decipher" the DATAI.  The
+          messages which are not self-explanatory are detailed below.
+
+                 BP
+          CTRL:#         Controller as per storage control/drive
+                         interface card
+          DRV:#          Drive address (A,B,C,D,E,F OR G)
+                                                                         Page 51
+SYSTAT
+
+
+          MESSAGE>       Controller command response (Self-explanatory)
+
+          FILES command
+
+          The summary of information printed by the  FILES  command  is  divided
+          into  five  fields.   The  following  is  an  explanation  of the four
+          possible modes which could appear in the MODE field.
+
+          Mode           Explanation
+
+          DUMP           The file is opened without any Input/Output
+                         buffers.
+          IN             File is opened with just an input buffer.
+          OUT            File is opened with just an output buffer.
+          UPD            File is opened with both input and
+                         output buffers (UPDATE mode).
+                                                                         Page 52
+SYSTAT
+
+
+          ((SAMPLE RUNS))
+
+
+          WHE FTA0:(CR)             (THIS WILL DISPLAY INFO ON A SPECIFIED
+                                     DEVICE)
+
+          Device is Detached
+
+          '.WHE OPR:(CR)'           (IS THE OPR TERMINAL SET? WHERE?)
+          OPR not set
+
+          '.SYSN(CR)'               (THIS GIVES THE SYSTEM NO. AND MONITOR
+          VERS.)
+          TYMSHARE C33-P029/FA-1 9-10-76
+
+          '.SYSTAT BUSY(CR)'        (USE THIS TO GET A LIST OF ALL DEVICES)
+          Busy devices:
+          Job Device why     Logical Who
+           2  ACT    init            OPER
+          Det PTR
+          Det LPT
+          Det FTA0
+          Det FTA1
+          Det FTA2
+          Det FTA3
+          Det PTP
+          14  PLT    as+init         TYMNET
+          32 Disk devices opened
+
+          '.SYSTAT ERROR(CR)'       (THIS GIVES ERROR AND UNHAPPY MESSAGES)
+          No SET OPR done -- no OPR tty
+          OPR message on the CTY
+          System finished Auto-Restart procedures
+
+          '.PSP(CR)'                (HARDWARE PROBLEMS? DISK SPACE LEFT?)
+          DSKB:   64396
+          BPA1(DSKB0:330100):  RETRIES:1 SDATAI(CTRL:0 DRV:B No message) SCONI(
+           Count error Equipment check) SLBN(CYL:0 HEAD:7 RECORD:11) SDAT:2
+          SDEV:2
+          No SET OPR done -- no OPR tty
+          OPR message on the CTY
+          System finished Auto-Restart procedures
+
+          '.SYSTAT APR(CR)'         (PRINT ARITHMETIC PROCESSOR NUMBER)
+          APR serial no. 591
+
+          '.SYSTAT DISK(CR)'        (THIS DISPLAYS ALL DISK INFORMATION)
+          Disk devices:
+          Unit or file-structure
+                  Free       BUFFERED          DUMP          MONITOR      Seeks
+                  Blocks  Reads   Writes  Reads   Writes  Reads   Writes
+          DSKB:   64386
+          BPA1(DSKB0:330100):
+                  15459   108170  40366   99369   62443   215339  23874   4680
+           MSB  RETRIES:1 SDATAI(CTRL:0 DRV:B No message) SCONI( Count error
+           Equipment check) SLBN(CYL:0 HEAD:7 RECORD:11) SDAT:2 SDEV:2
+                                                                         Page 53
+SYSTAT
+
+
+          BPA2(DSKB1:330101):
+                  16044   117903  18034   184735  55775   51167   14193   3997
+           MSB 
+          BPA3(DSKB2:330102):
+                  15974   94164   20819   233268  50733   64978   19411   5453
+           MSB 
+          BPA4(DSKB3:330103):
+                  16904   106554  20721   226728  61331   78956   16992   4761
+           MSB 
+          Units not in any file structure:
+          BPA0(33SWAP):
+                  0       0       0       0       0       4       0       0
+           MSB 
+
+          '.SYSTAT ME(CR)'           (YOUR TTY NO.? GFD'ED ELSWHERE?)
+          30* MARTINEZ +
+
+          '.WHO .'                   (SAME EFFECT AS 'SYSTAT ME')
+          30* MARTINEZ +
+
+          '.WHO'                     (A LIST OF ALL USERS AND TTY NUMBERS)
+           1  PJ +
+           2  OPER +
+           3  DIST180A +
+           4  WCM +
+           5  SPTBACNSLT +
+           6  TYMNET (JOELSJ) +
+           7  WFW +
+           8  DIST180B +
+           9  MARTINEZ +
+          10  SPTASKD2 +
+          11  GIGO +
+          12  RSTRAUSS +
+          13  DIAG +
+          14  TYMNET +
+          15  DIST180B +
+          16  ORTIZD (RONL) +
+          17  ROGNLIEA +
+          18  NET3 +
+          19  SPTBASAM +
+          20  EUSKEW +
+          21  WCM +
+          22  KENHOLCOMB (LARRYSMITH) +
+          23  TYMNET (JOELSJ) +
+          24  W.MAIN +
+          25  KOPFJ +
+          26  DIST49B +
+          27  NET3 +
+          28  WCM +
+          29  CHIPRINT +
+          30* MARTINEZ +
+          32  CASE +
+
+          '.SYSTAT  9'                (THIS PRINTS INFO ABOUT SPECIFIED JOB)
+          TTY0 NOT ATTACHED TO A JOB
+           9  NONAME04  67 SYSTAT 9+18   C        88.08  1:24:34 MARTINEZ +$
+                                                                         Page 54
+SYSTAT
+
+
+          '.SYSTAT (ROGNLIEA)'        (THIS PRINTS INFO FOR A SPECIFIED USER)
+          17  NONAME04  56 MAGNUM 13+88  TI       294.35  2:55:18 ROGNLIEA + 
+          17  MGA017 SEP 232   DUMP ACTRTY      ROGNLIEA
+
+          '.SYSTAT FILES(CR)'         (LIST OPEN FILES EG. BEFORE HANGUP)
+          Open disk devices:
+          Job    File    Block Mode Owner       Who
+          30  LUD    SYS 1     DUMP SYS         MARTINEZ
+          30  DUL    SYS 81    DUMP SYS         MARTINEZ
+          16  LIB40  REL 160   IN   SYS         RONL
+          16  LIB40  REL 159   UPD  RONL
+           8  Y89TX3 ME0 2     IN   DIST180B
+           8  MGA008 SEP 457   DUMP ACTRTY      DIST180B
+           8  2A0!6 TMP 1     DUMP DIST180B
+           7  )0I;9. TMP 33    OUT  WFW
+           7  READST SAI 47    IN   WFW
+          29  SPOOL  FDF 174   IN   SPOOL       CHIPRINT
+           5  DSA    MAC 5     IN   SPTBACNSLT
+           5  2A992E TMP 5     DUMP SPTBACNSLT
+          29  SPOOL  GDF 844   UPD  SPOOL       CHIPRINT
+          29  INV    257 14    IN   SPOOL       CHIPRINT
+          17  MGA017 SEP 232   DUMP ACTRTY      ROGNLIEA
+          13  INVGRS CBL 1     DUMP DIAG
+          23  NODFI  DAT 2     IN   JOELSJ
+          23  2A8E@ TMP 1     DUMP JOELSJ
+          22  FOR03  DAT 1     UPD  LARRYSMITH
+          20  LOGOS      5     IN   NODE        EUSKEW
+          20  2A8K$[ TMP 9     DUMP EUSKEW
+          26  2A8=" TMP 7     DUMP DIST49B                  _
+          12  CSCNO  BLI 1     UPD  RSTRAUSS
+          12  2A.]K+ TMP 10    DUMP RSTRAUSS
+           2  093076 SAT 415   DUMP UN1         OPER
+           2  093076 DAT 36    DUMP SYS         OPER
+
+          '.SYSTAT SWAP(CR)'          (THIS WILL DISPLAY SWAPPING DATA)
+          Swapping devices:
+          Unit    Reads   Writes  Used/Avail(P)
+          BPA0    1290981 359658  2601/8190 = 32%
+          BPA1    0       0       0/700 = 0%
+          BPA2    0       0       0/700 = 0%
+          BPA3    0       0       0/700 = 0%
+          BPA4    0       0       0/700 = 0%
+
+          ((ERRORS AND RECOVERIES))
+
+          Effects of user license on status reports
+
+          SYSTAT license is required to obtain some of  the  system  information
+          such  as  swapping  statistics and complete disk status reports and to
+          get a job status report on jobs outside one's  own  GAN.   Performance
+          statistics that are reported will not reflect the total system load if
+          the user has inadequate license to obtain the necessary information.
+
+          Read files license is necessary to obtain  all  the  file  information
+          (such as shared directories).
+                                                                         Page 55
+INDEX
+
+
+          ARM-10 CHECKING  . . . . . . . . .  23
+          ARM-10 CONTROL PANEL . . . . . . .  25
+          ARM-10 RECONFIGURATION . . . . . .  27
+          ARM10 LX CONTROL PANEL . . . . . .  25
+          AUTO CHKPNT  . . . . . . . . . . .  7
+          AUTO COPYCRASH . . . . . . . . . .  7
+          AUTO CRASH DUMP  . . . . . . . . .  7
+          AUTO CRASHSAVE . . . . . . . . . .  7
+          AUTO DATE-TIME . . . . . . . . . .  7
+          AUTO DSKCLN  . . . . . . . . . . .  7
+          AUTORESTART DESCRIPTION  . . . . .  7
+          AUTORESTART ERRORS . . . . . . . .  10
+          AUTORESTART INTRO  . . . . . . . .  4
+          AUTORESTART SUMMARY  . . . . . . .  5
+
+          BASE CAUSED HANGUPS  . . . . . . .  13
+          BASE CRASH FORM  . . . . . . . . .  17
+          BOOTSTRAP INTRO  . . . . . . . . .  32
+          BOTLOD PAPERTAPES  . . . . . . . .  32
+
+          CHKCLK . . . . . . . . . . . . . .  8, 39
+          CONSOLE LIGHTS RECORDING . . . . .  18
+          CONTROLLER/DISC CAUSED HANGUPS . .  15
+          COPYCRASH  . . . . . . . . . . . .  31
+
+          DATE AND TIME FORMAT . . . . . . .  8
+          DC830 HANGUP FLOWCHART . . . . . .  18
+          DESELECTING ARM-10 CORE  . . . . .  27
+          DISK ERROR WORDS . . . . . . . . .  50
+
+          FTALOD PAPERTAPES  . . . . . . . .  33
+          FTALOD USE . . . . . . . . . . . .  36
+
+          HANGUP RESTART FLOWCHART . . . . .  16
+          HUNG SYSTEM INTRODUCTION . . . . .  12
+          HUNG SYSTEM RECOVERY SUMMARY . . .  12
+
+          INTERLEAVING (2-WAY, 4-WAY)  . . .  20
+
+          JOB STATUS . . . . . . . . . . . .  48
+
+          LICENSE ABBREVIATIONS  . . . . . .  49
+
+          MANUAL CORE SCAN . . . . . . . . .  24
+          MEMORY CAUSED HANGUPS  . . . . . .  14
+          MONITOR BACKUP TAPES . . . . . . .  34
+          MONITOR PARITY ERRORS  . . . . . .  20
+          MONITOR PARITY PROCEDURES  . . . .  23
+
+          NXM (NON-EXISTENT MEMORY)  . . . .  20
+
+          PARITY CRASH MARS  . . . . . . . .  28
+          PARITY ERROR . . . . . . . . . . .  20
+          PSP  . . . . . . . . . . . . . . .  46
+
+          RESTART FAILURES . . . . . . . . .  10
+          RESTART SAMPLE . . . . . . . . . .  9
+
+          SAMPLE BOTLOD CREATION . . . . . .  32
+          SETOPR . . . . . . . . . . . . . .  8
+          SPURIOUS PARITY ERRORS . . . . . .  20
+          SSW 4 RESTARTS . . . . . . . . . .  6
+          SYSTAT . . . . . . . . . . . . . .  41
+          SYSTAT COMMAND DESCRIPTION . . . .  42
+          SYSTAT COMMAND FORMAT  . . . . . .  41
+          SYSTAT ME  . . . . . . . . . . . .  46
+          SYSTAT OUTPUT BREAKDOWN  . . . . .  48
+          SYSTAT UP  . . . . . . . . . . . .  46
+
+          THE SYSNO COMMAND  . . . . . . . .  46
+          THE USERS COMMAND  . . . . . . . .  46
+          THE WHERE COMMAND  . . . . . . . .  46
+          THE WHO COMMAND  . . . . . . . . .  47
+          TYMCOM-X CONFIGURATION . . . . . .  3
+          TYMCOM-X CONSOLE SWITCHES  . . . .  21
+
+          USER PARITY ERRORS . . . . . . . .  29
+
+   G6_ N
