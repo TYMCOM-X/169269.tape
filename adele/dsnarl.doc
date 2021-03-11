@@ -1,0 +1,1275 @@
+
+
+
+                    *******************************
+
+                                 DSNARL
+                    (Maintenance program for SNARL)
+
+                        External Specifications
+
+                             April 5, 1981
+                              Adele Gadol
+
+                    *******************************
+
+
+
+                           Table of Contents                             
+
+
+
+
+
+Section                                                             Page
+
+
+
+    List of Figures           .  .  .  .  .  .  .  .  .  .  .  .  .   ii
+
+
+1.     General information    .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.1    Intended program use  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.2    References      .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+
+2.     Operating characteristics .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       2.1    Command overview   .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       2.2    Getting started .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+
+3.     Command formats        .  .  .  .  .  .  .  .  .  .  .  .  .  . 3
+
+       3.1    The tape dump mode .  .  .  .  .  .  .  .  .  .  .  .  . 3
+
+       3.2    Miscellaneous tape commands .  .  .  .  .  .  .  .  .  . 8
+
+       3.3    Testing and checking commands  .  .  .  .  .  .  .  .  . 9
+
+       3.4    Fixup commands  .  .  .  .  .  .  .  .  .  .  .  .  .   10
+
+       3.5    Help and program information commands   .  .  .  .  .   11
+
+       3.6    Miscellaneous   .  .  .  .  .  .  .  .  .  .  .  .  .   12
+
+
+4.     Continuation tapes     .  .  .  .  .  .  .  .  .  .  .  .  .   14
+
+
+5.     Command files          .  .  .  .  .  .  .  .  .  .  .  .  .   15
+
+
+6.     User aborts            .  .  .  .  .  .  .  .  .  .  .  .  .   15
+
+
+    Appendix A
+
+       Tape Record Display Formats  .  .  .  .  .  .  .  .  .  .  .   17
+
+
+                                   i
+
+
+
+                            List of Figures                              
+
+
+
+Figure                                                              Page
+
+
+1.  Screen display after new block read   .  .  .  .  .  .  .  .  .    5
+
+2.  Screen picture - display phase  .  .  .  .  .  .  .  .  .  .  .    6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   ii
+
+
+
+1    General information      
+
+
+
+1.1    Intended program use         
+
+     DSNARL is designed to be  used as a companion maintenance  tool for
+the  archive program,  SNARL.   For that  purpose, it  will  perform the
+following functions:
+
+a)  DSNARL will have a set of "dump" commands for SNARL tapes  which can
+    be used for debugging SNARL.
+
+b)  It  will have  a means  of checking  correctness of  SNARL  tapes by
+    comparing them with a set of files.  For the purpose of checking new
+    versions of SNARL, a set of files can be accumulated  which exercise
+    special features or test boundary conditions.
+
+c)  It will re-create the resident directory on a SNARL  tape containing
+    a damaged directory.
+
+d)  It will have a recovery  function for damaged tapes which  will copy
+    and create a  new SNARL tape  using as much  material as it  can get
+    from the damaged tape.
+
+     Other functions may be added as needed.
+
+
+
+1.2    References       
+
+TYMCOM-X Reference Manual
+TYMCOM-X Monitor Reference Manual
+SNARL External Reference Specification
+
+     The reader  should be  familiar with  the SNARL  External Reference                                                  
+Specification before reading this document.
+
+
+
+
+2    Operating characteristics      
+
+
+
+2.1    Command overview        
+
+     Miscellaneous tape commands:
+
+REWIND          rewind with or without wait
+UNLOAD          unload with or without wait
+
+     The following  command is used  to enter a  mode in  which detailed
+tape examination can be done.
+
+
+                                   1
+
+
+
+DUMP
+
+     Testing and checking commands:
+
+QCHECK          quick consistency check of a SNARL tape
+VERIFY          extensive tape verification with file comparison
+DIFFERENCES     disk file comparison including lookup blocks
+
+     The  following   commands  are  used   for  fixing   or  retrieving
+information from damaged tapes.
+
+REDIR           re-create the tape-resident directory
+RECOVER         read and copy from a damaged tape to a new SNARL tape
+
+     Help and program information commands:
+
+HELP            prints a command list or parameter list
+?               short form of HELP
+INSTRUCTIONS    gets a copy of this document
+GRIPE           provides an easy means for a user to enter a gripe
+NEWS            types the latest tidbits on DSNARL
+
+     Miscellaneous:
+
+LOG             set up transcript file for user interactions
+UNLOG           cancel use of the transcript file
+COMMENT         a "do nothing" command to insert comments in the log
+QUIT            exit from the program
+
+
+
+2.2    Getting started        
+
+     From  the  EXEC level,  type  "R DSNARL"  to  execute  the program.
+DSNARL will  type a  short heading and  then ask  for an  initial device
+assignment.   The device  name  may be  the  name of  any  magnetic tape
+device.  DSNARL will then print out the number of tracks on the selected
+device and then prompt for  a density setting.  The density should  be a
+decimal  number which  is  a legal  setting  for the  device.   When the
+program  is ready,  it  will type  the  prompt character  ">".   In this
+example and in the ones that follow, user input is underlined.
+
+Example:  .R DSNARL            
+
+          DSNARL (V1.0) here at 9:08 16 MAR 79
+          SYSTEM C30-P033/Q
+          DEVICE  >>FTA1                    
+          TRACKS:  9
+          DENSITY (800,1600)  >>1600                                
+          TAPE NOT WRITE PROTECTED
+
+          >   (DSNARL is now ready to accept commands)
+
+
+
+
+                                   2
+
+
+
+3    Command formats      
+
+     In  the  command  descriptions  in  this  document,  the  following
+conventions will be observed.   Upper case letters will  denote commands
+and key words that should  be typed exactly as they appear.   Lower case
+phrases denote variable information.  Quantities enclosed by  "< >" must
+be supplied, while quantities  enclosed in brackets "[ ]"  are optional.
+Choices will appear as a  column or will be described separately  in the
+text.
+
+     Input to DSNARL follows these rules:
+
+a)  The command prompt for DSNARL is ">".  When  additional sub-commands
+    (interactions)  are  necessary,  DSNARL  will  use  the  prompt ">>"
+    whenever it is requesting input.
+
+b)  Keyword  input  is  converted to  upper  case  before  processing by
+    DSNARL.
+
+c)  Keywords may be abbreviated to the least number of  characters which
+    assures uniqueness.
+
+d)  A command may be continued on the next line if the character  "&" is
+    inserted in the current  line just before the carriage  return.  The
+    problem this creates for the user is that only the current  line may
+    be edited.  In  order to cancel an  entire multiple line  command in
+    case of an error, the user must abort it (see Section 6).
+
+e)  Leading white space (tabs and spaces) at the beginning of  a command
+    and trailing white space on all lines of a command will be purged by
+    the input scanner.
+
+f)  Usernames  which  are  entered  in a  command  must  be  enclosed in
+    parentheses "( )" in order to be recognized.
+
+g)  PPN  numbers which  are entered  in a  command must  be  enclosed in
+    brackets "[ ]" in order to be recognized.
+
+
+
+3.1    The tape dump mode          
+
+     The dump command causes the user to enter this mode in  which tapes
+can be  examined at the  word or  byte level in  terms of  physical tape
+blocks and the logical records composing them.
+
+************************************************************************
+*                                                                      *
+*       DUMP                                                           *
+*                                                                      *
+************************************************************************
+
+     This "dump  tape" mode will  behave differently depending  upon the
+
+
+
+                                   3
+
+
+
+type of terminal being used.   After the user types "dump",  DSNARL will
+ask the following question:
+        Terminal type?  >>
+
+     The legal responses are (others may be added):
+        TTY     Use for hardcopy only or dumb CRT terminals.
+        HP      HP-2621 (Tymshare-444)
+
+
+3.1.1    Display oriented terminal operation            
+
+     Display oriented operation of the dump function is an  exception to
+the input rules  in that user  input will ne prompted by  the usual
+">>".  In addition, echo will  be turned off so that the  brief commands
+will not be displayed on the screen; only the results will be shown.
+
+     On  the HP  terminal, some  extra keystrokes  are required  to tell
+DSNARL when to  find the position  of the cursor,  since the use  of the
+cursor control keys send no  such indication to the host.   Scrolling of
+tape  data  is  done by  the  host  using the  editing  features  of the
+terminal, since there is  no way to "lock"  a portion of the  screen and
+not enough storage in the terminal to write all the information required
+at some steps.  Therefore this  will be slower than the  local scrolling
+operation.
+
+     The first  event that happens  after selection of  display oriented
+operation is the appearance of a set of switches and settings which will
+be  displayed continuously.   Then the  user will  be asked  to  enter a
+physical  tape block  number.  The  following is  an explanation  of the
+switch settings and their values.
+
+indices  These are the word number positions which are indicated  on the
+     displays  of  portions  of  the  tape  block  being  examined.  The
+     possible values are OCTAL or DECIMAL.
+
+map  This  indicates whether  the  map feature  is enabled  or  not.  If
+     enabled, a map of distinguishable logical record types  is produced
+     when the user selects a block to examine.  These types  are denoted
+     by a  three-letter code, the  same ones which  appear in  the SNARL
+     External Specifications document in the Appendix on the  SNARL tape
+     format.   An  unrecognized area  is  denoted by  "XXX".   The legal
+     values for the map switch are ON or OFF.
+
+selected mode  This is  the translation  mode selected  by the  user for 
+     display  of actual  tape data.   This switch  may have  one  of the
+     following values:
+
+     OCTAL  Display 36-bit words in octal.     
+
+     DECIMAL  Display 36-bit words in decimal.     
+
+     SIXBIT  Display bytes as  SIXBIT characters.  Words are  treated as     
+          six bytes of six bits each.  The contents of eight  words will
+
+
+
+                                   4
+
+
+
+          be  displayed  on  each line.   On  the  HP  terminal, special
+          characters will be shown using the "display functions" option.
+
+     ASCII  Display  bytes as  ASCII characters.   Words are  treated as     
+          five bytes  of seven  bits each with  the 35-bit  unused.  The
+          contents of ten words will  be shown on each line.  On  the HP
+          terminal, special characters will be shown using  the "display
+          functions" option.
+
+     <tape  record code>  Any  of the  tape record  codes listed  in the        
+          Appendix  on  the  SNARL tape  format  in  the  SNARL External
+          Specifications  is legal  here.   Each of  these  represents a
+          display   format  that   DSNARL  knows   for   the  meaningful
+          representation  of the  record.  See  Appendix A  for detailed
+          information  about  these  formats,  some  of  which  will  be
+          combinations.
+
+     DEFAULT  This switch value causes  DSNARL to make its  own decision     
+          about  display  format.   If given  a  recognizable  record to
+          display,  DSNARL will  use the  corresponding format  for that
+          record type.   If given an  unknown quantity, DSNARL  will use
+          octal format.
+
+     In answer  to the question  about tape block  number, the  user may
+enter either:
+
+     an integer         where 0 is the first block number; or
+     LAST               to indicate the last block; or
+     NEXT               for next in sequence; or
+     PREVIOUS           for previous block.
+
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    indices | map | select mode || actual mode |  phase  | block    |                    
+ |      OCTAL | ON  |   default   ||             |  SWITCH |  20      |
+ |                                                                    |
+ |  ================================================================  |
+ |                                                                    |
+ |  0000-0003 RCD    0004-1004 DAT    1005-2005 DAT    2006-2006 EOF  |
+ |  2007-2010 EOU    2011-2012 BOU    2013-2013 UFD    2014-3014 DAT  |
+ |  3015-3061 LOK    3062-4062 DAT    4063-5063 DAT    5064-6064 DAT  |
+ |  6065-7065 DAT    7066-7066 EOF    7067-7133 LOK    7134-7777 DAT  |
+ |                                                                    |
+ ----------------------------------------------------------------------
+
+             Figure 1.  Screen display after new block read
+
+
+     Figure 1 is a picture of the screen after the user has given a tape
+block number if the map  is enabled.  Hereafter, the dump  function will
+be in one of four phases, SWITCH, HELP, MAP, or DISPLAY.
+
+     In SWITCH phase, the settings of the three switches described above
+may be changed.
+
+
+                                   5
+
+
+
+     In MAP phase, the user  may move the cursor through the  record map
+and select a record to display by "marking" the map entry with  a cursor
+command.  Display can also  be requested from anywhere with  an explicit
+command.
+
+     In DISPLAY phase,  the user can scroll  through a quantity  of data
+displayed  on the  screen and  examine individual  locations  in various
+modes.
+
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    indices | map | select mode || actual mode |  phase  | block    |                    
+ |      OCTAL | ON  |   default   ||    DAT      | DISPLAY |  20      |
+ |                                                                    |
+ |  ================================================================  |
+ |                                                                    |
+ | DAT record starting at 4063, ending at 5063.    size=1000+1        |
+ |                                                                    |
+ | 0000|  301406031141   045352262742   727236262500   211212052604   |
+ | 0004|  246613054134   422152321100   517376571306   625034664730   |
+ | 0010|  625661505000   301406032141   045352372302   673114171310   |
+ | 0014|  517414161722   673173730566   064240000000   301406033141   |
+ | 0020|  045351267752   713354166166   064240000000   301406034141   |
+ | 0024|  045352567310   627455464734   626054572356   627135620120   |
+ | 0030|  773745477122   354321200000   301406130141   045351167310   |
+ | 0034|  627356420152   354321200000   301406131141   045351560744   |
+ | 0040|  637235644312   607115167316   716776471352   625661505000   |
+ | 0044|  301406132141   045350462754   647074520250   522627306424   |
+ | 0050|  301406133141   045352364734   637314520246   703034362566   |
+ | 0054|  064240000000   301406134141   045352071312   633034362500   |
+ | 0060|  305661505000   301406230141   045351662760   721012060716   |
+ | 0064|  625661505000   301406231141   045352464750   663132060716   |
+ | 0070|  625004424032   050000000000   301406232141   045350262716   |
+ | 0074|  647344041712   673514571166   064240000000   301406233141 ->|
+ |                                                                    |
+ ----------------------------------------------------------------------
+
+               Figure 2.  Screen picture -  display phase
+
+
+     Figure 2 is an example of the screen during display  phase.  Notice
+the "->" at the end of  the last line of the data.  This  indicates that
+there is  more data which  could not  fit on the  screen.  The  user may
+scroll up to view it.
+
+     The following is  a summary of the  commands.  They are  mostly one
+and  two-character commands.   No carriage-returns  are  necessary.  The
+cursor is moved to the  desired places using the cursor control  keys on
+the keyboard.
+
+
+
+
+
+
+
+                                   6
+
+
+
+------------------------------------------------------------------------
+|                            LEGAL ANYWHERE                            |
+|----------------------------------------------------------------------|
+| H                     | change to help phase; display instructions   |
+|-----------------------|----------------------------------------------|
+| S                     | go to switch set phase                       |
+|-----------------------|----------------------------------------------|
+| M                     | go to map search phase                       |
+|-----------------------|----------------------------------------------|
+| R                     | refresh the screen; allow new block #        |
+|-----------------------|----------------------------------------------|
+| Q                     | Quit the dump function                       |
+|-----------------------|----------------------------------------------|
+| <word1>:<word2>T      | Type the data from <word1> through <word2>.  |
+|-----------------------|----------------------------------------------|
+| <row>,<column>T       | Type the record indicated in <row> and       |
+|                       | <column> of the map.                         |
+|-----------------------|----------------------------------------------|
+| T                     | Type the most recently indicated quantity.   |
+|----------------------------------------------------------------------|
+|                     ADDITIONAL HELP PHASE COMMANDS                   |
+|----------------------------------------------------------------------|
+| U                     | Scroll up.                                   |
+|-----------------------|----------------------------------------------|
+| D                     | Scroll down.                                 |
+|----------------------------------------------------------------------|
+|                    additional switch phase commands                  |
+|----------------------------------------------------------------------|
+| C                     | Cause host to read cursor position.          |
+|-----------------------|----------------------------------------------|
+| N                     | Go to next value for this switch.            |
+|-----------------------|----------------------------------------------|
+| P                     | Go to previous value for this switch.        |
+|----------------------------------------------------------------------|
+|                     ADDITIONAL MAP PHASE COMMANDS                    |
+|----------------------------------------------------------------------|
+| *T                    | Type the record pointed to by the cursor.    |
+|-----------------------|----------------------------------------------|
+|                   ADDITIONAL DISPLAY PHASE COMMANDS                  |
+|----------------------------------------------------------------------|
+| U                     | Scroll up                                    |
+|-----------------------|----------------------------------------------|
+| D                     | Scroll down.                                 |
+|-----------------------|----------------------------------------------|
+| C                     | Cause host to read cursor positions.         |
+|-----------------------|----------------------------------------------|
+| *O                    | Examine current location in OCTAL.           |
+|-----------------------|----------------------------------------------|
+| *D                    | Examine current location in DECIMAL.         |
+|-----------------------|----------------------------------------------|
+| *S                    | Examine current location in SIXBIT.          |
+|-----------------------|----------------------------------------------|
+| *A                    | Examine current location in ASCII.           |
+------------------------------------------------------------------------
+
+
+                                   7
+
+
+
+3.1.2    TTY oriented terminal operation            
+
+     If  TTY  operation  is  selected,  a  number  of  sub-commands  are
+available for viewing portions of the tape.  They are all  prompted with
+">>", and a carriage-return is required to terminate each command.
+
+     The following table describes the TTY mode DUMP sub-commands.
+
+------------------------------------------------------------------------
+| INDICES <OCTAL>               | This command functions the same as   |
+|         <DECIMAL>             | the indices switch in display mode.  |
+|----------------------------------------------------------------------|
+|       <integer number>        | Gets the desired tape block so that  |
+| BLOCK <NEXT>                  | it may be examined.                  |
+|       <PREVIOUS>              |                                      |
+|       <LAST>                  |                                      |
+|----------------------------------------------------------------------|
+| MAP                           | Types a record map of current block. |
+|----------------------------------------------------------------------|
+| <word1>:<word2>T [mode]       | These forms of the "type" command    |
+| <row>,<column>T [mode]        | correspond to the similar commands   |
+| T [mode]                      | described for display operation.     |
+|                               | [mode] has the same values as        |
+|                               | the "selected mode" switch.          |
+-----------------------------------------------------------------------|
+
+
+
+3.2    Miscellaneous tape commands         
+
+
+3.2.1    REWIND         
+
+************************************************************************
+*                                                                      *
+*       REWIND [WAIT]                                                  *
+*                                                                      *
+************************************************************************
+
+     The REWIND command rewinds the tape and normally returns control to
+the program  user immediately  without waiting  for completion.   If the
+WAIT option is included,  REWIND will wait for completion  before giving
+control to the user.
+
+
+3.2.2    UNLOAD         
+
+************************************************************************
+*                                                                      *
+*       UNLOAD [WAIT]                                                  *
+*                                                                      *
+************************************************************************
+
+
+
+
+                                   8
+
+
+
+     The UNLOAD  unloads the  tape and normally  returns control  to the
+program user  immediately without waiting  for completion.  If  the WAIT
+option  is  included,  UNLOAD will  wait  for  completion  before giving
+control to the user.
+
+
+
+3.3    Testing and checking commands          
+
+
+3.3.1    QCHECK         
+
+************************************************************************
+*                                                                      *
+*       QCHECK                                                         *
+*                                                                      *
+************************************************************************
+
+     The QCHECK command performs a  quick check of a SNARL  tape, mainly
+looking at  the sequence  of SNARL logical  records (see  description of
+tape format in the  SNARL external specifications) to  determine whether
+they make sense.  DSNARL will  report such problems as values  which are
+probably out of range and logical records not in the proper order.  If a
+record header word fails to  index to the next record header  word, then
+DSNARL will stop the check  at that point with appropriate  warnings and
+information.
+
+
+3.3.2    VERIFY         
+
+************************************************************************
+*                                                                      *
+*       VERIFY [user list]                                             *
+*                                                                      *
+************************************************************************
+
+     The VERIFY command  is used to check  correctness of a  SNARL tape.
+It  will  compare   the  file  contents   of  tape  files   against  the
+corresponding  ones on  disk as  well as  performing the  same  kinds of
+consistency checks done by QCHECK.
+
+     If no user list is supplied, VERIFY will compare the  user contents
+of tape files against files on  disk belonging to the same user  name as
+the tape file.
+
+     The user list may consist of one of the following:
+
+a)  A single  user name.  This  tells DSNARL to  compare all  tape files
+    against the files in the single user directory named.
+
+b)  A list of user name  pairs, separated by commas.  Each pair  has the
+    format:
+            (username_on_disk)_(username_on-tape)
+
+
+
+                                   9
+
+
+
+    where  username1  corresponds to  a  disk user  name,  and username2
+    corresponds  to  a  tape username.   VERIFY  will  compare  files in
+    username2 on  the tape  to the corresponding  files in  username1 on
+    disk.  Users not  mentioned in the list  will be compared as  in the
+    default case (no translation).
+
+
+3.3.3    DIFFERENCES         
+
+************************************************************************
+*                                                                      *
+*       DIFFERENCES [<username1> <username2>]                          *
+*                   [<filename1> <filename2>]                          *
+*                                                                      *
+************************************************************************
+
+     The DIFFERENCES command is used to compare two files or the  set of
+files in a directory with the set of files in another directory.   It is
+intended as a  means to check  files which have  been stored to  a SNARL
+tape and retrieved to assure that the retrieved files match the original
+ones.  The lookup blocks as well as the file contents are compared.
+
+     The  filenames may  be  specified with  or without  a  username and
+should not contain wild  card characters.  If usernames only  are given,
+then  the  processing goes  as  follows.  Each  file  in  "username1" is
+considered.  If there is a file in "username2" with the same name as the
+current  one  being  considered  from  "username1",  then  the  two  are
+compared; otherwise a short message is printed.
+
+     The comparisons  are done  as simple  binary compares.   Since this
+feature is intended as a  screening check, a full report  of differences
+is  not  given.   When  20  differences  have  been  reported  during  a
+comparison,  then  the  remainder  of  the  files  are  not  checked and
+processing continues with the next files, if any.
+
+
+
+3.4    Fixup commands        
+
+
+3.4.1    REDIR         
+
+************************************************************************
+*                                                                      *
+*       REDIR                                                          *
+*                                                                      *
+************************************************************************
+
+     The REDIR command is used to re-create the  tape-resident directory
+on a SNARL tape if it has been damaged.
+
+
+
+
+
+
+                                   10
+
+
+
+3.4.2    RECOVER         
+
+************************************************************************
+*                                                                      *
+*       RECOVER                                                        *
+*                                                                      *
+************************************************************************
+
+     The  RECOVER command  is used  to retrieve  as much  information as
+possible from  a damaged SNARL  tape, creating and  writing a  new SNARL
+tape containing that information in the process.
+
+     DSNARL will prompt the user  for a secondary tape drive to  be used
+to write the new tape.  This  drive will be defined for the  duration of
+the RECOVER command.
+
+
+
+3.5    Help and program information commands           
+
+
+3.5.1    HELP         
+
+************************************************************************
+*                                                                      *
+*       HELP [command word]                                            *
+*                                                                      *
+************************************************************************
+
+     The  HELP  command  by  itself prints  a  command  list  with brief
+explanations.  If  the [command  word] parameter  is included,  only the
+information for the indicated command is given.
+
+
+3.5.2    ?         
+
+************************************************************************
+*                                                                      *
+*       ? [command word]                                               *
+*                                                                      *
+************************************************************************
+
+     The "?" command is a shortened form of HELP without explanations.
+
+
+3.5.3    INSTRUCTIONS         
+
+************************************************************************
+*                                                                      *
+*       INSTRUCTIONS                                                   *
+*                                                                      *
+************************************************************************
+
+
+
+
+                                   11
+
+
+
+     The INSTRUCTIONS  command gets  the user a  copy of  this document.
+The user will be asked for a file name where the information can  be put
+for later printing or spooling.
+
+
+3.5.4    GRIPE         
+
+************************************************************************
+*                                                                      *
+*       GRIPE                                                          *
+*                                                                      *
+************************************************************************
+
+     The  GRIPE  command provides  a  means to  register  complaints and
+suggestions.  DSNARL will  prompt for the  message; any number  of lines
+may be entered followed by a CTRL-D.
+
+
+3.5.5    NEWS         
+
+************************************************************************
+*                                                                      *
+*       NEWS                                                           *
+*                                                                      *
+************************************************************************
+
+     The  NEWS command  gets  a type-out  of the  latest  information on
+DSNARL.  This is intended to be a short blurb, since program information
+should gradually be incorporated into the master specifications.
+
+
+
+3.6    Miscellaneous       
+
+
+3.6.1    LOG         
+
+************************************************************************
+*                                                                      *
+*       LOG <transcript file name> [ERRORS]                            *
+*                                                                      *
+************************************************************************
+
+     The LOG command opens  up a disk file  to be used to  log commands,
+user  interaction, and  errors  pertaining to  the DSNARL  run.   If the
+"ERRORS" keyword is supplied, only the error information is  reported to
+the file.
+
+
+3.6.2    UNLOG         
+
+
+
+
+
+
+                                   12
+
+
+
+************************************************************************
+*                                                                      *
+*       UNLOG                                                          *
+*                                                                      *
+************************************************************************
+
+     UNLOG cancels the use of the transcript file set up by LOG.
+
+
+3.6.3    COMMENT         
+
+************************************************************************
+*                                                                      *
+*       COMMENT <comment text>                                         *
+*                                                                      *
+************************************************************************
+
+     COMMENT  is  a  "do   nothing"  command  which  can  be   used  for
+documentation purposes to annotate the hard copy or transcript  of SNARL
+activity.
+
+
+3.6.4    QUIT         
+
+************************************************************************
+*                                                                      *
+*       QUIT                                                           *
+*                                                                      *
+************************************************************************
+
+     The QUIT command is used to exit from the program.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   13
+
+
+
+4    Continuation tapes      
+
+     The QCHECK and VERIFY commands must deal with SNARL tapes that have
+been  continued  on  additional reels.   Indeed  they  should  check the
+continuation tape for consistency with the previous tape.
+
+     When the  logical end  of tape  is reached  during either  of these
+commands, DSNARL will print a message indicating that we are at  the end
+of  the  current  reel.   Then  DSNARL will  ask  the  user  to  enter a
+continuation command.  The legal responses at that point are:
+
+a)  "?" or "HELP" to get a list of options;
+
+b)  "STOP" to  terminate the current  operation at the  end of  the last
+    complete file stored; or
+
+c)  "CONTINUE"  to  continue  the  DSNARL  interaction  and  prepare for
+    mounting the continuation tape.
+
+     If the command entered  is "CONTINUE", then DSNARL will  unload the
+current  tape, notifying  the user,  and request  that the  next  one be
+mounted.  The  user will be  prompted for another  command.  One  of the
+following may be entered:
+
+a)  A "GO" command that has the simple format:
+            GO
+    This tells DSNARL that the next tape is mounted on the current drive
+    and is ready to go.
+
+b)  A magnetic tape  drive name and optionally  a density to  change the
+    current drive.  The format of this command is:
+            <tape device name> [density value]
+    If this response  is used, then DSNARL  will continue to  prompt for
+    commands until it gets a "GO".
+
+Example:  FTA2  6250 BPI  9 TRACK
+          QCHECK is at the end of tape  1-1.
+
+          Please enter a continuation command.  >>CONT                                                  
+          Unloading the tape on FTA2.
+          Please mount next tape and GO when ready.
+
+          >>FTA3            
+          FTA3  6250 BPI  9 TRACK
+
+          >>GO            
+
+          Continuing with tape  1-2 created at 19:30 on 31 MAR 79.
+
+
+
+
+
+
+
+
+                                   14
+
+
+
+5    Command files      
+
+     Command files may be used interchangeably with input from  the TTY.
+A command file may contain part of a command (such as a <file  list>) or
+a whole command or multiple commands.  Command files may be nested.
+
+     Command  files  are called  at  any point  with  the  character "@"
+immediately followed by the  command file name.  This construct  must be
+distinguishable  from any  other  input which  may  be on  the  line.  A
+command file name is expressed in the form
+     [user designator] <file name>
+where the user designator may be  a username or a PPN.  There  should be
+no spaces between the user designator if it exists and the file name.
+
+     Following a  command file  call, new  input will  be read  from the
+indicated  file and  echoed to  the TTY  until the  end of  the  file is
+reached or another command file is called.  Since DSNARL will ignore any
+line numbers that  it finds in the  input, command files may  be created
+with any of the editors on the TYMCOM-X.
+
+     The following rules  and restrictions apply  to the use  of command
+files.
+
+a)  Confirmation and interaction will always be done to/from the TTY.
+
+b)  When an error or a  user abort occurs during processing  of commands
+    in  a command  file,  SNARL will  terminate the  processing  of that
+    command  file and  any  others higher  in  the chain  if  calls were
+    nested.
+
+c)  Nesting is limited to a depth of 10 command files.
+
+
+
+
+6    User aborts      
+
+     DSNARL will trap  on escapes (in XEXEC  mode) or CTRL-C  (in PDP-10
+mode) and return the user to command level.  A limited subset  of DSNARL
+commands, prompted with the special character "!", will be  available at
+interrupt time if a command execution was in progress.  They are:
+
+     HELP       help with available commands
+     ?          list of available commands
+     ABORT      stop the current operation
+     CONTINUE   continue with the current operation
+
+     The ABORT  command will have  different effects depending  upon the
+command which  was in  process at the  time of  the abort.   The general
+rules are:
+
+a)  REWIND and UNLOAD can not be interrupted.
+
+
+
+
+                                   15
+
+
+
+b)  Those commands  which move  tape will report  the position  when the
+    tape is stopped.
+
+c)  Execution of  a non-tape  command will terminate,  and the  state of
+    DSNARL  will  be restored  to  what  it was  prior  to  the command.
+    However, it will probably not  be possible in practice to  abort any
+    non-tape command.
+
+d)  If an interrupt and  subsequent abort occurs while at  command level
+    or  before  command execution  has  been started,  then  the command
+    buffers are cleared, and the user is returned to the  normal command
+    level.  The user will be advised of the action taken.
+
+e)  If a command file was  being processed, DSNARL will bail out  of all
+    opened command files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   16
+
+
+
+                               Appendix A                                
+
+                      Tape Record Display Formats                         
+
+
+
+
+     The following is a summary of the patterns used for display  of the
+tape  logical records  during the  operation of  the DUMP  command.  The
+abbreviation "w" means word; "b" means bit.
+
+HED
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      ASCII
+w3-4                    DECIMAL
+w5-6                    ASCII
+w7                      DECIMAL
+w8                      interpreted as a time
+w9                      interpreted as a date
+w10                     OCTAL
+w11-12                  DECIMAL
+w13-17                  ASCII
+
+DIR
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      DECIMAL
+
+RCD
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2-3                    DECIMAL
+w4                      OCTAL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   17
+
+
+
+LOK
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      DECIMAL
+w3                      interpreted as a time
+w4                      interpreted as a date
+w5-6                    OCTAL
+w7-w8,b17               SIXBIT
+w8,b18-w9               OCTAL
+w10                     DECIMAL
+w11-12                  OCTAL
+w13-14                  DECIMAL
+w15-20                  OCTAL
+w21                     DECIMAL
+w22                     OCTAL                 ***  think about doing
+w23-24                  DECIMAL                    these in octal  ***
+w25-27                  OCTAL
+w28-29                  SIXBIT
+w30-31                  OCTAL
+w32-33                  DECIMAL
+w34-36                  OCTAL
+
+DAT
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2-last                 OCTAL
+
+EMP
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      DECIMAL
+
+EOF
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+
+BOU
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      OCTAL
+
+EOU
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2                      OCTAL
+
+EOT
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+
+CON
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+
+
+
+                                   18
+
+
+
+DUM
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+w2-last                 OCTAL
+
+UFD
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+
+MFD
+w1,b0-17                interpreted as 3-character record descriptor
+w1,b18-35               DECIMAL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   19
+    ?@ 9ð
