@@ -1,0 +1,121 @@
+                          PROJECT REQUEST ANALYSIS             PR no. 8100222                                                                      
+
+
+     PR title _______________________________________              
+
+     responsible section TYMCOM-X______________                         
+
+     resource group TSU___________                    
+
+     prepared by Adele_Gadol_______                 
+
+     ------------------------------------------------------------------------
+
+     feasibility of proposed project:
+             Implementing new  commands of any  significance in  the existing
+     SPOOL  is extremely  dangerous,  and I  do  not recommend  it.   We have
+     experienced good  examples of the  difficulties recently when  trying to
+     repair long-standing paging and  format problems which, on  the surface,
+     looked straightforward.
+             A new  slave program (suggestion  "1" from the  project request)
+     which would manipulate and transmit information from SPOOL's  data bases
+     and would alter the  request status accordingly would need  to cooperate
+     with SPOOL in the use of  its files and status data.  The  SPOOL changes
+     would probably  be tricky and  widespread due to  the way that  SPOOL is
+     written (I could discuss the reasons at great length).  In  addition, we
+     often experience  SPOOL data  base problems now,  which are  solved when
+     they  occur by  the use  of the  maintenance program  SPFIX.   These are
+     likely to be  complicated by the  addition of another  program accessing
+     SPOOL's files.
+             In   consideration   of  these   difficulties,   my  preliminary
+     suggestion for a solution in  conjunction with the existing SPOOL  is as
+     follows:  (1) Implement a new status code in SPOOL for files  being sent
+     to the  remote station.  SPOOL  must be taught  to leave  these requests
+     alone.  (2) Implement the means to identify and mark with the new status
+     the requests which will be transferred.  This could be done with a slave
+     program  running   independently  or  by   a  combination  of   a  SPOOL
+     modification  and  and engine  program  logged into  SPOOL.   The STATUS
+     command could be scanned (hopefully licenses won't be a problem) to find
+     the requests, and a  new command in SPOOL could  be used to set  the new
+     status on the request.  The  new command would be analogous to  the HOLD
+     command.   Other variations  are possible,  such as  a slave  which only
+     reads SPOOL  data bases and  uses SPOOL to  make a  status modification.
+     (3) Implement a means of changing the request status to  COMP (complete)
+     when the files have been printed.  There are several possibilities.  One
+     is to use  the existing mechanism for  marking finished "print  to tape"
+     requests as complete.   Others are a new  command in SPOOL or  data base
+     alterations done by the slave program.
+             Implementing a scheme such  as suggestion "2" is  most desirable
+     in a rewrite  of SPOOL.  In  fact, it should  be made general  enough by
+     means of applying various modules for collecting the data such  that the
+     solution may  cover other  applications as well.   Some of  the existing
+     ones  are  the use  of  SPOOL by  MAGNUM,  the current  "print  to tape"
+     capability, and the DCS stations.
+
+
+
+
+
+
+                                      1
+                          PROJECT REQUEST ANALYSIS             PR no. 8100222                                                                      
+
+
+
+     recommended alternative:
+             At this time,  it is necessary to  run SPOOL over a  circuit and
+     collect the files as they would normally be printed.  In order  to avoid
+     the transmission of  multiple copies the  following could be  done. Scan
+     the output from the status and list commands to obtain information about
+     requests.   The list  command gives  each file  name and  the  number of
+     copies  desired  for  it.   Then  use  the  print  option  which  allows
+     individual files  to be  printed.  (IMPORTANT) There  is a  problem with
+     this in that  this particular print option  does not make  an accounting
+     record; this would otherwise need to be done.
+
+     technology requirements:
+          Existing TYMCOM-X tools for SPOOL work.
+
+     benefits/justification:
+             A  good   general  solution  to   this  problem   would  satisfy
+     implementation  requirements for  what seems  to be  a growing  need for
+     access to SPOOL by local and remote applications.
+
+     impact on other systems:
+             Modifications  to existing  SPOOL should  affect  SPOOL software
+     only.   A  rewrite should  take  into account  the  combined BATCH/SPOOL
+     system and associated accounting and would affect MIS.
+
+     risk analysis:
+             The risk of modification is the introduction of new problems and
+     the time and cost to fix them.
+
+
+     ------------------------------------------------------------------------
+
+     PRELIMINARY ESTIMATES:  (in weeks)
+             NOTE:  The  estimates are based  upon modifications  to existing
+     SPOOL and  take into account  the difficult nature  of doing  so.  These
+     include time for modifiying the maintenance program SPFIX, which must be
+     kept  up to  date.  Adding  such features  to a  rewrite  would probably
+     increase the project  time by about  6 weeks.  The  on-going maintenance
+     time for SPOOL is likely to be increased if enhancements are made to the
+     existing system.  The amount is unknown at this time.
+
+     personnel_time_estimates             resource_estimates                  
+      -requirements ____1___              -managers ____1___                                            
+      -specifications ____3___            -total personnel ____2___                                                   
+      -coding ____3___                    -equipment _________                                             
+      -testing ____3___                   -machine time _________                                                
+      -documentation ____1___             -education _________                                             
+      -implementation ____1___                      
+      -maintenance ________                   
+
+     cost estimates      
+      -development costs _________                         
+      -implementation costs ________                            
+      -operating costs ________                       
+
+
+                                      2
+
