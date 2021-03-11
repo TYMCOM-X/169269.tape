@@ -1,0 +1,63 @@
+.memo;
+.device tty;
+.single space;
+.indent 5;
+.UnderlineBetween (~~,~);
+.blankline;
+.turn off "%";
+.nojust;
+.every heading (,CO-OP INTERVIEW QUESTIONS,);
+.Every footing (,,{PAGE!});
+.skip 3;
+.list (-4,4,0,"1.");
+.item;
+If no transcript was available before the interview, ask:
+.preface 0;
+.list (-4,4,0,"a.");
+.item;
+What class are you in (eg. junior, senior)?  How many semesters
+(quarters) do you have to go?
+.item;
+What courses have you had?  What were your grades?
+.EndList;
+.preface 1;
+.item;
+What languages do you know (or have you had)?  Which are your favorites?
+.item;
+Describe a significant (or enjoyable, or challenging) programming
+project you have done (or several).  What was the problem you
+solved?  How did you go about it?  Did you have a choice of language?#
+etc.
+.item;
+If the student knows assembler and higher-level languages:
+.preface 0;
+.list (-4,4,0,"a.");
+.item;
+Do you prefer, on the whole, high-level or low-level languages.
+.Item;
+When do you think it is appropriate to use assembler?  When is
+a high-level language preferred?
+.endlist;
+.preface 1;
+.item;
+Have you been introduced to structured programming?  Describe what it
+means to you.
+.item;
+Describe what modularity is (if they haven't done so).  Can you make
+an assembly language program modular?  How?  Global variables vs.
+parameters for communication -- when is it better do use globals?
+parameters?
+.item;
+If you were to modify a program written by someone else, what kind of
+documentation would you want to have?  What kind of documentation should
+a user have?
+.item;
+What are your general goals?
+.item;
+Why did you become involved in the co-op
+program?
+.item;
+If you were offered the position, how long will you need to accept or
+decline?
+.Endlist;
+
