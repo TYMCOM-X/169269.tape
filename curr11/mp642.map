@@ -1,0 +1,1247 @@
+Link11 Memory Allocation Map  ****  Date 10/26/81  ****  Time 16:32:14
+
+
+Link11 Version 5.2M
+*@LK642{LK642.CMD:  SV642.IMG/img/b:1000,MP642.MAP=CG642.OBJ,RU642.OBJ,exec.OBJ
+*error.OBJ,pkt1.OBJ,pkt2.OBJ,pkt3d.OBJ,cmdtym.OBJ,cmds.OBJ,trm.OBJ,trmf.OBJ
+*trmp.OBJ,trmt.OBJ,zapbuf.OBJ,status.OBJ,lnk1.OBJ,lnk2.OBJ,lnkf.OBJ,lnkf2.OBJ
+*lnkha.OBJ,lkhbs1.OBJ,lkhbs2.OBJ,lkhbs3.OBJ,TYMA.OBJ,tymb.OBJ,lina.OBJ,once.OBJ
+*end.OBJ}/E
+
+Module: COMMON                   File: CG642.OBJ
+Module: ROUTE                    File: RU642.OBJ
+Module: EXEC                     File: EXEC.OBJ
+Module: ERROR                    File: ERROR.OBJ
+Module: PKT1                     File: PKT1.OBJ
+Module: PKT2                     File: PKT2.OBJ
+Module: PKT3D                    File: PKT3D.OBJ
+Module: CMDTYM                   File: CMDTYM.OBJ
+Module: CMDS                     File: CMDS.OBJ
+Module: TRM                      File: TRM.OBJ
+Module: TRMF                     File: TRMF.OBJ
+Module: TRMP                     File: TRMP.OBJ
+Module: TRMT                     File: TRMT.OBJ
+Module: ZAPBUF                   File: ZAPBUF.OBJ
+Module: STATUS                   File: STATUS.OBJ
+Module: LNK1                     File: LNK1.OBJ
+Module: LNK2                     File: LNK2.OBJ
+Module: LNKF                     File: LNKF.OBJ
+Module: LNKF2                    File: LNKF2.OBJ
+Module: LNKHA                    File: LNKHA.OBJ
+Module: LKHPK1                   File: LKHBS1.OBJ
+Module: LKHPK2                   File: LKHBS2.OBJ
+Module: LKHPK3                   File: LKHBS3.OBJ
+Module: TYMA                     File: TYMA.OBJ
+Module: TYMB                     File: TYMB.OBJ
+Module: LINA                     File: LINA.OBJ
+Module: ONCE                     File: ONCE.OBJ
+Module: END                      File: END.OBJ
+
+Program file:     SV642.IMG
+Program name:     COMMON
+Transfer address: 001000  
+
+Memory limits:          Low    High   Length
+	<LOWMEM>      001000  001116  000116        39. Words
+	<SX    >      001116  001336  000220        72. Words
+	<PURE  >      001336  010044  006506      1699. Words
+	<CODE  >      010044  107360  077314     16230. Words
+	<MAIN  >      107360  110450  001070       284. Words
+	<SECOND>      110450  110506  000036        15. Words
+	<TENTHS>      110506  110530  000022         9. Words
+	<INIT  >      110530  110532  000002         1. Words
+	<.XDT. >      110532  110600  000046        19. Words
+	<.SYM. >      110600  110600  000000         0. Words
+	<PDATA >      110600  110646  000046        19. Words
+	<DDB   >      110646  112156  001310       356. Words
+	<LDB   >      112156  112446  000270        92. Words
+	<ADB   >      112446  112566  000120        40. Words
+	<SDB   >      112566  122714  010126      2091. Words
+	<IMPURE>      122714  125730  003014       774. Words
+	<ONCE  >      125730  126420  000470       156. Words
+	<VECTBL>      126420  126610  000170        60. Words
+	Overall       001000  126610  125610     21956. Words
+
+********************************************
+Module: COMMON                                    3394. Words
+			Low    High   Length
+	      ADARBF  000016  Global
+	      ADARSR  000014  Global
+	      ADAXBF  000022  Global
+	      ADAXSR  000020  Global
+	      ADFUNC  000002  Global
+	      ADINDX  000006  Global
+	      ADINIT  000004  Global
+	      ADMAXI  000013  Global
+	      ADNEXT  000010  Global
+	      ADOUTP  000000  Global
+	      ADSTS1  000012  Global
+	      ATOTXX  000000  Global
+	      CLKREG  177546  Global
+	      DDCBGN  000026  Global
+	      DDCEND  000032  Global
+	      DDCSIZ  000002  Global
+	      DDDDBI  000016  Global
+	      DDERBC  000134  Global
+	      DDERBF  000116  Global
+	      DDERCS  000132  Global
+	      DDERFT  000142  Global
+	      DDERHE  000140  Global
+	      DDERIP  000120  Global
+	      DDERIS  000114  Global
+	      DDERNP  000124  Global
+	      DDEROR  000122  Global
+	      DDERPC  000130  Global
+	      DDERRX  000144  Global
+	      DDERSI  000136  Global
+	      DDERSZ  000126  Global
+	      DDID    000006  Global
+	      DDINDX  000007  Global
+	      DDLFAL  000234  Global
+	      DDLFAV  000154  Global
+	      DDLFBC  000172  Global
+	      DDLFBH  000164  Global
+	      DDLFBI  000160  Global
+	      DDLFBJ  000174  Global
+	      DDLFBK  000176  Global
+	      DDLFBP  000205  Global
+	      DDLFBQ  000200  Global
+	      DDLFBS  000170  Global
+	      DDLFBT  000166  Global
+	      DDLFBW  000202  Global
+	      DDLFBY  000204  Global
+	      DDLFCC  000250  Global
+	      DDLFCZ  000151  Global
+	      DDLFFC  000160  Global
+	      DDLFGS  000236  Global
+	      DDLFIC  000246  Global
+	      DDLFIK  000242  Global
+	      DDLFIP  000244  Global
+	      DDLFIQ  000240  Global
+	      DDLFIR  000146  Global
+	      DDLFIS  000252  Global
+	      DDLFIX  000254  Global
+	      DDLFLC  000502  Global
+	      DDLFOC  000304  Global
+	      DDLFOK  000300  Global
+	      DDLFOP  000302  Global
+	      DDLFOR  000150  Global
+	      DDLFOS  000474  Global
+	      DDLFOV  000162  Global
+	      DDLFOX  000312  Global
+	      DDLFOZ  000306  Global
+	      DDLFPC  000253  Global
+	      DDLFPL  000156  Global
+	      DDLFPO  000232  Global
+	      DDLFQQ  000145  Global
+	      DDLFQX  000310  Global
+	      DDLFRQ  000476  Global
+	      DDLFSR  000152  Global
+	      DDLFS1  000226  Global
+	      DDLFS2  000230  Global
+	      DDLFTD  000500  Global
+	      DDLFTM  000477  Global
+	      DDLFTP  000501  Global
+	      DDLFT1  000222  Global
+	      DDLFT2  000224  Global
+	      DDLFXR  000206  Global
+	      DDLFXS  000210  Global
+	      DDLFX1  000212  Global
+	      DDLFX2  000214  Global
+	      DDLFX3  000216  Global
+	      DDLFX4  000220  Global
+	      DDLHBF  000202  Global
+	      DDLHCZ  000125  Global
+	      DDLHDH  000204  Global
+	      DDLHDW  000262  Global
+	      DDLHFC  000226  Global
+	      DDLHHD  000500  Global
+	      DDLHHM  000200  Global
+	      DDLHHY  000224  Global
+	      DDLHLC  000500  Global
+	      DDLHLD  000152  Global
+	      DDLHMX  000156  Global
+	      DDLHND  000150  Global
+	      DDLHNH  000172  Global
+	      DDLHNL  000154  Global
+	      DDLHNN  000146  Global
+	      DDLHNU  000256  Global
+	      DDLHPH  000176  Global
+	      DDLHSH  000174  Global
+	      DDLHSM  000266  Global
+	      DDLHSN  000265  Global
+	      DDLHSS  000236  Global
+	      DDLHTR  000160  Global
+	      DDLHTY  000264  Global
+	      DDLHUP  000260  Global
+	      DDLHXP  000162  Global
+	      DDLHXS  000226  Global
+	      DDLKCZ  000027  Global
+	      DDLKEC  000066  Global
+	      DDLKER  000114  Global
+	      DDLKFC  000070  Global
+	      DDLKFH  000106  Global
+	      DDLKFN  000112  Global
+	      DDLKFP  000046  Global
+	      DDLKFT  000110  Global
+	      DDLKIN  000036  Global
+	      DDLKIS  000040  Global
+	      DDLKLC  000146  Global
+	      DDLKLD  000044  Global
+	      DDLKNA  000056  Global
+	      DDLKNS  000034  Global
+	      DDLKNX  000032  Global
+	      DDLKN1  000052  Global
+	      DDLKN2  000054  Global
+	      DDLKPS  000113  Global
+	      DDLKP0  000050  Global
+	      DDLKSP  000104  Global
+	      DDLKST  000042  Global
+	      DDLKTP  000065  Global
+	      DDLKXT  000002  Global
+	      DDLK0H  000070  Global
+	      DDLK0T  000072  Global
+	      DDLK1H  000074  Global
+	      DDLK1T  000076  Global
+	      DDLK2H  000100  Global
+	      DDLK2T  000102  Global
+	      DDNCON  000030  Global
+	      DDPOKE  000010  Global
+	      DDPRIV  000002  Global
+	      DDRSUM  000012  Global
+	      DDSDBI  000020  Global
+	      DDSOC   000004  Global
+	      DDSSRC  000014  Global
+	      DDSTDP  000033  Global
+	      DDSTEP  000032  Global
+	      DDSTS0  000000  Global
+	      DDSTS1  000026  Global
+	      DDSX    000022  Global
+	      DDWLD   000024  Global
+	      DEVMAX  000026  Global
+	      DXSIZE  000004  Global
+	      EDTNO   000000  Global
+	      EDTNUM  000001  Global
+	      JIFDIV  000005  Global
+	      JIFMUL  000003  Global
+	      JIFM05  043120  Global
+	      JIFM10  106240  Global
+	      JIFM15  151360  Global
+	      JIFO10  000006  Global
+	      JIFO2   000036  Global
+	      JIFO4   000017  Global
+	      JIFSEC  000074  Global
+	      JIFX10  001130  Global
+	      JIFX15  001604  Global
+	      JIFX16  001700  Global
+	      JIFX2   000170  Global
+	      JIFX20  002260  Global
+	      JIFX30  003410  Global
+	      JIFX60  007020  Global
+	      JIFX8   000740  Global
+	      JIF150  021450  Global
+	      LDERBD  000062  Global
+	      LDHACK  000256  Global
+	      LDHACZ  000047  Global
+	      LDHAEA  000154  Global
+	      LDHAED  000156  Global
+	      LDHAEI  000160  Global
+	      LDHAEL  000162  Global
+	      LDHAEN  000164  Global
+	      LDHAEO  000166  Global
+	      LDHAEP  000170  Global
+	      LDHAFC  000152  Global
+	      LDHAFG  000152  Global
+	      LDHAFR  000263  Global
+	      LDHAIA  000257  Global
+	      LDHAIB  000252  Global
+	      LDHAIC  000254  Global
+	      LDHAID  000210  Global
+	      LDHAIF  000200  Global
+	      LDHAIL  000206  Global
+	      LDHAIS  000174  Global
+	      LDHAIW  000202  Global
+	      LDHAIX  000262  Gl
+	      LDHAKB  000140  Global
+	      LDHAKE  000142  Global
+	      LDHAKP  000146  Global
+	      LDHAKT  000144  Global
+	      LDHAKX  000240  Global
+	      LDHALA  000260  Global
+	      LDHALC  000270  Global
+	      LDHAMD  000151  Global
+	      LDHAMX  000150  Global
+	      LDHAOB  000253  Global
+	      LDHAOC  000255  Global
+	      LDHAOD  000214  Global
+	      LDHAOL  000212  Global
+	      LDHAOR  000261  Global
+	      LDHAOS  000176  Global
+	      LDHAOW  000204  Global
+	      LDHAPL  000116  Global
+	      LDHAPR  000110  Global
+	      LDHAQB  000126  Global
+	      LDHAQE  000130  Global
+	      LDHAQN  000134  Global
+	      LDHAQP  000136  Global
+	      LDHAQT  000132  Global
+	      LDHAQX  000226  Global
+	      LDHARB  000106  Global
+	      LDHARS  000104  Global
+	      LDHASB  000120  Global
+	      LDHASC  000172  Global
+	      LDHASE  000122  Global
+	      LDHAST  000124  Global
+	      LDHASX  000216  Global
+	      LDHATD  000265  Global
+	      LDHATI  000266  Global
+	      LDHATR  000267  Global
+	      LDHAUA  000264  Global
+	      LDHAXB  000114  Global
+	      LDHAXS  000112  Global
+	      LDHCHN  000012  Global
+	      LDHCSZ  000027  Global
+	      LDHDDB  000014  Global
+	      LDHDWX  000002  Global
+	      LDHERB  000070  Global
+	      LDHERC  000064  Global
+	      LDHERS  000074  Global
+	      LDHERX  000100  Global
+	      LDHEXB  000072  Global
+	      LDHEXC  000066  Global
+	      LDHEXS  000076  Global
+	      LDHEXX  000102  Global
+	      LDHFCL  000026  Global
+	      LDHGRP  000011  Global
+	      LDHINX  000004  Global
+	      LDHLCL  000104  Global
+	      LDHLNO  000013  Global
+	      LDHNBR  000016  Global
+	      LDHNXS  000022  Global
+	      LDHNXT  000020  Global
+	      LDHSDB  000006  Global
+	      LDHSFC  000054  Global
+	      LDHSLH  000034  Global
+	      LDHSLT  000036  Global
+	      LDHSPC  000060  Global
+	      LDHSPD  000010  Global
+	      LDHSRC  000056  Global
+	      LDHSR0  000046  Global
+	      LDHSR2  000050  Global
+	      LDHSSD  000052  Global
+	      LDHSTX  000000  Global
+	      LDHST0  000024  Global
+	      LDHST1  000026  Global
+	      LDHXLH  000040  Global
+	      LDHXLT  000042  Global
+	      LDHZCN  000044  Global
+	      LDHZLH  000030  Global
+	      LDHZLT  000032  Global
+	      LKOFS$  000004  Global
+	      MAXDX   000006  Global
+	      MAXTIM  177777  Global
+	      MXNPKT  077777  Global
+	      NIDMAX  000013  Global
+	      PKCMAX  000072  Global
+	      PKTWDS  000040  Global
+	      SDACNT  000034  Global
+	      SDCBGN  000006  Global
+	      SDCEND  000030  Global
+	      SDCSIZ  000011  Global
+	      SDDDB   000004  Global
+	      SDFCNT  000036  Global
+	      SDLFAX  000072  Global
+	      SDLFBI  000040  Global
+	      SDLFBL  000064  Global
+	      SDLFBO  000056  Global
+	      SDLFCZ  000016  Global
+	      SDLFFC  000040  Global
+	      SDLFI0  000042  Global
+	      SDLFI1  000044  Global
+	      SDLFLC  000074  Global
+	      SDLFO0  000060  Global
+	      SDLFO1  000062  Global
+	      SDLFQN  000055  Global
+	      SDLFRQ  000066  Global
+	      SDLFS1  000070  Global
+	      SDLFVC  000054  Global
+	      SDLFVH  000050  Global
+	      SDLFXF  000046  Global
+	      SDLHBF  000066  Global
+	      SDLHCN  000044  Global
+	      SDLHCZ  000014  Global
+	      SDLHFC  000040  Global
+	      SDLHI1  000056  Global
+	      SDLHI2  000054  Global
+	      SDLHLC  000070  Global
+	      SDLHLD  000042  Global
+	      SDLHO1  000062  Global
+	      SDLHO2  000060  Global
+	      SDLHPC  000064  Global
+	      SDLHSC  000040  Global
+	      SDLHSP  000045  Global
+	      SDLHS1  000046  Global
+	      SDLHVH  000050  Global
+	      SDLHVL  000052  Global
+	      SDLINK  000000  Global
+	      SDLKCZ  000004  Global
+	      SDLKFC  000030  Global
+	      SDLKFL  000032  Global
+	      SDLKLC  000040  Global
+	      SDLKLK  000030  Global
+	      SDLKLV  000035  Global
+	      SDLKXX  000037  Global
+	      SDPCNT  000020  Global
+	      SDPKCP  000014  Global
+	      SDPKDH  000010  Global
+	      SDPKDT  000012  Global
+	      SDPKSP  000016  Global
+	      SDPMAX  000002  Global
+	      SDREQB  000026  Global
+	      SDREQL  000024  Global
+	      SDRSMC  000027  Global
+	      SDSDID  000022  Global
+	      SDSDSC  000023  Global
+	      SDSOC   000003  Global
+	      SDSTCC  000034  Global
+	      SDSTCF  000056  Global
+	      SDSTCY  000004  Global
+	      SDSTCZ  000017  Global
+	      SDSTD1  000044  Global
+	      SDSTD2  000046  Global
+	      SDSTD3  000050  Global
+	      SDSTD4  000052  Global
+	      SDSTER  000057  Global
+	      SDSTFC  000030  Global
+	      SDSTID  000032  Global
+	      SDSTLC  000066  Global
+	      SDSTPL  000035  Global
+	      SDSTR1  000040  Global
+	      SDSTSC  000036  Global
+	      SDSTSR  000042  Global
+	      SDSTSS  000030  Global
+	      SDSTS1  000006  Global
+	      SDSTS3  000054  Global
+	      SDSTVP  000056  Global
+	      SDSTV1  000060  Global
+	      SDSTV2  000062  Global
+	      SDSTV3  000064  Global
+	      SDTPVC  000144  Global
+	      SDTRAD  000040  Global
+	      SDTRBD  000106  Global
+	      SDTRBL  000127  Global
+	      SDTRBR  000032  Global
+	      SDTRBS  000065  Global
+	      SDTRBX  000070  Global
+	      SDTRCD  000102  Global
+	      SDTRCI  000077  Global
+	      SDTRCL  000114  Global
+	      SDTRCM  000104  Global
+	      SDTRCP  000044  Global
+	      SDTRCS  000133  Global
+	      SDTRCT  000130  Global
+	      SDTRCV  000103  Global
+	      SDTRCX  000036  Global
+	      SDTRCZ  000041  Global
+	      SDTRC1  000134  Global
+	      SDTRC2  000136  Global
+	      SDTRC3  000140  Global
+	      SDTRC4  000142  Global
+	      SDTRDL  000071  Global
+	      SDTRDY  000126  Global
+	      SDTREC  000101  Global
+	      SDTRES  000131  Global
+	      SDTRFC  000042  Global
+	      SDTRFD  000111  Global
+	      SDTRFP  000123  Global
+	      SDTRFV  000112  Global
+	      SDTRFX  000125  Global
+	      SDTRHD  000105  Global
+	      SDTRHI  000075  Global
+	      SDTRHP  000120  Global
+	      SDTRIC  000067  Global
+	      SDTRIL  000066  Global
+	      SDTRIP  000042  Global
+	      SDTRLC  000144  Global
+	      SDTRLD  000107  Global
+	      SDTRLP  000070  Global
+	      SDTRLT  000102  Global
+	      SDTRLW  000113  Global
+	      SDTRLX  000072  Global
+	      SDTROD  000046  Global
+	      SDTROS  000064  Global
+	      SDTRPC  000035  Global
+	      SDTRPG  000117  Global
+	      SDTRRE  000074  Global
+	      SDTRSC  000122  Global
+	      SDTRSE  000101  Global
+	      SDTRSI  000076  Global
+	      SDTRSL  000072  Global
+	      SDTRSN  000007  Global
+	      SDTRSO  000073  Global
+	      SDTRSR  000100  Global
+	      SDTRSX  000124  Global
+	      SDTRS0  000030  Global
+	      SDTRS1  000050  Global
+	      SDTRS2  000052  Global
+	      SDTRS3  000054  Global
+	      SDTRS4  000056  Global
+	      SDTRS5  000060  Global
+	      SDTRS6  000062  Global
+	      SDTRTP  000037  Global
+	      SDTRTT  000034  Global
+	      SDTRVD  000110  Global
+	      SDTRVP  000121  Global
+	      SDTRVT  000116  Global
+	      SDTRXC  000132  Global
+	      SDTXAP  000146  Global
+	      SDXCNT  000021  Global
+	      ST.S0   000001  Global
+	      TRMPLM  000050  Global
+	      TRMTTL  000004  Global
+	      TRPMAX  000007  Global
+	      TRPWRN  000005  Global
+	      TRPWRX  000003  Global
+	      VERNO   000250  Global
+	      VERNUM  002431  Global
+	      VLLKFC  000006  Global
+	      VLLK0C  000012  Global
+	      VLLK1C  000012  Global
+	      .IDCR   000007  Global
+	      .IDFD   000011  Global
+	      .IDLK   000000  Global
+	      .IDLP   000006  Global
+	      .IDMT   000010  Global
+	      .IDST   000001  Global
+	      .IDTR   000002  Global
+	      .IDTX   000003  Global
+	      .IDTY   000004  Global
+	      .IDTZ   000005  Global
+	      .IDWD   000012  Global
+	      .PLKIL  000000  Global
+	      .PLOPT  000024  Global
+	      .PLSPR  000001  Global
+	      .PLSTP  000020  Global
+	      .PLTRM  000003  Global
+	      .PLZAP  000014  Global
+	      .XXASC  000000  Global
+	      .XXBCD  177777  Global
+	      .XXCAL  177777  Global
+	      .XXCRS  177777  Global
+	      .XXEBC  177777  Global
+	<LOWMEM>      001000  001000  000000         0. Words
+	      LOWMEM  001000  Global
+	<SX    >      001116  001336  000220        72. Words
+	      SX      001116  Global
+	      L0SX    001120  Global
+	      L1SX    001220  Global
+	      MNLKSX  001116  Global
+	      MXLKSX  001316  Global
+	      SXTBL   001116  Global
+	      SXTOP   001336  Global
+	      S0SX    001322  Global
+	      T0SX    001326  Global
+	<PURE  >      001336  001504  000146        51. Words
+	      PURE    001336  Global
+	      CMDETB  001502  Global
+	      CODTIL  001502  Global
+	      CODTIP  001502  Global
+	      CODTIU  001502  Global
+	      CODTOU  001502  Global
+	      CODTOX  001502  Global
+	      CODTSL  001503  Global
+	      CODTSU  001502  Global
+	      DEVLTR  001416  Global
+	      DEVNAM  001370  Global
+	      DFTHST  001354  Global
+	      DXTBL   001472  Global
+	      DXTOP   001500  Global
+	      HCLTBL  001364  Global
+	      NIDDX   001431  Global
+	      NIDPMX  001457  Global
+	      NIDPWN  001444  Global
+	      THSNOD  001336  Global
+	      ..MOD   001366  Global
+	<CODE  >      010044  010234  000170        60. Words
+	      CODE    010044  Global
+	      PURBGN  010044  Global
+	<MAIN  >      107360  107360  000000         0. Words
+	      MAIN    107360  Global
+	<SECOND>      110450  110450  000000         0. Words
+	      SECOND  110450  Global
+	<TENTHS>      110506  110506  000000         0. Words
+	      TENTHS  110506  Global
+	<INIT  >      110530  110530  000000         0. Words
+	      INIT    110530  Global
+	      INISUB  110530  Global
+	<.XDT. >      110532  110600  000046        19. Words
+	      .XDT.   110532  Global
+	<.SYM. >      110600  110600  000000         0. Words
+	      .SYM.   110600  Global
+	<PDATA >      110600  110600  000000         0. Words
+	      PDATA   110600  Global
+	<DDB   >      110646  112156  001310       356. Words
+	      DDB     110646  Global
+	      LKFDDB  110646  Global
+	      LKHDDB  111350  Global
+	      L0$     110646  Global
+	      L1$     111350  Global
+	      S0$     112070  Global
+	      TR0CON  112154  Global
+	      T0$     112124  Global
+	<LDB   >      112156  112446  000270        92. Words
+	      LDB     112156  Global
+	      LHALDB  112156  Global
+	      L1.0    112156  Global
+	<ADB   >      112446  112566  000120        40. Words
+	      ADB     112446  Global
+	      ADB0$   112446  Global
+	      ADB1$   112472  Global
+	      ADB2$   112516  Global
+	      ADB3$   112542  Global
+	      ASAADB  112446  Global
+	<SDB   >      112566  122714  010126      2091. Words
+	      SDB     112566  Global
+	      L0$0    112566  Global
+	      L0$1    112662  Global
+	      L0$10   113526  Global
+	      L0$11   113622  Global
+	      L0$12   113716  Global
+	      L0$13   114012  Global
+	      L0$14   114106  Global
+	      L0$15   114202  Global
+	      L0$16   114276  Global
+	      L0$17   114372  Global
+	      L0$2    112756  Global
+	      L0$20   114466  Global
+	      L0$21   114562  Global
+	      L0$22   114656  Global
+	      L0$23   114752  Global
+	      L0$24   115046  Global
+	      L0$25   115142  Global
+	      L0$26   115236  Global
+	      L0$27   115332  Global
+	      L0$3    113052  Global
+	      L0$30   115426  Global
+	      L0$31   115522  Global
+	      L0$32   115616  Global
+	      L0$33   115712  Global
+	      L0$34   116006  Global
+	      L0$35   116102  Global
+	      L0$36   116176  Global
+	      L0$37   116272  Global
+	      L0$4    113146  Global
+	      L0$5    113242  Global
+	      L0$6    113336  Global
+	      L0$7    113432  Global
+	      L1$1    116366  Global
+	      L1$10   117176  Global
+	      L1$11   117266  Global
+	      L1$12   117356  Global
+	      L1$13   117446  Global
+	      L1$14   117536  Global
+	      L1$15   117626  Global
+	      L1$16   117716  Global
+	      L1$17   120006  Global
+	      L1$2    116456  Global
+	      L1$20   120076  Global
+	      L1$21   120166  Global
+	      L1$22   120256  Global
+	      L1$23   120346  Global
+	      L1$24   120436  Global
+	      L1$25   120526  Global
+	      L1$26   120616  Global
+	      L1$27   120706  Global
+	      L1$3    116546  Global
+	      L1$30   120776  Global
+	      L1$31   121066  Global
+	      L1$32   121156  Global
+	      L1$33   121246  Global
+	      L1$34   121336  Global
+	      L1$35   121426  Global
+	      L1$36   121516  Global
+	      L1$37   121606  Global
+	      L1$4    116636  Global
+	      L1$40   121676  Global
+	      L1$5    116726  Global
+	      L1$6    117016  Global
+	      L1$7    117106  Global
+	      S0$1    121766  Global
+	      T0$1    122054  Global
+	      T0$2    122224  Global
+	      T0$3    122374  Global
+	      T0$4    122544  Global
+	<IMPURE>      122714  125116  002202       577. Words
+	      IMPURE  122714  Global
+	      CKSFLG  122716  Global
+	      CKSVAL  122714  Global
+	      IMPBGN  122714  Global
+	      IMPCLR  122720  Global
+	      REQSTH  124030  Global
+	      REQSTT  124032  Global
+	      STKBGN  124020  Global
+	      STKEND  123420  Global
+	      TMRCNT  124252  Global
+	      TMRDSP  124676  Global
+	      TMRFRE  124034  Global
+	      TMRLST  124036  Global
+	      TMRSDB  124464  Global
+	      TMRTOP  124250  Global
+	      TRRNGP  125114  Global
+	      TRRNGT  125112  Global
+	<ONCE  >      125730  125730  000000         0. Words
+	      ONCE    125730  Global
+	      PKTBGN  125730  Global
+	<VECTBL>      126420  126530  000110        36. Words
+	      VECTBL  126420  Global
+
+********************************************
+Module: ROUTE                                        9. Words
+			Low    High   Length
+	      HSOF$X  000002  Global
+	      HSTN$X  000004  Global
+	      NODN$X  000002  Global
+	<PURE  >      001504  001526  000022         9. Words
+	      HSTN$1  001506  Global
+	      HSTN$2  001514  Global
+	      NODN$1  001504  Global
+	      NODN$2  001512  Global
+	      PTHPR$  001520  Global
+	      PTHSC$  001521  Global
+
+********************************************
+Module: EXEC                                       638. Words
+			Low    High   Length
+	<LOWMEM>      001000  001116  000116        39. Words
+	      CRSCNT  001022  Global
+	      DBGENT  001004  Global
+	      GO      001000  Global
+	      NODSTS  001020  Global
+	      VERLOC  001034  Global
+	<MAIN  >      107360  110410  001030       268. Words
+	      MAINLP  107666  Global
+	      START   107360  Global
+	<PURE  >      001526  001534  000006         3. Words
+	<CODE  >      010234  011026  000572       189. Words
+	      ACKOPS  011006  Global
+	      GETPSW  010522  Global
+	      GOBOOT  010270  Global
+	      RD50XX  010706  Global
+	      RTNRTI  010266  Global
+	      TIMKIL  010430  Global
+	      TIMREQ  010320  Global
+	      XXRD50  010530  Global
+	<VECTBL>      126530  126536  000006         3. Words
+	<IMPURE>      125116  125536  000420       136. Words
+	      CKSPNT  125126  Global
+	      CKSWRD  125130  Global
+	      CLKFLG  125116  Global
+	      LPSAVG  125134  Global
+	      S       125136  Global
+	      UPTIME  125122  Global
+
+********************************************
+Module: ERROR                                      327. Words
+			Low    High   Length
+	      CTYRBF  177562  Global
+	      CTYRSR  177560  Global
+	      CTYXBF  177566  Global
+	      CTYXSR  177564  Global
+	      TRPERX  000016  Global
+	<CODE  >      011026  012146  001120       296. Words
+	      CTYCHR  011722  Global
+	      ERROR   011026  Global
+	      STKUND  011110  Global
+	      TRPER0  011150  Global
+	      TRPER1  011166  Global
+	      TRPER2  011204  Global
+	      TRPER3  011222  Global
+	      TRPER4  011240  Global
+	      TRPER5  011256  Global
+	      TRPER6  011274  Global
+	      TRPER7  011312  Global
+	<VECTBL>      126536  126566  000030        12. Words
+	<PDATA >      110600  110646  000046        19. Words
+	      BADSTK  110644  Global
+	      BUGBUF  110600  Global
+	      SAVEEC  110620  Global
+	      SAVEPC  110640  Global
+	      SAVER1  110624  Global
+
+********************************************
+Module: PKT1                                       423. Words
+			Low    High   Length
+	<CODE  >      012146  013640  001472       413. Words
+	      ACCEPT  013346  Global
+	      CLRINP  013604  Global
+	      CPKRTN  013534  Global
+	      CTLPKT  013026  Global
+	      CTLPKX  013042  Global
+	      CTLSTE  013106  Global
+	      CTLSTR  013064  Global
+	      DECOWN  012616  Global
+	      DECPCN  012574  Global
+	      GETBYT  012236  Global
+	      GETCTL  012342  Global
+	      GETPKT  013116  Global
+	      GIVPKT  013310  Global
+	      JNKCPK  012534  Global
+	      JNKCPX  012526  Global
+	      JNKPKT  012560  Global
+	      JNKPKX  012552  Global
+	      MAKKIL  013430  Global
+	      OUTSUP  013576  Global
+	      PKTAGN  013314  Global
+	      PKTINI  012146  Global
+	      PKTRTN  013550  Global
+	      PKTRTX  013526  Global
+	      PUTBYT  012406  Global
+	      REFUSE  013414  Global
+	      REMOVE  012732  Global
+	      SETDIS  013450  Global
+	      SETEPK  013466  Global
+	      SETKIL  013440  Global
+	      SETNAK  013460  Global
+	      SNDDPK  013010  Global
+	      WAKCHK  012652  Global
+	<VECTBL>      126566  126602  000014         6. Words
+	<PURE  >      001534  001536  000002         1. Words
+	      NUMPKT  001534  Global
+	<IMPURE>      125536  125544  000006         3. Words
+	      PKFCMN  125542  Global
+	      PKFCNT  125540  Global
+	      PKFLST  125536  Global
+
+********************************************
+Module: PKT2                                      1221. Words
+			Low    High   Length
+	      MAXPKT  000013  Global
+	<CODE  >      013640  020166  004326      1131. Words
+	      CLRCFP  020130  Global
+	      CLRCTP  020054  Global
+	      CLRDDV  017766  Global
+	      CLRSDV  020004  Global
+	      CONCOL  015602  Global
+	      CONNSB  014202  Global
+	      FINDIS  017622  Global
+	      FRESOC  017634  Global
+	      GRBSDB  017644  Global
+	      JNKOWN  017374  Global
+	      KILKIL  013772  Global
+	      KILKIW  013766  Global
+	      KILKIX  013752  Global
+	      KILKI2  014064  Global
+	      KILKI3  014070  Global
+	      REQXR1  017176  Global
+	      REQXR2  017204  Global
+	      RTYNAK  016002  Global
+	      SETINU  017612  Global
+	      SNDDAT  017142  Global
+	      SNDDA0  017144  Global
+	      SNDDA3  017162  Global
+	      SNDDTP  017122  Global
+	      SNDEAT  017020  Global
+	      SNDINT  017026  Global
+	      SNDKIL  016334  Global
+	      SNDKL5  016436  Global
+	      SNDPKT  013640  Global
+	      SNDSRC  017136  Global
+	<PURE  >      001536  002014  000256        87. Words
+	<SECOND>      110450  110454  000004         2. Words
+	<IMPURE>      125544  125546  000002         1. Words
+
+********************************************
+Module: PKT3D                                        2. Words
+			Low    High   Length
+	      STARFP  000000  Global
+	      STARFW  000000  Global
+	      STARIP  000000  Global
+	      STARTP  000000  Global
+	      STARTW  000000  Global
+	      XXSSRC  000000  Global
+	<CODE  >      020166  020172  000004         2. Words
+	      SNDRCR  020166  Global
+
+********************************************
+Module: CMDTYM                                     494. Words
+			Low    High   Length
+	<PURE  >      002014  002034  000020         8. Words
+	      TYMENT  002014  Global
+	<CODE  >      020172  022106  001714       486. Words
+
+********************************************
+Module: CMDS                                       660. Words
+			Low    High   Length
+	      .CXACK  000010  Global
+	      .CXCIN  000002  Global
+	      .CXCMD  000000  Global
+	      .CXDAK  000016  Global
+	      .CXDIS  000014  Global
+	      .CXECL  000004  Global
+	      .CXNAK  000012  Global
+	      .CXRST  000006  Global
+	<CODE  >      022106  024552  002444       658. Words
+	      CMDACK  022350  Global
+	      CMDCNP  022644  Global
+	      CMDCON  023514  Global
+	      CMDDAK  022252  Global
+	      CMDDIS  022106  Global
+	      CMDENT  022324  Global
+	      CMDNAK  022622  Global
+	      EATBLK  023332  Global
+	      ENDLIN  023170  Global
+	      GETDEC  023240  Global
+	      INLOUT  023110  Global
+	      MAKDSC  024432  Global
+	      OUTDEC  023372  Global
+	      OUTSTR  023174  Global
+	      OUTST1  023200  Global
+	      TRSSRC  024500  Global
+	      WATIDL  023050  Global
+	<PURE  >      002034  002040  000004         2. Words
+
+********************************************
+Module: TRM                                       2896. Words
+			Low    High   Length
+	      FPCCCR  000025  Global
+	      FPCNCH  000023  Global
+	      FPCOUT  000004  Global
+	      FPCRLF  000001  Global
+	      FPCRTN  000010  Global
+	      FPDONX  000003  Global
+	      FPIXLF  000015  Global
+	      FPLINF  000006  Global
+	      FPNEBS  000034  Global
+	      FPNLFD  000021  Global
+	      FPNSPA  000017  Global
+	      FPPRFX  000012  Global
+	      FPXBSE  000037  Global
+	      .CXBSP  000004  Global
+	      .CXCAN  000030  Global
+	      .CXCNT  000002  Global
+	      .CXCRN  000016  Global
+	      .CXDC2  000024  Global
+	      .CXDLE  000020  Global
+	      .CXEOT  000056  Global
+	      .CXESC  000032  Global
+	      .CXFFD  000014  Global
+	      .CXHSP  000042  Global
+	      .CXHTB  000006  Global
+	      .CXLCA  000040  Global
+	      .CXLCS  000052  Global
+	      .CXLFD  000010  Global
+	      .CXNUL  000000  Global
+	      .CXPRE  000054  Global
+	      .CXRUB  000044  Global
+	      .CXSMI  000036  Global
+	      .CXUCA  000034  Global
+	      .CXUCS  000050  Global
+	      .CXUNU  000046  Global
+	      .CXVTB  000012  Global
+	      .CXXOF  000026  Global
+	      .CXXON  000022  Global
+	<ONCE  >      125730  125776  000046        19. Words
+	<CODE  >      024552  037004  012232      2637. Words
+	      BALTMO  032772  Global
+	      BRDRDY  034670  Global
+	      BRDTMO  034750  Global
+	      BREAKR  035224  Global
+	      CARDET  034550  Global
+	      CARLOS  035002  Global
+	      CHRDLY  036710  Global
+	      CON2TR  035362  Global
+	      HANGU4  035202  Global
+	      HNDXON  036324  Global
+	      HUNGUP  035052  Global
+	      INPGET  032676  Global
+	      OUTCHR  032550  Global
+	      OUTCOD  034460  Global
+	      OUTDLY  032174  Global
+	      OUTGET  032534  Global
+	      OUTIDL  032710  Global
+	      OUTRDY  031602  Global
+	      OUTRD1  031610  Global
+	      RNGDET  034470  Global
+	      SNDGRX  036150  Global
+	      TRDATA  025246  Global
+	      TRDDBI  024552  Global
+	      TRINTR  024702  Global
+	      TRMFNC  035606  Global
+	      TRMSTP  035636  Global
+	      TROCNT  034154  Global
+	      TRRSUM  031536  Global
+	      TRSDBI  024600  Global
+	<SECOND>      110454  110460  000004         2. Words
+	<TENTHS>      110506  110512  000004         2. Words
+	<MAIN  >      110410  110414  000004         2. Words
+	<PURE  >      002040  002746  000706       227. Words
+	<IMPURE>      125546  125564  000016         7. Words
+	      CINCNT  125554  Global
+	      CINLST  125556  Global
+	      COTCNT  125560  Global
+	      COTLST  125562  Global
+
+********************************************
+Module: TRMF                                       815. Words
+			Low    High   Length
+	<CODE  >      037004  041602  002576       703. Words
+	      CLRBAL  037634  Global
+	      CPYPRM  041540  Global
+	      ENBKEY  037454  Global
+	      OUTCPK  037016  Global
+	      RPTBIT  041176  Global
+	      RPTBTX  041170  Global
+	      RPTPAR  041224  Global
+	      RPTTYP  041122  Global
+	      RPTVAL  041216  Global
+	      SETDFT  041314  Global
+	      SETPRF  041412  Global
+	      SETTCD  041560  Global
+	      SETTTP  041476  Global
+	      TRPOKE  037004  Global
+	<PURE  >      002746  003306  000340       112. Words
+
+********************************************
+Module: TRMP                                       458. Words
+			Low    High   Length
+	<CODE  >      041602  043422  001620       456. Words
+	      CHKTWO  042320  Global
+	      CLRCMC  043324  Global
+	      CLRIHB  043310  Global
+	      DECCNT  043112  Global
+	      DELCHR  042452  Global
+	      DELSRC  043264  Global
+	      ECHSLF  042364  Global
+	      GETCMC  042764  Global
+	      GETIHB  042572  Global
+	      PKTSLF  042402  Global
+	      PUTCHR  041602  Global
+	      PUTIHB  042662  Global
+	      REECHO  043360  Global
+	      RNGBEL  042162  Global
+	      SNDTRP  043156  Global
+	<TENTHS>      110512  110516  000004         2. Words
+
+********************************************
+Module: TRMT                                       419. Words
+			Low    High   Length
+	      MAXPRF  000010  Global
+	      MAXTYP  000015  Global
+	      PRFSIZ  000011  Global
+	      TPRMAX  000052  Global
+	      TYPSIZ  000012  Global
+	<PURE  >      003306  005014  001506       419. Words
+	      BRKTBL  003513  Global
+	      CHRINX  003306  Global
+	      DSPRPT  004112  Global
+	      FILDIV  003740  Global
+	      FILMUL  003713  Global
+	      PRFPNT  004772  Global
+	      TPFBTS  004750  Global
+	      TPFCMD  004704  Global
+	      TPFDFS  004552  Global
+	      TPFLFH  004574  Global
+	      TPFNM1  004506  Global
+	      TPFNM2  004530  Global
+	      TPRIDX  003766  Global
+	      TPROFF  004040  Global
+	      TPRTBL  003767  Global
+	      TTPBTS  004426  Global
+	      TTPNM1  004122  Global
+	      TTPNM2  004156  Global
+	      TTPWID  004337  Global
+	      TYPPNT  004462  Global
+
+********************************************
+Module: ZAPBUF                                      65. Words
+			Low    High   Length
+	<CODE  >      043422  043620  000176        63. Words
+	      ZAPBUF  043422  Global
+	<TENTHS>      110516  110522  000004         2. Words
+
+********************************************
+Module: STATUS                                     887. Words
+			Low    High   Length
+	<CODE  >      043620  047106  003266       859. Words
+	      STDDBI  043620  Global
+	      STPOKE  043700  Global
+	      STRSUM  043650  Global
+	      STSDBI  043622  Global
+	<PURE  >      005014  005104  000070        28. Words
+
+********************************************
+Module: LNK1                                        33. Words
+			Low    High   Length
+	<CODE  >      047106  047206  000100        32. Words
+	      LKDDBI  047106  Global
+	      LKSDBI  047136  Global
+	      NOLINK  047176  Global
+	<IMPURE>      125564  125566  000002         1. Words
+	      CURSX   125564  Global
+
+********************************************
+Module: LNK2                                       460. Words
+			Low    High   Length
+	<CODE  >      047206  050766  001560       440. Words
+	      CHKFLG  047316  Global
+	      CHKRSP  047242  Global
+	      FGPOKE  047262  Global
+	      LKCONT  050242  Global
+	      LKPDWN  047440  Global
+	      LKPOKE  047330  Global
+	      LKPOK0  047360  Global
+	      LNKDWN  050306  Global
+	      LNKUP   050564  Global
+	      MOVPKE  047766  Global
+	      MOVPKT  047712  Global
+	      MOVPK0  047746  Global
+	      NXTCFR  047652  Global
+	      NXTPKT  047460  Global
+	      RSPOKE  047206  Global
+	<PURE  >      005104  005150  000044        18. Words
+	<SECOND>      110460  110464  000004         2. Words
+
+********************************************
+Module: LNKF                                      2562. Words
+			Low    High   Length
+	      LKFLOD  000000  Global
+	      MAXMSG  000062  Global
+	<CODE  >      050766  062140  011152      2357. Words
+	      LFOUTX  055220  Global
+	      LFRSUM  051072  Global
+	      LKFINI  050766  Global
+	      LKFINS  051046  Global
+	      LKFSTR  056116  Global
+	<MAIN  >      110414  110420  000004         2. Words
+	<PURE  >      005150  005756  000606       195. Words
+	      MSGLEN  005524  Global
+	<IMPURE>      125566  125602  000014         6. Words
+	<SECOND>      110464  110470  000004         2. Words
+
+********************************************
+Module: LNKF2                                      296. Words
+			Low    High   Length
+	<CODE  >      062140  063230  001070       284. Words
+	      LKFIN2  062140  Global
+	      LKFOU2  062750  Global
+	<PURE  >      005756  006004  000026        11. Words
+	<IMPURE>      125602  125604  000002         1. Words
+
+********************************************
+Module: LNKHA                                     1149. Words
+			Low    High   Length
+	<PURE  >      006004  006444  000440       144. Words
+	<CODE  >      063230  067152  003722      1001. Words
+	      LHADWX  066570  Global
+	      LHAINX  064740  Global
+	      LHAISV  063230  Global
+	      LHAOSV  064116  Global
+	      LHASTX  066004  Global
+	<MAIN  >      110420  110424  000004         2. Words
+	<SECOND>      110470  110474  000004         2. Words
+
+********************************************
+Module: LKHPK1                                    1538. Words
+			Low    High   Length
+	      LKHLOD  000000  Global
+	      LKHSTR  000000  Global
+	<CODE  >      067152  074670  005516      1447. Words
+	      FILFRM  071506  Global
+	      LHPOKE  067426  Global
+	      LHRSUM  067424  Global
+	      LKHATO  070174  Global
+	      LKHBGN  067534  Global
+	      LKHBYO  074410  Global
+	      LKHINI  067152  Global
+	      LKHINS  067376  Global
+	      LKHNKL  071412  Global
+	      LKHSCM  074624  Global
+	<PURE  >      006444  006724  000260        88. Words
+	<IMPURE>      125604  125612  000006         3. Words
+	      LKHLFT  125606  Global
+
+********************************************
+Module: LKHPK2                                    2086. Words
+			Low    High   Length
+	<CODE  >      074670  104110  007220      1864. Words
+	      BADFRM  102456  Global
+	      BRKCIR  102702  Global
+	      CLRCIR  102774  Global
+	      EMPFRM  074670  Global
+	      LKHDWN  103626  Global
+	      LKHNPK  074746  Global
+	      LKHNXT  075054  Global
+	      LKHUP   103606  Global
+	      SNDSPR  102534  Global
+	<IMPURE>      125612  125716  000104        34. Words
+	      FRMXXX  125612  Global
+	<PURE  >      006724  007514  000570       188. Words
+
+********************************************
+Module: LKHPK3                                     712. Words
+			Low    High   Length
+	<CODE  >      104110  106516  002406       643. Words
+	      BALBCK  106462  Global
+	      LKHDAT  104110  Global
+	      LKHSPK  106372  Global
+	      SNDTYM  106342  Global
+	<PURE  >      007514  007704  000170        60. Words
+	<TENTHS>      110522  110526  000004         2. Words
+	<SECOND>      110474  110500  000004         2. Words
+	<IMPURE>      125716  125730  000012         5. Words
+	      LKHMNC  125726  Global
+	      ZAPCNT  125724  Global
+
+********************************************
+Module: TYMA                                        82. Words
+			Low    High   Length
+	      MAXRNT  000024  Global
+	<CODE  >      106516  106622  000104        34. Words
+	      TYNFIV  106576  Global
+	      TYNGTT  106516  Global
+	<PURE  >      007704  010044  000140        48. Words
+	      TYNFNF  007704  Global
+	      TYNRNT  010016  Global
+	      TYNRTN  007724  Global
+
+********************************************
+Module: TYMB                                        36. Words
+			Low    High   Length
+	<CODE  >      106622  106732  000110        36. Words
+	      PUTHSN  106700  Global
+	      TYMCON  106622  Global
+
+********************************************
+Module: LINA                                       144. Words
+			Low    High   Length
+	<CODE  >      106732  107360  000426       139. Words
+	      ASAFNC  107272  Global
+	      ASAINI  107004  Global
+	      ASAINT  106732  Global
+	      ASAOUI  107120  Global
+	      ASAOUT  107260  Global
+	      BPTINS  107040  Global
+	<VECTBL>      126602  126610  000006         3. Words
+	<SECOND>      110500  110504  000004         2. Words
+
+********************************************
+Module: ONCE                                       137. Words
+			Low    High   Length
+	<ONCE  >      125776  126420  000422       137. Words
+	      CODTOP  126420  Global
+	      ONCNRM  126010  Global
+	      ONCXDT  126000  Global
+
+********************************************
+Module: END                                         13. Words
+			Low    High   Length
+	<IMPURE>      125730  125730  000000         0. Words
+	      IMPEND  125730  Global
+	<MAIN  >      110424  110450  000024        10. Words
+	<INIT  >      110530  110532  000002         1. Words
+	      PUREND  110532  Global
+	<SECOND>      110504  110506  000002         1. Words
+	<TENTHS>      110526  110530  000002         1. Words
+	<VECTBL>      126610  126610  000000         0. Words
+	      VECEND  126610  Global
+    @ï
