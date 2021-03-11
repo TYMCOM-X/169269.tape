@@ -1,0 +1,485 @@
+begin "SysDpy - System Display Hack"
+
+  require "(sailib)sail.def" source!file;
+  require "rdisp.req" source!file;
+  require "(sailib)dul.req" source!file;
+  require "(sailib)bitops.req" source!file;
+
+! This is an afternoon hack to do reasonable system displays.
+! It is not intended to be blindingly fast or a fine specimen
+! of structured programming.  In fact, it sort of sucks.
+!
+! Dave W. Smith,  September 8, 1982.
+;
+! globals ;
+
+boolean StillRunning;			! true while we're still going ;
+
+integer SleepTime;			! seconds to sleep between scans ;
+
+string CmdLine, MsgLine;		! text of cmd and msg lines ;
+
+integer array Buffer[ 1 : 24, 1 : 16 ];	! screen buffer for redisplay ;
+integer Row, Col;			! current row, col within buffer ;
+
+string State!Codes;			! string of state codes ;
+
+integer array Ignore!Jobs[ 0 : 9 ];	! bitmap of jobs to ignore ;
+
+integer CPU!Tics,			! tics used last min ;
+	CPU!TicsPerMin;			! tics per min this cpu ;
+! Some utility routines
+;
+
+integer procedure Gettab( integer idx, tbl );
+  begin
+    return( calli( !xwd( idx, tbl ), '41 ));
+  end;
+
+
+string procedure CVHMS( integer HMS );
+  begin
+    string S;
+
+    S := cvs( HMS div 3600 ) & ":";
+    HMS := HMS mod 3600;
+    S := S & ( "0" & cvs( HMS div 60 ))[inf-1 to inf] & ":";
+    HMS := HMS mod 60;
+    S := S & ( "0" & cvs( HMS ))[inf-1 to inf];
+    return( S );
+
+  end;
+! initialization ;
+
+procedure InitSysDpy;
+  begin "initialization"
+    integer I, V;
+
+    if ( not ( Gettab( -1, -'20 ) land !bit(3) )) then
+      usererr( 0,0,"Requires SY", "x" );
+
+    T!Init;  T!ILP := false;
+    R!Init;
+
+    arrclr( Ignore!Jobs );
+
+    CPU!TicsPerMin := Gettab( '26, '11 ) * 60;
+
+    StillRunning := true;
+    SleepTime := 5;
+
+    CmdLine := NULL;
+    MsgLine := "Type ? for Help";
+
+    State!Codes := NULL;
+    I := 0;
+    while ( true ) do
+      begin "get state codes"
+	V := Gettab( I, '25 );
+	if ( not !skip! ) then done "get state codes";
+	State!Codes := State!Codes & cvxstr( V );
+	I := I + 1;
+      end "get state codes";
+
+  end "initialization";
+! Utility routine to put a string into the buffer
+;
+
+integer procedure Install( integer BP; string S );
+  begin "install string"
+
+    while ( length( S )) do idpb( lop( S ), BP );
+    return( BP );
+
+  end "install string";
+! Install information about the system
+;
+
+procedure InstallSystemInfo;
+  begin "install system info"
+    integer BP, V;  string S;
+
+    BP := point( 7, Buffer[ Row, Col ], -1 );
+    S := NULL;
+
+    S := S & cvstr( Gettab( 0,'11 )) & cvstr( Gettab( 1,'11 )) &
+	     cvstr( Gettab( 2,'11 )) & cvstr( Gettab( 3,'11 )) &
+	     cvstr( Gettab( 4,'11 ));
+    while ( length( S ) and ( S[inf for 1] = 0 )) do
+      S := S[1 to inf-1];
+    S := S & "  ";
+
+    case ( Gettab( '17,'11 ) lsh -15 land '7 ) of
+      begin
+	[0] begin end;
+	[1] S := S & "[Restricted]  ";
+	[2][3][6][7] S := S & "[SuperShut]  ";
+	[4] S := S & "[Shut]  ";
+	[5] S := S & "[Restricted+Shut]  "
+      end;
+
+    S := S & CVHMS( call( 0, "MSTIME" ) div 1000 );
+    S := S & "  Up " & CVHMS( Gettab('15,'12) div 60 );
+
+!    V := Gettab( '35, '11 );
+!    if ( V ) then S := S & "  Down in " & CVHMS( V );
+
+    ! other misc facts ;
+
+    Install( BP, S );
+
+    Row := Row + 1;
+    
+  end "install system info";
+! Install disk info
+;
+
+procedure InstallDiskInfo;
+  begin "install disk info"
+    integer V, BP, Unit, DskChrBits, FreePages;
+    integer array DskChrBlk[ 0 : 6 ];
+    string S;
+
+    BP := point( 7, Buffer[ Row, Col ], -1 );
+    S := "Disk Free  % Full";
+    Install( BP, S );
+
+    Row := Row + 1;
+
+    Unit := 0;  FreePages := 0;
+    while ( true ) do
+      begin "every unit";
+	BP := point( 7, Buffer[ Row, Col ], -1 );
+
+	DskChrBlk[0] := cvsix( "DSKB" & cvos( Unit ) );
+
+	start!code
+	  setzm !skip!;
+	  movei 1,access(DSKChrBlk[0]);
+	  hrli 1,'7;
+	  calli 1,'45;		! dskchr 1, ;
+	    setom !skip!;
+	  movem 1,DSKChrBits;
+	end;
+
+	if ( !skip! ) then done "every unit";
+
+	V := (( DSKChrBlk[6] - DSKChrBlk[3] ) * 10  ) div DSKChrBlk[6];
+
+	FreePages := FreePages + DSKChrBlk[3];
+
+	S := ( "B" & cvos( Unit ) & "  " )[ 1 for 4 ] &
+	     ( "     " & cvs( DSKChrBlk[3] ))[ inf-5 to inf ] & " " &
+	     ( "::::::::::"[ 1 for V ] & ".........." )[1 for 10];
+
+	BP := Install( BP, S );
+	Row := Row + 1; Unit := Unit + 1;
+	
+      end "every unit";
+
+    BP := point( 7, Buffer[ Row, Col ], -1 );
+    S := "Total Free = " & cvs( FreePages );
+    Install( BP, S );
+    Row := Row + 1;
+    
+  end "install disk info";
+! Install CPU info
+;
+
+procedure InstallCPUInfo;
+  begin "install CPU Info"
+    integer I, V, BP;
+    string S;
+
+    BP := point( 7, Buffer[ Row, Col ], -1 );
+    S := "% CPU busy";
+    Install( BP, S );
+
+    Row := Row + 1;
+
+    CPU!Tics := CPU!TicsPerMin - Gettab( '35, '12 );
+
+    BP := point( 7, Buffer[ Row, Col ], -1 );
+    V := (CPU!Tics * 10) div CPU!TicsPerMin;
+    S := ("::::::::::"[1 for V] & "..........")[1 for 10];
+    V := ( CPU!Tics * 100 ) div CPU!TicsPerMin;
+    S := S & ("  "&cvs(V))[inf-2 to inf] & "%";
+    Install( BP, S );
+
+    Row := Row + 1;
+    
+  end "install CPU Info";
+! Install information about selected jobs
+;
+
+procedure InstallJobInfo;
+  begin "install job info"
+    integer BP, V;  string S;
+    integer Job, HiJob;
+    integer JobStatus, JobPriv, JobAUN, JobGFD, JobTRU;
+
+    HiJob := Gettab( '20, '12 );
+
+    for Job := 1 upto HiJob do
+      begin "each job slot"
+
+	BP := point( 7, Buffer[ Row, Col ], -1 );
+
+	JobStatus := Gettab( Job, 0 );
+	if ( not ( JobStatus land !bit(3) )) then
+	  begin "not logged in"
+	    ClrBit( Job, Ignore!Jobs[0] );
+	    continue "each job slot";
+	  end "not logged in";
+
+	if ( TstBit( Job, Ignore!Jobs[0] )) then continue "each job slot";
+
+	JobPriv := Gettab( Job, 6 );
+	JobAUN := Gettab( Job, -'23 );
+	JobGFD := Gettab( Job, 2 );
+	JobTRU := Gettab( Job, 4 ) div 100;
+
+	! program name ;
+
+	S := (cvs(Job)&"    ")[1 to 4] &
+	     cvxstr( Gettab( Job, 3 )) & "  ";
+
+	! size in pages.  (uses incorrectly documented gettab) ;
+
+	V := Gettab( Job, '7 ) land '777;
+	S := S & (cvs(V)&"  ")[1 for 3] & " ";
+
+	! status ;
+
+	V := (JobStatus lsh -21) land '37;
+	if (( V = 0 ) and not ( JobStatus land !bit(0))) then
+	  S := S & "^C"
+	else
+	  S := S & State!Codes[ (V*2+1) for 2 ];
+
+	S := S & "  ";
+
+	! TRUs ;
+
+	S := S & ("       "&cvs( JobTRU div 100 ))[inf-6 to inf] & "." &
+		 ("0"&cvs( JobTRU mod 100 ))[inf-1 to inf] & "  ";
+
+	! user name ;
+	
+	S := S & cvxstr( Gettab( Job, -'22 )) &
+		 cvxstr( Gettab( Job, -'21 ));
+	while ( length( S ) and ( S[inf for 1] = " " )) do
+	  S := S[1 to inf-1];
+
+	! GFD'd username ;
+
+	if ( JobAUN neq JobGFD ) then
+	  S := S & " (" & CVUser( JobGFD ) & ")";
+	S := S & " ";
+
+	! other misc stuff ;
+
+	if ( JobPriv land (!Bit(8)+!Bit(23))) then S := S & "*";
+	if ( JobPriv land !bit(21)) then S := S & "+";
+
+	BP := Install( BP, S );
+
+	Row := Row + 1;
+	if ( Row = 23 ) then done "each job slot";
+
+      end "each job slot";
+    
+  end "install job info";
+! Fill the buffer with text to be displayed
+;
+
+procedure SetupBuffer;
+  begin "setup buffer"
+    integer BP; string S;
+
+    arrclr( Buffer, cvasc("     ") );
+
+    ! fill in the display ;
+
+    Row := 1;  Col := 1;
+    InstallSystemInfo;
+    InstallJobInfo;
+
+    Row := 2;  Col := 12;
+    InstallDiskInfo;
+    Row := Row + 1;
+    InstallCPUInfo;
+
+    ! fill in the message line ;
+    BP := point( 7, Buffer[23,1], -1 );
+    Install( BP, MsgLine );
+
+    ! fill in the command line ;
+    BP := point( 7, Buffer[24,1], -1 );
+    Install( BP, CmdLine );
+
+    
+  end "setup buffer";
+! Subroutines for the Command Parser
+;
+
+integer procedure ScanNumber;
+  begin
+    integer I;
+    I := 0;
+    while ( CmdLine = " " ) do lop( CmdLine );
+    while (( CmdLine >= "0" ) and ( CmdLine <= "9" )) do
+      I := I * 10 + (lop( CmdLine ) - "0");
+    return( I );
+  end;
+
+
+! Routine to set the sleep time
+;
+
+procedure SetSleepTime;
+  begin
+    lop( CmdLine );
+    if ( CmdLine neq " " ) then return;
+    SleepTime := ScanNumber;
+  end;
+! Set bits for jobs to be ignored (until the frame logs out).
+;
+
+procedure OmitJobs;
+  begin "ignore jobs"
+    integer Hi, Lo, C, I;
+
+    lop( CmdLine );
+
+    while ( true ) do
+      begin "scan command"
+	Lo := ScanNumber;
+	C := lop( CmdLine );
+	if ( C = "-" ) then
+	  begin
+	    Hi := ScanNumber;
+	    lop( CmdLine );
+	  end
+	else Hi := Lo;
+	for I := Lo upto Hi do
+	  if ( I <= 128 ) then SetBit( I, Ignore!Jobs[0] );
+	if ( C neq "," ) then done "scan command";
+      end "scan command";
+
+  end "ignore jobs";
+! Clear the 'ignore this job' bit for the specified jobs.
+;
+
+
+procedure IncludeJobs;
+  begin "include jobs"
+    integer Hi, Lo, C, I;
+
+    lop( CmdLine );
+
+    while ( true ) do
+      begin "scan the command"
+	Lo := ScanNumber;
+	C := lop( CmdLine );
+	if ( C = "-" ) then
+	  begin
+	    Hi := ScanNumber;
+	    lop( CmdLine );
+	  end
+	else Hi := Lo;
+	for I := Lo upto Hi do
+	  if ( I <= 128 ) then ClrBit( I, Ignore!Jobs[0] );
+	if ( C neq "," ) then done "scan ommand";
+      end "scan the command";
+
+  end "include jobs";
+! The Command Parser
+;
+
+procedure CommandParse;
+  begin "command parser"
+
+    if ( length( CmdLine ) = 0 ) then
+      MsgLine := NULL
+    else if ( kequ( CmdLine, "?" )) then
+      MsgLine := "Sorry, none yet.  Suggestions to DWS"
+    else if ( kequ( CmdLine, "Q" )) or ( kequ( CmdLine, "Quit" )) then
+      StillRunning := false
+    else if (( CmdLine = "Z" ) or ( CmdLine = "z" )) then
+      SetSleepTime
+    else if ( CmdLine = "-" ) then 
+      OmitJobs
+    else if ( CmdLine = "+" ) then
+      IncludeJobs
+    else
+      MsgLine := "Bad Command, Type ? for Help";
+
+    CmdLine := NULL;
+
+  end "command parser";
+! Command Scanner
+;
+
+procedure CommandScan;
+  begin "command scan"
+    integer C;
+
+    while ( T!ChrP ) do
+      begin "get a character"
+
+	C := T!GetC;
+
+	if ( C = 3 ) then
+	  StillRunning := false
+	else if ( C = #CR ) then
+	  CommandParse
+	else if (( C = '177 ) or ( C = #BS )) then
+	  CmdLine := CmdLine[1 to inf-1]
+	else if (( C >= " " ) and ( C <= "z" )) then
+	  CmdLine := CmdLine & C
+	else
+	  begin
+	    T!Bell;
+	    CmdLine := NULL;
+	  end;
+
+      end "get a character";
+
+  end "command scan";
+! Routine to sleep for the specifed amount of time or until a
+! break character arrives
+;
+
+procedure Snooze;
+  begin
+
+    if ( SleepTime ) then
+      calli( !xwd( '21, SleepTime ), '72 );	! hiber ;
+
+  end;
+! Top level logic
+;
+
+  InitSysDpy;
+
+  while ( StillRunning ) do    
+    begin "main loop"
+
+      SetupBuffer;
+
+      R!Disp( Buffer, true, 1, 1 );
+
+      if ( T!ChrP ) then
+	CommandScan
+      else
+	Snooze;
+
+    end "main loop";
+
+  T!Fini;
+
+  call(0,"EXIT");
+    
+end "SysDpy - System Display Hack";
+ *(w[0
