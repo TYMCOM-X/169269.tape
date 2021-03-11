@@ -1,0 +1,27 @@
+
+There appears to be a problem with the proposed circuit request
+mi]essage format. At present, whenever a message is received by the sup,
+there exists the possibility that the entire message was not removed
+from the sup's input ring into the input buffer (CBUF). There is also
+the possibility that the entire message was not yet received by the sup.
+In all records that the sup receives there is a byte count of the total
+number of bytes that the sup has received which is placed at the head of
+the record. In all of the current message types that the sup receives,
+it can be computed from the information provided within the first four
+bytes of the message--regardless of type--how long the message is
+SUPPOSED to be. By subtracting the actual byte count from the expected
+message length + header information, it can be immediately determined if
+}ia complete message was received. If it wasn't, then a microcode
+routine is called to get any more characters that might still be in the
+ring, and if that fails, then the message is marked as incomplete, put
+on a special list for incomplete messages, and it must wait until the
+rest of the message arrives.
+	With the proposed format, there is no way to determine how long
+the message is going to be, hence there is no way to determine if the
+entire message was received or not. The sup must be provided with
+some method for computing the expected length of message, or else it
+won't know if it got all of the message or not. Of course the easiest
+way is to send a byte count of the expected message and have it included
+within the first 3 halfwords, but then this would obviously entail
+changing the format. I'm open for suggestions.
+-Greg
