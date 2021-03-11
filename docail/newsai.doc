@@ -1,0 +1,207 @@
+	non-TENEX/TOPS20 SAIL:
+The SAIL run-time library can be made in 4 basic styles.  Of these
+one form (the great big RUNTIM.REL) is least often used, and is only
+marginally useful.  Typically any one site will have at least two of
+the others, and often has all three.
+
+-RUNTIM.REL
+	is a single load module with all of the SAIL runtimes in it.
+  Advantages:	No library search is necessary.
+  Disadvantages:All of the runtimes are loaded, even if you use only
+		a few of them.  
+		All of the runtimes are in the low segment, and are 
+		not shareable.
+		Severely impacts the size of small programs, thus 
+		causing them to require more swapping effort than
+		they really need.
+
+-LIBSA9.REL
+	is a library of runtimes that load into the low segment.
+  Advantages:	Since it is a library, only necessary code is loaded.
+		Since this is loaded into the low segment, you may use
+		this library for single-segment programs.
+  Disadvantages:No sharing of SAIL runtime-package code is possible.
+		Libraries load more slowly than load modules.
+		All of the runtimes are in the low segment, and are 
+		not sharable.
+
+-HLBSA9.REL
+	is a library of runtimes primarily in the high segment.
+  Advantages:	Again, since this is a library, only necessary code is
+		included in your core image.  In addition, this places
+		as much of the SAIL runtime code in the high segment as
+		possible.  There it can be part of a sharable high 
+		segment for SAIL programs (typically compiled to 
+		produce sharable code themselves) producing a useful 
+		amount of segment sharing for those individual SAIL
+		programs.  This can be extremely useful if the program
+		is widely used within the time-sharing system it is
+		running on (good technique for SAIL-language CUSPs).
+  Disadvantages:Any SAIL program loaded with this library will have
+		both segments, and the code is (slightly) larger for
+		two-segment operation.
+		Libraries load more slowly than load modules.
+		There is no possibility of sharing the runtimes except
+		with other incarnations of the same program.
+
+-SAILOW.REL+SAISG9.SHR
+	SAILOW is a load module which pulls in the hiseg SAISG9.SHR
+  Advantages:	loads extremely quickly, since the actual code has
+		already been loaded into the high segment.
+		Allows maximum sharing between diverse SAIL programs
+		since they may all use the same runtimes.  Minor bugs
+		in the runtimes may be fixed in the segment and will
+		become immediately available to all SAIL programs using
+		this version of the runtimes, whereas programs loaded
+		using the other library techniques need to be reloaded 
+		to receive the bug fixes.
+  Disadvantages:Prohibits any further sharing of code by two different
+		SAIL programs, since the high segment has already been
+		completely determined.  In fact, some huge programs
+		may not even fit if forced to exist soley in the low
+		segment.
+		Severely impacts the size of small programs, thus 
+		causing them to require more swapping effort than
+		they really need.
+		Requires special loading procedure for user programs
+		(SAILOW.REL must be the FIRST file loaded, otherwise
+		the high segment will not be properly linked up).
+		Some sites have gotten around this by installing a
+		special loader switch for SAIL that says (in effect)
+		"load SYS:SAILOW.REL first".
+The compiler normally comes in 4 flavors:
+A) debugging  -- Useful when checking out the SAIL compiler itself.  It
+		has code to trace the scanner and parser, to examine 
+		the compiler variables, and in general to get a picture
+		of what the machine thinks is going on.  Not recommended
+		for normal compilation use.
+B) low segment-- All code resides in the low segment.  The debugging
+		hooks are gone (as are their concommitant performance
+		reductions).  The major disadvantage is that this form
+		allows no sharing between simultaneous compilations.
+C) use SAISG9 -- Allows the compiler to share the same set of runtimes 
+		as the SAIL programs which are running.  If you intend 
+		to most often use the SAILOW/SAISG9 style of runtimes 
+		for running programs, this is the compiler you want, 
+		since it will share memory with the various SAIL 
+		programs as well as other compilations.
+D) reentrant  -- The majority of the code resides in the high segment.
+		This allows maximum sharing between simultaneous
+		compilations.  Also, (I believe) this is the only
+		form that supports the "/X" (extended compilation)
+		feature of the SAIL compiler.  If not, it does at least
+		reduce the amount of disk storage necessary for saving
+		extended compilers.
+	Putting SAIL up on your system (long form).
+
+put files onto an empty directory
+
+run CKS as described in the accompanying document.
+
+load (with symbols) your DDT, SAIL.REL /L LIBSA9.REL and save as SAIL. 
+	(LIBSA9.REL is a library file)
+	you are now through with SAIL.REL
+[use this SAIL for all .SAI compilations below]
+
+In order to get this SAIL to work properly, make sure device SYS: has
+	files 2OPS2.OPS, GOGTAB.DEF, and LIBSA9.REL.  If it does not,
+	you may use the files provided on the tape.
+
+compile and load PTRAN.SAI
+	this requires SCNCMD.SAI and WNTSLS.SAI
+
+execute your PTRAN (command line is "PROD_HEL" <cr>)
+	this requires file HEL
+	you are now through with PTRAN.SAI, PTRAN.REL
+    [PTRAN translates the rules in HEL into 
+	a production table PROD and PROD.QQQ]
+
+compile and load RTRAN.SAI
+	this requires SCNCMD.SAI and WNTSLS.SAI
+
+execute your RTRAN (command line is "RESTAB_PROD.QQQ,FOO2")
+	you are now through with RTRAN.SAI, RTRAN.REL, SCNCMD.SAI,
+	 and WNTSLS.SAI
+    [RTRAN translates the production table PROD produced by PTRAN
+	and the list of runtimes in FOO2 into a parse table for the
+	compiler]
+
+modify file HEAD if desired (most likely change is the second line:
+	from "?KI10SW__1" to "?KL10SW__1" to say you want to take 
+	advantage of the KL instruction set, rather than simply using
+	the KI instructions.)  The CPU specification affects only the 
+	code in the compiler at this step (not compiler emitted code).
+
+Select which form of compiler you desire from the ones on the previous 
+	page, and assemble with FAIL using the appropriate command file 
+	(command line is "FILE@" <cr>).  If you intend to rebuild the 
+	libraries (a good idea if you are changing the CPU switch), do 
+	not load these files until you have rebuilt the libraries.
+	
+Compiler  Command	Load (in the specified order!)
+type	   file
+A	LSAILD.CMD	(with symbols) your DDT, LSAILD.REL, /L LIBSA9.REL
+B	LSAIL.CMD	LSAIL.REL, /L LIBSA9.REL
+C	LSAIL.CMD	SAILOW.REL, LSAIL.REL (*)
+D	RSAIL.CMD(**)	XTCLOR.REL, RSAIL.REL, /L HLBSA9.REL
+
+(*)  See notes on SAILOW above -- it is not a normal library.
+(**) You will need file SAILOR.FAI as well.  If it is not there (SCISS
+	likes to delete it), compile and run SCISS.SAI, take the non-
+	standard option called "Select entries from prompt list", and
+	reply "Y" to all prompts up to and including "SAILOR".  On the
+	next prompt, reply "N", and on the next prompt reply "DONE".
+	Constructing the runtime libraries
+
+Make sure you have fixed HEAD as you desire (see previous page).
+
+for RUNTIM.REL
+    1) run FAIL, command line: "RUNTIM.CMD@"
+
+for SAILOW/SAISG9
+    1) run FAIL, command line: "SEGMNT.CMD@"
+    2) load (with symbols) TAILOR.REL, UPPER.REL, and your DDT
+	(in that order!)
+    3) execute the resultant core image, which will make SAILOW.REL
+	and SAISG9.SHR on your directory
+  Note: The code in SAILOW will know the file name and PPN of its
+	associated segment. (the default is SAISG9.SHR[1,4])
+    4) the files you have now constructed must go on device SYS:.  
+	They are:	SAILOW.REL and SAISG9.SHR
+
+for LIBSA9 and/or HLBSA9
+    1) compile and load SCISS.SAI
+    2) save SCISS (since it starts another pass with a RUNPRG)
+    3) Run SCISS Reply Y<cr> to all questions.  SCISS will cut the large
+	runtime files into a large number of files which are the the 
+	separate elements of the runtime library.  It then jumps to 
+	FAIL which will perform all the necessary assemblies.  Note: at 
+	TYMSHARE, our experience has been that FAIL breaks down part 
+	way through the assemblies, and gives an error message to the 
+	effect that COMMENT is an undefined opcode, or some other such 
+	garbage.  If this happens to you, just re-run SCISS as if you 
+	had not done so before, and it will notice that it actually has
+	done some of its work, and will therefore skip the first 
+	assemblies.  This has been enough for our SCISS in every case. 
+	If further errors occur, something is most likely really broken.
+	SCISS will eventually tell you that it has created your 
+	libraries on your directory.  If you got no message from FAIL
+	about what it was assembling, then apparently SCISS did not
+	jump to FAIL successfully.  In that case, just run FAIL and
+	give it the command "###FAI.TMP@" <cr>  (###=your job number).
+	This is the file that SCISS made for FAIL to use, and what you
+	just did was tell FAIL where its command file was.
+
+    4) the files you have now constructed must go on device SYS:.  
+	They are:	HLBSA9.REL and LIBSA9.REL and GOGTAB.DEF
+Constructing BAIL and its myriad aary files
+	(a number of BAIL file sources are created during the PTRAN run)
+    1) Compile BAIL with SAIL getting BAIL.REL
+    2) run FAIL, command line "BAIFLS.CMD@"
+    3) load BAISM1.REL and start it.
+    4) the files you have now constructed must go on device SYS:.  
+	They are:
+	BAICLC.REL, BAIIO1.REL, BAIIO2.REL, BAIMSC.REL, BAIPRC.REL, 
+	BAICLC.SM1, BAIIO1.SM1, BAIIO2.SM1, BAIMSC.SM1, BAIPRC.SM1, 
+	BAIL.REL and BAIPD9.REL
+   d e¾
