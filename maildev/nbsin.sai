@@ -1,0 +1,1165 @@
+Entry;
+
+begin "NBS-In"
+
+  require "
+[Must be compiled /R]
+" message;
+  require "(sailib)sail.def" source!file;
+  require "nbsmsg.def" source!file;
+
+  define DEBUG = {false};
+
+
+!               N   N  BBBB    SSSS   III   N   N
+!               NN  N  B   B  S        I    NN  N
+!               N N N  BBBB    SSS     I    N N N
+!               N  NN  B   B      S    I    N  NN
+!               N   N  BBBB   SSSS    III   N   N
+!
+!    A routine to extract an NBS format mail packet from a stream
+!  of bytes and return a record filled with (a subset of) the data
+!  in the packet.
+!
+!  Dave W. Smith,  June 1982 ;
+
+
+!  Primary reference:
+!
+!	SPECIFICATION FOR MESSAGE FORMAT
+!	COMPUTER BASED MESSAGE SYSTEMS
+!
+!	National Bureau of Standards
+!	Institute for Computer Sciences and Technology
+!
+!	September, 1981
+!
+!  Also available on ARPA as [SRI-NIC]<NETINFO>RFC806.DOC ;
+! The 'node' record is used internally to build up a tree which is
+! later collapsed into an 'NBS!Rec'. ;
+
+record!class node (
+    record!pointer ( node ) link, more;
+    string title, text );
+
+define node!pointer = {record!pointer ( node )};
+! The count stack is used to keep track of bytes eaten when in nested
+! elements.  Eating a byte decrements all active counts. ;
+
+  integer CST;
+  integer array CS[ 1 : 10 ];
+
+
+! Push a count onto the count stack ;
+
+procedure PushCount( integer C );
+  begin
+    CST := CST + 1;
+    CS[ CST ] := C;
+    if ( DEBUG ) then
+      print( "push CS["&cvs(CST)&"]="&cvs(CS[CST])&crlf );
+  end;
+
+
+! Pop the stack ;
+
+procedure PopCount;
+  begin
+    CST := CST - 1;
+    if ( DEBUG ) then
+      print( "pop  CST="&cvs(CST)&crlf );
+  end;
+
+
+! Return the top value on the stack ;
+
+integer procedure Count;
+  begin
+    return( CS[ CST ] );
+  end;
+! Procedure to get the next Octet ;
+
+integer procedure GetOctet( integer procedure Source );
+  begin "GetOctet"
+
+    integer T;
+
+   ! first update our length structure ;
+
+   if ( CST > 0 ) then
+     begin
+       for T := CST downto 1 do
+	 begin
+	   if ( CS[ T ] < 0 ) then done;
+	   CS[ T ] := CS[ T ] - 1;
+	 end;
+     end;
+
+    T := Source;
+
+!    if ( DEBUG ) then
+!      print( "'"&cvos(T)&crlf );
+
+    return( T );
+
+  end "GetOctet";
+! Stuff which gets set up for each sub-packet ;
+
+integer PropertyListP,
+	PacketType,
+	PacketLength;
+
+
+! Parse the packet type and packet length ;
+
+procedure SetupPacket( integer procedure Source );
+  begin "setup packet"
+    integer B, C;
+
+    B := GetOctet( Source );
+    PropertyListP := ( B land '200 );
+
+! ** hack ** ;
+    if ( PropertyListP ) then
+      usererr( 0,0,"?NBSIN - GAK! A property list!  Oh My!","x" );
+! ** hack ** ;
+
+    PacketType := ( B land '177 );
+
+    B := GetOctet( Source );
+    if ( not ( B land '200 )) then
+      PacketLength := B
+    else if ( B = '200 ) then
+      PacketLength := -1		! undefined length ;
+    else
+      begin
+	C := ( B land '177 );
+	PacketLength := 0;
+	while ( C ) do
+	  begin
+	    PacketLength := PacketLength * '400 + GetOctet( Source );
+	    C := C - 1;
+	  end;
+      end;
+
+    if ( DEBUG ) then
+      print( "Setup Type = '"&cvos(PacketType)&
+	      ", Len = '"&cvos(PacketLength)&crlf );
+
+    PushCount( PacketLength );
+
+  end "setup packet";
+! Routine to skip an element ;
+
+node!pointer procedure IgnorePacket( integer procedure Source; string Why );
+  begin "ignore packet"
+
+    print( "%NBSIN - ignoring ", Why, crlf );
+
+    while ( Count ) do
+      GetOctet( Source );
+
+    PopCount;
+
+    return( null!record );
+
+  end "ignore packet";
+! ['0] No-Op - Primitive ;
+
+node!pointer procedure NoOp( integer procedure Source );
+  begin
+
+    PopCount;
+
+    return( null!record );
+
+  end;
+! ['1] End-of-Constructor - Primitive ;
+
+! The End-of-Constructor is used to indicate the end of a packet of
+! indeterminate length.  Therefore we look on the count stack for
+! a negative count, (indicating unknown length), and zero it. ;
+
+node!pointer procedure End!Of!Constructor( integer procedure Source );
+  begin "end of constructor"
+    integer T, V;
+
+    if ( DEBUG ) then
+      print( "[End-of-Constructor]", crlf );
+
+    ! close the top object of undefined length ;
+
+    T := CST;
+    while ( T ) do
+      begin
+	V := CS[ T ];
+	CS[ T ] := 0;
+	if ( V < 0 ) then done;
+	T := T - 1;
+      end;
+
+    PopCount;
+
+    return( null!record );
+
+  end "end of constructor";
+! ['2] ASCII-String - Primitive ;
+
+node!pointer procedure ASCII!String( integer procedure Source );
+  begin "ascii string"
+    node!pointer N;  string T;
+
+    T := NULL;
+
+    N := new!record( node );
+    node:title[N] := "ascii-string";
+
+    while ( Count ) do
+      T := T & ( GetOctet( Source ) land '177 );
+    node:text[N] := T;
+
+    if ( DEBUG ) then
+      print( "ASCII /" & T & "/" & crlf );
+
+    PopCount;
+
+    return( N );
+
+  end "ascii string";
+! ['10] Boolean - Primitive ;
+
+! ['11] Unique-ID - [ ASCII-String | Bit-String | Integer ] ;
+
+! ['12] Sequence ;
+
+! ['13] Set ;
+
+! ['21] Padding - Primitive ;
+
+! ['40] Integer - Primitive ;
+
+! ['44] Property-List - contains [ Property ]* ;
+
+node!pointer procedure PropertyList( integer procedure Source );
+  begin "p-list"
+    node!pointer X;
+
+    X := IgnorePacket( Source, "Property-List" );
+
+    PopCount;
+
+    return( null!record );    
+
+  end "p-list";
+! ['50] Date - [ ASCII-String ] ;
+
+node!pointer procedure Date( integer procedure Source );
+  begin "date"
+
+    node!pointer N;
+
+    N := new!record( node );
+    node:title[ N ] := "date";
+
+    SetupPacket( Source );
+    if ( PacketType neq '2 ) then
+      node:link[N] := IgnorePacket( Source, "non-ASCII Date" )
+    else
+      node:link[N] := ASCII!String( Source );
+
+    PopCount;
+
+    return( N );
+
+  end "date";
+! ['103] Bit-String - Primitive - qualifier is fill bit count ;
+
+! ['106] Compressed - [Bit-String] - qualifier is CID ;
+  ! CID 0 is Unspecified ;
+  ! CID 1 is NBS!Standard ;
+
+! ['105] Property - qualifier is PID ;
+  ! PID 1 is Comment - [ ASCII!String ]* ;
+  ! PID 2 is Printing-Name - [ ASCII!String ] ;
+
+! ['107] Encrypted - [Bit-String] - qualifier is EID ;
+  ! EID 0 is Unspecified ;
+  ! EID 1 is NBS-Standard ;
+! ['114] Field - qualifier is FID ;
+
+! This is the basic message constructor.  The qualifier determines
+! which of the myriad field types this is. ;
+
+node!pointer procedure Field( integer procedure Source );
+  begin "field"
+
+    node!pointer N, M;
+    integer Qualifier;
+
+    N := new!record( node );
+    node:title[N] := "Field";
+
+    Qualifier := GetOctet( Source );
+
+    if ( DEBUG ) then
+      print( "FID = '", cvos( Qualifier ), crlf );
+
+    ! Now we fall into a big if/then/else to do the Qualifier ;
+
+! continued ... ;
+! continued ... ;
+
+    if ( Qualifier = '1 ) then
+      begin "from"
+
+ 	node:text[N] := "from";
+
+	! [ originator-identity ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "originator";
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII From:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "originator";
+
+end "from"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '2 ) then
+      begin "posted-date"
+
+	node:text[N] := "posted-date";
+
+	! [ Date ] ;
+
+        SetupPacket( Source );
+	if ( PacketType neq '50 ) then
+	  node:link[N] := IgnorePacket( Source, "non Date Posted-Date" )
+	else
+	  node:link[N] := Date( Source );
+
+      end "posted-date"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '3 ) then
+      begin "reply-to"
+
+	node:text[N] := "reply-to";
+
+	! [ recipient ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "recipient"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Reply-To:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "recipient";
+
+      end "reply-to"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '4 ) then
+      begin "text"
+
+	node:text[N] := "text";
+
+	! [ anything ]* ;
+
+	SetupPacket( Source );
+	if ( PacketType neq '2 ) then
+	  node:link[N] := IgnorePacket( Source, "non-ASCII Text" )
+	else
+	  node:link[N] := ASCII!String( Source );
+
+      end "text"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '5 ) then
+      begin "to"
+
+	node:text[N] := "to";
+
+	! [ recipient ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "recipient"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2en
+	      node:link[M] := IgnorePacket( Source, "non-ASCII To:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "recipient";
+
+      end "to"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '6 ) then
+      begin "cc"
+
+	node:text[N] := "Cc";
+
+	! [ recipient ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "recipient"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Cc:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "recipient";
+
+      end "cc"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '7 ) then
+      begin "subject"
+
+	node:text[N] := "Subject";
+
+	! [ ASCII-String ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "subject"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Subject:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "subject";
+
+      end "subject"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '10 ) then
+      begin "attachments"
+
+	node:text[N] := "Attachments";
+
+	! unrestricted ;
+
+	node:link[N] := IgnorePacket( Source, "Attachments:" );
+
+      end "attachments"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '14 ) then
+      begin "author"
+
+	node:text[N] := "Author";
+
+	! [ originator ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "each author"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Author:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "each author";
+
+      end "author"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '15 ) then
+      begin "bcc"
+
+	node:text[N] := "Bcc";
+
+	! [ recipient ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "recipient"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Bcc:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "recipient";
+
+      end "bcc"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '16 ) then
+      begin "circulate-next"
+
+	node:text[N] := "Circulate-Next";
+
+	! [ recipient ]* ;
+
+	node:link[N] := IgnorePacket( Source, "Circulate-Next:" );
+
+      end "circulate-next"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '17 ) then
+      begin "circulate-to"
+
+	node:text[N] := "Circulate-To";
+
+	! [ recipient ]* ;
+
+	node:link[N] := IgnorePacket( Source, "Circulate-To:" );
+
+      end "circulate-to"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '20 ) then
+      begin "comments"
+
+	node:text[N] := "Comments";
+
+	! [ ASCII-String ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "each comment"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Comments:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "each comment";
+
+      end "comments"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '21 ) then
+      begin "date"
+
+	node:text[N] := "Date";
+
+	! [ Date ] ;
+
+	SetupPacket( Source );
+	if ( PacketType neq '50 ) then
+	  node:link[N] := IgnorePacket( Source, "Bad Date" )
+	else
+	  node:link[N] := Date( Source );
+
+      end "date"
+ 
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '22 ) then
+      begin "end-date"
+
+	node:text[N] := "End-Date";
+
+	! [ Date ] ;
+
+	node:link[N] := IgnorePacket( Source, "End-Date:" );
+
+      end "end-date"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '23 ) then
+      begin "in-reply-to"
+
+	node:text[N] := "In-Reply-To";
+
+	! [ Unique-ID | ASCII-String ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "each something"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII In-Reply-To:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "each something";
+
+      end "in-reply-to"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '24 ) then
+      begin "keywords"
+
+	node:text[N] := "Keywords";
+
+	! [ ASCII-String ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "each keyword"
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII Keywords:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "each keyword";
+
+      end "keywords"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '25 ) then
+      begin "message-class"
+
+	node:text[N] := "Message-Class";
+
+	! [ ASCII-String ] ;
+
+	node:link[N] := IgnorePacket( Source, "Message-Class:" );
+
+      end "message-class"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '26 ) then
+      begin "message-id"
+
+	node:text[N] := "Message-ID";
+
+	! [ Unique-ID ] ;
+
+	node:link[N] := IgnorePacket( Source, "Message-ID:" );
+
+      end "message-id"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '27 ) then
+      begin "o-s-n"
+
+	node:text[N] := "Originator-Serial-Number";
+
+	! [ ASCII-String ]* ;
+
+	node:link[N] := IgnorePacket( Source, "Originator-Serial-Number" );
+
+      end "o-s-n"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '30 ) then
+      begin "precedence"
+
+	node:text[N] := "Precedence";
+
+	! [ ASCII-String ] ;
+
+	node:link[N] := IgnorePacket( Source, "Precedence" );
+
+      end "precedence"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '31 ) then
+      begin "received-date"
+
+	node:text[N] := "Received-Date";
+
+	! [ Date ] ;
+
+	node:link[N] := IgnorePacket( Source, "Received-Date:" );
+
+      end
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '32 ) then
+      begin "received-from"
+
+	node:text[N] := "Received-From";
+
+	node:link[N] := IgnorePacket( Source, "Received-From:" );
+
+      end "received-from"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '40 ) then
+      begin "references"
+
+	node:text[N] := "References";
+
+	! [ Unique-ID | ASCII-String ]* ;
+
+	node:link[N] := IgnorePacket( Source, "References:" );
+
+      end "references"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '42 ) then
+      begin "sender"
+
+	node:text[N] := "Sender";
+
+	! [ originator-identity ]* ;
+
+	M := N;
+
+	while ( Count ) do
+	  begin "originator";
+
+	    SetupPacket( Source );
+
+	    if ( PacketType = '1 ) then
+	      node:link[M] := End!Of!Constructor( Source )
+	    else if ( PacketType neq '2 ) then
+	      node:link[M] := IgnorePacket( Source, "non-ASCII From:" )
+	    else
+	      node:link[M] := ASCII!String( Source );
+
+	    if ( Count ) then
+	      begin
+		node:more[M] := new!record( node );
+		M := node:more[M];
+	      end;
+
+	  end "originator";
+
+      end "sender"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '43 ) then
+      begin "start-date"
+
+	node:text[N] := "Start-Date";
+
+	! [ Date ] ;
+
+	node:link[N] := IgnorePacket( Source, "Start-Date:" );
+
+      end "start-date"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '44 ) then
+      begin "warning-date"
+
+	node:text[N] := "Warning-Date";
+
+	! [ Date ] ;
+
+	node:link[N] := IgnorePacket( Source, "Warning-Date:" );
+
+      end "warning-date"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '45 ) then
+      begin "reissue-type"
+
+	node:text[N] := "Reissue-Type";
+
+	! [ ASCII-String ] ;
+
+	node:link[N] := IgnorePacket( Source, "Reissue-Type:" );
+
+      end "reissue-type"
+
+! continued ... ;
+! continued ... ;
+
+    else if ( Qualifier = '46 ) then
+      begin "obsoletes"
+
+	node:text[N] := "Obsoletes";
+
+	! [ Unique-ID ] ;
+
+	node:link[N] := IgnorePacket( Source, "Obsoletes:" );
+
+      end "obsoletes"
+
+! continued ... ;
+! continued ... ;
+
+    else
+      begin "?"
+
+	node:text[N] := "*unknown*";
+
+	node:link[N] := IgnorePacket( Source, "FID = '"&cvos( Qualifier ) );
+
+      end "?";
+
+    PopCount;
+    return( N );
+
+  end "field";
+! ['115] Message - contains [ Field | Message ]* - qualifier is MID ;
+
+! MID 1 is NBS-Standard ;
+
+node!pointer procedure Message( integer procedure Source );
+  begin "message"
+
+    node!pointer N1, N2;
+    integer Qualifier;
+
+    Qualifier := GetOctet( Source );
+
+    N1 := N2 := new!record( node );
+
+    node:title[N2] := "message";
+
+    while ( Count ) do
+      begin "each field"
+
+	SetupPacket( Source );
+
+	if ( PacketType = '1 ) then
+	  node:link[N2] := End!Of!Constructor( Source )
+	else if ( PacketType = '114 ) then
+	  node:link[N2] := Field( Source )
+	else
+	  node:link[N2] := IgnorePacket( Source, "'"&cvos( PacketType ));
+
+	if ( Count ) then
+	  begin
+	    node:more[N2] := new!record( node );
+	    N2 := node:more[N2];
+	  end;
+
+      end "each field";
+
+    PopCount;
+    return( N1 );
+
+  end "message";
+! ['176] Extension ;
+
+! ['177] Vendor-Defined ;
+
+! A diagnostic routine to dump a tree ;
+
+recursive procedure DumpTree( node!pointer N; integer Level );
+  begin
+    integer I;
+
+    if ( N = null!record ) then return;
+
+    while ( N ) do
+      begin
+	for I := 1 upto Level do print( "  " );
+	if ( node:title[N] ) then
+	  print( node:title[N], crlf )
+	else
+	  print( "...", crlf );
+	DumpTree( node:link[N], Level+1 );
+	N := node:more[N];
+      end;
+
+
+  end;
+
+! This routine flattens our node-tree into the NBS record ;
+
+procedure FlattenTree( node!pointer N;
+		       record!pointer ( NBS!Rec ) NBS );
+  begin "flatten"
+
+    node!pointer F, D, E;
+    string FID, FData;
+
+    F := node:link[N];
+    if ( not equ( node:title[F], "message" )) then
+      usererr( 0,0,"?NBSIN - no message at root","x" );
+
+    while ( F neq null!record ) do
+      begin "each field"
+	label TryNextField;
+
+        D := node:link[F];
+
+	if ( D = null!record ) then goto TryNextField;
+
+	if ( not ( kequ( node:title[D], "field" ))) then
+	  usererr( 0,0,"?NBSIN - message had no fields","x" );
+
+	FID := node:text[D];
+	FData := NULL;
+
+	while ( D neq null!record ) do
+	  begin "data in field"
+
+	    E := node:link[D];
+	    if ( E neq null!record ) then
+	      begin
+		if ( kequ( node:title[E], "ascii-string" )) then
+		  begin
+		    if ( length( FData )) then
+		      FData := FData & 0 & node:text[E]
+		    else
+		      FData := node:text[E];
+		  end
+		else if ( kequ( node:title[E], "date" )) then
+		  FData := FData & node:text[ node:link[E]]
+		else
+		  usererr(0,0,"?NBSIN - bad field element "&node:title[E] );
+	      end;
+
+	    D := node:more[D];
+	  end "data in field";
+
+	if ( kequ( FID, "posted-date" )) then
+	  NBS!Rec:PostedDate[ NBS ] := FData
+	else if ( kequ( FID, "date" )) then
+	  NBS!Rec:Date[ NBS ] := FData
+	else if ( kequ( FID, "to" )) then
+	  begin
+	    if ( length( NBS!Rec:To[ NBS ] )) then
+	      NBS!Rec:To[ NBS ] := NBS!Rec:To[ NBS ] & 0 & FData
+	    else
+	      NBS!Rec:To[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "from" )) then
+	  begin
+	    if ( NBS!Rec:From[ NBS ] ) then
+	      NBS!Rec:From[ NBS ] := NBS!Rec:From[ NBS ] & 0 & FData
+	    else
+	      NBS!Rec:From[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "sender" )) then
+	  NBS!Rec:Sender[ NBS ] := FData
+	else if ( kequ( FID, "reply-to" )) then
+	  begin
+	    if ( NBS!Rec:ReplyTo[ NBS ] ) then
+	      NBS!Rec:ReplyTo[ NBS ] := NBS!Rec:ReplyTo[ NBS ] & 0 & FData
+	    else
+	      NBS!Rec:ReplyTo[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "cc" )) then
+	  begin
+	    if ( NBS!Rec:Cc[ NBS ] ) then
+	      NBS!Rec:Cc[ NBS ] := NBS!Rec:Cc[ NBS ] & 0 & FData
+	    else
+	      NBS!Rec:Cc[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "bcc" )) then
+	  begin
+	    if ( NBS!Rec:Bcc[ NBS ] ) then
+	      NBS!Rec:Bcc[ NBS ] := NBS!Rec:Bcc[ NBS ] & 0 & FData
+	    else
+	      NBS!Rec:Bcc[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "subject" )) then
+	  NBS!Rec:Subject[ NBS ] := FData
+	else if ( kequ( FID, "in-reply-to" )) then
+	  NBS!Rec:InReplyTo[ NBS ] := FData
+	else if ( kequ( FID, "keywords" )) then
+	  begin
+	    if ( NBS!Rec:Keywords[NBS] ) then
+	      NBS!Rec:Keywords[NBS] := NBS!Rec:Keywords[NBS] & 0 & FData
+	    else
+	      NBS!Rec:Keywords[ NBS ] := FData;
+	  end
+	else if ( kequ( FID, "text" )) then
+	  NBS!Rec:Text[ NBS ] := NBS!Rec:Text[ NBS ] & FData
+	else if ( kequ( FID, "comments" )) then
+	  NBS!Rec:Comments[ NBS ] := NBS!Rec:Comments[ NBS ] & FData;
+	  
+TryNextField:
+	F := node:more[F];
+      end "each field";
+
+  end "flatten";
+! This is the main worker ;
+
+internal boolean procedure NBSUnPack( integer procedure Source;
+				      NBS!pointer NBS );
+  begin "unpack"
+    node!pointer N;
+
+    N := new!record( node );
+    node:title[N] := "root";
+
+    SetupPacket( Source );
+    if ( PacketType neq '115 ) then
+      node:link[N] := IgnorePacket( Source, "non-Message" )
+    else
+      node:link[N] := Message( Source );
+
+    if ( DEBUG ) then
+      DumpTree( N, 1 );
+
+    FlattenTree( N, NBS );
+
+    return( true );
+
+  end "unpack";
+
+
+end "NBS-In" ;
+   F >Û
