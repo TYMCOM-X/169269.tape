@@ -1,0 +1,12 @@
+
+30 JAN 0415 C930-P034/K02-1 $S #1422-KL CRA001, Zero key,
+   StopPC/ERRCON:EXCMPE+3 Base interface not initialized by host yet.
+   Address error (ADDERR) sets up previous context F which is not a DDB.
+   Caused by error detected in dump mode output routine.
+   (TODD)
+
+30 JAN 0423 C930-P034/K02-1 $S #1422-KL CRA002, Zero key,
+   StopPC/ERRCON:EXCMPE+3 Base interface not initialized by host yet.
+   Address error (ADDERR) sets up previous context F which is not a DDB.
+   Caused by error detected in dump mode output routine.
+   (TODD)
