@@ -1,0 +1,112 @@
+.memo;
+.page frame 60 high 70 wide;
+.area text lines 4 to 57 chars 6 to 70;
+.title area heading lines 1 to 3;
+.title area footing line 60;
+.place text;
+.underlinebetween (~~,~);
+.blankline;
+.indent 0;
+.single space;
+.nojust;
+.byhand;
+.skip 2;
+~~Job Objectives~
+
+.endhand;
+
+.preface 0;
+
+.list(-4,4,0,"1.");
+
+.item;
+Continue with PEAK support and development:
+
+.list(-4,4,0,"a.");
+
+.item;
+Support version 1.0 on Tymcom-X.
+
+.item;
+Move version 1.0 to TOPS-20.
+
+.item;
+Implement a multi-host version of PEAK in BLISS.  (Due to changing plans
+within the division, this project is not applicable.)
+
+.endlist;
+.skip 1;
+.item;
+Prepare to do development work under VAX/VMS by:
+.list (-4,4,0,"a.");
+.item;
+Participating in the division's VAX/VMS class.
+.item;
+Converting DUMPER (a program for reading tapes onto the VAX) from "C" to
+BLISS.  (This program is currently being debugged.)
+.endlist;
+.preface 1;
+.endlist;
+.byhand;
+.skip 2;
+~~Personal Development Objectives~
+.endhand;
+
+.list(-4,4,0,"1.");
+
+.preface 1;
+
+.item;
+Improve my ability to handle interruptions and switch tasks by:
+
+.preface 0;
+.list(-4,4,0,"a.");
+.item;
+Using a Day-Timer to make appropriate notes when interruptions occur so
+that I can return with as little disorientation as possible.
+
+.item;
+Keeping a list of tasks occasioned by each project I am working on and clear
+each list the same day.  Copy tasks forward that cannot be completed that
+day.
+
+.endlist;
+.preface 1;
+
+.item;
+Improve project-management skills:
+
+.preface 0;
+.list(-4,4,0,"a.");
+
+.item;
+At the inception of a project, write an informal report outlining
+initial plans and a suggested approach (or possible approaches).  For
+some projects requiring research, the report may consist of a statement
+of objectives and a list of research areas or questions.
+
+.item;
+Amend this report as necessary to reflect new information and changes
+in plan.
+
+.item;
+Use this report to guide my work on the project.
+
+.endlist;
+.preface 1;
+
+.item;
+Improve trouble-shooting skills by
+
+.preface 0;
+.list(-4,4,0,"a.");
+
+.item;
+Studying the advanced features of on-line debuggers (eg. BAIL, DDT, RAID).
+
+.item;
+Observing the techniques of colleagues.
+
+.endlist;
+
+.endlist;
