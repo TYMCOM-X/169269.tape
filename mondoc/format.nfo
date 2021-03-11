@@ -1,0 +1,7 @@
+$Menu FORMAT;System file formats.
+*(MONDOC)DUL.DOC:DUL;Format of DUL.SYS.
+*(MONDOC)LUD.10:LUD;Format of LUD.SYS.
+*(MONDOC)STREAM.DOC:STREAM;Format of stream accounting files.
+*(MONDOC)STFILE.NFO:STFILE;Format of system statistics files.
+*(MONDOC)SYMTAB.MEM:SYMTAB;Format of macro/fail/loader symbol tables.
+*(MPL)TATTLE.mem:TATTLE;Format of tattle records in stream accounting.
