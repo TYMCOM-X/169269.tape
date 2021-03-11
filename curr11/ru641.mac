@@ -1,0 +1,9 @@
+; Network map for base 641
+.macro	route
+	node	641
+;	npath	641a,641a
+	npath	641b,641b
+	hpath	654,*
+	hpath	tymnet,*
+.endm
+
