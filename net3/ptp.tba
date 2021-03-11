@@ -1,0 +1,606 @@
+100 !*******************************************************************
+200 !*  Project Tracking Program     By Bruce Thomson for Tim Zerbiec  *
+300 !*                Version of 22 May 1982 at 1540                   *
+400 !*******************************************************************
+500 !
+600 ver$="22-May-81"
+700 !
+800 ! Error trapping:
+900 on error goto 58900
+1000 !
+1100 ! External routines:
+1200 def external simpl ecoset (integer j)
+1300 call ecoset(0) ! Turn off echo
+1400 !
+1500 ! Banner:
+1600 print "**** Project Tracking Program version of ":ver$:" ****"
+1700 print
+1800 !
+1900 ! Files used:
+2000 !
+2100 !              PROJECT     ...    Contains fields:
+2200 !                                 Job Number = 0-9999    (4  bytes)
+2300 !                                 Date and time entered  (10 bytes)
+2400 !                                 Short Description      (20 bytes)
+2500 !                                 Pntr too Long Desc.    (5  bytes)
+2600 !                                 status                 (10 bytes)
+2700 !                                 Assigned to            (30 bytes)
+2800 !                                 date assigned          (6  bytes)
+2900 !                                 requested by           (30 bytes)
+3000 !                                 required date          (6  bytes)
+3100 !                                 complete date          (6  bytes)
+3200 !
+3300 !             LONG         ...    Pointer to PROJECT     (5  bytes)
+3400 !                                 Long descriptions      (variable)
+3500 !                                 Records terminated with a record
+3600 !                                 containing only '.'
+3700 !
+3800 ! Variables and constants:
+3900 !
+4000 string job, te, short, plong, stat, asgto, project, asgdt, rqdt, compdt
+4100 string foo, command, long(200), rqby, fltr.1, fltr.2
+4200 integer sz.job, sz.te, sz.short, sz.plong, sz.stat, sz.asgto
+4300 integer sz.project, sz.asgdt, sz.rqdt, sz.compdt, c, x, sz.rqby
+4400 integer of.job, of.te, of.short, of.plong, of.stat, of.asgto, of.date
+4500 integer of.asgdt, of.rqdt, of.compdt, t, updfg, of.rqby, ct, sz.fltr.1
+4600 integer of.fltr.1, sz.fltr.2, of.fltr.2, dt.fg, temp, r.fg, x1
+4700 real dt.vl, start.dt, finish.dt
+4800 !
+4900 of.job=1     ! offset to job
+5000 sz.job=4     ! length of job number field
+5100 of.te=sz.job+of.job
+5200 sz.te =10    ! time and date entered
+5300 of.short=sz.te+of.te
+5400 sz.short=20  ! length of short desc
+5500 of.plong=sz.short+of.short
+5600 sz.plong=5   ! pointer to long desc
+5700 of.stat=sz.plong+of.plong
+5800 sz.stat=10   ! status
+5900 of.asgto=sz.stat+of.stat
+6000 sz.asgto=30  ! assigned to
+6100 of.asgdt=sz.asgto+of.asgto
+6200 sz.asgdt=6   ! assigned date
+6300 of.rqdt=sz.asgdt+of.asgdt
+6400 sz.rqdt=6    ! required date
+6500 of.rqby=sz.rqdt+of.rqdt
+6600 sz.rqby=30   ! Requested by
+6700 of.compdt=sz.rqby+of.rqby
+6800 sz.compdt=6  ! date completed
+6900 !
+7000 ! Compute total for PROJECT fields:
+7100 sz.project = sz.job + sz.te + sz.short + sz.plong + sz.stat + sz.asgto
+7200 sz.project = sz.project + sz.asgdt + sz.rqby + sz.rqdt + sz.compdt
+7300 !
+7400 ! Size of some string arrays depends on sz.project
+7500 string ar.fltr.1(1000):sz.project, ar.fltr.2(1000):sz.project
+7600 string ar.fltr.3(1000):sz.project, ar.proj(1000):sz.project
+7700 !
+7800 ! Security: One password allows update, the other only reads
+7900 on escape goto 7900
+8000 print "Password : ":
+8100 input in form "r":foo
+8200 gosub 59300
+8300 if foo<>"ZERB" and foo<>"REGION" then
+8400  c=c+1
+8500  if c=3 then log "Wrong!" ! 3 trys only, then dump em
+8600  goto 8000
+8700 endif
+8800 call ecoset(-1)
+8900 print
+9000 print "[ok]"
+9100 print
+9200 if foo="REGION" then updfg=1 ! if updfg=1 then no update allowed
+9300 !
+9400 ! Open files for random I/O
+9500 open "PROJECT-a" for symbolic random io as file 1
+9600 open "LONG-a" for symbolic random io as file 3
+9700 !
+9800 ! See what user wants to do:
+9900 on escape goto 9900
+10000 print " * ":
+10100 input in form "r": command
+10200 command=left(command,1)
+10300 x=asc(command)
+10400 if x>=97 then command=char(x-32)
+10500 if command="?" or command="H" then
+10600  print
+10700  print "Valid commands are: "
+10800  print
+10900  print "   B - Bye (see ya later)."
+11000  if updfg=0 then print "   E - Enter new project."
+11100  print "   F - Find project."
+11200  print "   Q - Quit."
+11300  print "   R - Report mode."
+11400  if updfg=0 then print "   U - Update old project."
+11500  print
+11600  goto 9900
+11700 endif
+11800 if command="B" then log "See Ya Later Tim!"
+11900 if command="E" and updfg=0 then 12600
+12000 if command="F" then 20800
+12100 if command="R" then 27700
+12200 if command="U" and updfg=0 then 42400
+12300 if command="Q" then end ".Exit."
+12400 Print "Invalid command.  Type '?' for help."
+12500 goto 9900
+12600 ! The enter new project command:
+12700 !
+12800 ! calculate project number from size of file.
+12900 job=rpad(substr(str(int(size(1)/(sz.project+2))),2),sz.job)
+13000 print
+13100 print "Enter new project number "+job+"."
+13200 print
+13300 print "Short description of project : ":
+13400 input in form "r": short
+13500 if left(short,1)="^" then 9900
+13600 if length(short) > sz.short then
+13700  print "Too long! short description must be":sz.short:" or less chars."
+13800  goto 13300
+13900 endif
+14000 short=rpad(short,sz.short)
+14100 print "Long description required?   : ":
+14200 input in form "r":foo
+14300 if left(foo,1)="^" then 13300
+14400 c=0
+14500 gosub 52900
+14600 if foo="YES" then
+14700  print "Enter long description. Terminate with '.' in column 1."
+14800  c=c+1
+14900  input in form "r":foo
+15000  if foo="^" then 14100
+15100  long(c)=foo
+15200  if foo="." then 15800
+15300  goto 14800
+15400  else
+15500  c=1
+15600  long(1)="."
+15700 endif
+15800 print "Assigned to                  : ":
+15900 input in form "r": asgto
+16000 if left(asgto,1)="^" then 14100
+16100 if length(asgto) > sz.asgto then
+16200  print "Too long! names must be":sz.asgto:" or less chars."
+16300  goto 15800
+16400 endif
+16500 asgto=rpad(asgto,sz.asgto)
+16600 print "Requested by                 : ":
+16700 input in form "r": rqby
+16800 if left(rqby,1)="^" then 15800
+16900 if length(rqby) > sz.rqby then
+17000  print "Too long! names must be":sz.rqby:" or less chars."
+17100  goto 16600
+17200 endif
+17300 rqby=rpad(rqby,sz.rqby)
+17400 if flag=1 then return
+17500 print "Assignment date              : ":
+17600 input in form "r": foo
+17700 if left(foo,1)="^" then 15800
+17800 gosub 51400
+17900 if foo="bull" then 17500
+18000 asgdt=foo
+18100 print "Date required                : ":
+18200 input in form "r": foo
+18300 if left(foo,1)="^" then 17500
+18400 gosub 51400
+18500 if foo="bull" then 18100
+18600 rqdt=foo
+18700 stat="NEW"
+18800 stat=rpad(stat,sz.stat)
+18900 gosub 52600
+19000 te=foo
+19100 foo=right(date,5)
+19200 te=te+left(foo,2)+right(foo,2)
+19300 te=rpad(te,sz.te)
+19400 compdt="------"
+19500 compdt=rpad(compdt,sz.compdt)
+19600 plong=rpad( substr( str(size(3)+1),2 ),sz.plong )
+19700 project=job+te+short+plong+stat+asgto+asgdt+rqdt+rqby+compdt
+19800 if length(project)<>sz.project then
+19900  print "Error! size of project incorrect. Check code."
+20000 endif
+20100 write on 1 at size(1)+1 in form "r":project
+20200 write on 3 at size(3)+1 in form "r":job
+20300 for x=1 to c
+20400 write on 3 at size(3)+1 in form "r":long(x)
+20500 next x
+20600 print
+20700 goto 9900
+20800 ! find commands
+20900 print "F* ":
+21000 input in form "r": command
+21100 command=left(command,1)
+21200 if command="^" then 9900
+21300 x=asc(command)
+21400 if x>=97 then command=char(x-32)
+21500 if command="?" or command="H" then
+21600  print
+21700  print "Find subcommands:"
+21800  print
+21900  print "  K  -  find by Keyword."
+22000  print "  P  -  find by Project number."
+22100  print "  S  -  Summary by short descriptions."
+22200  print "  Q  -  Quit find."
+22300  print
+22400  goto 20900
+22500 endif
+22600 if command="P" then 23200
+22700 if command="K" then 25800
+22800 if command="S" then 24700
+22900 if command="Q" then 9900
+23000 print "Invalid Find subcommand. Type '?' for help."
+23100 goto 20900
+23200 print "Project # : ":
+23300 input in form "r":foo
+23400 if left(foo,1)="^" then 20900
+23500 if val(foo)>=size(1)/(sz.project+2) then
+23600  print "That project number not assigned yet."
+23700  goto 23200
+23800 endif
+23900 x=val(foo)*sz.project+1+(val(foo)*2)
+24000 input from 1 at x in form "r":project
+24100 gosub 53900
+24200 gosub 55000
+24300 gosub 57600
+24400 print
+24500 goto 20900
+24600 goto 9900
+24700 print
+24800 for c=0 to int(size(1)/(sz.project+2))-1
+24900 input from 1 at c*sz.project+1+(c*2) in form "r": project
+25000 gosub 53900
+25100 if c<10 then print " ":
+25200 print c:"  -  ":short:
+25300 if (c+1)/2=int((c+1)/2) then print
+25400 next c
+25500 print
+25600 print
+25700 goto 20900
+25800 print ! here for keyword search
+25900 print "Search Key : ":
+26000 input in form "r":foo
+26100 if left(foo,1)="^" then 20900
+26200 gosub 59300
+26300 print
+26400 for c=0 to ize(1)/(sz.project+2))-1
+26500 input from 1 at c*sz.project+1+(c*2) in form "r": project
+26600 t$=""
+26700 for x=1 to sz.project
+26800 t=asc(substr(project,x,1))
+26900 if t>97 then t=t-32
+27000 t$=t$+char(t)
+27100 next x
+27200 project=t$
+27300 if index(project,foo)<>0 then print "Found in project":c:"."
+27400 next c
+27500 print
+27600 goto 20900
+27700 print ! report
+27800 print "Filter by N)ame, K)ey, S)tatus, or Z)ip : ":
+27900 input in form "r" : foo
+28000 if left(foo,1)="^" then 9900
+28100 if foo="" then foo="z"
+28200 gosub 59300
+28300 fltr.1=foo
+28400 fltr.1=left(fltr.1,1)
+28500 if fltr.1="N" then
+28600  sz.fltr.1=sz.asgto
+28700  of.fltr.1=of.asgto
+28800  print "  Name project assigned to              : ":
+28900 endif
+29000 if fltr.1="K" then
+29100  sz.fltr.1=sz.project
+29200  of.fltr.1=1
+29300  print "  Filter key                            : ":
+29400 endif
+29500 if fltr.1="S" then
+29600  sz.fltr.1=sz.stat
+29700  of.fltr.1=of.stat
+29800  print "  Status                                : ":
+29900 endif
+30000 if fltr.1="Z" then
+30100  goto 30700
+30200 endif
+30300 input in form "r":foo
+30400 if left(foo,1)="^" then 27800
+30500 gosub 59300
+30600 fltr.1=foo
+30700 print "Delimit by date ?                       : ":
+30800 input in form "R":foo
+30900 if left(foo,1)="^" then 27800
+31000 gosub 52900
+31100 if foo="YES" then
+31200  print "  E)ntry, R)equired, or C)omplete date  : ":
+31300  input in form "r":foo
+31400  if left(foo,1)="^" then 30700
+31500  gosub 59300
+31600  if index("ERC",foo)=0 then 31200
+31700  if foo="E" then of.date=of.te
+31800  if foo="R" then of.date=of.rqdt
+31900  if foo="C" then of.date=of.compdt
+32000  print "  Enter start date                      : ":
+32100  input in form "r":foo
+32200  if left(foo,1)="^" then 31200
+32300  gosub 51400
+32400  if foo="bull" then 32000
+32500  gosub 60100
+32600  start.dt=dt.vl
+32700  print "  Enter finish date                     : ":
+32800  input in form "r":foo
+32900  if left(foo,1)="^" then 32000
+33000  gosub 51400
+33100  if foo="bull" then 32700
+33200  gosub 60100
+33300  finish.dt=dt.vl
+33400 else
+33500  dt.fg=1
+33600 endif
+33700 print "Filter by O)pen C)losed or Z)ip         : ":
+33800 input in form "r": foo
+33900 if left(foo,1)="^" then 30700
+34000 if foo="" then foo="Z"
+34100 gosub 59300
+34200 fltr.2=foo
+34300 if index("OCZ",foo)=0 then 33700
+34400 fltr.2=left(fltr.2,1)
+34500 sz.fltr.2=sz.compdt
+34600 of.fltr.2=of.compdt
+34700 print "Output filename or 'T' for terminal     : ":
+34800 input in form "r":foo
+34900 if left(foo,1)="^" then 33700
+35000 gosub 59300
+35100 if foo="T" then foo="TERM"
+35200 open foo for symbolic sequential output as file 2
+35300 ct=0 ! pass 1 ... filter by name etc.
+35400 for c=0 to int(size(1)/(sz.project+2))-1
+35500 input from 1 at c*sz.project+1+(c*2) in form "r": project
+35600 ar.proj(c+1)=project
+35700 t$=""
+35800 for x=1 to sz.project
+35900 t=asc(substr(project,x,1))
+36000 if t>97 then t=t-32
+36100 t$=t$+char(t)
+36200 next x
+36300 project=t$
+36400 if index(substr(project,of.fltr.1,sz.fltr.1),fltr.1)<>0 or fltr.1="Z" then
+36500  ct=ct+1
+36600  ar.fltr.1(ct)=project
+36700  endif
+36800 next c
+36900 if dt.fg=1 then  ! if no date filter, skip...
+37000  for x=1 to ct
+37100  ar.fltr.2(x)=ar.fltr.1(x)
+37200  next x
+37300  dt.fg=0
+37400  goto 38700
+37500 endif
+37600 temp=ct
+37700 ct=0 ! pass 2 ... date filter
+37800 for c=1 to temp
+37900 foo=substr(ar.fltr.1(c),of.date,6)
+38000 if left(foo,1)="-" then 38600
+38100 gosub 60100
+38200 if dt.vl>=start.dt and dt.vl<=finish.dt then
+38300  ct=ct+1
+38400  ar.fltr.2(ct)=ar.fltr.1(c)
+38500 endif
+38600 next c
+38700 if fltr.2="Z" then
+38800  for x=1 to ct
+38900  ar.fltr.3(x)=ar.fltr.2(x)
+39000  next x
+39100  goto 40200
+39200 endif
+39300 temp=ct
+39400 ct=0
+39500 for c=1 to temp  ! pass 3 ... open or closed
+39600 foo=substr(ar.fltr.2(C),of.fltr.2,sz.fltr.2)
+39700 if (fltr.2="O" and left(foo,1)="-") or (fltr.2="C" and left(foo,1)<>"-") then
+39800  ct=ct+1
+39900  ar.fltr.3(ct)=ar.fltr.2(c)
+40000 endif
+40100 next c
+40200 write on 2:
+40300 write on 2:
+40400 for x=1 to ct
+40500 temp=val(substr(ar.fltr.3(x),of.job,sz.job))
+40600 project=ar.proj(temp+1)
+40700 gosub 53900
+40800 write on 2 in form "r": "Proj:"+job+" Ent: "+left(te,6)+" "+substr(te,7,4)+" Desc: "+short
+40900 write on 2 in form "r": "Assg:"+substr(asgto,1,index(asgto," "))+" on "+asgdt+" for "+rqby
+41000 write on 2 in form "r": "Required: "+rqdt+" Stat: "+stat+" Completed: "+compdt
+41100 r.fg=1
+41200 gosub 57800
+41300 r.fg=0
+41400 for c=1 to temp
+41500 write on 2 in form "r":long(c)
+41600 next c
+41700 write on 2:
+41800 write on 2:
+41900 next x
+42000 print "*** Done ***"
+42100 close 2
+42200 print
+42300 goto 9900
+42400 print ! here for update
+42500 print "Project # : ":
+42600 input in form "r":job
+42700 if job="" then 42400
+42800 if left(job,1)="^" then 9900
+42900 if val(job)>=size(1)/(sz.project+2) then
+43000  print "That project number not assigned yet."
+43100  goto 42500
+43200 endif
+43300 print
+43400 c=val(job)
+43500 print "U* ":
+43600 input in form "r": command
+43700 command=left(command,1)
+43800 if command="^" then 42400
+43900 x=asc(command)
+44000 if x>=97 then command=char(x-32)
+44100 if command="?" or command="H" then
+44200  print
+44300  print "Valid update subcommands are: "
+44400  print
+44500  print "  A  -  change Assigned to."
+44600  print "  C  -  enter completion date."
+44700  print "  N  -  New project number."
+44800  print "  R  -  change Required date."
+44900  print "  S  -  change Status."
+45000  print "  Q  -  Quit update mode."
+45100  print
+45200  goto 43500
+45300 endif
+45400 if command="A" then 46200
+45500 if command="C" then 47600
+45600 if command="N" then 42400
+45700 if command="R" then 48800
+45800 if command="S" then 50000
+45900 if command="Q" then 9900
+46000 print "Invalid Update subcommand!"
+46100 goto 43500
+46200 print
+46300 print "New assigned to : ":
+46400 input in form "r": asgto
+46500 if left(asgto,1)="^" then 43500
+46600 if length(asgto) > sz.asgto then
+46700  print "Too long! names must be":sz.asgto:" or less chars."
+46800  goto 46300
+46900 endif
+47000 asgto=rpad(asgto,sz.asgto)
+47100 for x=1 to length(asgto)
+47200 write on 1 at of.asgto+(c*sz.project-1+(c*2))+x in form "x": substr(asgto,x,1)
+47300 next x
+47400 print
+47500 goto 43500
+47600 print
+47700 print "Completion date : ":
+47800 input in form "r": foo
+47900 if left(foo,1)="^" then 43500
+48000 gosub 51400
+48100 if foo="bull" then 47600
+48200 compdt=foo
+48300 for x=1 to length(compdt)
+48400 write on 1 at of.compdt+(c*sz.project-1+(c*2))+x in form "x": substr(compdt,x,1)
+48500 next x
+48600 print
+48700 goto 43500
+48800 print ! change required date
+48900 print "Required date : ":
+49000 input in form "r": foo
+49100 if left(foo,1)="^" then 43500
+49200 gosub 51400
+49300 if foo="bull" then 48900
+49400 rqdt=foo
+49500 for x=1 to length(rqdt)
+49600 write on 1 at of.rqdt+(c*sz.project-1+(c*2))+x in form "x": substr(rqdt,x,1)
+49700 next x
+49800 print
+49900 goto 43500
+50000 print ! change status
+50100 print "Status : ":
+50200 input in form "r": stat
+50300 if left(stat,1)="^" then 43500
+50400 if length(stat)>sz.stat then
+50500  print "Too long! Status must be < ":sz.stat:" chars."
+50600  goto 50100
+50700 endif
+50800 stat=rpad(stat,sz.stat)
+50900 for x=1 to length(stat)
+51000 write on 1 at of.stat+(c*sz.project-1+(c*2))+x in form "x": substr(stat,x,1)
+51100 next x
+51200 print
+51300 goto 43500
+51400 if foo="t" or foo="T" then gosub 52600  ! check date
+51500 on error goto 52200
+51600 if length(foo)<>6 then 52200
+51700 if val(right(foo,2))<82 or val(right(foo,2))>99 then 52200
+51800 if val(substr(foo,3,2))<1 or val(substr(foo,3,2))>31 then 52200
+51900 if val(left(foo,2))<1 or val(left(foo,2))>12 then 52200
+52000 on error goto 58900
+52100 return
+52200 foo="bull"
+52300 on error goto 58900
+52400 print "Invalid date! enter date as MMDDYY."
+52500 return
+52600 foo=date ! get todays date
+52700 foo=substr(foo,4,2)+substr(foo,7,2)+substr(foo,1,2)
+52800 return
+52900 if left(foo,1)="Y" or left(foo,1)="y" or foo="" then
+53000  foo="YES"
+53100  return
+53200 endif
+53300 if left(foo,1)<>"N" and left(foo,1)<>"n" then
+53400  print "Enter 'Y' or 'N' : ":
+53500  input foo
+53600  goto 52900
+53700 endif
+53800 return
+53900 job=substr(project,of.job,sz.job)  ! Get fields into thier variables
+54000 te=substr(project,of.te,sz.te)
+54100 short=substr(project,of.short,sz.short)
+54200 plong=substr(project,of.plong,sz.plong)
+54300 stat=substr(project,of.stat,sz.stat)
+54400 asgto=substr(project,of.asgto,sz.asgto)
+54500 asgdt=substr(project,of.asgdt,sz.asgdt)
+54600 rqby=substr(project,of.rqby,sz.rqby)
+54700 rqdt=substr(project,of.rqdt,sz.rqdt)
+54800 compdt=substr(project,of.compdt,sz.compdt)
+54900 return
+55000 print  !  print pretty
+55100 print "Project number     ":job
+55200 print "Date entered       ":
+55300 foo=te
+55400 gosub 57400
+55500 print foo+"  "+substr(te,7,2)+":"+substr(te,9,2)
+55600 print "Short description  ":short
+55700 print "Status             ":stat
+55800 print "Requested by       ":rqby
+55900 print "Assigned to        ":asgto
+56000 print "Assigned on        ":
+56100 foo=asgdt
+56200 gosub 57400
+56300 print foo
+56400 print "Date required      ":
+56500 foo=rqdt
+56600 gosub 57400
+56700 print foo
+56800 print "Date completed     ":
+56900 foo=compdt
+57000 gosub 57400
+57100 print foo
+57200 print
+57300 return
+57400 foo=substr(foo,1,2)+"/"+substr(foo,3,2)+"/"+substr(foo,5,2)
+57500 return ! format date
+57600 print "Long description : "
+57700 print
+57800 temp=0
+57900 x1=val(plong)+sz.job+2
+58000 input from 3 at x1 in form "r":foo
+58100 if foo="." then return
+58200 if r.fg=0 then print foo
+58300 if r.fg=1 then
+58400  temp=temp+1
+58500  long(temp)=foo
+58600  endif
+58700 x1=x1+length(foo)+2
+58800 goto 58000
+58900 print
+59000 print "Error ":errcd:" at loc ":errln
+59100 on error goto 58900
+59200 goto 9900
+59300 t$=""
+59400 for x=1 to length(foo) ! convert foo to upper case
+59500 t=asc(substr(foo,x,1))
+59600 if t>97 then t=t-32
+59700 t$=t$+char(t)
+59800 next x
+59900 foo=t$
+60000 return
+60100 dt.vl=(val(left(foo,2))+(val(substr(foo,3,2))/32))/13+val(right(foo,2))
+60200 return ! value for a date in foo returned in dt.vl
+60300 !*****************************************************************
+60400 !-EOF-
+   _ 
+qA
