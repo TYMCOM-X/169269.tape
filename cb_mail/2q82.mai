@@ -1,0 +1,5173 @@
+
+
+From: CARL
+Date: APRIL 4,1982 9:59
+Magnum doesn't know about node 2456 (the replacement for 1306) on
+system 930.  I guess that it forgot?
+/Carl.
+
+
+From: DARREN
+Date: APRIL 5,1982 8:28
+To: Section
+I will probably be stopping at Peet's Coffe on my way in to the meeting
+today - if anyone would like me to pick up coffee, get your order in
+before 11:00. /D
+
+
+From: ADELE
+Date: APRIL 5,1982 11:13
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the week of
+March 29 - April 2.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Adele   |   Ken
+		|	    |
+	Tue     |   Lois    |   Carl
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Lois    |   Dave
+		|	    |
+	Fri     | Margaret  |   Carl
+
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: CARL
+Date: APRIL 5,1982 11:15
+Not a complaint... but you can schedule me for tuesday or friday
+mornings sometime.... friday afternoon could soon go to my head.
+This week is fine, so don't worry.   ...just a reminder. /Carl.
+
+re: Support line.
+
+
+From: ADELE
+Date: APRIL 5,1982 11:27
+Yes, I though about your reminder before you even made it.  Will alter
+the schedule next week.   --Adele
+
+
+From: CARL
+Date: APRIL 5,1982 19:43
+To: Bill,Todd,Darren
+I'd like to talk to one of you about BLOCK-IO input.  I had a long list
+of questions which has been narrowed down to one or two...  At present,
+I need to know something about BLOCKIO's interaction with HIBER, eg. in
+the case (wait for x amount of time or receipt of a character) it appears
+that the hiber always waits x amount of time, even though it has gotten
+lost of characters...
+/Carl.
+
+Any ideas?
+
+
+From: CARL
+Date: APRIL 5,1982 20:22
+Todd,
+  A specific question for you... Does BLOCK-INPUT (tty block/io) set
+any of the interrupt conditions such as character received... etc
+as does normal i/o ???  (obviously a SCNSER question?).
+
+  I'm hung up while waiting for you to answer, so I'd appreciate a
+speedy response if possible.  Call me, if you have any questions.
+At the office, or at home.  /Carl.
+
+
+From: CARL
+Date: APRIL 5,1982 20:33
+Re: TAPE status
+
+1. The program appears to spend the majority of it's time, at least
+   when block-io is used, at that initial 2-minute wait, and the
+   monitor must buffer the block-io input for the job quite nicely.
+
+2. The receipt of character interrupt does not seem to matter for
+   block-io input, and thus the HIBER doesn't return until after the
+   timeout.
+       This can be changed to not bother waiting if the timeout is
+       not being used.  Thus, it will only wait when the timeout is
+       requested.
+
+3. The timeout mode is "Image".  The non-timeout mode is "Binary".
+   According to the YAMM, EOT's are ignored in Binary mode.  Thus,
+   they do not signal end-of-transmission, and are considered as
+   "normal" data.
+       This is important, only in that the data written on the tape
+       itself after the <EOT> is still pumped at the terminal and
+       becomes thrown at the terminal as command input after the
+       file is closed.  (This happens when a tape is written over
+       with "new" data which is shorter than the old data.)  The
+       way to prevent this is to be able to "turn off" the reader
+       via program control, and to then read all the available data
+       and throw it away, (or CLRBFI).
+
+4. The use of "Image Binary" rather than "Binary" will then allow the
+   <EOT> to signal end-of-transmission/end-of-block-io mode, however
+   I believe that this still will not turn off the reader.  Any IDEAS
+   to whether that is possible to do???  (I tried it in LOCAL... none
+   of the ASCII characters seem to have any effect).
+
+5. As a last resort, when the EOT is found, a message which says:
+   "TURN OFF READER" could be typed and then it can gobble up all the
+   input that it gets for a short while, and stop when it runs out.
+
+5a. The recording (punch) mode "can" start the punch by sending a DC1
+   code (^Q)... but again, that is not a problem at present.
+
+I am still awaiting an answer from Todd or someone about block-io. It
+may be a monitor feature, but I'm not sure where to look for it, since
+SCNSER is a little be large.
+
+/Carl.
+
+
+From: WRS
+Date: APRIL 6,1982 0:02
+The monitor never sees the characters when the port is in block IO mode
+(that's what makes it fast), therefor, you'll never get a character
+received interrupt.  I think that the line received interrupt is caused
+whenever a full block has been received, but I'm not sure.  -Bill
+
+
+From: CARL
+Date: APRIL 6,1982 0:04
+I kinda suspected that (never seeing it for each character).  I'll ask
+Todd about the line interrupt... unless you happen to know where I can
+look in SCNSER (or wherever) to find out myself before then.  Do you
+know if a CLRBFI will clear any pending block-io input if it isn't read
+before a terminate-block-input is issued, or does it matter -- will it
+just be lost?
+  (I want it to go away... rather than having to read it and not do
+   anything with it after reading it.  Otherwise, it gets assumed to
+   be terminal input and it louses up the command scanning with data.)
+/Carl.
+
+
+From: WRS
+Date: APRIL 6,1982 12:44
+I recommend trying the line waiting interrupt (thats how I would do it).
+On clearing the input buffer, CLRBFI only clears the bufferlets in the
+host so it won't affect characters in a block input buffer.  You should
+probably do something like this:
+  1. terminate block mode
+  2. send a device control to stop the reader (is this right?)
+  3. send a yellow ball
+  4. wait for orange ball
+  5. CLRBFI
+This will assure you get all the characters up to when the reader stops.
+-Bill
+
+
+From: WRS
+Date: APRIL 6,1982 12:50
+Ah, one thing to try, if we have received so much data from the reader
+that we don't have room for it, and we backpressure the network, will the
+network send us an orange ball?  If not, this could result in a deadly
+embrace if you follow the suggestion above.  A solution would be to read
+an discard characters until an orange ball arrives, thus preventing
+backpressure.  That's not as nice though, so its probably worth it to
+check to see if orange balls work right.  -Bill
+
+
+From: CARL
+Date: APRIL 7,1982 10:19
+[LONSTS 5% 350ms. C930-P034/K11 FOONLY Frame: 7 on TTY11 2456-160]
+
+.ftmagnum
+
+ FATAL ERROR A19.007
+ PLEASE CONTACT YOUR TYMSHARE REPRESENTATIVE IMMEDIATELY.
+
+EXIT
+
+.....Node 2456.... does not appear to work. (Still).
+
+
+From: CARL
+Date: APRIL 7,1982 10:54
+Thanks Lois!
+  Re: Node 2456 for magnum.
+/Carl.
+
+
+From: LOIS
+Date: APRIL 7,1982 10:59
+Carl,
+Node 2456 has now been added.
+
+What is the state of PCOM?  David Miller is still holding the transmittal.
+What series of commands do Scott and Lee use to crash systems running PCOM?
+
+How about Nick Taddeo's license?
+-Lois
+
+
+From: CARL
+Date: APRIL 7,1982 12:58
+1) PCOM needs a new transmittal.  It's been being "tested" on 930 and
+   on (mpl:36).  I ought to get that done today, but Bill needs to
+   get around to signing it.
+
+2) I have no idea what SCOTT and LEE are doing to crash systems.
+
+3) TADDEO has XC SY AC WF OP   (already!)  I didn't do anything.
+
+4) You now have RC TD and MG which you didn't have.  (MG is what
+   you probably needed to change anything).
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 7,1982 13:53
+I gave lois, RC MG TD licenses on :930... the ones she didn't have.
+I also gave ERNSTD (dennis) GD TD HU license for takeit, using tapes, etc.
+/Carl.
+
+
+From: CARL
+Date: APRIL 7,1982 20:20
+Todd,
+  **** Warning **** Warning ****
+       Alien Approaching!!!!
+
+Um.., there seems to be a problem with DIRIT on :930 today.  It
+has this interesting case of amnesia.  It doesn't seem to know
+a DIRIT.INI file from a VUE.INI file...  Could you please take
+a look into this problem.
+  Some other people in the section have noticed that there is
+some sort of "weird" things happenning between DIRIT and UNDELE.
+I suspect, it is just a DIRIT problem...
+  Anyway, let me know (and Lois also) what you find out, and what
+you do to fix the problem.
+/Carl.
+
+
+From: CARL
+Date: APRIL 7,1982 20:38
+To: Darren, Dave
+
+Empire bug! *** If you have an army in "automatic" mode and a troop
+                transport "full", and the army attempts to board the
+                troop transport during it's move...
+
+                ...you have an infinite LOOP with the message about
+                the transport being "FULL", move again printing and
+                the army attempting to move again "automatically".
+Quite reproduceable!
+/Carl.
+
+
+From: TODD
+Date: APRIL 8,1982 0:38
+ 1422  6   EDIRIT.MAC~     MPL           04:15 12-MAY-81  13:16 27-FEB-82   16 W
+
+
+From: CARL
+Date: APRIL 8,1982 1:02
+dirit.mac restored.... dated 12-jun-81 ... are you sure?
+/Carl.
+
+
+From: TODD
+Date: APRIL 8,1982 1:18
+Dirit has been fixed. /Todd
+
+From: CARL
+Date: APRIL 8,1982 1:44
+SOmeone fix CRASH.SAV on 930 so you can get a dump using /D !
+
+
+From: CARL
+Date: APRIL 8,1982 2:22
+Adele,
+  I've mod your SIZES program to look for files with license
+set on them.  It gives you the option of listing the individual
+files with license as well as just the user summary.  The changed
+source is (CARL:930)SIZES.SAI in case you'd like to replace your
+version.
+  It does not yet have the capability to look for a specific license
+or a set of licenses... but I'll probably add that, since it is a
+desired feature.
+/Carl.
+
+
+From: LOIS
+Date: APRIL 8,1982 10:40
+CARL,
+THE DIFFERENCE BETWEEN THE TWO INITG FILES IS THAT THE ONE ON 930 USES
+A SETPROC FOR DED RATHER THAN A ADDPROC--36 ONLY HAD THE ADDPROC FOR VUE.
+(I THINK THIS WAS YOUR SUGGESTION).
+
+DOING CTEST SETRPG=(SYS)NEWRPG WILL CLOBBER DIRIT UNDER ANY USER NAME OR
+LOG IN METHOD.
+
+I TOOK OFF MY INIT FILE, THEN I COULD SETPROC (HURRAH) RATHER THAN HAVING
+IT ILL MEM REF ON ME--BUT NOW WHEN I TRY TO LOAD THE MONITOR RPG TELLS ME
+THAT ?262 PAGES NEEDED (THERE  ARE 16994 PAGES ON CORE).  GRRRRRRRR.
+
+WHAT IS RPG DOING TO ME?
+
+HOW CAN I EVER GET THIS MONITOR COMPILED?
+
+(ADELE HAS THE SAME PROBLEM TRYING TO LOAD THE MONITOR USING THE ALTERNATE
+MACRO--MAYBE I SHOULD TRY WITH THE USUAL MACRO).
+
+-LOIS
+
+
+From: DWS
+Date: APRIL 8,1982 13:51
+yeah, that's a bug.  workaround, until one of us has a chance to
+fix it is...  don't do it.
+
+
+From: CARL
+Date: APRIL 8,1982 20:29
+Lois,
+  I ran (UAS)UPDRTY to add Node 2470, and changed 2456 so that the node set = 1.
+Please check that it is ok, and that that is all I need to do.
+Thasnks, Carl.
+
+
+From: CARL
+Date: APRIL 8,1982 22:15
+To: Adele, Bill
+
+I found the RPG problem which was mentioned at the section/os meeting
+today.  The problem is that RPG (at least in two places) expects to
+find  a zero word at the end of the RPGINI list.  It assumes that it
+is there, although it doesn't appear to insure that condition anywhere.
+Apparently only 1 zero word is necessary, however I have not yet found
+where rpg "mis-calculates" the necessary amount.  It may be that we
+have been extremely "lucky" that it always diddles the INI list at the
+end of available core and depends on finding locations past JOBFF set
+to zero.
+  When you do a SETPROC, (possibly other SET commands also) it builds
+the new list at (JOBFF), then it goes and looks for the old list.  It
+deletes it, then checks again to make sure there was only one.  This is
+when it dies... it finds garbage just after the end of the original list
+and go <bang> "ill mem ref".
+/Carl.
+
+
+From: CARL
+Date: APRIL 9,1982 0:26
+To: Bill, Adele
+
+(SYS:930)NEWRPG.SHR  version 150.0, sources on (CARL:930) now puts
+a zero word in memory after reading your RPG.TMP file and no longer
+will die if you have the "exact" number of words in your TMP file.
+/Carl.
+
+
+From: ADELE
+Date: APRIL 9,1982 11:57
+When I set up my init file to user (sys)newrpg.shr, I was dead in the water
+after the init file ran.  The message I received when trying to do anything
+was:		(SYS)NEWRPG.SHR NOT FOUND
+
+What do you suppose is the trouble?
+
+--Adele
+
+
+From: WRS
+Date: APRIL 9,1982 14:27
+New SETTRM.SAI in (MPL) should "work around" RPG's ILL MEM REF problem.
+Between this and Carl's new RPG, you may never see it again.  -Bill
+
+
+From: CARL
+Date: APRIL 9,1982 19:41
+To: Tim
+Cc: Bill, Adele
+
+The RPG change that I suggested appears to "NOT" be as straight-forward
+as I had outlined.  (So what else is new?)  To do it that way would
+involve adding yet another "CROCK" to RPG, and I steadfast refuse to
+do that. (Although, it would only take an hour or so to do it that way.)
+Further investigation is necessary, and I will let you all know when I
+have decided how it will be done.
+/Carl.
+(If it will be done.)
+
+
+From: CARL
+Date: APRIL 9,1982 19:45
+Tim,
+  Another way would be to add a second "hack" the same way that
+/FTX is implemented, however... It is not clear that that is better,
+although it may be "cleaner".
+/Carl.
+
+
+From: CARL
+Date: APRIL 10,1982 17:50
+Ken,
+  I fixed the problem with (CARL)WHEN.  The problem was in the SW!INI
+routine actually.  A routine "get!line" was recursive, and while reading
+your SWITCH.INI searching for a "WHEN" line, it recursed off the stack
+because you had a lot of continuation lines.
+  The routine is no longer recursive, and now it works.
+
+  The file (KEN)SWITCH.CAB is your SWITCH.INI modified with a switch-line
+entry for the WHEN program.  If you don't have a WHEN entry, it prompts
+you with "Who?", to which you can specify any list of names.
+/Carl.
+
+
+From: CARL
+Date: APRIL 10,1982 18:38
+Dave,
+  (CARL:930)EMPIRE.FOO gets the following message (infinately?) at
+the end of my next move.
+
+%FRSSRE Subscript range error on line 195 of ENEMYM
+                Subscript 1 of LOCS = 1951
+... with subscript 1 increasing with each message.  I don't know if
+it ever stops.
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 10,1982 18:41
+Re: EMPIRE.FOO
+  It is a game using EMPIRE.MAP on (CARL) which has exactly 70 cities.
+/Carl.
+
+
+From: CARL
+Date: APRIL 10,1982 19:32
+Re: WHEN
+The WHEN program in my directory has also been modified to
+know about two "optional" switches.  /MULTI and /SINGLE
+  /SINGLE is the default
+  /MULTI forces two names listed per line instead of one.
+
+If neither is there, then you get one entry per line.
+/Carl.
+
+
+From: CARL
+Date: APRIL 10,1982 22:08
+Re: Solution to PCOM "job capacity exceeded" problem
+
+Let the PCOM frame (detached or not detached) print a message
+    to it's command port if the CREFRM uuo fails.  We can check
+    that condition.
+Wait until the CREFRM uuo succeeds, either by sleeping for awhile
+    then re-trying, or whatever other method you prefer.
+
+Thus, if a user runs it /NODETACH he can <esc>/^C out of it, and
+    otherwise, it is pretty obvious that it hasn't completed yet
+    if the PCOM job is "SL"eeping and mail hasn't been received.
+
+=======================================
+
+Send me mail (CC to Adele) and I'll look at fixing that.  Also the
+    nnnPCO.TMP vs TMP:PCO problem which Sherman would like fixed.
+/Carl.
+
+
+From: WRS
+Date: APRIL 10,1982 22:56
+Adele,Carl: That solution to PCOM job capacity problem sounds okay.
+It already does a USERERR when it can't create a frame.  You could
+just change that to a loop.  The new sail does AUXCAL's for OUTSTR and
+PRINT so they won't block if the job is detached.  Let me know what
+you and Adele decide and how long you think it'll take.  -Bill
+(PS - this is an official COEES bug report, Mike and I have a copy
+in case you want it for your records) 
+
+
+From: CARL
+Date: APRIL 10,1982 23:28
+Yes, I would Like a copy of the COEES bug report.
+No "real" idea how long it will take.. haven't looked
+  at the code... although I was looking at something else
+  in PCOM .  {SCOTT/CARL} bug report.  Code uses magic
+  numbers for bre^aaktable when it should use GETBREAK.
+/Carl.
+
+
+From: CARL
+Date: APRIL 11,1982 14:36
+Re: Mail from Bill about PCOM
+ I sent the following message to Bill:
+
+Date: APRIL 10,1982 22:08
+Re: Solution to PCOM "job capacity exceeded" problem
+
+Let the PCOM frame (detached or not detached) print a message
+    to it's command port if the CREFRM uuo fails.  We can check
+    that condition.
+Wait until the CREFRM uuo succeeds, either by sleeping for awhile
+    then re-trying, or whatever other method you prefer.
+
+Thus, if a user runs it /NODETACH he can <esc?/^C out of it, and
+    otherwise, it is pretty obvious that it hasn't completed yet
+    if the PCOM job is "SL"eeping and mail hasn't been received.
+
+======================================
+
+Send me mail (CC to Adele) and I'll look at fixing that.  Also the
+    nnnPCO.TMP vs TMP:PCO problem which Sherman would like fixed.
+/Carl.
+
+
+I also replied to his message, saying that I didn't have any estimate
+for how long to fix either problem.  The first is fairly easy, but the
+TMPCOR problem is not quite so straightforward.
+/Carl.
+
+
+From: CARL
+Date: APRIL 11,1982 14:43
+Sherman,
+  Did Scott tell you anything as far as where to find a TMPCOR reading
+routine.  I figure it is best to ask you, rather than Scott since you
+just asked him.
+/Carl.
+
+
+From: KEN
+Date: APRIL 11,1982 20:30
+Carl,
+
+What does it mean when PCOM says "%cant disown inferior"?
+
+/ken
+
+
+From: CARL
+Date: APRIL 11,1982 23:41
+%can't disown inferior
+means that the job/frame which was spawned could not be dis-owned.
+your frame has a handle to it, and it won't let you dis-associate
+your frame from your child frame.
+
+Why PCOM can't disown the chile frame is beyond me... it does that
+every so often, but not all the time.
+/Carl.
+
+
+From: CARL
+Date: APRIL 11,1982 23:44
+To: Most of the section (especially those paranoid about 930's hardware).
+
+1) Earlier today, 930's center disk appeared to "hang" and the system
+   stuck in the state where it said "TTYnn not available" when you
+   tried to login/build-a-circuit-in.
+
+2) I stopped by and reloaded the system.  (pat self on back)
+
+3) A dump was still not possible ... for whatever reason.
+4) The center disk drive (or so it seemed) made noises again while
+   attempting to load (SYS)SYSTEM.SAV.  The first time, it could "NOT"
+   find the file, response: NO FIL.  The second time, it found it, but
+   it took well over 3 minutes (yes! three "minutes" to load the monitor
+   from disk.  (It takes less time to read from tape?).
+
+5) Again, the disk drive made noises and "03 2" was in the lights on the
+   disk drive.  -- Didn't we "replace" that drive??? Why is it behaving
+   like the "old" drive, down to the noises and re-seeking or the same
+   problems that the other drive sufferred from?
+
+6) Would whomever arrives first thing in the morning, please call the
+   hardware people.
+/Carl.
+
+
+From: CARL
+Date: APRIL 11,1982 23:54
+To: Most of the section (especially those paranoid about 930's hardware).
+
+1) Earlier today, 930's center disk appeared to "hang" and the system
+   stuck in the state where it said "TTYnn not available" when you
+   tried to login/build-a-circuit-in.
+
+2) I stopped by and reloaded the system.  (pat self on back)
+
+3) A dump was still not possible ... for whatever reason.
+4) The center disk drive (or so it seemed) made noises again while
+   attempting to load (SYS)SYSTEM.SAV.  The first time, it could "NOT"
+   find the file, response: NO FIL.  The second time, it found it, but
+   it took well over 3 minutes (yes! three "minutes" to load the monitor
+   from disk.  (It takes less time to read from tape?).
+
+5) Again, the disk drive made noises and "03 2" was in the lights on the
+   disk drive.  -- Didn't we "replace" that drive??? Why is it behaving
+   like the "old" drive, down to the noises and re-seeking or the same
+   problems that the other drive sufferred from?
+
+6) Would whomever arrives first thing in the morning, please call the
+   hardware people.
+/Carl.
+
+
+From: WRS
+Date: APRIL 11,1982 23:57
+Crashes should be able to be dumped now, I fixed CRASH.SAV.  -Bill
+
+
+From: CARL
+Date: APRIL 12,1982 0:04
+Re: What exactly did you do to crash.sav?
+I ask for the record, so that lois & I can make sure that it
+gets written down, so future re-builds don't cause this hassle.
+/Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 2:31
+To: Bill, Adele
+Re: Last weekend's fun project
+
+Please take a look at (CARL)PARCOM.SHR on 930.
+It has amazing similarities to PCOM, but with a lot extra.
+
+No! I haven't solved the "CREFRM" or "TMPCOR" problems with
+the original PCOM (yet), but I'd like your comments, if not
+your approval on what I've added.
+
+Enough Suspense.  Try it.  Try /NEWS or look closely at /HELP.
+
+-Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 3:30
+Dearest Lois,
+  (Gee! What does he want?)
+
+Well,  since I don't "trust" my alarm clock, and I feel that I may
+not stay awake "all" night, although it is obvious that I've been 
+awake most of it....
+
+If you come in before 9:00.  Pleas call me at home immediately, or
+at 8:00 or as soon after, but not before.  I would appreciate it,
+even if I do stay up all night, since I "really" can't afford to
+miss getting my taxes done this morning at 9:30.  I know I'll be
+awake for awhile longer while I make sure I have "whatever" I can
+find (that I haven't found yet) for last year's info.  (I can't
+find anything from mid-october to january... I've been cleaning
+and looking for more than a month now).
+/Carl.
+
+Thanks.
+
+
+From: CARL
+Date: APRIL 12,1982 3:37
+My home # is 415-961-1082 in case you don't have it available.
+
+
+From: ADELE
+Date: APRIL 12,1982 9:47
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the week of
+April 12-16.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Lois    |   Dave
+		|	    |
+	Tue     |   Adele   |   Carl
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Lois    |   Dave
+		|	    |
+	Fri     | Margaret  |   Ken
+
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: SGAVETTE
+Date: APRIL 12,1982 12:27
+Carl,
+Yes, Scott did give me a file to read TMCPOR.  I have not done anything with it as yet.
+/Sherman
+
+
+From: CARL
+Date: APRIL 12,1982 12:29
+I ask about TMPCOR reading, since Bill has a trouble report from COEES
+for the original PCOM which the "just released" PCOM still needs fixed.
+And... while I'm in there, if I can fix the TMPCOR problem for you, we
+all can be "happy".
+/Carl.
+
+
+From: SGAVETTE
+Date: APRIL 12,1982 12:42
+Carl,
+Please see me when you come in, or call me if you prefer and I will
+describe the TMPCOR problem I am having with PCOM.  Thanks .../Sherman
+
+
+From: ADELE
+Date: APRIL 12,1982 15:47
+
+
+System 930 will be down for a limited period of time either late Monday
+afternoon or, more likely, Tuesday morning.  This is to shift its
+position in the lab in order to make room for the F4 which is due to
+arrive on Tuesday.  System 934 is likely to be moved on Monday.  --AG
+
+
+
+
+From: CARL
+Date: APRIL 12,1982 21:08
+Busy?  Send me mail. /Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 21:12
+Dave, ...is SCREAM BROKEN?
+Re: ...
+DO SCREAM
+...
+Record Type(s) to include  [All]:
+Record Type(s) to exclude  [None]:
+Starting date (month,day,year): 4,12,82
+Number of days  [All]:
+[Reading (UN1)041282.SAT]
+
+Invalid index for array JOB!OPNAM. Index no. 1, value is 0
+Called from 37345  Last SAIL call at 40273
+?^C
+
+(Probably the MPL version). /Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 21:42
+Hmmm.  Oops!  (Well almost!)
+The parameter stuff I added to PCOM forgot to pass it along to the
+child PARCOM.  As soon as I figure out a way to do that, I'll let
+you know.  If you ran it /NODETACH - Of course it worked.  If you
+set your parameters from inside your CTL file  it works.  The only
+thing broken is the /PARAMETER switch.
+
+Anyway, time estimate for Putting in the !foCFM fix and the TMPCOR
+fix is 4 hours.  1 for coding, 2 for testing, 1 for release paperwork.
+(Coding has been done already in PARCOM) will be testing it later.
+/Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 23:27
+Adele, Lois,
+  I hung 930 and had to reload it tonight.  Again, the disk drive
+seems to be making noise when reading from SYSTEM.SAV.  Maybe that
+file is in a bad place on the disk?  I somehow doubt it.  It may
+be worth our while to get one of our monitor wizards to look at
+boots and see if it does something weird on a device read error?
+/Carl.
+
+
+From: CARL
+Date: APRIL 12,1982 23:32
+Dave, the problem I mentioned about SCREAM doesn't happen with (DWS)SCREAM.
+
+
+From: WRS
+Date: APRIL 13,1982 1:20
+Okay, I'll hang on to the PCOM transmittal and maybe we'll just xmit
+one version.  How comfortable are you that the parameter stuff is
+  1. done well from a user's point of view
+  2. not likely to affect reliability or introduce bugs
+(as soon as you feel good about these things, we ought to just
+release it as PCOM - no sense in having two)  -Bill
+
+
+From: CARL
+Date: APRIL 13,1982 1:24
+I think you got a mail packet from an aborted MAIL message.
+  I'd like to still discuss my changes, since I'd like your comments
+on the user's point of view...  My point of view may be stilted
+because, I've seen this same implementation before (MIC) and there
+may be a better way.
+
+
+From: CARL
+Date: APRIL 13,1982 1:27
+To: Bill, Adele
+I'd like to get both of you together for a short meeting to discuss
+the changes I've made to PCOM/PARCOM and finish up what I've started.
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 13,1982 1:29
+Bill, just pick a time & let both adele and I know when.  If she cannot
+make it, at least you & I should talk other than via mail.
+
+
+From: DWS
+Date: APRIL 13,1982 10:37
+yeah, a record type changed, and things have gotten mucked up.
+
+
+From: CARL
+Date: APRIL 13,1982 12:25
+Bill,
+  Re: curly braces... more reason why it doesn't work.
+
+I tried curly braces in a comment, and the monitor accepts the
+close-curly-brace as an escape (unless you specifically turn it off
+with TTY ALTMOD or TTY NO ALTMODE [whichever]).  Thus, if a user
+has a file with {macro} in it, and parameters are "off" he may
+lose his PCOM because of ERROR.
+/Carl.
+
+
+From: CARL
+Date: APRIL 13,1982 12:30
+To: Adele, Dave, Lois
+I'll be in about 1:15, so whomever has the support-line book,
+I will get it from you then.
+/Carl.
+
+
+From: DWS
+Date: APRIL 13,1982 12:30
+Re: stream accounting
+do you remember which file it blew up on?  i just wrote a SAT analysis
+tool, and want to go in and check.  seems to be related (at least in
+part) to a new stream record type.  /dws
+
+
+From: CARL
+Date: APRIL 13,1982 14:26
+Sherman,
+  Please setup DSK:PCOM[3,352477] as a non-standard PCOM and test it
+for the TMPCOR problem we discussed.  I don't seem to be able to get
+RPG to setup a NON-standard processor for me.  /Carl
+
+
+From: SGAVETTE
+Date: APRIL 13,1982 16:08
+Carl,
+(CARL)PCOM appears to work just fine.  If you want to see how to set up
+a nonstandard processor, look at (SGAVETTE)INIT.SAI.  I think you can
+also set one up by CTE SETNON, but I don't know the syntax.  Bill probably
+does.   .../Sherman
+
+
+From: CARL
+Date: APRIL 13,1982 16:44
+No No No!  I don't have an INIT.SAI myself, so looking at your INIT.SAI
+will not help.  I tried the CTE SETNON stuff and it appears not to work.
+I'll talk to you about it when you have time. /Carl.
+
+
+From: WRS
+Date: APRIL 13,1982 17:20
+Carl (CC Adele):
+Todd put CLSDMP bit 200 in CLOSE so it will set dumped bit.  Now TITO
+doesn't have to do RENAME's and won't screw files.  Please update TITO.
+Thanks -Bill  (don't forget to make the transmittal dependent on /L)
+
+
+From: CARL
+Date: APRIL 13,1982 17:54
+Re: Tito -- That means, I can't release it until /L although it would
+    be much better.  -Fine!   Any Idea when /L to be released so I can
+    schedule the work for TITO to be done before then.
+/Carl.
+
+
+From: CARL
+Date: APRIL 13,1982 23:59
+To: Bill, Adele, Scott, Ken, Lois, Dmitry, Dave, Tim
+Re: Proposed parameter scheme for PCOM
+
+The file (CARL)PCOM.PAR contains a description of the proposed
+parameter substitution scheme which I am planning to implement
+in the PCOM program to be released to COEES until our future
+PERP implementation is done.
+
+Please take a moment or two to peruse the description and let me
+know what you think of it.  It is not meant to satisfy everyone,
+but to be useable.
+/Carl.
+
+
+From: CARL
+Date: APRIL 14,1982 0:03
+Scott,
+  I'd like your opinion and comments regarding actual implementation
+of parameter variables and values as per the small discussions which
+took place on Tuesday, and (although not necessary to read immediately)
+as described (hopefully) more clearly in (CARL)PCOM.PAR on 930.
+
+  Because I am not (yet) putting a "limit" on the number of variable
+names that a user would define, I have begun to implement the table
+of name-value pairs with a simple linked record list (name,value,next)
+and the ordered parameters (not yet associated with names) as a 2nd
+linked record list (value,next).  Of course, this will work fine.
+
+  I am concerned about keeping "level" (or file) information around
+and possibly "forgetting" all parmeter-names defined in a file as that
+file is "exited" to really implement PUSH/POP operations rather than
+an "absolute" set of names.   Again, this can be done by adding the
+proper info to the current records.
+
+  However, Bill mentioned that this would be an ideal use of LEAP with
+triplets of file|name|value thus letting me locate and/or purge entries
+more easily.  I somewhat agree, but I am leary of having to declate an
+absolute number of items (itemvars, etc) and one-day having the whole
+program die because some user defined too many names.
+
+  Can you find some time today to talk to me about this (wednesday),
+briefly to: (pick 1) calm my fears, reject the idea of using LEAP,
+coerce me into using LEAP instead of RECORDS, suggest another approach.
+
+  I'd appreciate it, so that I don't waste valuable time on something
+which is likely to "break"? ...  Thanks.  Carl.
+
+
+From: ADELE
+Date: APRIL 14,1982 7:51
+I asked Bill (by mail) if he could get together late this afternoon to talk
+about PCOM provided I get back from my appointment.  It would be OK with me
+for the two of you to talk as long as I get word of any decisions.
+
+--Adele
+
+
+From: DARREN
+Date: APRIL 14,1982 7:56
+Dave, Tim, Carl:
+New EMPIRE on (GAMES:930) will take pieces out of whatever automatic mode
+they may be in upon triggering any of the "illegal move, move again"
+messages, thus preventing loops upon same. /D
+
+
+From: TJB
+Date: APRIL 14,1982 11:04
+I looked at PCOM.PAR.  Seems reasonable to me -- but I am not sure that you
+have reached your stated goal of being easily understandable to non-tech
+(especially non-programmer) types.  I don't have a counter proposal, nor
+do I really even know how to quantify what I think is difficult about the
+scheme, so I guess that I have no right to complain.  It seems usable.
+
+
+From: SDANIELS
+Date: APRIL 14,1982 13:36
+	About the LEAP items: the new restriction on the number of
+items is (due to the ROCHESTER-LEAP addition) now simply an address
+space problem rather than 4090.  (You needn't worry about running out).
+I have heard that DATUMs of LEAP items which are RECORD!POINTERs or
+ARRAYs of RECORD!POINTERs are not always subject to garbage collection,
+but, if such things are avoided, then LEAP is just fine.
+	-Scott
+
+
+From: LOIS
+Date: APRIL 14,1982 14:30
+To Carl and Bill,
+
+Adele called to say that she would return quite late, if at all, today and
+to go on and meet without her.
+-Lois
+
+
+From: CARL
+Date: APRIL 14,1982 18:50
+To: Parameters discussion list
+Re: (CARL)PCOM.PAR
+
+I've updated my proposal for those of you who have gotten to
+read it already.  The major change was to eliminate the /PARAMETERS
+switch in lieu of allowing the user to simply specify the parameters.
+a la:
+    .PCOM (USER)FILE par1,par2,...,parN : name=par,name=par /switches
+/Carl.
+
+
+From: CARL
+Date: APRIL 15,1982 1:41
+Scott,
+  Reading through the LEAP tutorial, I have noticed at least one typeo.
+Should I make a list of all such (if any more are found), or do you not
+want to correct any that I find (since you may already know of them).
+/Carl.
+
+
+From: CARL
+Date: APRIL 15,1982 2:24
+Scott,
+  Reading through (DOCAIL)TUT3.DOC I found a couple of typeo's which
+could be confusing if not corrected.  At least I'm guessing what they
+should be: (See!  I was confused!).
+{Page 5} under SET EXPRESSIONS, 1. Explicit Set -
+  "C)  {item2,item2,item2,item3}"  should be "C) {item2,item2,item1,item3}"
+
+(same example was used for lists, so I suspect that that is right.)
+
+{Page 23} under ANY and BINDIT in the FOREACH ?x,y example
+  "THEN FOREACH x,y | A XOR x=y DO <stmt>" should be...
+  "THEN FOREACH x,y | A XOR x EQV y DO <stmt>".
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 15,1982 13:24
+Adele,
+  I hope that you had a pleasant evening last night (Wednesday).
+As you may have noticed, I wasn't in this morning.  I slept in, catching
+up on some missed "sleep".  I will try to catch "BILL" and get his
+reccommendations on the PCOM transmittal: (whether to wait a day or two,
+plus user testing time, or to transmit the original copy with the
+two or three fixes requested).  Unfortunately, the fixes were added
+afterwards and will have to be re-installed, but Bill and I can discuss
+that.
+/Carl.
+
+
+From: CARL
+Date: APRIL 16,1982 4:40
+To: TYMCOM-X group.
+
+*** Please cast your votes ***
+
+Please read and edit the file (CARL)VOTES to comment and suggest
+monitor command names to run the PCOM program.  Two names are being
+sought.  One for normal /DETACH mode and the other for /NODETACH
+mode.  The top contenders so far are "PCOM" and "TAKE".  Please
+voice your agreement, disagreement, suggestions, etc in the above
+file.   The decision will be made by Monday afternoon when the
+then current stable version of PCOM will be transmitted.
+
+/Carl.
+To: TYMCOM-X group.
+
+*** Please cast your votes ***
+
+Please read and edit the file (CARL)VOTES to comment and suggest
+monitor command names to run the PCOM program.  Two names are being
+sought.  One for normal /DETACH mode and the other for /NODETACH
+mode.  The top contenders so far are "PCOM" and "TAKE".  Please
+voice your agreement, disagreement, suggestions, etc in the above
+file.   The decision will be made by Monday afternoon when the
+then current stable version of PCOM will be transmitted.
+
+/Carl.
+
+
+From: MCH
+Date: APRIL 16,1982 12:20
+The new lighting system goes into effect at 19:00 TONIGHT!  Lights
+will go out automatically.  They can be turned back on for a period
+of 2 hrs. using the switches on the hallway wall across from my office.
+The experimental machine room is NOT supposed to be affected.  
+
+
+If this becomes a serious hastle for any of the night people please let
+me know.  I'll see if we can come up with ideas for a "workaround".  /Mike
+
+From: KEN
+Date: APRIL 16,1982 14:53
+Carl,
+
+Did we ever settle the issue of what default extension to associate
+with PCOM's command files?
+/ken
+
+
+From: CARL
+Date: APRIL 16,1982 15:01
+Re: PCOM default extensions.  No.
+
+
+From: KEN
+Date: APRIL 16,1982 15:11
+Carl,
+
+You recall that today at 3:30pm there will be a MAGNUM/TYMCOM-X wine
+and cheese tasting in conference room 1?
+/ken
+
+
+From: CARL
+Date: APRIL 16,1982 15:14
+Actually, I forgot.  Oh well, be thgere eventually.
+
+
+From: KEN
+Date: APRIL 17,1982 10:02
+Carl,
+
+It strikes me that if neither monitor name for PCOM is "PCOM", then the
+extension ".PCO" will make little sense as a default.
+/ken
+
+
+From: CARL
+Date: APRIL 17,1982 20:14
+Re: .PCO  -- I agreee.
+
+
+From: CARL
+Date: APRIL 19,1982 5:43
+Bill,
+  I seem to be missing something basic about lists and sets.
+
+The manual says "PUT <item-exp> in <set/list-variable> [bef/aft <loc>]"
+and I have defined SET and LIST itemvars which I initialized with
+ itmv!1 _ new(Phi);   and   itmv!2 _ new(Nil);  which compiles fine.
+SAIL complains about my "PUT SI in itmv!1" and "PUT SI in itmv!2 before 1"
+statements and continues with associated DRYROT's in LEAP mostly LEAPSK.
+
+It isn't clear... should I be saying "PUT SI in DATUM(itmv!1)" ???
+(Yes, BY THE WAY, SI is defined as STRING ITEMVAR SI;).
+
+If you have 5 minutes to talk to me, please do so... maybe easier than 
+either of us harrassing the source file to make it work.  /Carl.
+
+
+From: CARL
+Date: APRIL 19,1982 5:53
+Adele,
+  I have forgotten the time for the DED meeting.  I know it is either
+11:30 AM (doubtful) or 1:30 PM today.  Could I ask you to give me a
+call at home about 10AM if it is this morning, and 12ish if it is this
+afternoon.  I do not wish to miss the meeting.  Doubtless... a good
+memory doesn't equal pale ink... but I'd rather sleep for 2 more hours
+if I don't have to be awake sooner.
+
+  Thanks!  /Carl.   (Yes, I was in "nighttime" phase!) Goodnight!
+
+
+From: CALSTATE
+Date: APRIL 19,1982 9:07
+Carl,
+   TAPE  version 12.01 has been archived as requested......have a nice day...
+
+                                                 scott
+
+
+From: CARL
+Date: APRIL 19,1982 23:52
+Re: Monitor Commands for PCOM
+
+I seem to recall some comment about "PERFORM" coming from your direction.
+The actual "current" implementation of the PERFORM command is said to be
+a useless abomination.  (Actually, it seems to be implemented via some
+kludge in RPG, such that only RPG commands will work in a perform file).
+
+Unfortunately, the "only" documented feature of PERFORM that PCOM would
+not satisfy is that an "ABORTED" perform file can be continued at the
+point where it left off.  I would like to campaign for somehow (?) adding
+something to PCOM in the future (possibly "NEAR" future) to alleviate
+that problem.  That would allow PERFORM to work, and also give us a useful
+command for PCOM.
+
+(This message is sent to you only.  Please bring up the idea with Bill and
+ Adele and let me know [through them?] if this is feasable).
+/Carl.
+
+
+From: WRS
+Date: APRIL 20,1982 3:37
+(WRS)PUSHX.MAC contains code for a SAIL callable routine that will sprout
+another frame and pass your terminal to it (al la TOPS-20 PUSH command).
+The monitor /K13 and later has the POP command to return to the parent
+frame.  BLISS hackers can make minor mods to the source.  If you want the
+child frame to get the license the parrent has, give your program WC RC SY,
+otherwise that won't work until the license passing UUO is complete.  -Bill
+
+
+From: SGAVETTE
+Date: APRIL 20,1982 7:36
+Carl,
+Re PERFORM:  A quick scan of your idea ... it seems reasonable.
+I won't be in for the next three days.  If you want something done
+before then, bring it up with Bill, Adele and Mike yourself.
+If you want me to handle it when I return, please remind me.
+/Sherman
+
+
+From: WRS
+Date: APRIL 20,1982 23:44
+What is (SYS)TYMPC.DAT? anyone?  -Bill
+
+
+From: CARL
+Date: APRIL 20,1982 23:46
+Re: (SYS)TYMPC.DAT
+Well, it look like a set of numbers {obviously}
+and it was written by BOWLESM ... but that was before my time. /Carl.
+
+
+From: WRS
+Date: APRIL 20,1982 23:49
+I'm not blind - anyway, APR 3 1982 is not before your time.  If you have
+anything useful to say about its origin, I'd like to hear it, otherwise...
+-Bill
+
+
+From: CARL
+Date: APRIL 20,1982 23:52
+No.
+
+
+From: ADELE
+Date: APRIL 21,1982 15:32
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the rest of the
+week of April 19-23.
+
+		|____AM_____|____PM_____
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Adele   |   Dave
+		|	    |
+	Fri     | Margaret  |   Ken
+
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: ADELE
+Date: APRIL 21,1982 15:36
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the week of
+April 26-30.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Lois    |   Ken
+		|	    |
+	Tue     |   Adele   |   Carl
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Lois    |   Dave
+		|	    |
+	Fri     | Margaret  |   Carl
+
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: DWS
+Date: APRIL 21,1982 19:09
+Re:  ftDED 0.31 - split screen stuff
+
+New commands are:
+
+	^X2	split the screen
+	^X1	remove the other window
+	^X^G	grow this window by a line
+	^X^O	move to the other window
+
+It all seems to work (really!).  If you notice anything funny, however,
+let me know ASAP, or be prepared to replicate it.     /DWS
+
+
+From: DWS
+Date: APRIL 22,1982 10:32
+Re: Another command in ftDED v0.31
+
+^X^T  prints the current date/time in the message line
+
+
+From: DWS
+Date: APRIL 22,1982 11:17
+Re: growing a window in ftDED v0.31
+
+It was pointed out that ^X^G used to mean 'cancel the ^X', and was
+thus a bad choice of a binding.  Henceforth, the command to grow
+a window is ^XG (or ^Xg).
+
+
+From: DWS
+Date: APRIL 22,1982 12:00
+Re:  ftDED 0.32
+Searches should be about 30% faster.
+
+
+From: WRS
+Date: APRIL 22,1982 14:47
+Whats the news on /K for 2020's?  -Bill
+
+
+From: CARL
+Date: APRIL 22,1982 17:21
+Since DED is much like EMACS, (command characters anyway), it would
+be wise to be somewhat compatible, or to avoid obvious conflicts.
+I went through all this awhile ago and probably confused enough
+FINE & EMACS users myself with VUE.  I just feel strongly about this
+and want you to know.
+  I have some lists of commands by name and character for EMACS and
+VUE if you would like to use them for reference when picking a new
+command character.
+/Carl.
+
+Re: ^X^T is transpose regions in EMACS, not display date&time.
+
+
+From: CARL
+Date: APRIL 22,1982 18:50
+Is there some reason why (MPL)TAUX disappeared?
+/Carl.
+
+
+From: CARL
+Date: APRIL 22,1982 18:51
+re:Taux -- or at least license seems to be needed to run it.
+
+
+From: WRS
+Date: APRIL 22,1982 18:55
+It works fine for me.  Its been there since last october.  You always
+need AC license to build circuits to user names not your own.  -Bill
+
+
+From: CARL
+Date: APRIL 22,1982 19:01
+I found out what was wrong....
+  It appears protection is checked against your GFD ppn not your AUN.
+  I was GFD'd to CALSTATE, so even though my gan is 3, & MPL is 3,
+  CALSTATE's gan is not 3... thus ALL RD NO won't let me use it!
+    (poor protection scheme--if you ask me).
+
+
+From: WRS
+Date: APRIL 22,1982 19:34
+Agreed.
+
+
+From: CARL
+Date: APRIL 23,1982 4:12
+65 again... password file.  Another hotline call.
+
+
+From: CARL
+Date: APRIL 23,1982 4:35
+.GFD OSP
+[ MA P034/J 4-22-82 /LOIS ]
+CONF##.MAC and MON##.CMD now exist in (M33) only, MONED1 knows. /WRS
+Sources for J are presently in .mac, K sources in .k/Lois
+
+Uh....
+.dir *.k
+
+"There aren't any"
+
+Uh... I'm making believe that you got rid of /J, and that /K is *.MAC
+again... is that right???
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 5:04
+Bill,
+  The problem with ONCE et al appears to be processor dependent.
+I tried F3XJ38 (before my changes), F3XJ54 (after 99% my changes),
+F3XK14 (the current one on 930).  No failures of the same type at
+all.  In fact, no MISSING OR INCONSISTANT PACKSET ID messages either.
+
+DEFINE, DISOLVE and REFRESH all appear to work as expected, (archaic,
+stupid and clumsy -- but as coded).  I need to schedule a KS to play
+with, and see if I can find the problem with DDT.  We do not have
+an ALL FILES dump earlier than the /K transmittal, so the sources to
+any particular /Jxx monitor are not readily available even on backup.
+
+The earliest ALLFILES is dated 11/24 (so subtract 1 week to 11/17) and
+that is after all the massive changes, and probably only has some of
+the original sources.  I will check further, ...
+
+...which dark alleys would you like me to pursue?
+/Carl
+
+
+From: CARL
+Date: APRIL 23,1982 5:35
+To: Calstate & TSU-CO-OP   (Julie)
+
+Please do not overwrite the ALL FILES tape-sets for SA1124.ALL or
+SA1205.ALL without contacting me about it first.  Also, it would
+be nice not to overwrite SA1219.ALL either, but that one may not
+be as critical.
+
+If you can use tapes other tapes for the next ALL FILES, it would
+be appreciated.  (I don't know when you're going to do the next
+set for 930, ... please talk to me about this before you do the
+next one --- even if you must call me at home & wake me up.)
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 5:58
+Adele,
+  Could you please find out whom I should speak with to schedule
+testing time on either 118 or 675's hardware.  It is my understanding
+that both machines now belong to Dick Ouelette's group (which means
+us too!).  It is also my understanding that :675 is being used thru
+Friday (today) by Ben Russell & then Dennis Ernst has time scheduled
+to test some nodes...  after that (when?) I'd like to get some time
+somewhere, prefereably on 118's hardware due to the hassle of having
+to write things on tape or disk for "N" versions of the monitor where
+"N" is known to be larger than 4, but otherwise unknown.
+
+  I also will probably NOT be in at all on Monday, since I have a
+court appointment at 1:00 in San Jose.  I do not plan to work much
+at the office this weekend either, unless absolutely necessary.
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 6:05
+I sent mail to calstate & tsucoop (I believe that Julie isn't here on
+Fridays), asking that she talk to me before she does the next 930
+ALL FILES, since I don't want the tapes from last OCT-NOV-DEC period
+to be overwritten until this ONCE thing is resolved.  They are the
+sets which cover the period of time when I was finishing up the ONCE
+testing & the original /K transmittal.
+  If she is supposed to do an ALL FILES store this weekend, it would
+be ideal for her to use "NEW" tapes rather than tapes from OCT-DEC.
+(It also wouldn't be useful to overwrite first-quarter 82 either...).
+Do you know what arrangements need to be made for this?
+
+(Gee aren't I good for a lot of questions?)
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 6:12
+In any case... I couldn't assemble a monitor for FO using (OSP)!
+/Carl.
+
+
+From: LOIS
+Date: APRIL 23,1982 7:47
+Carl,
+1) Yes, the k sources are now in osp.
+
+2) The reason you couldn't compile a monitor for fo is that the conffo.mac
+file in m33 is darren's file without all the usual definitions.  If you want
+to compile an fo in osp you must rename the present conffo.mac in m33 to
+conffo.exp, then copy over the conffo.mac from osb to m33--then compile
+monitor (and then delete the conffo.mac and rename the file back).
+-Lois
+
+
+From: CARL
+Date: APRIL 23,1982 19:54
+Thank you Lois, Re: OSP info.
+
+I got what I wanted by using the latest F3XK14.SAV from M33 and changing
+the system number & the config name with DDT before coming up manually.
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 20:41
+Bill,
+  I believe that the ONCDSK problem is not as critical as we had
+thought earlier (since it appears to affect KS's but not F3's).
+It may be worthwhile to experiment with a KL or KI to make sure
+it is only KS dependent, before I jump into ONCE looking for KS
+problems.  I'm leaving it up to you to decide whether I should try
+to schedule time or not.
+/Carl.
+
+
+From: CARL
+Date: APRIL 23,1982 20:50
+BIll,  FYI system 31 just took another hit on DRWSPR.EPO. /Carl. (Fixed)
+
+
+From: CARL
+Date: APRIL 23,1982 20:52
+Adele,
+  As I do intend to do some work this weekend, I will probably
+finish up the PCOM stuff.  It has parameters installed, it has
+the job capacity exceeded fix installed, it has the TMPCOR read
+fix installed.   I am half-way through installing better switch
+control which is the last thing I intend to do for now.
+
+  A future enhancement which should go into the next version
+should be to do "better logging" so that if the system goes down
+the "entire" log file isn't lost, and possibly to have it read
+SWITCH.INI for default switches.  Bill knows about these, and
+we agree that they need not go into this version.
+
+/Carl.
+
+
+From: WRS
+Date: APRIL 23,1982 23:22
+re: 31 thanks for the scoop, I wonder whats up, PJ should be totally shut
+down.
+re: ONCDSK, should keep on it.  KS's are more important than we'd like.
+-Bill
+
+
+From: CARL
+Date: APRIL 23,1982 23:25
+re: ONCDSK
+Uh.. does that mean you'd like me to schedule testing on a KI or KL?
+I don't know what time I'll have this weekend, & Monday I have to go
+to court at 1:00 in the afternoon... Adele is checking into who exactly
+I have to schedule either 118 or 675 with now that "we" own them both.
+However, I will persist until I find the problem.
+/Carl.
+
+
+From: CARL
+Date: APRIL 24,1982 4:09
+Dave,
+ what does the line in telecopy (after a copy)
+
+32436 (28606) CHARS. TRANSMITTED
+
+ actually say?  I understand that 32436 is the number of 8-bit bytes
+ in the file (filesize in words * 4.5), but I have no idea what the
+ (28606) is...  do you know?
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 24,1982 4:13
+Todd,
+  I'd like you to let me know exactly what kind of problems you had
+with 934 when you were refreshing/defining a structure on the top
+drive (APA2).  Other than what appeared to be "hardware" or really
+screwed-up software from ages ago (which I doubt), I didn't have
+any trouble.
+  The hardware problem I had was that ONCDSK in FILMAN was perpetually
+dying when it tried to come up and got some kind of error indication
+on APA2, and said that the drive was "OFF LINE".  Other than that,
+no problems.
+/Carl.
+(PS THAT "one" problem was/is a "BIG" hassle.)
+
+
+From: CALSTATE
+Date: APRIL 25,1982 9:52
+from: CALSTATE, APR 25, 1982   9:55
+To: Carl
+
+	I received your request not to write over the November Allfile too
+late.  The allfiles done on 11-21-81 were written over on 4-18-82.
+I will save the ones from 12-19 and 12-05, but that will mean writing
+over pretty recent allfiles (done in January).
+
+Julie.
+
+
+
+From: CARL
+Date: APRIL 26,1982 0:24
+Julie,
+  Re: 11-21-81 all files.  Oh!
+
+I'd like to suggest a procedure change in doing the backups then...
+  could you please delete the directory on disk for the tapes being
+  written on "before" they are overwritten, i.e. that morning.  "or"
+  just after they are written over, i.e. that afternoon.  This change
+  will keep people like me from thinking that the tapes are still
+  around during that week when they've been overwritten, but no directory
+  has been done yet.
+
+Anyway... let me know before you nwwd to do an allfiles again, so that
+something can be done about saving files on those tapes. /Carl.
+
+
+From: CARL
+Date: APRIL 26,1982 0:31
+Have there been any more OPER/PJ problems since that last one on :31?
+/Carl.
+
+
+From: CARL
+Date: APRIL 26,1982 3:47
+To: Adele
+CC: Bill, Lois, Mike
+
+Just a reminder...
+  I may not be in at all today, or late afternoon at best.  I a court
+appointment this afternoon and do not know how long that ordeal will
+take.  If anyone needs me for anything, send mail && I will get to it
+as soon as possible.
+/Carl.
+
+
+From: DWS
+Date: APRIL 26,1982 11:32
+re: telecopy
+I'm not really sure without going back and looking.  I think that the
+second number has something to do with how many characters were 'really'
+transmitted.  (This may be different in update mode).
+
+
+From: ADELE
+Date: APRIL 26,1982 15:48
+	There is a narrative in (adele:36)stat1a.doc which I plan to turn in
+as part of 1st quarter status reports.  If you get a chance, look it over
+and comment.  I need to give it to Mike tomorrow, though.
+
+-Thanks, Adele
+
+
+From: DWS
+Date: APRIL 26,1982 17:10
+Re: ftDED v0.33
+You can now control the behaviour of long lines.  The environment
+variable 'WRAP', when nonzero (the default case), causes long lines
+to wrap.  When zero, long lines will march off the screen a la VUE.
+
+
+From: ADELE
+Date: APRIL 26,1982 21:11
+Mike said he would take care of getting keys to VG3 & the room where 675 is.
+They are tightly controlled.  Probably, we will have keys for managers; when
+I get mine, I'll arrange to leave them in a place where the group can get at
+them when needed.
+
+--Adele
+
+
+From: CARL
+Date: APRIL 26,1982 21:16
+I realize that keys are tightly controlled, but I'd like to voice that
+if only a few people have keys, then the situation becomes "LESS" secure
+since the keys end up getting left somewhere "accessable" to those who
+need to use them, and hence also to those who don't need to use them.
+
+I can live with whatever is done, but it is a "hassle" as far as I'm
+concerned.  I have more access to CUPC machines than I will for a lab
+machine and that is inane as well as ridiculous!
+/Carl.
+
+
+From: ADELE
+Date: APRIL 26,1982 21:21
+	If, in order to get keys for the group, only a small request is likely
+to be granted easily, then such a request is far preferable to a lot of delays
+and extra work.  The idea is to get access for those who need it legitimately.
+Although I have not talked directly to the "keeper of the keys", I believe
+that Mike has judged the most expedient method of getting our needs met.
+
+-Adele
+
+
+From: CARL
+Date: APRIL 26,1982 21:28
+I'm not trying to push the issue.  I just wanted to voice my complaint.
+(If I wanted to push the issue, there is a lot more that I could say.)
+/Carl.
+
+
+From: CARL
+Date: APRIL 26,1982 23:28
+Mike,
+  The lights went into "blackout" mode again & wouldn't stay on.
+I'm only complaining because I took a hotline call in my office and
+was trying to take care of it when the lights started doing their
+thing.  "talk about aggravation!".
+/carl.
+
+
+From: CARL
+Date: APRIL 27,1982 4:02
+1. Fix PCOM -- DoLOG not set properly... on default/detach
+2. Call Personnell about job postings.
+3. Dig DEEP into KS2020 ONCDSK.
+
+
+From: CARL
+Date: APRIL 27,1982 9:07
+Lois,
+  I do want to apologise for waking you last night for the spool
+problem on system 25.  When answering a hotline or support line
+call, I tend to not think about the "real" importance of a problem
+and attempt to take care of the problem as the caller perceives
+its importance.  That happens & I apologise.  /Carl.
+
+
+From: CARL
+Date: APRIL 27,1982 9:17
+Adele,
+  Re: Update on PCOM
+
+While I'm blocked waiting for listings and other things concerning
+the KS ONCDSK problem, I have done some finishing on PCOM.  It is
+all but ready for preliminary release.  I have a few consistency
+checks to make and some final changes to make for the command names
+and the quote-escape-to-parameter-unquote character.  The latter two
+changes are already "in" the source with arbitrary values which work
+already.  They just need to be finalized.
+
+/Carl.
+
+
+From: CARL
+Date: APRIL 27,1982 4:02
+1. Fix PCOM -- DoLOG not set properly... on default/detach
+2. Call Personnell about job postings.
+3. Dig DEEP into KS2020 ONCDSK.
+
+
+From: ADELE
+Date: APRIL 27,1982 11:10
+I have a file in (adele:930) call "crash" which is an example of the message
+sent to OSU about the latest crash analysis request.  Feel free to copy it
+for your use.  I find that it a good prompter for what is needed when we
+get such a request.  One thing I could have done better is to add the phone
+numbers or a mail address for the people who want the info.
+
+-Adele
+
+
+From: SGAVETTE
+Date: APRIL 27,1982 11:43
+Carl,
+Are you aware that the version of PCOM in your directory (the one that works
+with RPG) now BAILS out? .../Sherman
+
+
+From: CARL
+Date: APRIL 27,1982 11:47
+Yes!  that is my development -- undebugged copy.
+It is going through it's final debugging thrashes.
+/Carl.
+
+
+From: KEN
+Date: APRIL 28,1982 17:16
+Carl,
+
+:nomail in the file doesn't work if you do give any switches.
+
+A wise man told me so.
+
+/ken
+
+
+From: CARL
+Date: APRIL 29,1982 10:28
+Ken,
+  I believe that the problem you found in PCOM is fixed. Please try
+it and let me know.
+/Carl.
+
+
+From: CARL
+Date: APRIL 29,1982 10:30
+Bill,
+  On the ONCE/ONCDSK problem, I'm seeing really weird things.  First,
+everything works fine on an F3.  Second, the message we get about the
+packs on a KS doesn't even get printed on an F3, yet even a simple
+"Disolve" makes the message appear on a KS, (although I suspect that
+this is correct?).  Third, EDDT seems to %HALT the KS processor while
+attempting to $X over what appear to be harmless instructions.  Fourth,
+Some things work different when I have a breakpoint set in various
+places than if I don't.
+
+  Are there things I should know about EDDT which are different than
+normal DDT?  I understand about EXEC registers vs USER registers, but
+that shouldn't be a problem in ONCDSK/REFSTR!
+
+  Not a declaration of exhonoration, but.. the dispatch code I put in
+ONCE and ONCDSK is working fine.  Something else is not working for
+the REFRESH/DEFINE commands... as it "THINKS" that it did the refresh
+when loaded without DDT, and thinks something else is wrong otherwise.
+
+  Do you think that the old RMXKON could be loaded with a current /K ?
+/Carl.
+
+
+From: SGAVETTE
+Date: APRIL 29,1982 10:37
+29 April, 1982
+
+To: Everyone
+
+From:	Sherman
+
+Subject:  Paychecks
+
+With Ellen on leave of absence, the standard procedure for getting your
+paychecks to you seems to have temporarily fallen apart.  I received
+checks for everyone in the section this morning and I just wanted to
+thank you all.  The extra money will really come in handy so soon after
+tax time.
+
+Seriously folks,  I do have your checks for those of you in OSU and
+Languages.  I gave Adele the checks for everyone in her unit.  I will
+bring the ones I have to the section meeting this afternoon and Adele
+will do the same.  If you need them before that, please see me or
+Adele.  I apologize for the inconvenience and hope that we can get
+everything straightened out by next pay period.
+
+/Sherman
+
+
+From: SGAVETTE
+Date: APRIL 29,1982 16:27
+Everyone:
+The file to edit is (PARTY:930)OTA.EAT (OTA = Outstanding Achievement Award)
+/Sherman
+
+
+From: ADELE
+Date: APRIL 30,1982 12:07
+To:  TSU members
+From:  Adele
+Copies:  Mike, Sherman
+
+I would like to start holding regular TSU meetings again on a weekly
+basis.  At this moment, I am partial to Tuesday afternoons at 2:30 if
+we get suitable accomodations.  Although a weekly meeting may at times
+seem too frequent, I feel that such a schedule should be tried for two
+reasons.  First, we are in a transition period, and we are involved in
+a variety of projects; frequent informal status reporting is a must.
+Second, it is easy to become undisciplined about holding to a schedule
+when the meetings are widely spaced.
+
+Please send me mail with your comments.  I am open to other times also.
+Is anyone interested in a late morning meeting, beginning at perhaps 11?
+Monday at 11?
+
+--Adele
+
+
+
+From: CARL
+Date: APRIL 30,1982 12:14
+TSU mtgs on tues afternoons are fine,desireable,preferred, etc. /carl
+
+
+From: CARL
+Date: APRIL 30,1982 18:23
+To: Bill, Adele
+TITO has been fixed and tested.  The new version exhibits the same
+behavior in keeping license as does the previous version 15.13.
+
+The new version is 16.1 & the transmittal is on your (adele's) desk.
+/Carl.
+
+
+From: CARL
+Date: APRIL 30,1982 19:00
+To: Bill, Adele
+
+Are we going to discuss PCOM?
+/Carl.
+
+
+From: CARL
+Date: APRIL 30,1982 20:00
+Ken,
+  Re: PCOM and why :NOMAIL doesn't work.
+
+I'm sorry... you call cannot be completed as dialed.  You must
+now dial the area code before dialing telephone numbers not in
+your own area.
+
+Um,... Ya! It's one of those things.  PCOM has changed, and I
+removed a lot of extraneous commands which now must be specified
+in a different way.
+
+:NOMAIL is now accomplished by saying ":MAIL OFF" or ":SET MAIL OFF".
+However, PCOM doesn't complain if you use commands which it doesn't
+know about... So, you thought it was broken and it was really just
+being ignored.  Please update your files.
+
+New & current documentation is in (CARL:930)PCOM.DOC
+/Carl.
+
+
+From: CARL
+Date: APRIL 30,1982 20:27
+To: Adele, Bill
+Re: PCOM
+
+Documentation is in (CARL)PCOM.DOC on 930.  Also on your desks.
+
+Also, I noticed that if a user uses an "UNKNOWN" or "ILLEGAL"
+command, then PCOM just merrily goes on it's way and doesn't
+tell the user.  (Ken found this one for me, by using a command
+which I removed and complaining that it wasn't working.)
+
+Well, I understand that PCOM was an interim PERP program for
+COEES so that they could plop their PERP files through PCOM.
+My question is... Is it reasonable to have PCOM complain to
+the user "ILLEGAL COMMAND" or some such when an unknown command
+is encountered.  I talked to Mike, and he'd like to have us
+make a decision and then (if we decide to put in the messages)
+pass it by COEES as a memo, before we release it to SYS.
+/carl.
+
+
+From: MCH
+Date: APRIL 30,1982 20:30
+To:  The Section
+
+Stan is interested in arranging a picnic for June 10'th (a Thursday),
+probably to start late morning.  Would anyone not be able to make it?  /Mike
+
+From: CARL
+Date: APRIL 30,1982 21:15
+Re: June 10th
+I don't know... I will be possibly going to court the week before and
+again after, so my June schedule is up in the air until June 2nd.
+That's one reason, I'm not sure about the achievement dinner also.
+However, I suspect that June 10th will be soon enough that I will
+not have any problems with it.  (nice birthday picnic).
+
+
+From: CARL
+Date: MAY 1,1982 13:27
+Julie,
+  There are two tapes in your office for the allfiles to replace the
+two which have all of M33 for the week of 1205...  If the problem isn't
+solved, by next time, I have a few more in my office.
+/Carl.
+
+
+From: CARL
+Date: MAY 1,1982 14:53
+To: Section members.
+
+Please use (SYS)PCOM and let me know if you find any bugs.
+DO NOT use (CARL)PCOM, since it probably has BAIL loaded with it.
+/Carl.
+To: Section members.
+
+Please use (SYS)PCOM and let me know if you find any bugs.
+DO NOT use (CARL)PCOM, since it probably has BAIL loaded with it.
+/Carl.
+
+
+From: CARL
+Date: MAY 1,1982 16:41
+Re: Ha Ha Ha Hee Hee
+
+Consider this:  Create a PCOM job running detached.  It spawns a
+                child frame to perform your command file.  In the
+                command file, you set license and then do a "POP"
+                command.  Your child frame goes away, and it's
+                PTY port is now attached to the parent PCOM job's
+                command port.  (Ha Ha....)  No Zapper is sent, and
+                PCOM can't do anything to the child without typing
+                ^C to itself......................................
+
+Or something like that.
+/Carl.
+
+
+From: CARL
+Date: MAY 1,1982 17:11
+Re: MAIL & PCOM
+PCOM lets you turn off the mail to your mailbox... however, sometimes
+we forget to tell it that.  For those who munch their mailboxes the
+following will remove PCOM mail.
+
+R MAIL<cr>
+FIND proces
+
+From: CARL
+Date: MAY 1,1982 17:18
+Re: MAIL & PCOM
+PCOM lets you turn off the mail to your mailbox... however, sometimes
+we forget to tell it that.  For those who munch their mailboxes the
+following will remove PCOM mail.
+
+R MAIL<cr>
+FIND processed:<cr>
+PURGE<cr>
+Y<cr>
+T<cr>				-- to verify that it's only PCOM mail
+Q<cr>
+
+This message should not be deleted since the magic word ...... happens
+to break across a packet boundary.  (Like MAGIC!)
+/Carl.
+Re: MAIL & PCOM
+PCOM lets you turn off the mail to your mailbox... however, sometimes
+we forget to tell it that.  For those who munch their mailboxes the
+following will remove PCOM mail.
+
+R MAIL<cr>
+FIND processed:<cr>
+PURGE<cr>
+Y<cr>
+T<cr>				-- to verify that it's only PCOM mail
+Q<cr>
+
+This message should not be deleted since the magic word ...... happens
+to break across a packet boundary.  (Like MAGIC!)
+/Carl.
+
+
+From: CARL
+Date: MAY 1,1982 20:00
+                           -- to verify that it's only PCOM mail
+PURGE<cr>
+Y<cr>
+Q<cr>
+
+This message should not be deleted since the magic word ...... happens
+to break across a packet boundary.  (Like MAGIC!)
+/Carl.
+
+
+From: CARL
+Date: MAY 1,1982 20:04
+Re: Mail I sent about PCOM mail.  The "T<cr>" should be typed "before"
+you purge the packets.  I mistyped the mail example.
+/Carl.
+
+
+From: CARL
+Date: MAY 2,1982 14:00
+Any problems with the allfiles tapes? /Carl.
+
+
+From: CARL
+Date: MAY 2,1982 14:01
+Bill,
+  I'd like to talk to you about your "cable-converter" at shadow-brook.
+I suspect that my apt bldg has done something similar, but am not sure
+and would be interested in borrowing what you have to see if they do
+have something similar on our master antenna line, before building one
+myself.
+/Carl.
+
+
+From: TSUCOOP
+Date: MAY 2,1982 14:06
+may 2, 1982
+
+
+from: Julie
+
+Carl,  No, there were no problems with the allfiles tapes.
+There was a problem with a hung tape drive (the tape came off of
+one of the feeders on the tape drive.)
+Luckily, tito allowed me to continue with the allfiles, and had no complaints
+about your tapes.
+Thanks for asking.
+Julie
+
+
+From: WRS
+Date: MAY 2,1982 21:52
+I think it would be prefered to fatal on an illegal command.  The original
+rationalle was due to only a small command subset being implimented.  I agree
+about sending a memo to COEES.  -Bill
+sys sho sta
+
+
+From: ADELE
+Date: MAY 3,1982 9:34
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the week of
+May 3-7.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Adele   |   Dave
+		|	    |
+	Tue     |   Lois    |   Carl
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Lois    |   Dave
+		|	    |
+	Fri     | Margaret  |   Ken
+				
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: LOIS
+Date: MAY 4,1982 21:18
+Carl,
+Did you learn anything about why copying those files crashes 930?  Or
+anything else of interest?
+
+Nice to have 930 up for a change.
+-Lois
+
+
+From: CARL
+Date: MAY 4,1982 21:20
+No, I didn't.  Instead, Ben and I decided to copy the files to tape
+with TITO (while 552 was down, we took 930 stand-alone for this) and
+then to see if they can be read on 675's tape drive.  If not, they
+can always be copied to disk in the center using the STC drives & then
+telecopied to 675.  Anyway, we will see how long 552 stays up.
+
+I don't know what progress Ben has made.
+/Carl.
+
+
+From: LOIS
+Date: MAY 4,1982 22:00
+Carl,
+Did you try copying any of them to another directory?  Or copying anything
+else to RUSSELLB?  Obviously TITO was able to handle them.  Curiouser and
+curiouser.
+-Lois
+
+
+From: SDANIELS
+Date: MAY 4,1982 22:26
+
+Do
+not
+pollute
+my
+screen
+with 
+messages
+over
+a 
+few
+lines
+long
+!
+
+Instead
+refer
+to
+a
+file
+so
+I
+can
+see
+the
+other
+mail
+that 
+I
+get
+OK
+!
+!
+!
+
+
+From: CARL
+Date: MAY 4,1982 22:32
+What did I send you that was so long?....
+
+
+From: CARL
+Date: MAY 4,1982 22:36
+Darren,
+  What is the current procedure for assigning bits in the PATMAP
+so that patches don't overlap?  /Carl.
+
+
+From: SDANIELS
+Date: MAY 4,1982 22:35
+The little message about PCOM was not so much full of words as
+it was of line feeds.
+
+
+From: DARREN
+Date: MAY 4,1982 22:49
+I dunno - I don't use it, myself. /D
+
+
+From: CARL
+Date: MAY 4,1982 23:03
+Thanks./Carl.
+
+
+From: CARL
+Date: MAY 4,1982 23:14
+After some thought... the GETRAN problem may also be affecting KL's,
+but it isn't clear.  I'll let you know as soon as I check what the
+RDTIME function does on a KL different than a KS (it is different!).
+In the meantime (M33)GETRAN.PAT on 930 will fix the problem unless
+we have a processor that doesn't take any time between instructions.
+/Carl.
+
+
+From: CARL
+Date: MAY 4,1982 23:17
+Since there isn't a procedure for this, (or is there?) I have a patch
+for /K which fixes the ONCDSK/GETRAN problem on KS's and possibly on
+KL's (not yet sure if needed).  I've taken the next available bit in
+PATMAP... '100 for my patch, so the next bit is '200.  /Carl.
+
+
+From: ADELE
+Date: MAY 5,1982 10:18
+	I am working at home this morning -- and maybe this afternoon,
+depending upon what I can accomplish.  Call me here if need be.   --Adele
+
+
+From: WRS
+Date: MAY 5,1982 14:45
+Re: "...unless we have a processor that doesn't take any time between
+instructions...", you mean like the newly announced FOONLY-F0, 1/0
+times the speed of a CRAY-1, able to execute small subsets of the instruction
+set in no time at all*, ~rother instructions not implimented due to
+performance considerations.
+
+* - instruction set (programs optomized in microcode): JRST, HALT, JFCL,
+CAI, SKIP, MOVS, JUMP
+
+
+From: CARL
+Date: MAY 5,1982 14:52
+Bill, My patch is also applicable for KL's.  (JFCL instead of LSH T2,-'14)
+it is possible that a refresh operatrion on a KL will fail miserably just
+as it had on a 2020.
+/Carl.
+
+
+From: MCH
+Date: MAY 5,1982 15:33
+To:  The Section
+
+Tomorrow's meeting starts at 14:30 in conference room 1.  Ben Russell
+will be telling us about what he has been doing with VAX hardware, so
+please be on time.						/Mike
+
+From: CALSTATE
+Date: MAY 5,1982 16:07
+Carl ,
+  TITO version 16.1 has been archived as requested...have a nice day....
+                                                      Scott
+
+
+From: CARL
+Date: MAY 5,1982 16:36
+Re: Job 8 User:60@  %6 F
+Dave & I did some quick research & that username translates to
+
+PUSHJ 1,(6)		PUSHJ P,(T1)
+POP   1,5		POP   P,U
+
+which seems to appear in system.sav et al @ MSGSIM+3 & +4  in SCNSER.
+Interesting...No?
+/Carl.
+
+
+From: CARL
+Date: MAY 5,1982 18:22
+No, it does check for 5...args./Carl.
+
+
+From: KEN
+Date: MAY 6,1982 16:49
+Carl,
+
+Do you realize you h^aave a detached job on :36 hanging around?
+
+/ken
+
+
+From: CARL
+Date: MAY 6,1982 18:31
+No!
+
+
+From: CARL
+Date: MAY 6,1982 21:59
+To: Bill, Adele, Mike
+Re: Security Loophole
+
+Not super serious, but SPOOL does not check to see if the
+OPER password file has been munched, thus a user could munch
+the file and set status with spool (while inside spool).
+The license is process-license, but could allow a user to
+do things inside spool which he would not ordinarily be able
+to do. /Carl.
+
+
+From: CARL
+Date: MAY 7,1982 1:09
+Adele,
+  The file (CARL:930)DSTRCT.MMO describes the usage of district codes
+within SPOOL.  To make the changes to simply use zero or blank values
+in the database and accounting files is trivial.  However, some minor
+decisions such as what a user can see about a request and who can bill
+whom within districts and regions needs some discussion before I can
+give a reasonable estimate of the time needed to make all the changes.
+
+2 hours to edit and assemble SPOOL, and however long it takes LOIS to
+test each type of spool request (such as when SPOOL is first installed)
+is the total time required.   It is so easy to do that LOIS could do
+all the work in that same amount of time, now that I've found all the
+trouble points.
+
+I need 15 minutes of your time to discuss what we want to do. /Carl.
+
+
+From: CARL
+Date: MAY 7,1982 3:24
+Dave,Darren
+  EMPIRE still has problems sometimes when a destroyer attacks an
+enemy fighter which is on land.  It destroys the fighter, then it
+destroys the destroyer by breaking it up on land.  THEN, I got to
+attack with a fighter and subroutine FIND had a subscript error
+while trying to find the fighter which (i forgot to mention) was
+still left on the screen on the land square where the destroyer
+had attacked it earlier.
+/Carl.
+
+
+From: DARREN
+Date: MAY 7,1982 5:13
+To: Carl
+cc: Dave
+The problem of allowing ships to attack enemy fighters over land is 
+fixed (typo), but not installed.  The subsequent problem which led
+to the subscript error was described with sufficient incoherence to
+prevent further investigation. /D
+
+
+From: DWS
+Date: MAY 7,1982 9:15
+A reminder, to those of you who have yet to do so, to edit (PARTY)OTA.EAT
+with your time/place preferences so that we can get things set and snag
+a place on Laz's calender for the section dinner.        /DWS
+
+
+From: DWS
+Date: MAY 7,1982 10:29
+Darren, Carl,
+  Empire 3-5 (with the typo fix) is installed on (GAMES:930).
+/DWS
+
+
+From: LOIS
+Date: MAY 7,1982 12:43
+To the Tymcom-X section:
+
+Ray Jones will be taking 934 down to do some hardware testing tonight.
+-Lois
+
+
+From: CARL
+Date: MAY 7,1982 13:18
+Re: Subscript error in EMPIRE
+What happenned was that during my move, I attacked an enemy fighter
+with my destroyer.  The enemy fighter was destroyed, then my destroyer
+broke up on the shore.  However, the enemy fighter still appeared on
+my screen.  I had a fighter nearby and during the same move, I attacked
+the (dead) enemy fighter with my fighter.  The enemy fighter was then
+destroyed? (this is where the subscript error in FIND was typed).  My
+fighter then replaced the enemy fighter on the screen.
+[End of scenerio].
+/Carl.
+
+
+From: DWS
+Date: MAY 7,1982 13:32
+I figured that was what happened.  Darren's fix will prevent that.
+(The first bug set things up for the second one).
+
+
+From: CARL
+Date: MAY 7,1982 13:35
+I thought as much.  Just that darren said that he didn't understand the
+second part, so I restated it. /Carl.
+
+
+From: LOIS
+Date: MAY 7,1982 13:36
+To the Tymcom-X Section:
+
+Sherman's going away lunch is scheduled for Friday, May 14, 12 noon at
+Szechwan.  I'm assuming all but Todd are planning to attend.  Let me know
+only if you are not coming.
+-Lois
+
+
+From: CARL
+Date: MAY 7,1982 20:35
+Adele,
+  re: (CARL)DSTRCT.MMO
+
+This file has just grown a page longer.  page 2 contains district code
+usage information for the LISTER program with a brief overview and then
+some technical details for whomever gets to go into LISTER. /Carl
+
+
+From: CARL
+Date: MAY 7,1982 23:26
+Bill,
+  Re: ONCDSK.  Test was successful, both with the patched version
+and with the new code.  The patch is not necessary for KL's and in
+fact we want to put the LSH of the 12 low order bits back in for a
+KL, but not for the KS.  (On a KL the 12 low order bits are 0).
+/Carl.
+
+
+From: CARL
+Date: MAY 8,1982 12:36
+Re: (MPL)MARKER
+  Asks for a file name which it types out, e.g. (M33)P034.MEM using
+  filename.MKR on your AUN.  A carriage return defaults to (M33)P034.MEM
+  for those of us who don't have SETTRM in our init files.  However, it
+  is useful for any file which gets appended to.  /Carl.
+
+
+From: CARL
+Date: MAY 8,1982 12:51
+Scott,
+  What do I need to do to use RCHPTR and SCHPTR in a "LIBRARY" or
+subroutine module.  If I put the module in as a require "source!file"
+without the "entry" statement it works ok.  (see (MPL)MARKER.SAI).
+If I put the same thing into a subroutine module (See (CARL)MKR.SAI
+and (CARL)SET.SAI), then I get:
+FT-Sail: MKR.SAI 1
+LOADING
+1 UNDEFINED GLOBALS
+SYMBOL    REFERENCED IN
+USETI     SLBRIO
+
+Please let me know!  I'd like to make it a subroutine-library module
+not a source library module!!!!!!!   /Carl.
+
+
+From: CARL
+Date: MAY 8,1982 12:36
+Re: (MPL)MARKER
+  Asks for a file name which it types out, e.g. (M33)P034.MEM using
+  filename.MKR on your AUN.  A carriage return defaults to (M33)P034.MEM
+  for those of us who don't have SETTRM in our init files.  However, it
+  is useful for any file which gets appended to.  /Carl.
+
+
+From: SDANIELS
+Date: MAY 8,1982 13:03
+	One (simple) possibility is to load the appropriate SAILOW
+first when loading MKR.  The way to do this is: LOAD (FTSYS)SAILOW,MKR
+The problem is the library search order is not quite right for all 
+SAIL language programs (you have already searched LIBSAA before you
+got to RCHPTR).  Another soultion is to include a (perhaps uncalled)
+reference to USETI in your program (ie: ... if false the useti(0,1))
+	-Scott
+
+
+From: CARL
+Date: MAY 8,1982 13:59
+Thanks.
+
+
+From: ADELE
+Date: MAY 10,1982 9:06
+TO:	TSU
+FROM:	Adele
+RE:	support line
+CC:	Sherman, Mike
+
+	The following is the support line schedule for the week of
+May 10-14
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Adele   |   Dave
+		|	    |
+	Tue     |   Carl    |   Ken
+		|	    |
+	Wed	| Margaret  |   Dave
+		|	    |
+	Thu     |   Lois    |   Ken
+		|	    |
+	Fri     | Margaret  |   Carl
+				
+
+If your time(s) are not convenient, please arrange to swap and let me
+know.
+
+-Thanks, Adele
+
+
+
+From: DWS
+Date: MAY 10,1982 13:05
+A reminder to those who haven't done so yet...  Please edit (PARTY)OTA.EAT
+to add your date/place preferences for the section dinner.
+
+
+From: LOIS
+Date: MAY 10,1982 13:37
+Carl:
+
+Nick Taddeo put in an ITSR re PCOM in which one of the complaints was that
+there is no log file running /nodetach.  I remember discussion about this
+point and seem to recall and /log switch.  Is there such a thing?
+-Lois
+
+
+From: CARL
+Date: MAY 10,1982 13:49
+Re: Nick Taddeo & PCOM
+1) Which version is he running ?  what system?
+2) Yes ther is a /LOG switch which forces a log file
+3) The /LOG switch is documented in "R PCOM;/HELP" or "R PCOM;?"
+   and more so in PCOM.DOC
+4) The interaction of /DETACH on the mail and log-file is only
+   explained in the DOC file.  I guess it ought to be part of /HELP.
+   Will make it clearer. 
+/Carl.
+
+
+From: CARL
+Date: MAY 10,1982 13:54
+Are we going to ever talk about PCOM?
+cc: Adele, Bill
+
+
+From: CARL
+Date: MAY 10,1982 14:17
+Re: PCOM
+Newest pcom is v 1.12 which has the help text updated to reflect our
+earlier monologue.  It is installed on (SYS) on 930 and will be moved
+to :36 and :33 (FTSYS) for use by MAGNUM et al.
+/Carl.
+
+
+From: CARL
+Date: MAY 10,1982 14:20
+PCOM now identifies itself by minor version also.  (To keep track of
+whether we've fixed something or not before it is released).  The
+current (SYS) version matches my copy at v 1.12 as of today.  It may
+also be found on (FTSYS:33) and (FTSYS:36).
+/Carl
+
+
+From: ADELE
+Date: MAY 10,1982 16:51
+	There are a few things in "dstrct.mmo" I have questions about.
+(1) SPOOL item B.1.  What do you mean by alternate node mapping?
+(2) SPOOL item B.1.  What are N.B. nodes (alien term to me)?
+(3) Please explain the mapping for nodes > 2560 without print locations.
+    How does that work from a user as well as program point of view?
+
+--Thanks, Adele
+
+
+From: CARL
+Date: MAY 10,1982 17:02
+Re: DSTRCT.MMO
+
+(2) N.B. --- nota bene  [Latin: MARK WELL]
+
+(1)&(3) Spool has code which remaps node numbers which show a 0 print
+        location to  node# minus octal '4000  if the node# is greater
+        than octal '5000 (2560.).  It then, uses the new node# to see
+        if it has a printer location... (depending upon the user's
+        district # and Tymshare bit.
+
+        I don't know anything more than what the code says.  I never
+        heard of such a thing.
+
+/Carl.
+
+
+From: CARL
+Date: MAY 10,1982 19:49
+Ken, PCOM works as I illustrated in version 1.13  -Carl.
+
+
+From: CARL
+Date: MAY 10,1982 19:59
+Re: SCREAM !
+? Requires RF    ==== Talk with bill & let me know, but if you have
+                      WF that implies RF and I think that SCREAM
+                      should let you continue in that case.
+
+
+From: DWS
+Date: MAY 10,1982 21:20
+yeah, you're right.  i'll fix it.
+
+
+From: DWS
+Date: MAY 10,1982 21:22
+hold on!  scream works if you only have wf.  what version/where were
+you using it?
+
+
+From: CARL
+Date: MAY 10,1982 22:07
+My apologies!  I must have Taux'ed through after setting license
+so I must not have had it when I tried scream.  /Sorry.
+
+
+From: CARL
+Date: MAY 11,1982 0:31
+Re: Status update
+
+  I. SPOOL nodes:  NODPRI's format is '4000 * 2 words long with
+                   node mapping from 0-'3777 for each of customer
+                   and internal nodes.  "ANYONE" can specify which
+                   map to use, but if the internal node doesn't
+                   have a printer assigned, you must be in district
+                   0-9 for it to re-try the non-internal node for
+                   a printer loc.
+
+ II. COEES notes:  According to the stream records, all 5 COEES
+                   sessions in question ran up charges while inside
+                   one of COEES's programs: 1ESPLN or 1PCLN1.  It
+                   is not reasonable to attempt explanation without
+                   knowledge of the specified programs' internal
+                   operation.   (Is COEES wasting our time again
+                   merely to tell them that they have a programming
+                   problem?)
+/Carl.
+See me for further details.
+
+
+From: CARL
+Date: MAY 11,1982 0:44
+Lois,
+  FYI - PCOM v 1.13 is on (SYS:930), (FTSYS:33:36).  It has a fix for
+        Nick Taddeo's inquiry about logfile operation.  The HELP text
+        mentions the defaults for normal and /NODETACH modes, and the
+        NEW FEATURE added is that if a user "specifies" a logfile  in
+        the command line: e.g. "R PCOM;logfile=cmdfile", then in  the
+        case of /NODETACH as well as /DETACH, there will be a logfile
+        generated (unless the user says /NOLOG).
+/Carl.
+Please report any bugs or questions to me.  Thank you.
+
+
+From: LOIS
+Date: MAY 11,1982 9:25
+Carl:
+
+Did you give the new information on pcom to Nick?
+-Lois
+
+
+From: ADELE
+Date: MAY 11,1982 10:13
+(1) Did you realize that you had the support line this morning and also
+    an appointment with me?  I called you about 10AM - no answer.
+(2) SPOOL node question:  Is "ANYONE" a switch of some sort which indicates
+    the map to use?  Is the feature documented anywhere?
+
+--Adele
+
+
+From: CARL
+Date: MAY 11,1982 10:26
+Yes, I know that I have the support line ths morning.  I stayed up too
+late reading, so I slept a little over.
+No, I forgot about the appointment, however, I'm here 'somewhere'.
+
+As per SPOOL, the way the code reads, when you say "NODE=nnnn", if you
+want to use the internal nodes, then instead you say "NODE=nnnn +".
+
+
+From: CARL
+Date: MAY 11,1982 10:42
+No, I don't see any documentation in the spool manual about the node= +
+construct... but it is in the code, as I mentioned
+/Carl.
+
+
+From: ADELE
+Date: MAY 11,1982 15:42
+For the SPOOL and LISTER district code investigation, your analysis
+needs to be channeled into a set of recommendations for becoming
+independent of district codes.  It would be reasonable to add the
+recommendations to the beginning of your document and follow that up
+with the detail that you have already gathered.  It is worth explaining
+several alternatives and indicating which one you would choose and why.
+
+The following questions need to be answered:
+  (1) Is there a reasonable substitute for the checks made on district
+      now?  OPER license district perhaps?  Actual license? Something
+      else?
+  (2) Is there justification for changing the way information access
+      and billing restrictions work in order to minimize or eliminate
+      the district checks?
+  (3) I need some clarification on what is magical about district 0 and
+      district 2.  This, of course, is key to some of the solutions.
+
+--Thanks, Adele
+
+Sorry about the size of the last message -- I did want it in my log.  The
+text of it is in (adele:930)spool.
+
+
+From: LOIS
+Date: MAY 11,1982 16:09
+To the Tymcom-X section:
+
+There used to be an ADM 430, #52331, on the floor of Darren's office.  It
+was there last week (or at least, the week before) and is no longer there.
+Does anyone know where it went?
+-Lois
+
+
+From: CARL
+Date: MAY 12,1982 10:22
+Please let me know this afternoon, or send me mail if you want to
+come and see the skating show on sunday (for sure) and if you can
+buy your tickets today.  I want to turn back the tickets which are
+not sold tonight so that I don't have to pay for them.  You may
+still purchase them at the Skating Rink for the same price (assuming
+that they are not sold out [I don't know how they work it]). /Carl.
+
+
+From: CARL
+Date: MAY 12,1982 10:25
+Adele, Lois,
+   I'm not feeling too well this morning, so I am going to work for
+awhile at home.  If you want me for anything, feel free to call me
+(415)-961-1082.  I have a rehearsal for the skating show at 4:30 this
+afternoon, so I don't know if I will be in or not. /Carl.
+
+
+From: LOIS
+Date: MAY 12,1982 10:29
+Carl,
+I will buy two tickets for Sunday evening.  I'll give you a check when
+I see you.  Hope you feel better soon.
+-Lois
+
+
+From: CARL
+Date: MAY 12,1982 10:47
+Thank you for the empathy... it really is appreciated.
+/Carl.
+
+
+From: CARL
+Date: MAY 12,1982 10:49
+Anyone who is interested in coming to see the skating show that I'm
+going to be part of, this Sunday, at 2PM or 730PM... please let me
+know this afternoon if you want to buy tickets from me.  Otherwise,
+you takes your chances at the skating rink.  (Same price, either way.)
+
+I will be turning in what tickest arn't claimed tonight. /Carl.
+(Send me mail.)
+
+
+From: LOIS
+Date: MAY 12,1982 13:15
+Carl:
+You have a phone message from Gary Mauldin - x6460
+-Lois
+
+
+From: CARL
+Date: MAY 12,1982 15:47
+Adele, I just talked with Gary Mauldin about the new TAPE v 12.02, and
+he will be arranging for the postal service to test it tomorrow.  He
+mentioned that they were having another problem with transmission errors
+with tape.. is there anything I can do to be of service... or have you
+and Bill taken care of that. /Carl.
+
+
+From: ADELE
+Date: MAY 12,1982 16:28
+The TAPE fire is out.  You should be aware of what it was.  TAPE must
+have protection ALL RD RD rather than ALL RUN RUN.  This is because it
+gets rid of its high segment when reading and gets it back later using
+a GETSEG.  It is not able to do this when the protection isn't right.
+You will notice my old transmittals specify ALL RD RD.  I have taken
+care of getting the transmittal altered (Dave's original) - Gary Mauldin
+is following through with that.  I've also sent an MHX job around to
+fix the protection and asked Dave and Gary to follow up and make sure
+nothing has been forgotten.  I'll make sure there is an ITSR on the
+subject.
+
+--Adele
+
+
+
+From: CARL
+Date: MAY 12,1982 19:48
+You've made your point! Now STOP it!
+/Carl.
+
+
+From: MCH
+Date: MAY 13,1982 10:09
+To:  The Section
+Re:  Today's Section meeting
+
+It takes awhile to get a "standing" room reservation going--so we will
+have to MEET IN CONF. RM. 2 STARTING AT 3P.M. today.
+
+Note:  There will be NO Section meeting next week (the 20'th).    /Mike
+
+From: LOIS
+Date: MAY 13,1982 10:50
+Carl,
+Does RPG need different protection????  Can't do a "mod filename" without
+license set--get ?CAN'T FIND RPG.  Notice you just put up a new shr file
+protected ALL RD NO.
+-Lois
+
+
+From: SDANIELS
+Date: MAY 13,1982 11:15
+	Lucky for me, you didn't turn off display functions
+-Scott
+
+
+From: ADELE
+Date: MAY 13,1982 11:40
+	I have put together your info. on COEES to give to Mike who will
+send the memo.  Do you have the original memo on your desk?  /Adele
+
+
+From: DWS
+Date: MAY 13,1982 13:09
+we seem to be duplicating some effort.  i just prepared a patch for
+rpg, but won't try installing it now.
+
+
+From: DWS
+Date: MAY 13,1982 13:20
+i folded all control characters except <cr> <lf> <tab> to up-arrow
+form.  that included <bs>.  <del> was folded to ^#, and tilde, being
+printable, was left as is.
+
+
+From: CARL
+Date: MAY 13,1982 19:18
+Adele,
+  From some quick digging, thanks to Margaret pointing at the 1022
+databases on system 70, I do have a little info for you.
+
+1) there are no users in districts 4 thru 9.
+2) District 0 is mainly OPS, Validations, SRA, and the like
+   District 1 appears to be mainly MAIL names on system 8, marketing
+              communications and the like
+   District 2 is mainly Accounting, Billing, Payroll and the like
+   District 3 is mostly internal or development
+/Carl.
+
+
+From: CARL
+Date: MAY 13,1982 20:02
+Re: Letter Bombs.
+Since you weren't at the mtg today... Dave fixed up (SYS)MAIL to
+massage control-charcters.  I fixed RPG's (MAIL/POSTMAN) commands,
+GFD's ACCESS.MSG output, LOGINN's ACCESS.MSG output to convert
+all but ^H-^M to ^<char>, rubout to ^# and tilde to ^%.  All are
+on SYS: on 930.   Nulls are ignored (now) by LOGINN and GFD, they
+didn't used to be.  If no complaints, I'll have transmittals for
+GFD, LOGINN, and RPG on your desk tomorrow.
+
+Re: How are you feeling?
+    How is your car?
+/Carl.
+
+
+From: CARL
+Date: MAY 13,1982 20:07
+Also,
+  Are you still interested in going to see the skating show on Sunday?
+(I too k back the tickets I had, but they will be available at the door.)
+
+
+From: WRS
+Date: MAY 13,1982 20:14
+Won't have time for scate show, maybe next time.  -Bill
+Re: ^ characters, I think we have all jumped to conclusions a bit.  It
+is not clear (to me) that we should allow control character to be 
+included in messages at all.  Therefor there would be no need to do
+any special processing in MAIL, POSTMAN, (SYS)MAIL, (WRS)MAIL, etc.
+All that would need to be changed is SEND.  Can anyone convince me
+otherwise?    -Bill
+
+
+From: CARL
+Date: MAY 13,1982 20:18
+Re: ^<chars>
+Either way... but all forms of input must be stopped including reading
+from files, etc.  I is much easier to do something reasonable on output.
+(typeo I is "It" -^-).  (Especially since it has already been done, also
+anyone could create the packets elsewhere if a better mail system is
+implemented.)  Anyway, GFD-LOGIN read whatever is in ACCESS.MSG.. so that's
+probably not going against the grain of things.  Otherwise, RPG had to be
+changed to do something, anyway.
+  PS were you harrassed by letter bombs like dave and I were?
+
+
+From: WRS
+Date: MAY 13,1982 20:37
+Letter bombs, I got one from Scott, to which I replied with TNT ...
+    COPY (WRS)TNT,TTY:
+for a demo - its really nice (o}doesn't do anything nasty).  I agree that
+GFD and LOGINN are correct.  But, RPG is the only one that can write 
+packets into SYS:XOBLAM, but anyone can read them out of (*)MAIL.BOX.
+So by placing the burden on the reader, you have an undefined set of programs
+which must follow the cumbersome protocol (for example, a user may have a
+FORTRAN or MAGNUM program to read his mail).  Placing the burden on the
+SEND routine, keeps the control in a known set which is wholely in our hands.
+-Bill
+
+
+From: CARL
+Date: MAY 13,1982 20:42
+Agreed.  So do I take that to mean that you'd like me to do something
+to RPG to try and filter them out on input, a la the same scheme used
+for output...  remember that various control characters have special
+meaning, eg. ^D, ^F, ^B and (believe it or not) Rubout, thus removing
+the code from output, or leave the output code in RPG, but also add
+some code to SEND (I think I'd prefer this).  (eg. LETTER puts messages
+into someplace --- Right?).
+-Carl.
+
+
+From: TYMSHELTER
+Date: MAY 13,1982 22:04
+MSG#: A20967, forwarded from ONTYME II
+
+
+                               BBBBBBBBBBBBBBBBB
+                         BBBBBBBBBBBBBBBBBBBBBBBBBBBB
+                    BBBBBBB                         BBBBBB
+                BBBBB    Cupertino Town Meeting          BBBBB
+             BBBBB         Nuclear War: What Can We Do?     BBBBB
+           BBBB                                               BBBB
+          BBB  The City of Cupertino invites you to an          BBB
+         BBB  educational evening,  cosponsored by Physicians    BBB
+        BBB  for Social Responsibility and People for Social      BBB
+       BBB  Responsibility.                                        BBB
+       BBB                                                         BBB
+       BB   Where: Cupertino City Hall Council Chambers             BB
+       BB    When: May 20th, 8 to 10 PM                             BB
+        BBB                                                       BBB
+          BBB        BBBBBBBBBB   B    B      BBBBBBBBBB        BBB
+            BBBBBBBBB         B      B    B   B         BBBBBBBBB
+                              B   B   B    B  B
+                             BB B    B  B     BB
+                            BB     B   B  B  B BB  
+                           BB  B    B       B   BB
+                         BBB     B       B       BBB
+                       BBBB   B       B     B     BBBB
+
+ The evening will include:             
+
+   "The Last Epidemic" -- A film describing the awesome effects of 
+    nuclear war and the dangerous steps being taken that make it
+    more likely.
+
+   Dr. Roger Kennedy, chief of the department of internal medicine
+    at Kaiser Hospital, will speak and answer questions
+
+
+
+From: DWS
+Date: MAY 14,1982 8:52
+^m problem fixed.  the message broke a <cr><lf> pair accros a packet
+boundary.
+
+
+From: DWS
+Date: MAY 14,1982 10:08
+Re:  Section Dinner
+To:  Tymcom-X Section
+
+The consensus so far is that both June 18 and June 25 are convenient
+nights to hold the section dinner.  The next issue is to decide on a
+restaurant.  Those with the largest approval so far are Chef Chu's,
+Scott's Seafood, and La Mere Michelle.  Sherman says that La Mere
+Michelle won't handle parties our size, and recommends Au Chambertin
+as an alternative.  So, without further ado, it's ....
+
+VOTING TIME!
+
+Send me mail ASAP, so we can tie down Laz, with your vote for one of
+Chef Chu's, Scott's Seafood, or Au Chambertin.
+
+Results will be announced (probably by mail) tuesday evening, May 18.
+
+/DWS
+
+
+From: DWS
+Date: MAY 14,1982 13:57
+according to sherman, Au Chambertin is French, and verty good.
+
+
+From: CARL
+Date: MAY 14,1982 21:44
+Dir /YESTERDAY !
+
+
+From: KEN
+Date: MAY 14,1982 22:26
+Many thanks.
+
+
+From: ADELE
+Date: MAY 16,1982 22:33
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+	The following is the support line schedule for the week of
+May 17-21.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|   Lois    |   Carl
+		|	    |
+	Tue     |   Carl    |   Ken
+		|	    |
+	Wed	| Margaret  |   Ken
+		|	    |
+	Thu     |   Lois    |   Carl
+		|	    |
+	Fri     | Margaret  |   Ken
+				
+
+Please arrange swaps if your times are not convenient and keep Lois
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: LOIS
+Date: MAY 17,1982 11:10
+To Ken, Margaret and Carl:
+
+Phone numbers to reach group at class (Adele, Bill, Darren, Todd, Dave
+and Tim):  desk outside - x7000, phone in meeting room (dire emergencies
+only) - x6898.
+
+Message center has instructions to forward calls that are said to be
+urgent to support line.
+-Lois
+
+
+From: KEN
+Date: MAY 17,1982 16:29
+Carl,
+
+The only written I have at this point is (KEN)BATCH.DOC.
+
+/ken
+
+
+From: LOIS
+Date: MAY 17,1982 17:43
+To Bill, Todd and Darren:
+
+Copies to:  Adele and Carl
+
+Should I generate new K monitors for all 2020's with Carl's patch?  If so,
+what additional patches should I include?
+
+Patches presently on all 10's are close.pat, chkabt.pat, relupt.pat, undel.pat,
+newjer.pat and insoht.pat.
+-Lois
+
+
+From: CARL
+Date: MAY 17,1982 18:27
+You were Right!  Logout was the wrong version.
+/Carl.
+
+
+From: CARL
+Date: MAY 17,1982 19:20
+I know this isn't your calling in life... but there seems to be an
+endless loop at line 195 of EMEMYM which I seem to keep hitting
+every so often... in EMPIRE.
+/Carl.
+
+
+From: CARL
+Date: MAY 18,1982 0:14
+Bill,
+  I'd like some clarification on what is a "crash-analysis" call and
+what isn't.  Somehow, all the HOTLINE calls that I answer seem to be
+the type that the system keeps crashing, or has just crashed and they
+(meaning operations) want someone to give them a clue to what is
+happenning.  That "feels" like routine crash analysis, but I really
+feel bad about calling someone about it at any time of day.  Is this
+a typical HOTLINE call or am I just fated to get that type of call?
+/Carl {Sigh}!
+
+
+From: CARL
+Date: MAY 18,1982 1:43
+call software distribution!!!!!
+call Nancy B (Validations)!!!!!
+call software distribution!!!!!
+call Nancy B (Validations)!!!!!
+
+
+From: LOIS
+Date: MAY 18,1982 8:42
+To Adele, Margaret, Carl and Ken:
+
+I have to take a very sick dog to the vet, and will be in as soon as I can
+later this morning.
+-Lois
+
+
+From: LOIS
+Date: MAY 18,1982 12:46
+To the Tymcom-X Section:
+
+Darren's new pager finally arrived.  Number is (408) 744-2513.  Please
+change your call lists.
+-Lois
+
+
+From: CARL
+Date: MAY 18,1982 15:52
+Re: (CARL)HACKS  -- LICSUB.REQ/.SAI/.REL
+
+Routine Lic!Print has been renamed to LicPrt.
+Routine Lic!read  has been renamed to LicRd.
+
+{No period}.
+/Carl.
+^a
+
+From: CARL
+Date: MAY 18,1982 16:00
+Adele,
+  I split (CARL)LICENSE.SAI into 2 files: LICENSE.SAI which is the
+main program, and it requires LICSUB.REQ which declares and requires
+two routines LICPRT(integer license) and LICRD(string licenses) from
+"(CARL)LICSUB" as load!module.   /Carl.
+
+
+From: TSUCOOP
+Date: MAY 18,1982 16:49
+
+To: Carl
+From: Julie
+Date: 18-MAY-82
+
+Carl,
+    I believe the problem with (m33)system.txt has been corrected.  Please
+let me know if it is still a problem.
+Julie.
+
+
+From: CARL
+Date: MAY 18,1982 17:29
+Oper is changed... to work with new macro... X ++> HSHCOD.
+Done!
+
+
+From: CARL
+Date: MAY 19,1982 18:29
+To: Adele, Margaret
+Re: BATCH requests for District 38 on systems 83 & 90.
+
+Apparently, accounting records for these systems ARE being "lost"
+for SLIGOS customers in district 38.  All other FRENCH customers
+are being written into (FBATCH) for translation, while district 38
+is only written into (SLIBATCH) on systems other than 83 & 90.  On
+83 & 90 they are written directly into (*1BATCH), but no accounting
+is done because it is assumed that the billing will be done on the
+subsequent run of BATCH. (which is never done).
+-Carl.
+
+According to memo's from Ken Be Del, 83 is to be treated like 90 as
+far as french customers are concerned.  As such, I will check into
+whether any accounting needs to be done, and whether SLIGOS would
+like to collect revenues from BATCH.
+
+
+From: IWU
+Date: MAY 20,1982 15:24
+VUE PROBLEM REPORT
+==================
+
+TO DUPLICATE THE PROBLEM, DO THE FOLLOWING:
+
+ . LOGIN TO SYSTEM 39 FROM A HP TERMINAL
+ . COPY (IWU)BB2151.C01 TO YOUR DIRECTORY
+ . CT4 BB2151.C01
+ . ^V TO THE SECOND PAGE.  ON THIS PAGE, THE BEGINING OF
+    A LINE ";@(NETMID)PATCH.LIB IS ALWAYS MISSING UNTIL ^L IS
+    USED TO REDISPLAY IT.
+
+LET ME KNOW YOUR FINDING VIA MAIL (IWU:39) OR ONTYME (TYM.ISW).
+THANK YOU.
+
+ISHAN WU
+
+From: DWS
+Date: MAY 20,1982 15:59
+The results of the voting are in.  The winner is June 18th at Au Chambertin.
+Further news/information as it becomes available.   - Dave
+
+
+From: CARL
+Date: MAY 21,1982 12:41
+Dmitry,
+  I will be there by 1;15 ... see you then.  I just finished
+eating lunch. /Carl.
+
+
+From: LENKOV
+Date: MAY 21,1982 12:40
+Carl, I have to skip a game today. Sorry about that. /Dmitry
+
+
+From: CARL
+Date: MAY 21,1982 12:41
+Oh well,  then I won't hurry.  I will assume that you didn't order a court
+since both Scott & I aren't there.  Ok.
+
+
+From: CARL
+Date: MAY 22,1982 2:14
+On 930, PROP.DST in (CARL) has some written detail about what is necessary
+to do for the district code elimination project.  The last item, the list 
+of programs and what use they have of district codes is not completely
+checked for accurracy, and the suggested attack plan has not been typed in
+yet, but will follow.  Putting what is there in ENGLISH took awhile from
+all the notes and pieces of paper I have.
+/Carl.
+
+
+From: CARL
+Date: MAY 22,1982 16:43
+Ken,
+  What do you have planned for this weekend?  Would you be interested
+in getting together?  Maybe go biking somewhere???   /Carl.
+
+
+
+From: ADELE
+Date: MAY 24,1982 8:55
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+	The following is the support line schedule for the week of
+May 24-28.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	| Margaret  |   Carl
+		|	    |
+	Tue     |   Carl    |   Dave
+		|	    |
+	Wed	| Margaret  |   Dave
+		|	    |
+	Thu     |   Ken     |   Carl
+		|	    |
+	Fri     | Margaret  |   Ken
+				
+
+Please arrange swaps if your times are not convenient and keep Lois
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: KEN
+Date: MAY 24,1982 9:39
+Thanks for shortening the switch message in DIRIT/RPG.  It really is quite
+a bit more effective.
+
+/ken
+
+
+From: CARL
+Date: MAY 24,1982 14:32
+I see that I was supposed to be on the support line this afternoon...
+C'est la vie... have we had any crises?
+
+/Carl.
+
+
+From: KEN
+Date: MAY 24,1982 14:37
+no
+/ken
+
+
+From: MCH
+Date: MAY 24,1982 16:18
+Neither Dick nor Laz would be available on June 18'th for the dinner.  
+But both are free the 25'th.  Please let me know no later than tomorrow
+if the 25'th would NOT work for you.			/Mike
+
+From: CARL
+Date: MAY 24,1982 16:31
+I don't know anything about that far in the future to be able
+to confirm the 25th.  The later in june it gets, the less sure
+I am about the availability.  The sooner, the better for me.
+/Carl.
+D
+
+From: CARL
+Date: MAY 24,1982 19:24
+Scott,
+  I was talking to Adele the other day about interfacing SAIL programs
+to 1022.  She mentioned that she tried to do it once and failed, and
+that you could explain what the problem was.  She also mentioned that
+you had discussed the problem with people at decus to drum up support
+for changes to either SAIL or 1022 to make them more compatible... My
+questions are:  Is it possible to interface them, and if not easily,
+what exactly stands in the way?
+  (I know SAIL can call fortran routines...) Otherwise, I'm only guessing
+at reasons for incompatibility... eg. the i/o runtimes, memory allocation,
+etc.  It isn't important, but I'm interested in doing some kind of 1022
+intrfacing to a sail program if it is a t all possible. /Carl.
+
+
+From: KEN
+Date: MAY 24,1982 20:15
+Or how about a switch on DIRIT that causes it to produce a simple,
+unformatted file list, separated by <crlf>, compatible with the popular
+.CMD file format?
+/ken
+
+
+From: CARL
+Date: MAY 24,1982 20:20
+A la TOPS-10   "DIR/INDIRECT"   - Run (CARL) DIRECT.SHR
+/Carl.
+
+
+From: CARL
+Date: MAY 24,1982 20:21
+It (DIRECT.SHR) has a bug, if you say "*" in the list, it does it
+twice... I'm using the wrtong version of WILD. /Carl.
+
+Interested in FOOD?
+
+
+From: KEN
+Date: MAY 24,1982 20:25
+I've already eaten, thanks.
+/ken
+
+
+From: CARL
+Date: MAY 25,1982 22:20
+To: Lois, Bill, Adele, Tim, Mike, Scott, Dmitry, Darren & Todd
+Re: Rumor about May 15th visit from one Greg Lyons.
+
+That was a rumor.  I talked with greg tonight and he is the proud
+owner of one airline ticket from Braniff (which was for some time
+in the recent past).  Since some of the other airlines are honoring
+the Braniff tickets, Greg expects to be coming out to visit sometime
+this summer when his plans allow (and not last week!).
+  He asked that I spread the word & kill the rumor that he was going
+to be here in mid-may.  Please pass the word to anyone whom you feel
+would like to be aware of Greg's presence, that the rumor was true,
+but a little mis-timed!  I'll keep you aware of any other rumors I hear.
+/Carl.
+
+
+From: CARL
+Date: MAY 25,1982 22:28
+Sherman,  FYI
+Re: Rumor about May 15th visit from one Greg Lyons.
+
+That was a rumor.  I talked with greg tonight and he is the proud
+owner of one airline ticket from Braniff (which was for some time
+in the recent past).  Since some of the other airlines are honoring
+the Braniff tickets, Greg expects to be coming out to visit sometime
+this summer when his plans allow (and not last week!).
+  He asked that I spread the word & kill the rumor that he was going
+to be here in mid-may.  Please pass the word to anyone whom you feel
+would like to be aware of Greg's presence, that the rumor was true,
+but a little mis-timed!  I'll keep you aware of any other rumors I hear.
+/Carl.
+
+
+From: CARL
+Date: MAY 26,1982 1:00
+To: Ken, Julie, Adele, Lois, Margaret, Bill, Scott, Tim, Dave, Mike, Todd
+
+I have been building little SAIL subroutines which contain marginally
+useful procedures for programs I have written or modified recently...
+I was keeping a pointer to them in (CARL)HACKS.TXT and telling people
+about them from time to time.  I broke down and wrote HACKS.DOC which
+is an annotated list of each module, its routines and what they do in
+documentation format.  Due to congestion and the tendency to modify
+these files in my directory without warning, I have moved a **STABLE**
+copy of each module, *.REL,*.REQ (a require file) to the SPL directory
+along with the HACKS.DOC && HACKS.TXT files.   Sources too, but please
+don't modify without notification or testing since some transmittable
+products rely on these routines working.
+
+Comments to me, if any.  Maybe some of these will be in SAILIB someday.
+Sorry about the lenght of this message. /Carl.
+
+
+From: CARL
+Date: MAY 26,1982 1:11
+Yes!  This means don't look for "(CARL)name.REQ" or "(CARL)name.REL"
+in your source files.  I have moved all of those routines to (SPL)
+which happens to stand for "SECTION PROGRAM LIBRARY".  However, I may
+modify and add to these as time goes on.
+
+-Carl.
+
+Experimental copies may be found in (CARL), however!
+
+
+From: CARL
+Date: MAY 26,1982 1:14
+
+You have mail on system :36 in case you haven't read it yet.  -Carl.
+
+
+From: SDANIELS
+Date: MAY 26,1982 9:08
+    1022: I started a SAIL/1022 interface (which got the proverbial 90% done
+ of course), which Bill has used, so you could talk to him.  The problems are:
+ both SAIL and 1022 want to (A) manage core, (B) manage I/O channels including
+channel allocation and deallocation.
+(C) they have different record and string formats.
+(D) they have different ideas about where arguments are, what registers are
+used for, what to do when errors occur.
+In general, they both want to be THE interface to the operating system.
+
+
+From: SDANIELS
+Date: MAY 26,1982 9:13
+	Do NOT treat SPL as an extension of your directory.  Also, SPL
+has PROGRAMS on it, not CODE.  There is also a PRUNE directory on SPL which
+is supposed to have comments on EVERY file on the directory.  If you want
+to fill up MPL with piles of files, see the monitor group, but don't use
+MPL as a place for those files you don't want on your directory.  If the
+routines are documented, robust, ... then they maybe should be fixed up
+to go into SAILIB, but not simply by file transfer.
+	-Scott
+
+
+From: CARL
+Date: MAY 26,1982 10:35
+No --- I am not treating SPL as n extension of my directory.  A lot of
+thought went on before deciding to put those routines into SPL. Ok, I
+understand "programs" vs code, but aren't .REL files which are, I repeat
+"ARE" documented as library routines appropriate for something like
+SPL... or should they go into SAILIB?  I don't mean to fill up any
+directory with "files".  I'd just as soon put them into "ONE" file as
+a library.  I'm asking you what you want me to do with them... advise.
+
+I do feel "yelled at" for what you've said about programs vs code and
+now I am confused and feel bad.  Do I just misunderstand??? [AGAIN!]
+
+I will update the PRUNE file if it is OK to keep those routines there.
+However, it was my understanding that that was a place for "general"
+use by the section for "commonly" useful things, NOT just .SAV files!
+/Carl.
+
+
+From: CARL
+Date: MAY 26,1982 12:26
+Re: Reply about SPL.
+
+Please read (CARL:930)SCOTT.
+/Carl.
+
+
+From: WRS
+Date: MAY 26,1982 13:22
+Do you have Greg's phone number?
+-Bill
+
+
+From: DWS
+Date: MAY 26,1982 15:41
+Be forwarned...  Starting with version 0.40 (2 weeks from now) the
+change from 'FTDED' to 'PEAK' will be complete.  This means that DED.INI
+will have to be renamed PEAK.INI, and that (DWS)FTDED will become
+(DWS)PEAK.  Be prepared to adjust accordingly.   - Dave
+
+
+From: SDANIELS
+Date: MAY 26,1982 16:11
+	If the routines are described as "HACKs", they belong in your
+own directory, with entrepid users willing to take whatever they do
+allowed to use them.  We don't need to share "almost working" software,
+and the time saved in not writing such things is spent again in debugging
+their uses.  If you are willing to put the time into making them robust,
+have coherent args, ... then they belong in SAILIB, but the decision should
+not in general be any single person's.  The idea is to put in SAILIB only
+those things that are stable and reliable enough to be 
+
+From: SLISYS
+Date: MAY 27,1982 16:53
+Carl,
+
+About BATCH:
+ For CEGI customers (except FBATCH) on Tymshare machines batch request go to
+	FBATCH for translation and control by CEGI.
+				    on Sligos machines batch request go to
+	FBATCH for control by CEGI. (no translation needed).
+ For Sligos customers we are not using batch request system except for internal
+	usage.
+ In all cases this requests are not billable. Cegi bill their custommers for,
+	using Batch accounting. Not us. I can not tell to you if there is
+	any problems with batch accounting for this reason.
+
+Best regards
+/Bernard.
+
+
+From: CARL
+Date: MAY 27,1982 12:02
+Bernard,
+
+About BATCH:  Merci pour l'information.
+   Our group is investigating making some changes to BATCH.  It is not
+yet clear that we will make "any" changes.  Ken Be Dell, our liason
+d'internationale will be drafting a memo regarding our proposed changes
+in the near future, and you will probably receive a copy.
+
+   Thank you again for your help.
+
+Regards.
+/Carl
+
+
+From: MCH
+Date: MAY 28,1982 19:56
+Joan Pearson (MAGNUM) has asked for two people to help with the picnic
+planning and arrangements.  Any volunteers?			/Mike
+
+From: CARL
+Date: MAY 28,1982 21:07
+I think that you can tell Joan, that I'll volunteer to help.  /Carl.
+What's here username & I send here mail... If she has one on the ten's.
+
+
+From: CARL
+Date: MAY 28,1982 21:09
+I think that you can tell Joan, that I'll volunteer to help.  /Carl.
+What's her username & I'll send her mail... If she has one on the ten's.
+
+
+From: CARL
+Date: MAY 29,1982 0:55
+Re: Support-Line call about system 24
+
+Debbie of CUPC operations called because TITO was crashing the system
+every time they attempted to do the backup for (SYS).  It turned out
+that (SYS)LUD.SYS was bad.  Any attempt to read the file would cause a
+crash at MAPALL+5 in PCBIO.  Apparently, T1/DISK-POINTER was zero, from
+a bad pointer in the file's RIB.  After 3 more crashes I made sure that
+a FULL DSKCLN was run.  The first 4 times, only a FAST DSKCLN was done!
+
+I think that a STOPCD for a bad disk pointer ought to force a "FULL"
+DSKCLN to be run... don't you?
+
+The crashes are still out on :24,  CRA001-CRA005 for further analysis.
+I have a hardcopy of what the stack looked like for all 5 crashes.
+Almost all are identical for 16 or so locations.   /Carl.
+
+FULL DSKCLN seems to have fixed the file, as in I can read the file
+with CKSUM without crashing the system.  I told Operations to go ahead
+with the rest of their BACKUP.  /Carl.
+
+
+From: CARL
+Date: MAY 29,1982 1:05
+Re: I have a program ... FRM.MAC / FRMTST.SAV which loops for many
+    times (forever or until error) doing FOCFM-FOGFT-FORUN(logout)
+    without failure of "ANY" kind.  I'd like to run it for a "LONG"
+    period of time, but it writes HUGE amounts of things into the
+    SAT file.  I tried killing CHKPNT and left my program running,
+    but within a few minutes, the system appeared to "HANG" and I
+    couldn't run any programs to set license or to even restart CHKPNT.
+
+Latest CRASH file on 930 is the crash to look at.  Anyway, I'm attempting
+a SAIL version chopped down from PCOM to see if I can re-create the
+error.  /Carl.
+
+
+From: SDANIELS
+Date: MAY 29,1982 6:08
+	Pretty NIFTY.  F3's can do all of DMOVxx's correctly, as well as
+AOBJxx's.  If you (silly you) tested for F3's by AOBJN overflow, replace
+it with a check for PUSH carrying into the left half. (ac:= 0,,-1  / PUSH
+ac,0  /  now ac=1,,0 on KI/KL/KS and 2,,0 ont the F3).  LOGINN has been
+changed.		-Scott
+[for more details see (SDANIELS)MU327E.DOC}]
+
+
+From: CARL
+Date: MAY 29,1982 17:53
+Cputype gettab is '41,,.GTCNF  ('41,,'11)
+ returns CASE of (KI,KL,KS,F3) and currently returns 4 for 930.
+
+
+From: CARL
+Date: MAY 29,1982 19:49
+Scott,
+  Both 930 & 934 are running your new microcode... and /K18 version
+of the monitor.  /K18 has the EDDT code setup right for determining
+if ddt is talking to a F3, etc. /Carl.
+
+
+From: CARL
+Date: MAY 29,1982 19:51
+To: Anyone who may be reloading 930 or 934.
+Re: Now running SDD's exotic microcode ver 327e.
+
+Tape labeled "USE-ME" for /K15 or /K14 works ok.  However, if you
+need to get to DDT for any reason -- it will go out to lunch.
+
+Tape labeled "TRY-ME" has /K18 on it, which has DDT fixed.  If for
+any reason you cannot continue to run /K18 or later monitor, then
+microcode-tape labeled "USE-ME v325" should be used.  All monitors
+will boot and DDT should work properly.
+
+/Carl.
+
+
+From: CARL
+Date: MAY 29,1982 20:05
+Scott,
+  Tape labelled "TRY-ME" C930-P034/K18 on 930's tape drive has
+the right EDDT.  On 934 it can be found in (M33)FOXK18.SAV -Carl.
+
+
+From: WRS
+Date: MAY 30,1982 1:21
+The system mustbe shut to shut down CHKPNT without ill effect.
+-Bill
+Re: STOPCD (SLO) , I agree.  -Bill
+Thanks for your detailed analysis on 24.  I'm glad to see you doing more
+of that kind of thing.  I realize it isn't always possible due to time or
+experience constraints, but it is appreciated when it is possible.  -Bill
+
+
+From: CARL
+Date: MAY 30,1982 16:47
+re: system 24.  Thanks for the thanks.  It is appreciated & feels good.
+
+
+From: CARL
+Date: MAY 30,1982 16:57
+Ken,
+  If you are interested, you are invited to come over to my apt this
+weekend.  Not really much is going on.  If you decide to come, I can
+point you at a map and give you directions.  It's pretty easy. /Carl.
+
+
+From: CARL
+Date: MAY 30,1982 16:59
+PS.  Where were you last night? 5:00PM
+
+From: CARL
+Date: MAY 31,1982 0:06
+Files (CARL)BEFORE.KEN and SAVED.KEN have been deleted: checksum or parity
+error due to hard-read-error on disk.  APA0!  Will have to re-create XSAIL
+scenario later. /Carl.
+
+
+From: ADELE
+Date: MAY 31,1982 10:13
+	I guess I didn't find out what went on with system 24, but Bill was
+very pleased with your work.  Good show!       /Adele
+
+
+From: ADELE
+Date: MAY 31,1982 12:55
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+	The following is the support line schedule for the week of
+May 31 - June 4.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|        HOLIDAY
+		|	    |
+	Tue     |   Carl    |   Ken
+		|	    |
+	Wed	| Margaret  |   Lois
+		|	    |
+	Thu     | Margaret  |   Carl
+		|	    |
+	Fri     |   Lois    |   Ken
+				
+
+Please arrange swaps if your times are not convenient and keep Lois
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: ADELE
+Date: MAY 31,1982 13:10
+	A resource status report for May is in (carl:36)rscarl.rpt.  It does
+not contain anything for the week ending May 28, or course.  If you want that
+combined also, please send a message, and it will be done after time sheets are
+loaded on Tuesday.				/Thanks, Adele
+
+
+From: CARL
+Date: MAY 31,1982 15:16
+Re: Support line schedule.
+Tuesday is my court date...I am going to have to swap on the support-line
+with someone.  I believe it is also not too good for margaret...possibly
+just let it pass.. I will send mail to KEN and MARGARET to let them know
+that I will not be covering it.  (I may cover about 2 hours of it, but not
+all morning). /Carl.
+
+
+From: CARL
+Date: MAY 31,1982 15:19
+Margaret, Ken,
+  I'm scheduled to have the support line on Tuesday morning.  Since I must
+be in court early Tuesday afternon, I will probably not be in all day.  
+Please cover it in my absense.  If I am in at all, I will cover it while I
+am there.  /Carl.
+
+
+From: ADELE
+Date: MAY 31,1982 15:39
+	I'll change the schedule and send out mail.  /Adele
+
+
+From: ADELE
+Date: MAY 31,1982 15:44
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+	The following is the revised support line schedule for the week
+of May 31 - June 4.
+
+		|____AM_____|____PM_____
+		|	    |
+	Mon	|        HOLIDAY
+		|	    |
+	Tue     |   Ken     |   Margaret
+		|	    |
+	Wed	|   Carl    |   Lois
+		|	    |
+	Thu     | Margaret  |   Carl
+		|	    |
+	Fri     |   Lois    |   Ken
+				
+
+Please arrange swaps if your times are not convenient and keep Lois
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: CARL
+Date: MAY 31,1982 22:22
+Bill,
+  would it be possible (of course it's possible) for you to go in
+and patch the running monitor on 930 to track the last set of arguments
+given to the frmop call to graft a frame-tree, so that I can go in and
+look at what the monitor thought I passed as arguments...from PCOM.
+
+Basically, I'd like a couple of locations which I can look at which would
+hold the resultant arguments (defaulted or passed) for a frame graft call.
+Then I can force the error, and then go look at the monitor to see what
+got passed...  SAIL repetedly in PCOM fails with error-code #3, my macro
+routine almost *never* fails (haven't had it happen yet!).
+/Carl.
+
+If you could do that tonight & call me to let me know I'd appreciate it.
+
+
+From: WRS
+Date: MAY 31,1982 22:52
+Using (M33)MDDT, there are 4 symbols in the patch area:
+   GFT.J	- target frame number in RH
+   GFT.U	- new parent frame number in RH
+   GFT.M	- address of user argument in RH
+   GFT.X	- a number indicating where !FOGFT failed...
+	0: cant give new parent a child
+	1: cant give target a new parent
+	2: graft would create a loop in frame tree
+	3: target FD unable to convert to frame #
+	4: cant take parent away from child
+(note .X numbers only make sense if it fails for access rights)
+-Bill
+
+
+From: CARL
+Date: MAY 31,1982 23:01
+have you tested it? as in will I have to worry about crashig the
+system?  (of course that's why i asked you to patch it instead of me,
+so I wouldn't have to worry!) ... I will check it now. /Carl.
+
+
+From: WRS
+Date: MAY 31,1982 23:02
+No, haven't tested it.  -Bill
+
+
+From: CARL
+Date: MAY 31,1982 23:04
+I looked forst, before trying PCOM... did you know that GFT.X contains
+an instruction... "SETZM (P1)" ...Is that right?
+
+
+From: WRS
+Date: MAY 31,1982 23:05
+Thats okay, I just didn't zero it
+Old code left from ONCE, will never get executed, conv. pl to patch.
+-Bill
+
+
+From: CARL
+Date: JUNE 1,1982 5:12
+To: A bunch of people because I don't trust my alarm and it's important!
+
+Please call me at 11:00 AM this morning.  (not before) so that I may
+awake in time to get the things I need to do today.  Such as appear in
+court at 1:00 PM.
+
+I've been up most of the night, am not feeling terriffic, so do not
+expect to rise and shine with my alarm.  At least I know I will answer
+the phone.  -Thanks all!
+/Carl
+
+
+From: CARL
+Date: JUNE 1,1982 11:52
+Files (CARL)BEFORE.KEN,TRANS.KEN,START.KEN and SAVED.KEN have all been
+zapped by the APAn disk read error mechanism.  All have had hard errors
+preventing even a copy being made.  When you want to look further into the
+problem, I guess we'll just have to recreate the same scenerio with XSAIL
+and /X.  -Carl.
+
+
+From: ADELE
+Date: JUNE 2,1982 9:43
+	Well, I seem to have a very nasty cold and won't be in today or
+(possibly) tomorrow.  I'll be on and off the system, so send mail if you
+need me.  			/Thanks, Adele
+
+
+From: ADELE
+Date: JUNE 2,1982 11:12
+	I put all the SPOOL mail we have exchanged since 1-may in (carl)spool.
+
+
+From: WRS
+Date: JUNE 2,1982 11:12
+(SYS)*.SYS is reserved for critical system files...not cookies!  Please find
+another name for this file.  -Bill
+
+
+From: WRS
+Date: JUNE 2,1982 11:37
+EMSAA messages for STD.C/BALTRUNAS appended to file (CARL)EMSAA.MSG:
+A34083 STD.C/BALTRUNAS 02 JUN 82 11:33:27 
+
+
+From: CARL
+Date: JUNE 2,1982 16:57
+r bspice
+
+
+From: CARL
+Date: JUNE 2,1982 18:49
+
+To: Lois,Julie
+
+Since you are going into SPFIX (Julie) to add some statistics info, one
+more statistic which need only be printed if it is non-zero(!) is how
+many times the node number in the GDF is greater-than '4000 (octal). I
+suspect that you will never find any, but it would be nice to check it.
+
+What do you think, Lois?
+/Carl.
+
+
+From: CARL
+Date: JUNE 2,1982 20:00
+Lois,
+  I was wondering if I could "coax" you into making a nice chocolate
+cake...this weekend.  If that is at all possible, send me a note and
+let me know.  I'll give you some more details later.
+
+/Carl.
+
+
+From: LOIS
+Date: JUNE 3,1982 8:38
+Carl,
+
+1) That statistics report is getting quite long - if you suspect you will
+never find any node numbers that large how about checking and printing a
+statement somewhere in spfix as a separate check?
+
+2) Probably possible to bake a cake--if you mean on Sunday.  Why?  (I know
+it is your birthday Sunday).  Saturday we are going to a wedding, and I
+probably could not bake that day.  Give me more details.
+-Lois
+
+
+From: ADELE
+Date: JUNE 3,1982 12:12
+	I would like to see your activity summary for May by noon tomorrow.
+/Thanks, Adele
+
+
+From: CARL
+Date: JUNE 3,1982 19:19
+What's this mail message I got from you the other week that
+said that you deleted all my files?
+
+You should be ashamed of yourself!!!!!
+/Carl.
+
+
+From: RUSSELLB
+Date: JUNE 3,1982 19:27
+I deleted your files???   oh ya!  that happened on the packs for 169 Mallin.
+
+By the way, Mallinckrodt is up and running.  Network link should be in soon.
+Hung up on getting the circute completed at the St. Loius end.
+
+What would it take to get (sys)actsum to produce a report by username, project
+code, connect and trus instead of what it does now???  Mallinckrodt has req-
+uested it???
+
+Why is oper running xexec???  what can I do???  I would like to get the K oper-
+ating installed on all my 20's by the end of the month.  do you see any problems
+with this??.  We would bring up Otis first then migrate out to the rest of
+the world.
+
+Have a good one.
+
+ben
+
+
+From: CARL
+Date: JUNE 3,1982 23:42
+re: (sys)ACTSUM ???   Uh, give lois a call and find out if "we" support
+                      it as a product.  "we" meaning Tymcom-X section,
+                      rather than accounting or someplace else.
+
+Re: XEXEC on 930, a WRS hack - don't bother about it.
+
+Re: K on 2020's.   No problem, talk to Ed Imsland about getting whatever
+    he normally gives you (or do you get it from us?) and make sure you
+    get a /K-1 where it has the GETRAN patch installed.  (It'sa one-line
+    patch which replaces an instruction with a no-op).
+
+I see no problem.  I hear no problem.  I speak no problem.
+/Carl.
+
+
+From: CARL
+Date: JUNE 3,1982 23:49
+FYI: I have already talked to Ron Saltgaver about usernames on BUBB-NET.
+     A copy of the mail I sent him (in addition to my telephone conversation
+     about this subject) resides in (CARL:930)EMSAA.MSG
+/Carl.
+
+
+From: CARL
+Date: JUNE 4,1982 13:35
+I hope that you are feeling better.  Or will be soon.  You are still
+invited to come over on Sunday for my party from 2-7 PM.
+
+My report for may is in (CARL:36)RSCARL.MAY and believe it or not, it
+fits on one page.
+
+I will be giving WRS transmittals for RPG,GFD,LOGINN,PCOM today or on
+Monday.  All have been up a week on 930, and should be ok to go to 33
+next.  (Note: RPG got a bugfix for a customer on 23 yesterday, so the
+
+urgency for that transmittal is high.  It's up on :23 now, and :33 as
+soon as I copy it to SYS).
+/Carl.
+
+
+From: RUSSELLB
+Date: JUNE 4,1982 17:22
+Hi:  as fas as I know the Tymcom-X section is responsible for ACTSUM.
+It was written many years ago by a former member.
+
+Will check with Lois on Monday.  thnks.  Have a good weekend.   Ben
+
+
+From: CARL
+Date: JUNE 4,1982 21:28
+Ref: Birthday Party.
+
+Remember to come to my party!  Sunday from 2-7pm.
+   See you there!
+/carl.
+
+
+From: ADELE
+Date: JUNE 5,1982 10:55
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+Here is the support line schedule for the week of June 7-11.
+
+		|____AM_____|____PM____|
+		|	    |	       |
+	Mon	|   Lois    |   Ken    |
+		|	    |	       |
+	Tue     |   Adele   |   Carl   |
+		|	    |	       |
+	Wed	| Margaret  |   Ken    |
+		|	    |	       |
+	Thu     |   Lois    |   Dave   |
+		|	    |	       |
+	Fri     | Margaret  |   Carl   |
+		+-----------+----------+
+
+Please arrange swaps if your times are not convenient and keep me
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: CARL
+Date: JUNE 5,1982 17:31
+Adele,
+  How are you feeling this weekend?  Is your cold any better, or
+actually, is your cold getting the better of you?  I should hope
+that you are finally getting the better of your cold & that your
+visit to the doctor was helpful...
+
+   get well soon!
+
+-Carl.
+
+
+From: CARL
+Date: JUNE 5,1982 20:14
+Tim,
+  If you are home this evening... please give me a call at home. -Carl.
+
+If there is no answer, I may be out shopping for a little while.
+I'd maybe like to borrow a few of your "games" for tomorrow.  Gee!
+One day I might be organized to think a few days ahead... Take care. /Carl.
+
+
+From: CARL
+Date: JUNE 7,1982 14:46
+Bill,
+  My mistake I think.  /K18 was put on SYS, but when I patched it last
+week, I believe that I mis-typed /K17-1 ... so, that's why the system
+name is wrong. There is also a /K18 tape in the machine room that I made
+last week.  -Carl.
+
+
+From: CARL
+Date: JUNE 8,1982 0:05
+Bill,
+  Do you know what is happenning to the third moni-module drive for
+system 934?  As in... "Are we ever going to get it back?"  In any case,
+I'd like to propose that we rebuild 934 using one drive as a structure
+which can be wiped clean without care, and the remaining drives (one
+at present) as a stand-alone structure as is now.
+
+  You will ask... "Why bother?"  -- Well, if someone has to worry about
+whether someone has critical copies of files on 934 (for whatever reason)
+whenever testing may wipe the structure, it becomes a pain.  It is quite
+unreasonable to expect anyone to have to spend "X" hours backing up any
+directories on 934, especially when scratch tapes are not readily there
+for the taking.
+
+  Anyway, regarding ONCE documentation from Rick Daniels, I'd like to
+wipe 934 and test each of the commands as Rick has them documented to
+make absolutely sure that they do what they say, and that no unknown
+oddities crop up.  At last I heard, Darren had some copies, "only" copies
+of files on 934 which he didn't want wiped...  Also, I'd like to be sure
+that BOOTS and whatever else is needed to be done with a raw system can
+be done according to "existing" documentation.
+/Carl.
+
+
+From: KEN
+Date: JUNE 8,1982 12:40
+Carl,
+
+I just noticed that LOGON reported LISTER as being in TI state when it
+could only be in TO or RN state according to SYSTAT.
+
+/ken
+
+
+From: CARL
+Date: JUNE 8,1982 13:20
+Ken,
+  There is only one state "TI" which is reported as "TI" or "TO" by
+SYSTAT.  There are other bits which even systat cannot accurrately
+be sure that the state is not in flux, however SYSTAT uses them to
+decide whether the terminal is doing input or output at the moment.
+
+Since there is a state of flux, I decided not to bother checking.  "TI"
+means terminal i/o, not terminal input!
+/Carl.
+
+
+From: WRS
+Date: JUNE 8,1982 13:22
+You may now send and receive ONTYME-II (EMSAA) messages on 930.  To do
+so, send me mail with the following:
+  1. your ONTYME-II name(s)
+  2. your ONTYME-II passwords (will be put in a file)
+  3. the name of a file to send messages from (preferably EMSAA.SND)
+  4. the name of a file to put messages in (preferably EMSAA.MSG)
+Once an hour, a program will check and send you mail if it found any
+messages for you.  If the file EMSAA.SND (or whatever you call it) is
+not empty, its contents will be sent as messages.  The format to put
+messages in EMSAA.SND is:
+    <text of message A>
+    :SEND name1A
+    :SEND name2A
+       ...
+    :SEND nameNA
+    <text of message B>
+    :SEND name1B
+    :SEND name2B
+       ...
+    :SEND nameNB
+The file will be deleted after the messages are sent.  If you want a
+copy, send one to yourself.
+
+
+From: CARL
+Date: JUNE 8,1982 13:24
+Ref: EMSAA
+
+Could you please have it NOT do any I/O, enter, append or whatever to
+the EMSAA.MSG file in the individual username's directory?  Every hour,
+regardless of mail received, it appears to update the creation date of
+the file EMSAA.MSG!  This is bothersome, and gives the imreseesion that
+I got EMSAA mail & missed the message!
+-Carl.
+
+
+From: ADELE
+Date: JUNE 8,1982 21:46
+	My objectives are in (adele)agoal1.doc if you want to have a look.
+--Adele
+
+
+From: CARL
+Date: JUNE 10,1982 23:09
+Scott,
+  Please edit & keep PCOM.INF on (CARL) up to date with changes you
+make.  I added an entry for ver 101.22 with what I think you did, and
+an entry for 101.23 for my recent addition.
+-Carl.
+
+
+From: CARL
+Date: JUNE 10,1982 23:22
+PCOM command processed: 007PCO.LOG = PCOCTL.CTL/DETACH
+Job PCOCTL.CTL completed.
+Output recorded in file 007PCO.LOG.
+PCOM command processed: 007PCO.LOG = PCOCTL.CTL/DETACH
+Job PCOCTL.CTL completed.
+Output recorded in file 007PCO.LOG.
+
+
+From: ADELE
+Date: JUNE 11,1982 10:51
+	There will be a TSU meeting this coming Tuesday, June 15, at 2:30pm
+in conference room 2.
+
+--Adele
+
+
+From: ADELE
+Date: JUNE 11,1982 11:34
+	I have reserved conference room 4 for the PCOM meeting this afternoon
+at 2:30.		/Adele
+
+
+From: CARL
+Date: JUNE 13,1982 3:18
+Ref: PCOM et al
+
+?cant read nnnPCO.TMP error code '-262144
+
+message appears because the program believes RPGSW to be TRUE.
+the command "LOAD/SAVE:XXX YYY" seems to set something such that
+the "START" command at that point (in a sail program anyway) is
+thought to be at start+1, or so SAIL believes ==> RPGSW = -1.
+/Carl.
+
+
+From: CARL
+Date: JUNE 13,1982 3:27
+Ref: PCOM et al, msg: ?cant read nnnPCO.TMP error code '-262144
+
+Apparrently SAIL programs loaded with LOADER and then "Start"ed
+believe that they are started at start+1, such that RPGSW is TRUE (=-1).
+However, the same SAIL program loaded with LINK behaves fine.
+
+Macro programs loaded with either of SAIL or LOADER work fine.
+-Carl.
+
+
+From: CARL
+Date: JUNE 13,1982 20:33
+Since we are both working on parts of PCOM, My access.msg file now
+contains info concerning what various source files contain.  Please
+try to help both of us stay in SYNC with each other by updating the
+appropriate items and working from the latest BASE file whenever it
+is possible or reasonable.  /Carl.
+
+
+From: CARL
+Date: JUNE 14,1982 21:50
+Dennis,
+  Once upon a time we had talked about being able to build a
+circuit to a terminal on a micro-node.  :ST@nnn builds a circuit
+to the status device... so, what is the format for building a
+similar circuit to a terminal?
+-Carl.
+
+
+From: CARL
+Date: JUNE 15,1982 3:31
+Darren,
+  Did you know that your latest EMPIRE version does not respond with
+"Your orders? " at the end of the enemy's move?  WWherever the cursor
+was when it finished, that's where your next command gets echo'ed.
+Somethng got lost?
+/Carl.
+
+
+From: ADELE
+Date: JUNE 15,1982 9:42
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+Here is the support line schedule for the remainder of the week of
+June 14-18.
+
+		|____AM_____|____PM____|
+		|	    |	       |
+	Mon	|           |          |
+		|	    |	       |
+	Tue     |   Adele   |   Carl   |
+		|	    |	       |
+	Wed	| Margaret  |   Ken    |
+		|	    |	       |
+	Thu     |   Lois    |   Dave   |
+		|	    |	       |
+	Fri     | Margaret  |   Ken    |
+		+-----------+----------+
+
+Please arrange swaps if your times are not convenient and keep me
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: CARL
+Date: JUNE 15,1982 20:31
+Ref: TMP files for editors
+
+Do you remember the format which we (collective Tymcom-X group) agreed
+upon for passing non-standard filenames and the /RUN switch?
+
+I believe it was
+
+<real-filename>  <fuzzy?> "<displayed-filename>" /<switches>
+
+where <switches> was currently /RUN:<runspec>/RUNOFFSET and friends
+a la SCAN!WILD...  /Carl.
+
+
+From: TJB
+Date: JUNE 16,1982 1:53
+I am not sure if I have told you yet, but Shiela & Al and Barbara & I
+are all planning to come to the dance recital on Saturday evening.
+Would you please get me some further details (where, exactly when,
+likely duration, etc.) as soon as you can?  Thanks,      -Tim
+
+
+From: DWS
+Date: JUNE 16,1982 9:01
+<filspec>[ " <alias> " ] [ <switch> ]*
+<switch> ::= /rpg
+         ::= /run:<filspec>
+         ::= /read
+         ::= /runoff
+etc.
+Also, it wasn't a collective group agreement.  It was you, me, and Chris.
+
+
+From: CALSTATE
+Date: JUNE 16,1982 9:03
+Carl,
+  would it be possible for Joan and I to meet with you today(6/16) and 
+discuss the use of SAIL in building circuits,et al.
+
+                                        Scott (6204)
+
+
+From: CARL
+Date: JUNE 16,1982 11:45
+Thanks for the info.  Sorry for any mixup on when/where/who decided on
+the format.  /Carl.
+
+
+From: ADELE
+Date: JUNE 17,1982 9:17
+REMINDER:  TSU meeting, Tuesday afternoon (6/22) at 2:30, conference room 2.
+
+
+From: ADELE
+Date: JUNE 17,1982 9:42
+	PCOM meeting with Bill & I -- Friday at 2:00.		/Adele
+
+
+From: DARREN
+Date: JUNE 17,1982 16:46
+Do you have any further need for the files on (MFICHE:930) authored by you? /D
+
+
+From: ADELE
+Date: JUNE 18,1982 14:49
+Please edit the file (party)dinner.mem [even if you are unsure] so that we
+can get an idea of the attendance at next week's dinner at Au Chambertin.
+
+Thanks, Adele
+
+
+From: CARL
+Date: JUNE 18,1982 19:39
+To: Bill, Scott
+Re: PROCEDURE ITEMS
+
+Can I have one or both of you give me a simple example, syntactically
+correct (and compileable) of using ITEM PROCEDURES.  If possible, in
+actual application...
+  2 string item procedures, assigned to 2 different items, such that
+  a PNAME search will return an item number, and then I can do whatever
+  is necessary to ASSIGN or APPLY the item returned somehow through
+  ONE common routine.
+
+Nothing I seem to try will even compile, so I must really misunderstand
+everything as regards to declarations and usage.
+/Carl.
+To: Bill, Scott
+Re: PROCEDURE ITEMS
+
+Can I have one or both of you give me a simple example, syntactically
+correct (and compileable) of using ITEM PROCEDURES.  If possible, in
+actual application...
+  2 string item procedures, assigned to 2 different items, such that
+  a PNAME search will return an item number, and then I can do whatever
+  is necessary to ASSIGN or APPLY the item returned somehow through
+  ONE common routine.
+
+Nothing I seem to try will even compile, so I must really misunderstand
+everything as regards to declarations and usage.
+/Carl.
+
+
+From: CARL
+Date: JUNE 18,1982 22:14
+To: Tymcom-X Section
+Re: Reminder!
+
+If you are planning on attending the Tymcom-X/Magnum picnic on
+June 29th, please don't forget that I'm collecting $4 each for
+contributions for drinks & the main course.  Also, see Leeann
+Meyers (Magnum) for signup for additional items such as salads,
+condiments, volunteering to cook, etc.
+-Carl.
+
+
+From: CARL
+Date: JUNE 18,1982 22:18
+Re: Reminder!
+
+If you are planning on attending the Tymcom-X/Magnum picnic on
+June 29th, please don't forget that I'm collecting $4 each for
+contributions for drinks & the main course.  Also, see Leeann
+Meyers (Magnum) for signup for additional items such as salads,
+condiments, volunteering to cook, etc.
+-Carl.
+
+PS. I realize that you may not be coming due to the not-so-great
+    outdoors setting, but you do know that you are invited as a
+    part of the group.  If you plan on coming for a short while,
+    let me know anyway... /Carl.
+
+
+From: SDANIELS
+Date: JUNE 19,1982 1:50
+	How about (CARL)SAMPLE.SAI ??? Is that what you mean?
+-Scott
+
+
+From: SDANIELS
+Date: JUNE 19,1982 2:18
+Remember, the BREAKSET modes T and U that I use are (FTSYS)SAIL only
+
+
+From: CARL
+Date: JUNE 20,1982 15:50
+Yes, that's what I was asking for.
+  It is almost what I had, but it shows me what couple of things
+  that I had wrong. -Thank you.
+
+
+From: WRS
+Date: JUNE 20,1982 16:55
+EXE (WRS)PRCITM.SAI
+-Bill
+
+
+From: ADELE
+Date: JUNE 20,1982 21:35
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+Here is the support line schedule for the week of June 21-25.
+
+		|____AM_____|____PM____|
+		|	    |	       |
+	Mon	|   Lois    |   Ken    |
+		|	    |	       |
+	Tue     |   Carl    |   Dave   |
+		|	    |	       |
+	Wed	| Margaret  |   Ken    |
+		|	    |	       |
+	Thu     |   Lois    |   Dave   |
+		|	    |	       |
+	Fri     | Margaret  |   Carl   |
+		+-----------+----------+
+
+Please arrange swaps if your times are not convenient and keep me
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: SSEREP
+Date: JUNE 21,1982 9:34
+Carl:  The file (SSEREP)MUDLUD contains a description of the mud and the
+       Tymcom-IX lud.
+
+Ed Gauci.
+
+
+From: CALSTATE
+Date: JUNE 21,1982 9:57
+Mr. Baltrunas,
+   would you please call me today. I would like to talk to you about some
+SAIL stuff.
+                                        Scott (6204)
+
+
+From: CARL
+Date: JUNE 21,1982 12:44
+Scott & Joan,
+   Please call me CARL, rather than Mr. Baltrunas.  I didn't get time
+to talk to you the other day, although I did see Joan and told her that
+I did get your message.
+/Carl.
+I'll call you when I get a chance.
+
+
+From: CARL
+Date: JUNE 22,1982 1:30
+To: Bill, Adele, Lois
+Does anyone know why we're running /K15 on 930??? -Carl.
+
+
+From: ADELE
+Date: JUNE 22,1982 16:39
+	What version had we been running on 930?	/Adele
+
+
+From: LOIS
+Date: JUNE 22,1982 18:34
+To those interested:
+
+Yes, copying file npt169.sav to (russellb) does still crash 930.  Crash
+file is cra013 (and this took care of reloading K18-1 also).
+-Lois
+
+
+From: CARL
+Date: JUNE 22,1982 18:50
+Ref: CRA013 - "Cute!"
+
+
+From: ADELE
+Date: JUNE 23,1982 8:30
+	I'm sorry I was not able to get the word around that the unit meeting
+this week wouldn't happen.  At any rate, there will be one next week, Tuesday,
+at 3:00 in conference room 2.  (Later time to allow for the picnic, over-
+indulgence, etc.)
+
+/Adele
+
+
+From: MCH
+Date: JUNE 23,1982 12:40
+To:  The Section
+Re:  Section Meeting
+
+I was hoping that we could have one tomorrow, but we didn't get through
+as much material as we expected in this morning's meetings with COEES, so we
+will have to spill over to tomorow afternoon.			/Mike
+
+From: ADELE
+Date: JUNE 23,1982 14:51
+UPDATE:  TSU meeting
+	I have been informed that the picnic next Tuesday will last all
+afternoon (!!!) and that I will find myself quite alone in the 3pm meeting.
+Therefore, we will meet at 11am sharp in conference room 2 on the 29th.
+
+/Adele
+
+
+From: CARL
+Date: JUNE 23,1982 16:50
+Ken,
+  FYI -- *1BATCH, SPOOL, ... are in cost code 2009.
+
+
+From: WRS
+Date: JUNE 23,1982 18:31
+To:  The Section
+Re:  OCU Meeting
+
+I was hoping that we could have one tomorrow, but we didn't get through
+as much material as we expected in this morning's meetings with COEES, so we
+will have to spill over to tomorow afternoon.                   /Bill
+
+
+From: CARL
+Date: JUNE 24,1982 15:57
+Re: The MEMO which Ken BeDell is going to send to CT-France & Sligos
+
+DO you have any comments to make on it, or is it acceptable to you
+for Ken to send it as it stands. /Carl.
+
+
+
+From: CARL
+Date: JUNE 25,1982 0:15
+Scott,
+  I would like your help with a couple of SAIL macro's.  I've
+tried a bunch of things and had no real luck.  There is probably
+something very simple about why it doesn't work, but I've not
+been able to see it.
+
+  Please look at P.SAI (example) and SWDEF.SAI (body of the macro).
+Feel free to make any changes yourself if you get to look at them.
+Until I get some results I am just wasting my time.  Almost 2 days
+so far.  I had a version of SWDEF.SAI which worked without using
+FORLC, but was too complicated to read and couldn't do what I wante
+
+From: CARL
+Date: JUNE 25,1982 0:23
+tt,
+  I would like your help with a couple of SAIL macro's.  I've
+tried a bunch of things and had no real luck.  There is probably
+something very simple about why it doesn't work, but I've not
+been able to see it.
+
+  Please look at P.SAI (example) and SWDEF.SAI (body of the macro).
+Feel free to make any changes yourself if you get to look at them.
+Until I get some results I am just wasting my time.  Almost 2 days
+so far.  I had a version of SWDEF.SAI which worked without using
+FORLC, but was too complicated to read and couldn't do what I wanted
+completely.  Using FORLC, I can't seem to even get the simple case
+to work.
+  eg. Define A={X(1) X(2) X(3)}; Define X(m)={"}&m&{",};
+      Preset!with A 4; Integer array B[1:4];
+should be straight forward as
+      Define A(n)={ FORLC q=n DOC {q} ENDC; }; Define X(m)={"}&m&{",};
+      Preset!with A( (X(1),X(2),X(3)) ) 4; Integer array B[1:4];
+BUT!
+ it doesn't seem to work!  (see similar, but not same example in SWDEF).
+/Carl.
+
+
+From: CARL
+Date: JUNE 25,1982 0:34
+Re: Progress report.
+
+Nothing NEW on PCOM.  I've been working on re-doing the switches so
+that the new LOG switches "fit" as regular switches for the past 2
+days without any headway.  I'm hung up on some SAIL macros.
+
+The system variables, eg. $MAIL, $LOGGING, $SUBSTITUTION, and a few
+otheres are implemented as procedure variable & they work.  A few
+other things were done, but the details aren't necessary at this time.
+
+The current version is not yet releaseable, but as soon as a stable
+one is released, I will let everyone know & put it on (SYS:930) for
+testing. /Carl.
+
+
+From: ADELE
+Date: JUNE 25,1982 9:07
+	There is a note about Ken BeDell's memo on your desk.  I need
+clarification on section III -- otherwise, it looks OK.		/Adele
+
+
+From: CARL
+Date: JUNE 25,1982 17:32
+Well,
+  (MPL:930)LPQ now does the [sic] "right" thing to get your printout
+printed over in VG-3 on system X54's printer.  However, at present it
+will have "(LPQ)" as username until something else is done to pass
+your username along with the file across gateways.
+  -Carl.
+
+
+From: TSUCOOP
+Date: JUNE 25,1982 16:23
+Date: June 25, 1982    16:23
+To: Carl
+From: Julie
+
+Carl, In looking at the MACRO.DOC and MACRO.INF files, I don't see much that
+needs to be put in an opening paragraph.  The header at the top of the files
+seem to me to sum up the contents of the file pretty well.  There are a few
+short sentences that you mentioned that could be added, but not much.  If
+you get this message before I leave, I'll be glad to add what I can, but I
+assume you must want something other than what I think you want if you expected
+it to take up a page or so.
+/Julie.
+
+
+From: CARL
+Date: JUNE 26,1982 17:42
+Yeah!!!! Finally! I got it to work.
+  Take a look at P.SAI and SWDEF.DEF on my area!
+/Carl.
+
+
+From: CARL
+Date: JUNE 27,1982 4:02
+PCOM command processed: 001PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 001PCO.LOG.
+
+
+From: CARL
+Date: JUNE 27,1982 4:35
+PCOM command processed: pcoctl = pcoctl/NODETACH/LOG:OUTPUT
+Job pcoctl completed.
+Output recorded in file pcoctl.
+
+
+From: CARL
+Date: JUNE 27,1982 4:37
+PCOM command processed: pcoctl/NODETACH/LOG:OUTPUT/MAIL
+Job pcoctl aborted: halted by operator at line 13.
+
+
+From: CARL
+Date: JUNE 27,1982 4:02
+PCOM command processed: 001PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 001PCO.LOG.
+
+
+From: CARL
+Date: JUNE 27,1982 4:35
+PCOM command processed: pcoctl = pcoctl/NODETACH/LOG:OUTPUT
+Job pcoctl completed.
+Output recorded in file pcoctl.
+
+
+From: CARL
+Date: JUNE 27,1982 4:37
+PCOM command processed: pcoctl/NODETACH/LOG:OUTPUT/MAIL
+Job pcoctl aborted: halted by operator at line 13.
+
+
+From: CARL
+Date: JUNE 27,1982 14:23
+Adele,
+  Ref: My review...
+
+  I knew that there was a reason to get my review done early this
+month!  I wanted to have everything done for July 1 when the new
+rates for stock went into effect.  Something tells me that it;s not
+going to make it unless we get it passed along rather quickly.
+-Carl.
+
+
+From: CARL
+Date: JUNE 27,1982 15:05
+might you be interested in getting some food in the near future?
+(say in an hour or two?)  and would you care to join me in doing
+so then... I'm probably coming over that way... -Carl.
+
+PS. Is the printer room open?
+
+
+From: KEN
+Date: JUNE 27,1982 15:12
+Carl,
+
+For the moment the printer room is open, but only because Janet Chin was
+here and kind enough to take pity on me.  I called Mike, and of course
+he could be no help in finding a key, so we will have to absolutely
+fix this situation tomorrow.
+
+Food in an hour sounds ok.
+
+/Ken
+
+
+From: CARL
+Date: JUNE 27,1982 19:50
+Scott,
+  Can you shed any light upon why the following happens:
+
+.run pcom
+PCOM version 101.26
+(Type ? for HELP)
+Command file: ^C
+
+.ddt
+BAIL v2
+DSK:PCOM  .SM1[3,352477]
+  DSK:PCOM  .SAI[3,352477]
+  DSK:SAIL  .DEF[3,212145]
+  DSK:TYMINT.DEF[3,212145]
+  DSK:UUOSYM.DEF[3,352477]
+  DSK:SWDEF .DEF[3,352477]
+DSK:BAICLC.SM1[1,315372]
+DSK:BAIIO1.SM1[1,315372]
+DSK:BAIIO2.SM1[1,315372]
+DSK:BAIMSC.SM1[1,315372]
+DSK:BAIPRC.SM1[1,315372]
+End of BAIL initialization.
+
+'434711 %%% File not viewable
+1:break("checksw")
+
+ILL MEM REF FOR LOCATION 200037 AT USER 013022
+
+.
+(Regardless of where I try to set a breakpoint, I get an ILL MEM REF)
+This is not recent, but I need to use BAIL now, and it is most, MOST
+inconvenient.  Any insight will be appreciated.  This version of PCOM
+is all LOW-SEGMENT, 74 pages. /Carl.
+
+
+From: CARL
+Date: JUNE 27,1982 20:30
+PCOM command processed: pcoctx.log = pcoctx.CTL/NODETACH/LOG:OUTPUT
+Job pcoctx.CTL completed.
+Output recorded in file pcoctx.log.
+PCOM command processed: pcoctx.log = pcoctx.CTL/NODETACH/LOG:OUTPUT
+Job pcoctx.CTL completed.
+Output recorded in file pcoctx.log.
+
+
+From: ADELE
+Date: JUNE 28,1982 9:03
+RE:  Your review
+	I am working on it today.  Will get back with you ASAP.
+/Adele
+
+
+From: ADELE
+Date: JUNE 28,1982 9:14
+TO:	TSU
+FROM:	Adele
+CC:	Mike
+RE:	support line
+
+Here is the support line schedule for the week of June 28 - July 2.
+
+		|____AM_____|____PM____|
+		|	    |	       |
+	Mon	|   Adele   |   Ken    |
+		|	    |	       |
+	Tue     |   Carl    |   Dave   |
+		|	    |	       |
+	Wed	| Margaret  |   Ken    |
+		|	    |	       |
+	Thu     |   Lois    |   Dave   |
+		|	    |	       |
+	Fri     | Margaret  |   Carl   |
+		+-----------+----------+
+
+Please arrange swaps if your times are not convenient and keep me
+informed of any changes.
+
+/Thanks, Adele
+
+
+
+From: TODD
+Date: JUNE 28,1982 15:26
+When and where is the picnic tomorrow? /Todd
+
+From: CARL
+Date: JUNE 28,1982 16:39
+To: Todd, Darren, Bill, Scott
+Re: PICNIC
+
+There are maps on your chairs showing the location of our PICNIC
+tomorrow.  It is in the park at the end of Stevens Canyon Road.
+Please send me mail, or see me to sign up for additional things
+to bring.  As you are the last, there are not many choices left.
+
+Any type of SALAD (fruit, green, etc.) or DESSERT (pies, etc)
+will be fine.  If you have an extra cooler or something to bring
+ICE in that would also be appreciated.
+/Carl.
+
+
+From: CARL
+Date: JUNE 28,1982 18:53
+Adele,
+  I'm not really content with the actual wording of PERSONAL OBJ. #1
+however, that's the direction that I'd like to take that.  Any help
+you can muster for rewording will be appreciated.  I will continue
+to work on wording.
+/Carl.
+
+
+From: CARL
+Date: JUNE 28,1982 23:24
+To: Users of (CARL)WHEN.SAV
+
+New feature added.  In addition to reading SWITCH.INI, (for a standard
+list of names to look for), you may now specify just the one(s) you wish
+to check on by typing them on the command line:
+
+    .RUN (CARL)WHEN ; username-list
+
+/Carl.
+
+
+From: CARL
+Date: JUNE 29,1982 0:26
+Adele,
+  I sent mail earlier (cancelled) saying that I wasn't content with
+my wording of objective #1.  Due to interruptions, we did not get back
+together to discuss my re-wording.
+
+  There is YET another re-wording to be found in (CARL)COBJ.pub/doc
+which I am much more content with.  Let me know what your comments are
+and if you think maybe the order of 1a-b-c ought to change, eg. 1b-a-c.
+(Also whether the section name/unit name need be specified, or if
+ "the unit" or "the section" is appropriate.)
+/Carl.
+
+
+From: CARL
+Date: JUNE 29,1982 0:40
+Adele,
+  I have the support line this morning, but will need to run an
+early morning errand (between 9:30 & 10:30) I will ask someone to
+cover whilst I run my errand [absolutely must be done so that I
+can get some prints back by tomorrow afternoon].  Otherwise, I shall
+be in all morning if you have time open so that we can get together
+to finish up the details on my review.
+/Carl.
+
+
+From: CARL
+Date: JUNE 29,1982 9:40
+Ref: Division PICNIC
+
+Is still slated to be held in the park at the end of Stevens Canyon
+Road, however, in view of the current weather, MAY be changed to
+Joan Pearson's house in Los Altos.  If you don't hear further via
+mail, then try to give Joan or myself a call around 11:30.  /Carl.
+
+
+From: CARL
+Date: JUNE 29,1982 22:36
+so, how's it coming?
+  I decided that it wasn't worth while coming back into the office.
+I will work on the routine for you and we can discuss it tomorrow
+or as soon as it's done (assuming that you haven't written it already).
+send me mail whe you get out of the editor & I'll link to you.
+/Carl.
+
+
+From: KEN
+Date: JUNE 29,1982 22:41
+talk to me
+
+
+From: CARL
+Date: JUNE 30,1982 0:50
+I looked briefly at your routine...
+   rather then tamper with your style, I attacked the
+   equivalent routines in TAKEIT itself.  GETLIC.SAI on
+   my area is almost ready to install.  It compiles, and
+   if I didn't destroy any of the algorithm, it ought to
+   be useable. ... however, it is untested, so let me do
+   that first.
+If it works, you can either use it as is or attack it to
+fit your style.  I'll let you know as soon as it works/is tested.
+/Carl.
+
+
+From: ADELE
+Date: JUNE 30,1982 10:40
+	Mike looked at the objectives and says they look OK with one minor
+suggestion:  In the note under job objectives, change the phrase "should be
+re-evaluated" to "will be re-evaluated".  Please send mail -- tell me if
+latest copy is still in (carl)cobj.pub.  If it's alright, I'll make the fix
+and get a copy printed out.  It looks as if we have ourselves a review.
+
+/Adele
+
+
+From: CARL
+Date: JUNE 30,1982 10:51
+The latest copy is still (CARL)COBJ.PUB ... feel free to copy/rename
+it back to your area and make the changes.  Please delete the copy on
+my area when you have a good copy. thanks.
+/Carl.
+
+
+From: SDANIELS
+Date: JUNE 30,1982 11:22
+Dont send long transcripts as messages
+
+From: CARL
+Date: JUNE 30,1982 11:36
+Sorry.  my frustration got the better of me.
+
+
+From: WRS
+Date: JULY 1,1982 12:51
+I fixed FRMDDT to recognize HALT$X as a special case so it won't destroy
+the target frame's PC.  To continue, $P still doesn't work, so use ^T to
+get the PC and then do pc$G.  Will fix $P when I get a listing.  -Bill
+^d
+
+From: CARL
+Date: JULY 1,1982 21:38
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:41
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:50
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OFF
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:59
+PCOM command processed: pcoctl.log = pcoctl.CTL/NODETACH/LOG:OFF
+Job pcoctl.CTL completed.
+Output recorded in file pcoctl.log.
+
+
+From: CARL
+Date: JULY 1,1982 21:38
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:41
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OUTPUT
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:50
+PCOM command processed: 005PCO.LOG = pcoctl.CTL/NODETACH/LOG:OFF
+Job pcoctl.CTL completed.
+Output recorded in file 005PCO.LOG.
+
+
+From: CARL
+Date: JULY 1,1982 21:59
+PCOM command processed: pcoctl.log = pcoctl.CTL/NODETACH/LOG:OFF
+Job pcoctl.CTL completed.
+Output recorded in file pcoctl.log.
+
+
+From: CARL
+Date: JULY 1,1982 22:45
+PCOM command processed: pcoctl.CTL/NODETACH/LOG:ERROR
+Job pcoctl.CTL completed.
+PCOM command processed: pcoctl.CTL/NODETACH/LOG:ERROR
+Job pcoctl.CTL completed.
+
+
+From: CARL
+Date: JULY 2,1982 3:10
+Don't forget to removeve "FORGET:" !!!
+Don't forget to removeve "FORGET:" !!!
+
+
+From: CARL
+Date: JULY 2,1982 14:08
+PCOM command processed: pcoctl.CTL/NODETACH/NOLOG
+Job pcoctl.CTL completed.
+
+
+From: CARL
+Date: JULY 2,1982 14:10
+PCOM command processed: pcoctl.CTL/NODETACH/NOLOG
+Job pcoctl.CTL completed.
+
+
+From: CARL
+Date: JULY 2,1982 15:03
+PCOM command processed: 006PCO.LOG = pcoctl.CTL/NODETACH/LOG
+Job pcoctl.CTL completed.
+Output recorded in file 006PCO.LOG.
+
+
+From: CARL
+Date: JULY 2,1982 14:08
+PCOM command processed: pcoctl.CTL/NODETACH/NOLOG
+Job pcoctl.CTL completed.
+
+
+From: CARL
+Date: JULY 2,1982 14:10
+PCOM command processed: pcoctl.CTL/NODETACH/NOLOG
+Job pcoctl.CTL completed.
+
+
+From: CARL
+Date: JULY 2,1982 15:03
+PCOM command processed: 006PCO.LOG = pcoctl.CTL/NODETACH/LOG
+Job pcoctl.CTL completed.
+Output recorded in file 006PCO.LOG.
+
+
+From: LOIS
+Date: JULY 2,1982 15:27
+To Tymcom-X Section:
+
+Going away lunch for Dmitry is Friday, July 9 at noon at North China
+Restaurant, 2830 Homestead.
+-Lois
+
+
+From: CARL
+Date: JULY 2,1982 22:45
+PCOM command processed: pcoctl.CTL/DETACH/LOG:OFF
+Job pcoctl.CTL aborted: timeout at line 3476.
+
+
+From: SDERRY
+Date: JULY 2,1982 21:38
+Carl,
+
+Do you know where the sources to AUXMUX reside, would like to 
+look thru them.... sta
+
+
+From: CARL
+Date: JULY 2,1982 22:45
+PCOM command processed: pcoctl.CTL/DETACH/LOG:OFF
+Job pcoctl.CTL aborted: timeout at line 3476.
+ 3 r€
