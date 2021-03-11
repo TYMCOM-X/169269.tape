@@ -1,0 +1,73 @@
+.Page frame 60 high 77 wide;
+.Area text lines 4 to 57 chars 6 to 77;
+.Title area heading lines 1 to 3;
+.Title area footing line 60;
+.Place text;
+.StandardSpacing_ 1;
+.MarginHeadings_ true;
+.Device TTY;
+.Preface 1;
+.Memo;
+.UnderlineBetween (~~,~);
+.Byhand;
+.skip 3;
+~~JOB OBJECTIVES~
+.EndHand;
+.List (-4,4,0,"1.");
+.Item;
+Support top priorities for the TYMCOM-X systems as they relate to the
+Technical Support Unit.
+.Item;
+Get the SNARL project finished and into production ASAP.
+.Item;
+Continue to move the Technical Support Unit from react mode to project
+mode.
+.Preface 0;
+.List (-4,4,0,"a.");
+.Item;
+Make usage of MTS tracking tools a routine.
+.Item;
+Improve the ability to make and meet project commitments.
+.Item;
+Improve the status reporting to the unit and to my management.
+.EndList;
+.Preface 1;
+.Item;
+Encourage teamwork and the development of project management skills in
+TSU.  Look for opportunities for TSU members to take initiative.
+.EndList;
+.ByHand;
+.Skip 3;
+~~PERSONAL DEVELOPMENT OBJECTIVES~
+.EndHand;
+.List (-4,4,0,"1.");
+.Item;
+Continue to develop my management skills.  (Especially in planning,
+directing, and control.)
+.Preface 0;
+.List (-4,4,0,"a.");
+.Item;
+Make weekly informal status accounting a routine for unit members.
+.Item;
+Schedule mini-reviews to improve communication with the unit and so that
+annual reviews can be done smoothly and on time.
+.EndList;
+.Preface 1;
+.Item;
+Gain more ability to do mid-range planning.  Do this by working on a
+quarterly project chart in advance of the quarter.  Account for variance
+with the final.  Use the SNARL project as an experience base.
+.Item;
+Get to the point where direction changes are not traumatic.  One
+way to aid in this is to reduce the routine but necessary items to
+cookbook procedures.  Develop a calendar of routine items which must be
+carried out to manage the unit effectively.  Develop a calendar of
+routine technical items for the unit.  
+.Item;
+Gain more knowledge of the monitor.
+.EndList;
+
+
+
+
+
