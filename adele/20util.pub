@@ -1,0 +1,91 @@
+.Page frame 60 high 77 wide;
+.Area text lines 4 to 57 chars 6 to 77;
+.Title area heading lines 1 to 3;
+.Title area footing line 60;
+.Place text;
+.StandardSpacing_ 1;
+.MarginHeadings_ true;
+.Device TTY;
+.Preface 1;
+.Wantoutline_ true;
+.Memo;
+.UnderlineBetween (~~,~);
+.Outline ();
+.Once Center;
+TOPS/20 UTILITIES and SUPPORT PLANNING
+.skip 3;
+.L1
+Strategies
+.L2
+Short range
+.L3
+Encourage use of TOPS/20 by the section.
+.L3
+Help provide a good development environment on internal TOPS/20 systems.
+.L2
+Medium range
+.L3
+Provide the minimum functionality necessary to support a beta test
+site, probably a small, dedicated system.  This is a vague strategy,
+because it is dependent upon the customers needs.
+.L3
+Support responsibilities should be defined.
+.L3
+A feedback machanism should be implemented.
+.L2
+Long range
+.L3
+Provide the functionality necessary to support a time-sharing
+environment under TOPS/20.
+.L3
+Provide the software maintenance needed to support a potentially large
+customer base on TOPS/20.
+.L1
+Strategy issues
+.L2
+Emphasis should be on short and long range strategies, since the medium
+range needs are not clear.
+.L2
+Necessary product development should stress usable milestones.
+.L2
+Determine priorities of major utilities products.
+.L1
+Major Utilities Products
+.L2
+Periodic processing capability (PERP)
+.L2
+Printing, including remote capability (SPOOL)
+.L3
+Known requirements
+.L4
+Provide remote site (district office) printing capability
+.L4
+Provide a similar level of formatting and forms capability as we
+have at present on TYMCOM-X.
+.L4
+Report necessary statistics for user invoicing.
+.L4
+Provide support for an engine work station interface.
+.L5
+Efficient use of network resources for multiple copies -- eliminate
+need to transfer each copy through the network.
+.L5
+Allow accurate and up-to-date status reporting to users.
+.L5
+Provide a good interface for intelligent remote sites, other than
+printers.
+.L3
+Design issues
+.L4
+Should SPOOL handle hosts without printers?  If so, how?
+.L4
+Need a solution or a work-around for the high-numbered host problem.
+.L4
+Should charging responsibility for SPOOL postage (RCHARG) be removed
+from operators or at least district office operators?
+.L5
+Could postage be billed automatically?
+.L5
+Could billing statistics go directly to the stream?
+.EndOutline;
+
