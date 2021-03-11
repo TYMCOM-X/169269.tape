@@ -1,0 +1,2118 @@
+
+- 18 -
+Posted: January 11, 1983 23:20
+To:   txs
+From: WRS:930
+Re:   Press Release
+
+Please type (WRS)PRESS.1 for a recent (sort of) press release.
+-Bill
+
+- 19 -
+Posted: January 13, 1983 13:02
+To:   Bill, Carl
+From: MCH:930
+Cc:   Adele
+Re:   PASSWORD
+
+I had to commit to a delivery date:  Either Monday or Tues. of next
+week.  COEES understands that are getting this with less than full testing
+(I gave them a choice--early next week, with minimal testing or two weeks
+later with solid testing.  They're nervous and want it sooner rather than
+later.)								/Mike
+- 20 -
+Posted: January 13, 1983 13:57
+To:   Lois
+From: MCH:930
+Cc:   Adele
+Re:   ARTSON Procedure
+
+Please add an appropriate reminder to wherever you keep track of things to
+do about Artson:  Because the office is in San Jose, when they call someone
+like Bill or Darren or me, it's a toll call.  They make it a 3rd party call
+so it shows up on our phone bills.  The calls had been billed to Carl's office
+phone.  I asked Artson to change that today; the calls will be bulled to my
+no. (x7219) in the future.  We need a reminder to ourselves to call Artson in
+case either (1) I change my no. or (2) someone else becomes section manager.
+							/Mike
+- 22 -
+Posted: January 14, 1983 09:14
+To:   todd, darren, matoka, wrs
+From: LOIS:930
+Cc:   adele
+Re:   XCONSULT Query on DSKCLN
+
+Rick Daniels sent the following questions on DSKCLN:
+
+NEED INFORMATION ABOUT THE FOLLOWING:
+
+        A.  WHILE SYSTEM IS IN DSKCLN, WHAT DAMAGE (IF ANY) IS
+            CAUSED IF A DRIVE IS HUNG; OR A DRIVE DROPS OFF-LINE?
+
+        B.  IS IT BEST TO GET OUT OF DSKCLN AT THIS TIME, OR
+            SHOULD DSKCLN BE ALLOWED TO CONTINUE TO RUN?
+
+        C.  WHAT ARE THE HAZARDS OF MOVING THE PACK WITH I.D PLUG
+            WHILE IN DSKCLN, OR POPPING THE I.D PLUG?
+
+        D.  IS IT ADVISABLE TO MOVE A PACK WITH I.D. PLUG AT
+            ANYTIME WHILE THE SYSTEM IS BEING ACCESSED?
+
+Please let Adele and me know the correct answers to these questions (as well
+as Rick).  Thank you.
+
+- 29 -
+Posted: January 21, 1983 13:00
+To:   Ken
+From: DWS:930
+Cc:   Adele
+Re:   Peak for TOPS20
+
+If Tymshare will take me to lunch, I'll gladly sit down and show you
+what will have to be done to PEAK to get it up completely on TOPS20.
+Any time this next week is o.k. with me.
+
+Dave
+
+- 30 -
+Posted: January 23, 1983 20:27
+To:   Txs
+From: WRS:930
+Re:   Version 4 SEND
+
+Version 4 of SEND (now in SYS) fixes the bug causing files in excess of
+512 characters from being included in the text of the message with the 
+"@" command.  The file size is now limited to string space.  Also, this
+version supports the following commands which may be typed any time while
+entering text (thanks to Carl):
+
+.To       specify who to send this message to
+.Copy     specify who to send copies to
+.Subject  specify the subject heading
+.Reply    show that this is a reply message
+.Erase    erase the current text and start over
+.Review   print out the current text message
+.Send     transmit the current message and continue
+.Done     terminate the message and send it (^Z)
+.Help     reprints this text
+.Quit     terminate this message without sending it
+
+-Bill
+
+- 32 -
+Posted: January 23, 1983 23:26
+To:   Bill
+From: MAILDEV:930
+Sender: WRS:930
+Re:   Version 4 RDMAIL
+
+Version 4 of RDMAIL (now in SYS) includes the new command
+   REDistribute <criteria> TO <name>
+<name> may be ommited - user will be prompted for list.
+<criteria> may be ommited - current selection prevails.
+This message was redistributed.  Notice the Sender field
+indicates who redistributed it (last).  The rest of the fields
+remain unchanged from the original message (including date).
+There is no oppertunity to add comments.
+
+Forthcomming are the SEND, REPLY and FORWARD commands.  -Bill
+
+- 33 -
+Posted: January 24, 1983 11:09
+To:   darren
+From: LOIS:930
+Cc:   todd, matoka, adele, mch
+Re:   4 Meg Memory for 55
+
+Jim called from Operations to say that they had installed a 4 meg memory
+box on 55 over the weekend, and need the monitor patched.  (There has to
+be a better way than the current way of hand fitting the monitor for the
+4 meg memory).
+Anyway, Darren, I told Jim you would call Operations and arrange for a 
+time to patch it.
+-Lois
+
+- 34 -
+Posted: January 24, 1983 14:58
+To:   Bill
+From: SDANIELS:930
+Cc:   Adele
+Re:   (sailib)find => SPL
+
+(1) Make sure you get at least version 13.
+(2) put a privledged jump stub in SAILIB (for COESS types etc.)
+[v 13 I think is the one with .ellipsis]
+Otherwise, fine.
+
+- 36 -
+Posted: January 25, 1983 12:07
+Date: January 25, 1983 11:24
+To:   TXS.A/NEWMAN (ADELE:930)
+From: HRD.SUP:EMSAA
+Re:   ONTYME NAMES FOR MANAGER, SUPERVISORS, AND ABOVE
+Keywords: A29600 
+
+                   HUMAN RESOURCES DIVISION - MEMORANDUM
+                   *************************************
+
+<T Y M S H A R E>
+
+DATE>      25 JAN 83  11:22
+
+TO>        ALL TYMSHARE MANAGERS
+
+COPIES>    
+
+FROM>      DENISE CORNELY - PERSONNEL
+
+-----------------------------------------------------------------------
+
+PLEASE BE AWARE THAT THE SUPERVISOR, MANAGER, AND ABOVE LIST WILL BE 
+AVAILABLE IN ABOUT 1 WEEK.  IT WOULD BE GREATLY APPRECIATED IF
+YOU WOULD CHECK THE INFORMATION THAT PERTAINS TO YOU, IF IT IS
+NOT RIGHT PLEASE ONTYME ME AT HRD.SUP WITH THE RIGHT INFO.
+PSD AND BANKING WILL NOT BE ON THIS LIST BECAUSE THEY HAVE NOT BEEN
+VALIDATED.  THEY WILL STILL HAVE TO BE IMS'D IF YOU NEED THEM.
+
+THANK YOU,
+
+DENISE CORNELY/HRD.SUP
+
+
+- 37 -
+Posted: January 26, 1983 10:01
+To:   txs
+From: TODD:930
+Re:   Structures on 94
+
+Current structures on 94 are:
+
+MD: 2 unit Magnum development
+MS: 2 unit Magnum sources
+OSS: 2 unit OS and utilities
+OSU: 1 unit sundry OSU hacking, but can be dismounted
+SCR: 1 unit Scratch pack.  Unit will substitute for any that are disabled.}i
+
+It is suggested that a minimal number of personal files be kept on PS:
+You should access and connect to OSS: in your login.cmd file.
+-Todd
+
+- 38 -
+Posted: January 26, 1983 10:02
+To:   adele
+From: TODD:930
+Cc:   mch
+Re:   OSS:
+
+We need to get OSS: dumped to tape.  Virgil has agreed to take the tape
+to Fremont and load it onto 94.  Thanks,  Todd.
+
+- 39 -
+Posted: January 26, 1983 10:31
+To:   Adele
+From: MCH:930
+Re:   Sys 94
+
+1.  Let's expedite getting needed files onto the non-obsolete KL.
+2.  We need to check with Todd to find out how many ports are
+    currently available on that System.  If there are only 16,
+    there's going to be a shortage until TYMSRV is up and working.
+    (And, sigh, Stan will have to have priority on them--if all
+     16 are in use, the section will get 3 or 4.)
+3.  It might not hurt to check with Stan:  If we can help him get the
+    T20 MAGNUM files to :94, we can start using :84 that much sooner.
+
+- 42 -
+Posted: January 30, 1983 19:01
+Date: January 28, 1983 21:30
+To:   TXS.SUP (WRS:930)
+From: INSDVEND.DECMAIL:EMSAA
+Sender: WRS:930
+Keywords: A35085 
+
+FOR YOUR INFORMATION:
+
+LESLIE GROSS, DIGITAL EQUIPMENT CORPORATION ACCOUNT MANAGER
+FOR TYMSHARE/TYMNET HAS AN ACCOUNT ON ONTYME.  
+IF YOU WOULD LIKE TO SEND A MESSAGE TO HER, HER ACCOUNT IS
+INSDVEND.DECMAIL .
+IF YOU WOULD LIKE TO CONTACT HER BY PHONE, HER DIRECT DIAL
+NUMBER IS (408)748-4966.
+
+
+- 43 -
+Posted: January 30, 1983 19:03
+Date: January 28, 1983 15:16
+To:   TXS.B/SOLEY (WRS:930)
+From: TCMS.J/BENNETT:EMSAA
+Sender: WRS:930
+Keywords: A35330 
+
+ I work with Ron Saltgaver's group and I have a question concerning TYMCOM-XX
+software.  Is there a list somewhere that gives the files that make up the
+standard software package on the XX's?  if you know of one, could you let me
+know where it is so I can get a copy.  My ID is TCMS.J/BENNETT.
+
+Sincerely,
+ 
+Jim Bennett
+Ext. 7777
+
+
+- 1 -
+Posted: February 14, 1983 22:01
+To:   Todd, Adele, Mike
+From: WRS:930
+Re:   COEES INIT2.SAI
+
+In order to improve the reliability of the program, it would be necessary to
+change the necessary access rights for the .FOCON {_frmop.  It is
+not clear this is a desirable thing to do.  Currently, it attaches the
+port after stuffing "CONT<cr>" in the input buffer.  Yes, its gross, but
+with the half implemented framing system, its the best we can do without
+monitor work.  -Bill
+
+- 2 -
+Posted: February 14, 1983 22:02
+To:   Todd, Adele, Mike
+From: WRS:930
+Re:   COEES INIT2.SAI
+
+Actually, I suppose we could give the program WC license.  -Bill
+
+- 5 -
+Posted: January 1, 1964 00:00
+Date: February 16, 1983 16:38
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.BEDELL:EMSAA
+Re:   STATPAK SOURCE CODE (TYMCOM IX BATCH FORTRAN)
+Keywords: A59769 
+
+           Tymshare International Division        IOD.HQ    Cupertino   VG1-A01
+
+                                                  Tel. [-1] (408) 446-7846
+
+DATE>      16 FEB 83  16:13                       Telex 334489
+
+TO>        ADELE NEWMAN (TXS.A/NEWMAN)
+
+COPIES>    P. HAAS (IOD.HQ)
+           M. HINCKLEY (TXS.M/HINCKLEY)
+           E. JAY (CT.TECHSERV)
+           R. KALOCSAI (CT.BANK)
+
+FROM>      KEN BE DELL (IOD.HQ)
+
+------------------------------------------------------------------
+
+ADELE, I HAVE JUST GONE THROUGH SOME OF MY PENDING ITEMS FOR
+CEGI TYMSHARE FRANCE AND FIND THE ISSUE REGARDING STATPAK.
+
+MY LAST DISCUSSION WITH YOU WAS DURING MID DECEMBER AND YOU 
+STATED YOU WOULD ATTEMPT TO FIND THE "SOURCE CODE FOR THE TYMCOM IX
+BATCH FORTRAN".  YOU HAD STATED THEY DID NOT RESIDE ON G2CONVERT:9,
+PRIMARILY BECAUSE THIS USER DOES NOT EXIST ON HOST 9.
+
+HAVE YOU BEEN ABLE TO GATHER ANY ADDITIONAL INFORMATION SINCE
+DECEMBER?
+
+I LOOK FORWARD TO YOUR RESPONSE.  REGARDS. KEN
+
+
+- 6 -
+Posted: February 20, 1983 00:04
+Date: February 18, 1983 09:05
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.BEDELL:EMSAA
+Keywords: A62334 
+
+  CC: M/HINCKLEY  A/NEWMAN  IOD .HQ 
+
+TO: ADELE NEWMAN   COPY: MIKE HINCKLEY   FROM: KEN BE DELL
+
+RECEIVED YOUR MESSAGE OF YESTERDAY EVENING REGARDING STAPAK (IX) FILES
+LOCATED ON HOST 9.  I'LL COMMUNICATE WITH CT FRANCE AND LET YOU
+KNOW IF WE HAVE FURTHER QUESTIONS.  REGARDS. KEN BE DELL
+
+
+- 7 -
+Posted: February 20, 1983 00:04
+Date: February 18, 1983 10:05
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.HAAS:EMSAA
+Re:   PERP Availability for XX's  --  Possible Host Discrepancies 
+Keywords: A62478 
+
+  CC: A/NEWMAN  C/BALTRUNAS  M/HINCKLEY  CT .TECHSERV  IOD .HQ 
+      IOD .HQ 
+
+           Tymshare International Division        IOD.HQ    Cupertino   VG1-A01
+
+                                                  Tel. [-1] (408) 446-7846
+
+DATE>      18 FEB 83  10:00                       Telex 334489
+
+TO>        Adele Newman (TXS.A/NEWMAN)
+
+COPIES>    C.Baltrunas (TXS.C/BALTRUNAS)
+           M.Hinckley (TXS.M/HINCKLEY)
+           P.Stratman (CT.TECHSERV)
+           K.BeDell (IOD.HQ)
+
+FROM>      Peter Haas (IOD.HQ)
+
+-----------------------------------------------------------------------
+
+Adele -
+
+Thank you for the copy of Software Transmittal Form 07671, which designates
+which Perp System to use (Perp versions from 7.26, Defer versions from 1.26).
+
+It shows as execution location:
+
+  "all PDP-10's & also system # 180, 174"  [sic]
+
+The XX hosts installed at CEGI-Tymshare are numbered 
+
+  59    (node 625)
+ 170    (node  64)
+ 184    (node 751)
+ 264    (node 213)
+1292    (node 370)
+
+which means that you possibly meant to install PERP.SYS (checksum NOFGAS)
+on 170 and 184, not on 180 and 174.
+
+Please let me know whether this error is only apparent or real.
+
+Thank you,
+
+                                                                Page  2
+
+- Peter Haas (IOD.HQ)  tel. -7162
+
+
+- 8 -
+Posted: February 21, 1983 03:41
+To:   Txs
+From: WRS:930
+Re:   EMSAA
+
+EMSAA forwarding service (in both directions) will be temporarily
+unavailable until I convince certain persons that it is not up to
+the originating host to echo characters.  -Bill
+
+- 10 -
+Posted: February 22, 1983 10:33
+To:   TSU, Greg
+From: ADELE:930
+Cc:   Mike
+Re:   TSU meeting
+
+The unit meeting will be held tomorrow (Wednesday) at 3 PM in room J instead
+of today.  I'm fighting off a cold and may need to sack out for a while.
+--Adele
+
+- 11 -
+Posted: February 22, 1983 12:14
+To:   Ken, Adele
+From: MCH:930
+Re:   PEAK Meeting with Dick
+
+I just checked with Dick:  He'll probably be available about 4PM tomorrow.
+- 12 -
+Posted: February 22, 1983 18:22
+To:   Adele
+From: MCH:930
+Re:   BIONIC Yucckiness
+
+I got a call from Kevin Gardner in INSD.  NTD is apparently supposed to
+be making some changes soon that will affect VS2780/3780.  Since BIONIC
+is used by many of our customers to access this feature, it MIGHT require
+changes.  Kevin is working on setting up a meeting with key players in
+NTD, STD, and (sigh!) DBSD.  You'll probably be getting a memo from Kevin.
+I suppose that you and I will need to go to the meeting.  (You could handle
+it by yourself, but you deserve at least some moral support if BIONIC
+should have to be messed with.)		/Mike
+- 15 -
+Posted: February 23, 1983 09:47
+To:   Adele, Mike
+From: DWS:930
+Re:   Stanford Colloquia postings
+
+We get a weekly listing of C.S. colloquia from stanford via netmail.
+If you're interested, I could re-mail copies to you.
+
+- Dave
+
+- 18 -
+Posted: February 28, 1983 09:03
+To:   TSU
+From: ADELE:930
+Cc:   Mike
+Re:   VAX project in MTS
+
+A project for VAX startup work should appear on the time sheets for this
+week.  This is the place to report any time spent getting acquainted with
+the VAX.		/Thanks, Adele
+
+- 19 -
+Posted: February 28, 1983 10:32
+To:   Zonnie, Adele
+From: MCH:930
+Re:   Pascal
+
+Sounds like we need to spend some time talking about the Pascal compiler.
+I'm supposed to hear from Dmitry sometime today about whether or not he
+will accept the consulting contract (he had to check with a couple of
+other companies he's consulting for first).  I talked with Jack Orlove
+on Friday.  He now knows that we need a Legal Dept. decision about what
+to do (or not do) about the lack of a completed contract with MDSI.  
+
+Somewhere (most likely on Dmitry's documentation directory) there's a
+description of the design he did for an improved syntax err recovery
+mechanism.  It almost surely WON'T be in Scribe format.
+
+Let's at least get the meeting scheduled today.             /Mike
+- 23 -
+Posted: March 7, 1983 11:25
+To:   carl, adele
+From: LOIS:930
+Re:   New SPOOL commands
+
+Present help message in SPOOL reads
+
+LOCATION  - FOR SETTING THE ABSOLUTE PRINTER LOCATION
+NODE      - FOR SETTING THE ABSOLUTE NODE
+
+How about "EFFECTIVE" for "ABSOLUTE"?  Or can someone think of something
+better before release?
+
+Otherwise things are about ready for SPOOL transmittal.
+-Lois
+
+- 24 -
+Posted: March 7, 1983 11:40
+To:   mch
+From: LOIS:930
+Cc:   adele
+Re:   Tymnet classes
+
+There is no charge back for Tymnet classes
+-Lois
+
+- 1 -
+Posted: March 7, 1983 17:40
+To:   Carl, Adele, Lois
+From: MCH:930
+Cc:   MCH
+Re:   LOC and NODE Help Messages in SPOOL
+
+Possibilities might be something like:
+
+LOCATION - USED TO OVERRIDE THE DEFAULT PRINTER LOCATION
+NODE     - USED TO OVERRIDE THE DEFAULT NODE FOR SELECTION OF PRINTER LOCATION
+
+					/Mike
+- 2 -
+Posted: March 14, 1983 14:16
+Date: March 14, 1983 14:12
+To:   TXS.A/NEWMAN (ADELE:930)
+From: TXS.WRS:930
+Re:   EMSAA.server fixed!
+Keywords: A91702 
+
+Well, it would appear that EMSAA.SERVER is once again doing its thing, thanks
+to a few small hacks.  Please report any problems to me.  Also, if you do
+not get this message, please let me know.  Remember that you must have exactly
+one address in the TO field when sending a message to be forwarded.  Also
+remember that EMSAA addresses appearing in the CC field are not noticed (and
+thus ignored).  And lastly, don't forget to keep (EMSAA.SERVER)EMSAA.CTL up
+to date with your current name/password.
+
+-Bill
+
+
+- 3 -
+Posted: March 14, 1983 18:07
+Date: March 14, 1983 17:29
+To:   TXS.A/NEWMAN (ADELE:930)
+From: INSD.HSSMAIL:EMSAA
+Re:   LISTED ABOVE WERE THE RESPONSIBILITY
+Keywords: A92083 
+
+                  INFORMATION NETWORK SERVICES DIVISION
+
+                            M E M O R A N D U M
+
+DATE>      14 MAR 83  17:24                           []  TYMSHARE
+
+TO>        RON SALTGAVER
+           JIM BENNETT
+           ADELE NEWMAN
+           LYNNE EDWARDS
+
+COPIES>    
+
+FROM>      EDIE ADAMS (INSD.HSSMAIL)
+
+-----------------------------------------------------------------------
+
+WE HAVE SCHEDULED A SOFTWARE DISTRIBUTION MEETING FOR 
+WEDNESDAY, MARCH 16, AT 10:00. IT WILL BE HELD IN THE 
+BUILDING "B" CONFERENCE ROOM ON BUBB RD. WE WILL BE 
+
+      * CREATION OF SOFTWARE DISTRIBUTION TAPES FOR
+        DEC 20/20 CUSTOMERS (PROCEDURE, FREQUENCY,
+        FINAL TESTING, ETC.)
+
+      * HOW NEW SOFTWARE RELEASES ARE DISTRIBUTED
+        AND IMPLEMENTED
+
+      * A PROPOSED METHOD TO IMPROVE THE CONTROL AND
+        20/20 SOFTWARE RELEASES
+
+      * WHAT TYPE OF FOLLOW-UP SHOULD BE PROVIDED
+        AT THE BRANCH LEVEL AND AT THE CUSTOMER
+        SITES FOLLOWING THE INSTALLATION OF THE
+        NEW SOFTWARE
+
+OF GARY WOLF AND BEN RUSSELL PRIOR TO THEIR LEAVING. WE HAVE
+BEEN "VOLUNTEERED" TO TAKE OVER THIS OPERATION FOR OUR 20/20
+CUSTOMERS. 
+
+PLEASE ATTEND THIS MEETING; WE WOULD GREATLY APPRECIATE YOUR
+IDEAS AND SUGGESTIONS ON THIS.
+
+THANK YOU,
+
+EDIE ADAMS/HARDWARE SYSTEMS  SUPPORT
+EXT. 8139
+
+
+- 4 -
+Posted: March 15, 1983 11:39
+To:   carl
+From: LOIS:930
+Cc:   adele, mch
+Re:   SPOOL 6.3
+
+Chicago had a lot of post office requests that needed printing ASAP, and
+their usual printer was down.  They couldn't print them on their backup
+printer as it came in over another node.  I provided them with a copy of
+SPOOL 6.3, and it worked beautifully.  They are happy, customer is not
+unhappy--and SPOOL was a success.
+-Lois
+
+- 5 -
+Posted: March 15, 1983 16:08
+To:   Lois
+From: CARL:930
+Cc:   Adele, Mike
+Re:   SPOOL 6.3
+
+I'm glad that my changes to SPOOL actually "HELPED" someone to
+please a customer.  It's a perfect example of how a "new" addition
+to an old product can make it much more effective as a tool, even
+if the idea was "unsolicited" (as it was in this case).
+/Carl.
+
+- 6 -
+Posted: March 16, 1983 00:13
+To:   Mike
+From: WRS:930
+Cc:   Adele, Todd
+Re:   (COEES2506:26)INIT2X.SAI and associated monitor changes
+
+Well, my stomach just wouldn't let me hack the access rights for .ARCON,
+even though it would have only taken about 30 seconds to do.  After
+thinking about it, I decided that it really belonged as a special
+case access right.  So that it now is.  The only time you can
+continue a frame that you don't have write access to is when you
+are attaching a port to it.  It is still not allowed in other cases.
+
+The change to INIT2.SAI becomes a trivial removal of code to force the
+CONT command and the addition of an argument to the ATTACH uuo.  These
+changes have been made and exist in (COEES2506:26)INIT2X.SAI.  When the
+new monitor is moved to 26, they will want to rename INIT2X.SAI as INIT2
+and compile and test it before making it public.
+
+For further details on the monitor changes, see P034.MEM.
+
+-Bill
+
+- 7 -
+Posted: March 16, 1983 01:20
+To:   Todd
+From: WRS:930
+Cc:   Mike, Adele
+Re:   /L01 ??
+
+Well, /L01 stuff for ATTACH, RETACH for COEES works okay on 930.  What's
+the plan about version numbers?  Will we keep on with /L## until /L is
+fully operational and then release it as /M?  -Bill
+
+- 8 -
+Posted: March 21, 1983 18:48
+To:   Adele, Vivian
+From: MCH:930
+Re:   DUSAGE
+
+Whee!  COEES is finally beginning to use it.  Angela said today that they
+like it.  /Mike
+- 9 -
+Posted: March 23, 1983 20:06
+Date: March 23, 1983 19:09
+To:   TXS.A/NEWMAN (ADELE:930)
+From: TXS.M/HINCKLEY:EMSAA
+Keywords: A04962 
+
+Adele,
+
+I sent the following ONTYME to Doren Perruccio re SYSTAT or Otis:
+
+Doren,
+
+As per your request for a summary of today's phone call:
+
+1.  My section will provide Otis with a program that will allow an authorized
+    user to set SYSTAT licence on their job.
+
+2.  The program will include the following checks:
+    a.  Otis GAN
+    b.  Account Supervisor status
+    c.  Otis' system number and
+    d.  it will also ask for a password.
+
+3.  We will deliver within 2-3 weeks (sooner if possible).  
+
+                                               /M. Hinckley, Manager
+                                                Systems Development Section
+
+
+- 10 -
+Posted: March 24, 1983 12:24
+To:   Adele
+From: MCH:930
+Re:   Assignment of "SY for Otis" to Lois
+
+Good.  She seems like the best choice.  /Mike
+- 11 -
+Posted: March 25, 1983 11:32
+To:   Adele
+From: WRS:930
+Re:   TVEDIT
+
+I notice you have been using TVEDIT quite a bit lately.  Scott and
+I have decided its long past time to dispose of it.  Do you have any
+problem with this?  -Bill
+
+- 12 -
+Posted: March 25, 1983 13:23
+To:   Adele
+From: WRS:930
+Re:   TVEDIT to disappear May 1 1983
+
+How's that?
+-Bill
+
+- 13 -
+Posted: March 26, 1983 12:00
+To:   Tym.DEU:emsaa
+From: WRS:930
+Cc:   Mike, Adele, Lois
+Re:   P034/L on C39 with 190 net ports 128 jobs
+
+P034/L is now running on 39.  Operations has been asked to move it
+to SYSTEM.SAV.  It is configured for 128 jobs and 190 network ports.
+It seems to run fine, but the real test will come with a full load on
+Monday.  For fear of running out of freecore, I patched it to the value
+I found on the old 39 monitor less the calculated space taken by the
+new LDB's and DDB's.  This makes it aabout 64 pages which may give us
+some problems if people start opening many files.
+-Bill
+
+- 14 -
+Posted: March 27, 1983 17:52
+To:   txs
+From: CARL:930
+Re:   (SPL)FINDIT.SAV
+
+There is a "new" version of FNDFIL called FINDIT.  In addition to the
+stuff FNDFIL used to print, FINDIT also prints file size and protection.
+
+It accepts file specs separated by commas, single wildchar of ? and #,
+wild remainder of field using *, usernames "or" PPNs, wildcard ? in PPNs
+and maybe one day switches.
+
+It is "as fast" as FNDFIL when searching the entire disk, and much
+faster when specific directories or ppn wildcards are used.
+
+If no username or ppn is specified, the default is the entire disk!
+/Carl.
+
+- 15 -
+Posted: March 28, 1983 14:32
+To:   TSU
+From: ADELE:930
+Cc:   Mike
+Re:   new MTS project
+
+I have decided to put in a new MTS project for general technical work which
+is done primarily at the request of groups outside the division.  Right now
+its name is TSU External Technical -- any suggestions will be appreciated
+for a better name.  It has a start date of 4/2/83 and will appear on time
+sheets for next week.
+
+--Adele
+
+- 16 -
+Posted: March 30, 1983 00:32
+To:   txs
+From: CARL:930
+Re:   PCOM 1.60 Field Test
+
+PCOM version 1.60 is back up on (SYS:930) for testing.  This version
+fixes the truncated log files, and stranded jobs running LOGOUT.  New
+features include usernames printed with file specs, /LICENSE (since
+version 1.54) and /WATCH.  Please report any problems, complaints or
+bugs to CARL.
+
+- 1 -
+Posted: January 1, 1964 00:00
+Date: March 31, 1983 07:20
+To:   TXS.A/NEWMAN (ADELE:930)
+From: INSD.D/PERRUCCIO:EMSAA
+Keywords: A14672 
+
+ADELE,
+
+I TRYED TO RUN THE SYENA SYSTAT PROGRAM ON OTISIFRC.  I GOT THE
+MESSAGE 'NOT CORRECT GAN' .
+
+DOREN
+
+
+- 2 -
+Posted: April 2, 1983 05:19
+To:   txs
+From: CARL:930
+Re:   Moving programs to SPL (where they belong)
+
+When moving programs from various directories into SPL and replacing
+said same programs with something which says "XXXXXX has been moved to
+directory SPL", please use the prototype program (MPL)MPLSPL.SAV
+instead of writing your own.  This is exactly what this program was
+written for.  You need not do anything except say:
+
+   .Get (MPL)MPLSPL
+   .Save (????)XXXXXX
+
+and whenever anyone runs the program XXXXXX from directory (????) the
+program will print a reminder message and then run the proper program
+from SPL, at the same starting address (CCL or normal).  The message
+looks like:
+
+   >XXXXXX has been moved to directory (SPL),
+   >please use R (SPL)XXXXXX in the future.
+
+Remember to set the proper protection, on both the NEW program in
+SPL, and the replaced version of the program on the old directory.
+After people get used to running the program from SPL, the old
+program can be deleted at leisure.
+
+/Carl.
+
+- 3 -
+Posted: April 5, 1983 07:01
+Date: April 5, 1983 06:10
+To:   TXS.A/NEWMAN (ADELE:930)
+From: INSD.D/PERRUCCIO:EMSAA
+Keywords: A19944 
+
+ADELE,
+
+I TESTED THE SYENA PROGRAM AND IT RUNS VERY WELL. THANKYOU FOR YOUR HELP.
+ 
+DOREN
+
+
+- 4 -
+Posted: April 7, 1983 21:19
+Date: April 7, 1983 10:32
+To:   TXS.A/NEWMAN (ADELE:930)
+From: INSD.D/PERRUCCIO:EMSAA
+Keywords: A24354 
+
+ADELE,
+ 
+THE SYENA IS WORKING VERY WELL, I DO NOT AT THIS TIME HAVE ANYTHING ELSE
+FOR YOU ON IT. THANKYOU FOR YOUR HELP.
+ 
+DOREN
+
+
+- 5 -
+Posted: April 8, 1983 03:16
+To:   ct.techserv:emsaa
+From: CARL:930
+Cc:   carl
+Re:   SPOOL Problems
+
+Tymshare - Cupertino                         TXS.C/BALTRUNAS
+83-04-08  03:00 PST
+
+To>   Peter Stratman,   CT.TECHSERV
+From> Carl Baltrunas,   TXS.C/BALTRUNAS
+
+Re>   SPOOL problems (additional info)
+
+--------------------------------------------
+
+Peter,
+   In regards to the CENTER address for the CEGI XX's:  This is a
+completely different problem than simply an incorrect address in
+a data file.  As I mentioned in my last message to you, the CENTER
+address is keyed from a table of CENTER addresses "built-in" the
+SPOOL program itself.  System P59, P170, P264, .. etc., all begin
+with the letter "P" which is coded to mean printer location 7, for
+SLIGOS.  To change this, we will have to change the internal table
+in SPOOL and possibly the monitor names of your hosts.
+
+  At present, I am researching the appropriate prefix letter for
+your center machines.  The new prefix will probably be "S", unless
+there is some conflict or objection from CEGI.  Thus, system P59
+will become S59.  SPOOL will then be changed to reflect systems with
+the "S" prefix to have printer location 64, located at the ST-CLOUD
+address for CEGI-Tymshare.
+
+  This new PREFIX is not definate yet, but I would appreciate you to
+check with your staff to determine if this will cause any grave
+problems or inconveniences to other software now running at CEGI.
+
+--------------------------------------------
+
+Thank you for the information about hardware configurations and the
+intended use of SPOOL at CEGI.  I would also like you to send me a
+complete description of the problems you have been experiencing with
+attempting to use your REMOTE printer from the 2020's.
+
+                              Best regards,
+
+                              Carl.
+
+
+- 6 -
+Posted: April 8, 1983 09:18
+Date: April 8, 1983 08:06
+To:   TXS.A/NEWMAN (ADELE:930)
+From: CT.TECHSERV:EMSAA
+Re:   Perp   availability  for  xx's  -  Installation
+Keywords: A25649 
+
+ 
+ 
+ 
+ 
+ 
+ 
+                       M E M O R A N D U M
+ 
+  Cegi - Tymshare                         CT.TECHSERV St.Cloud
+ 
+  83-04-08 15:53                            [33] (1) 602.7012
+ 
+  To>        Peter Haas (iod.hq)
+ 
+  Copies>    A. Newman (txs.a/newman)
+             C. Baltrunas (txs.c/baltrunas)
+             K. BeDell (iod.hq)
+ 
+  From>      P. Stratman (CT.TECHSERV)
+ 
+ 
+             problems.
+             ref. 47.PERPXX
+ 
+    --------------------------------------------------------
+ 
+     Peter,
+ 
+     I  would  like  to  have  some information concerning the
+  installation of PERP and DEFER on systems 170 & 184.
+ 
+     When  checking  on  these two systems, I have noticed the
+  installation of system file PERP.SYS.
+ 
+     Since I have not heard from you concerning this matter, I
+  have attempted to complete the installation in the following
+  way :
+ 
+     -   Installation   of   SYS:PERP.SAV   with  licence  AC,
+     protection RUN RUN RUN.
+     - Validation of PERPOPER
+ 
+     The result is :
+ 
+     - PERP jobs may be entered without any problems.
+     - Execution is attempted at date and time specified.
+     - Execution ALWAYS fails, with message :
+     YOUR JOB "jobname" SUBMITTED TO "PERP"
+     HAS BEEN DELETED --
+     TROUBLE IN LINE 1.
+ 
+     Questions :
+ 
+ 
+ 
+ 
+ 
+   Perp availability for xx's - Installation problems
+                                                        Page 1
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     1.Have  I  been wrong to assume that the installation was
+     to be completed by us after your installation of PERP.SYS
+     ?
+ 
+     If  not,  then  :  2.Do  other  things have to be done in
+     order to complete the installation ?
+ 
+     If so, then : 2b.When will PERP be installed then ?
+ 
+     I   would   much   appreciate  a  prompt  reply,  as  the
+     installation has been announced to some customers.
+ 
+     Best Regards, Peter.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   Perp availability for xx's - Installation problems
+                                                        Page 2
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+- 7 -
+Posted: April 11, 1983 11:06
+Date: April 11, 1983 10:33
+To:   TXS.A/NEWMAN (ADELE:930)
+From: HRD.SUP:EMSAA
+Re:   MICRO ENGINE
+Keywords: A28018 
+
+TO:  DISTRIBUTION
+
+FR:  ZORAN SIMIC
+
+TYMSHARE MANUFACTURING DIVISION IS PLEASED TO ANNOUNCE THE PRODUCTION
+RELEASE OF THE MICRO ENGINE.  MICRO ENGINE CONFIGURATION IS AS FOLLOWS:
+
+                  1/2                  MEG OF MEMORY
+                   8                   SYNC PORTS
+                  16                   ASYNC PORTS
+
+                  OR
+
+                  1/4                  MEG OF MEMORY
+                   4                   SYNC PORTS
+                  16                   ASYNC PORTS
+
+BOTH VERSIONS ARE AVAILABLE AT 110V AND 220V.
+
+THE BUILD SCHEDULE FOR THE MICRO IS AT 22 UNITS PER MONTH.  DELIVERY
+IS AT 30 DAYS ARO.
+
+
+- 8 -
+Posted: April 12, 1983 15:10
+Date: April 12, 1983 14:53
+To:   TXS.A/NEWMAN (ADELE:930)
+From: PUBS.SUP:EMSAA
+Re:   TYMSHARE TODAY
+Keywords: A30336 
+
+          C O R P O R A T E    C O M M U N I C A T I O N S
+
+                         M E M O R A N D U M
+
+DATE>      12 APR 83  07:01
+
+TO>        ALL TYMSHARE MANAGERS
+
+COPIES>    
+
+FROM>      SAUNDRA HAYN SCHAULIS
+            EDITOR
+
+-----------------------------------------------------------------------
+
+TODAY'S THE DAY!
+
+TYMSHARE TODAY -- THE SPRING ISSUE -- A GORGEOUS 32-PAGES, IS HOT OFF
+THE PRESS AND READY TO BE USED.
+
+THIS ISSUE FEATURES "A CLOSER LOOK AT TYMSHARE'S TECHNOLOGIES" WITH AN
+INTRODUCTION BY TOM O'ROURKE.  WE FOCUS ON TYMNET, MICROBAND, URBANET, THE
+BARN, TNSC, THE FTCC VENTURE....AND MORE.
+
+THERE'S A MITS STORY, ARCO USING OUR FINANCIAL SYSTEM FOR LONG RANGE
+PLANNING AND ONE ABOUT SNAP-ON TOOLS THAT MAKES NUMBER CRUNCHING OBSOLETE.
+
+TELECHECK, OPAS, CPA, UNITAX--STORIES ABOUT THESE AND A BRAND NEW
+CARTOON FEATURE--ARE ALSO PARTS OF THIS LANDMARK ISSUE.
+
+MAIL YOUR TYMSHARE PUBLICATION ORDER FORM TO JANE PERRY, CORPORATE COMMUNI-
+CATIONS. SPECIFY:  TYMSHARE TODAY, NUMBER 6 (642).
+TYMSHARE TODAY COMES IN PACKAGES OF 25.  THINK AHEAD AND ORDER ENOUGH--
+YOU'LL BE USING THIS LANDMARK ISSUE FOR MONTHS TO COME TO SHOW YOUR
+CURRENT AND FUTURE CUSTOMERS WHAT TYMSHARE DOES TO PUT TOGETHER INFORMATION
+INTERCHANGE AND COMMUNICATIONS.
+
+CHEERS!
+                                                                Page  2
+
+
+- 9 -
+Posted: April 15, 1983 14:32
+Date: April 15, 1983 00:31
+To:   TXS.A/NEWMAN (ADELE:930)
+From: CT.TECHSERV:EMSAA
+Keywords: A34019 
+
+83-04-15 10:15
+ 
+TO:Peter Haas (iod.hq)
+ 
+CC:A. Newman (txs.a/newman)
+   C. Baltrunas (txs.c/baltrunas)
+   K. BeDell (iod.hq)
+ 
+FR:P. Stratman (ct.techserv)
+ 
+SU: Perp Installation Problems on Hosts 170 & 184.
+ 
+Peter, I have not received a reply to my memorandum A25649. Could
+you please try to get some answers to my questions by
+Monday, April 18th. ?
+ 
+Thank you, Peter.
+
+
+- 10 -
+Posted: April 15, 1983 20:02
+Date: April 15, 1983 19:46
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.HAAS:EMSAA
+Re:   DEFER & PERP Usage on Hosts 170 & 184
+Keywords: A35450 
+
+  CC: CT .TECHSERV  A/NEWMAN  C/BALTRUNAS  M/HINCKLEY  IOD .HQ 
+      IOD .HQ 
+
+            Tymshare International Division        IOD.HQ   Cupertino   VG1-A01
+ 
+                                                   Tel. [-1] (408) 446-7162
+ 
+DATE>       1983-04-15  19:36                      Telex 334489
+ 
+TO>         Peter Stratman (CT.TECHSERV)
+ 
+COPIES>     Adele Newman (TXS.A/NEWMAN)
+            Carl Baltrunas (TXS.C/BALTRUNAS)
+            Mike Hinckley (TXS.M/HINCKLEY)
+            Ken BeDell (IOD.HQ)
+ 
+FROM>       Peter Haas (IOD.HQ)
+ 
+ 
+REFERENCE>  A25649 of 1983-04-08 from CT.TECHSERV
+            A34019 of 1983-04-15 from CT.TECHSERV
+ 
+ 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 
+ 
+    Peter -
+ 
+    Mike Hinckley has already repaired what was needed for you to phys-
+    ically run both DEFER and PERP.
+ 
+    What is not, and will not, work correctly is session accounting as
+    regards prime and non-prime time.  The scheduler for 170 and 184 had to
+    be for technical reasons installed on C3, which runs according to a
+    California (PST/PDT) schedule.  That means that all jobs will be
+    executed correctly according to local (e.g. CET/CEST) time, but the
+    accounting which will be generated for billing purposes will always tag
+    the jobs as prime or non-prime according to Pacific Time.
+ 
+    There is no remedy for this.  Please let any customers who question
+    their monthly bill that they can only save money by adjusting their
+    scheduling to PST/PDT.  Actually, what will happen is that customers
+    will enjoy lower prices by running jobs anytime before 15h00 or 16h00,
+    CET/CEST (Paris time), depending on the time of year.  For that reason,
+    from a sales standpoint, you don't want to encourage DEFER jobs as much
+    as you might PERP jobs.
+ 
+    There's also no way to change the French price list so that prime and
+    non-prime time prices are equivalent, just for these two hosts.  The
+    change would then apply to all 940/X usage on any host.
+ 
+ 
+
+ 
+DEFER & PERP Usage on Hosts 170 & 184                                    Page 2
+ 
+ 
+ 
+    Best regards,
+ 
+    Peter Haas (IOD.HQ)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+- 11 -
+Posted: April 20, 1983 03:01
+Date: April 20, 1983 02:44
+To:   TXS.A/NEWMAN (ADELE:930)
+From: CT.TECHSERV:EMSAA
+Re:   DEFER & PERP on hosts 170 & 184.
+Keywords: A39604 
+
+ 
+ 
+ 
+ 
+ 
+ 
+                       M E M O R A N D U M
+ 
+  Cegi - Tymshare                         CT.TECHSERV St.Cloud
+ 
+  83-04-19 16:58                            [33] (1) 602.7012
+ 
+  To>         Mike Hinckley (txs.m/hinckley)
+ 
+  Copies>     Peter Haas (iod.hq)
+              Adele Newman (txs.a/newman)
+              Carl Baltrunas (txs.c/baltrunas)
+              Ken BeDell (iod.hq)
+ 
+  From>       P. Stratman (CT.TECHSERV)
+ 
+ 
+ 
+  REFERENCE>  A35450 of 83-04-16
+ 
+ 
+    --------------------------------------------------------
+ 
+     I  have  received  a  memo from Peter Haas (IOD) stating
+  that  PERP  on systems 170 and 184 should now be functioning
+  correctly.
+ 
+     In fact, the problem I reported still exists, and :
+ 
+ 
+  YOUR JOB "jobname" SUBMITTED TO "PERP"
+  HAS BEEN DELETED --
+  TROUBLE IN LINE 1.
+ 
+ 
+  is  still  sent  after  each  attempted  execution ( using a
+  perfectly correct command file ).
+ 
+     Could  you  please check this out ? If you need any help,
+  (access, licence, etc.) do not hesitate to contact me.
+ 
+     Thank you, and best regards,
+ 
+     Peter Stratman.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   DEFER & PERP on hosts 170 & 184.                     Page 1
+ 
+
+
+- 12 -
+Posted: April 20, 1983 10:27
+To:   Adele, Carl
+From: MCH:930
+Re:   CEGI PERP Problem
+
+I'll take a look at it later today (neither 170 nor 184 seem to be
+up at the moment.)  /Mike
+- 13 -
+Posted: April 20, 1983 19:32
+To:   Adele, Lois
+From: MCH:930
+Re:   CSCAN
+
+I got an urgent request from Angela yesterday to install it on (UEMUPL)
+on all 3 COEES systems (26, 29, 36).  Seems that Bill Stiles (among several
+others) really likes it (he's perhaps the key manager at COEES relative
+to Tymshare) and wanted to have some reports ready for his boss today.
+So I put it up.  Meant to tell you yesterday.
+
+It took a long time to get them started with it, but once the right
+people learned that it was there it has been very well received.
+
+Good job, well done.  /Mike
+- 14 -
+Posted: April 22, 1983 00:50
+To:   txs
+From: KEN:930
+Cc:   tjb
+Re:   (Spl)Copy Version 14.1
+
+Friends,
+
+(Spl) has a new version of Copy (V14.1), which avoids revealing a blemish
+in Telecopy's behavior (impossible, you say?).  It seems that Telecopy
+loses its grip when spaces are placed in front of system numbers in file
+specifications (eg. "(Milktoast: 36)Fizzle.Out"); It becomes catatonic.
+Copy removes all whitespace from the system specification list, and
+spares us all the embarrassment of watching software die.
+
+So there.
+
+/Ken
+- 15 -
+Posted: April 22, 1983 16:05
+Date: April 22, 1983 15:37
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.HAAS:EMSAA
+Re:   Full-Screen (VDU) PDP-X Editors
+Keywords: A44311 
+
+  CC: INSD .R/LYNN  L/LINDLEY  M/HINCKLEY  A/NEWMAN  IOD .HQ 
+
+           Tymshare International Division        IOD.HQ   Cupertino   VG1-A01
+ 
+                                                  Tel. [-1] (408) 446-7162
+ 
+DATE>      1983-04-22  15:14                      Telex 334489
+ 
+TO>        Peter Warn (TNS.PWARN)
+ 
+COPIES>    Anne Green (TUK.BRENTFORD)   Peter Stratman (CT.TECHSERV)
+           Keith Roberts (TUK.LONDON)   Martine Dieudonn'e (TNS.MD)
+           Aki Saeki (KTL.TOKYO)        Bob Barbour (IOD.HQ)
+           Kuniyoshi Kamoi (KTL.TOKYO)  Ken BeDell (IOD.HQ)
+           Rudi M"uller (TT.TM)          Dominique Marchand (TYM.EUROPS)
+           Albert Handelmann (TT.EM)    Yves Marceau (SLI.TECHMAIL)
+           Jasmijn Verhoeven (CT.AMSTERDAM)  Greg Marus (IOD.HQ)
+           Karl Lorenz (CT.TE)          Fabienne Heathcote (IOD.HQ)
+           John Lowry (TUK.BRENTFORD)   Ed Imsland (INSD.TECHMKTMAIL)
+           Rich Lynn (INSD.R/LYNN)      Lois Lindley (TXS.L/LINDLEY)
+           Mike Hinckley (TXS.M/HINCKLEY)    Adele Newman (TXS.A/NEWMAN)
+ 
+FROM>      Peter Haas (IOD.HQ)
+ 
+            or:  The Three Reluctant Bears
+ 
+REFERENCE> A25459 from TUK.BRENTFORD on 04-08
+ 
+ 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 
+ 
+    Peter -
+ 
+    Anne asked me about various PDP-X text processors (partly on your
+    behalf) and I'd like to let you know the score on the various products
+    available.
+ 
+    RUNOFF     is a very old product and rather primitive.
+ 
+    VUE   appears to be widely used at Tymshare, but could cause legal
+              problems if used by paying clients.
+ 
+    PEAK  is a new product employing full-screen editor capabilities, suit-
+              able for internal and client use both.
+ 
+    The problem with all of these packages is:  they're not supported !
+    The RUNOFF is not supported because of its advanced age and lack of
+    flexibility.  It would be stupid to actively support VUE because of the
+    possible legal trouble.  But, like the fable of Goldilocks, there is
+    one final bowl of porridge, which is neither petrified nor poisoned --
+    however, PEAK is not quite ready to be served yet, either.
+ 
+ 
+
+ 
+Full-Screen (VDU) PDP-X Editors                                          Page 2
+ or:  The Three Reluctant Bears
+ 
+ 
+    Actually, PEAK isn't yet supported because the PDP-X development group
+    doesn't yet have the manpower to give adequate customer
+    support/documentation.
+ 
+    However, if you're adventuresome, you might want to try the following
+    on any of the following hosts which have an L monitor: 35, 39, 57:
+ 
+         -PEAK (SYSNEWS)PEAK.TUT
+ 
+    to obtain a VDU tutorial.  Don't use a hard-copy terminal with PEAK --
+    you'll only get rubbish.
+ 
+    Shortly I shall be sending all affiliate technical managers photocopies
+    of information provided to me by Lois Lindley.
+ 
+ 
+    Best regards,
+ 
+    - Peter (IOD.HQ)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+- 16 -
+Posted: April 23, 1983 18:57
+To:   Carl
+From: WRS:930
+Cc:   Adele
+Re:   WHEN
+
+I'd like to put a version of WHEN in (MPL) or (SPL).  Do you feel comfortable
+putting your version there?  If you're busy, I can do it.  -Bill
+
+- 19 -
+Posted: April 27, 1983 15:12
+To:   Vivian
+From: ADELE:930
+Cc:   Adele
+Re:   DUMPER DB
+
+Sorry about the duplicate copy of this . . .
+Here is the checklist that we discussed:
+(1) The schema:
+	dump.type could be a single integer value '1N'
+	check maximum file name and directory name sizes
+	versn also could be stored numerically for space reasons; check its
+	   maximum size also.
+(2) in general:
+	comment for each field of the schema
+	comments in the source, particularly in dumpfile
+    (in particular, it is appropriate to define the proper values for each
+	field, such as what the "*" in tape.flag means)
+(3) A useful addition to findfile would be to allow a search in which user
+    enters the file name only and no directory name.  It could find all files
+    of that name in any directory.
+(4) Check handling of dumper files which were involved in a crash.
+(5) Update user documentation including "findfile" procedure.
+
+- 20 -
+Posted: April 27, 1983 16:58
+To:   adele, mch
+From: LOIS:930
+Re:   phones for move
+
+Becky Moll gave me the following information regarding the move of our
+telephones:
+
+A telephone request form needs to be filled out ASAP as they need two
+weeks for a large move.
+
+All phones should be listed giving KS number, Station letter, and all
+lines, plus name of person to whom phone is assigned.  Cost code (of
+course) goes on the form.  A map showing present location and new location
+would be very helpful.
+
+The move will be written up for May 13, but Becky felt the actual move
+of the phones themselves could be done over the weekend.
+
+All our phones are key sets at present.  Paul also has a key set (which
+still has 6709 and 6712 on it), and Scott's old phone does not have a
+key set.
+
+Do you want me (perhaps with Scott's assistance) to gather the
+appropriate information?
+
+- 21 -
+Posted: April 27, 1983 19:05
+Date: April 25, 1983 08:55
+To:   TXS.A/NEWMAN (ADELE:930)
+From: IOD.HAAS:EMSAA
+Re:   2780/3780 DEVELOPMENT NEEDS A24148
+Keywords: A45455 
+
+  CC: INSD .K/GARDNER  TYM .MFR  STD .N/MARSH  STD .P/NG  A/NEWMAN 
+      INSD .R/LYNN  TUK .BRENTFORD  IOD .HQ 
+
+           Tymshare International Division        IOD.HQ   Cupertino   VG1-A01
+
+                                                  Tel. [-1] (408) 446-7846
+
+DATE>      25 APR 83  08:48                       Telex 334489
+
+TO>        Kevin Gardner (INSD.K/GARDNER)
+
+COPIES>    M.Rude (TYM.MFR)
+           N.Marsh (STD.N/MARSH)
+           P.Ng (STD.P/NG)
+           A.Newman (TXS.A/NEWMAN)
+           R.Lynn (INSD.R/LYNN)
+           A.Green (TUK.BRENTFORD)
+
+FROM>      Peter Haas (IOD.HQ)
+
+-----------------------------------------------------------------------
+
+Kevin -
+ 
+Attached please find a contribution from Anne Green indicating HSA
+needs from Tymshare's U.K. affiliate.
+
+Best regards,
+
+- Peter  (IOD.HQ)
+                                        |
+                                        |
+                                        |
+                                        |
+                                        V
+.
+
+                                                     [-44]
+           Tymshare UK                  TUK.LONDON     (01) 379-7822
+
+DATE>      18 APR 83  10:17                 BRENTFORD  (01) 568-4277
+
+TO>        PETER HAAS (IOD.HQ)
+
+COPIES>    KEN BE DELL (IOD.HQ)
+           BOB BARBOUR (IOD.HQ)
+           GREG MARUS (IOD.HQ)
+           KEITH ROBERTS (TUK.LONDON)
+
+FROM>      ANNE GREEN (TUK.BRENTFORD)
+
+-----------------------------------------------------------------------
+
+PETER,  I HAVE DETAILED BELOW THE CURRENT CLIENTS WHO USE THE HSA
+2780/3780 ON THE VARIANS AND WHO WOUULD NEED TO HAVE ACCESS TO THIS
+CAPABILITY ON ANY ENGINE WE REPLACED THE VARIANS WITH.  WE ALSO HAVE A
+DISTRIBUTED COMMUNICATIONS SYSTEM (DCS-11) WHICH USES THE HSA
+ON THE VARIANS.
+
+CLIENTS                 TERMINAL EQUIPMENT              PRODUCT USED
+-------                 ------------------              ------------
+
+MARRIOTT HOTELS         DEC PDP 11/23                   DEC'S RDCP 2780/3780
+THISTLE HOTELS          DEC PDP 11/23                         "
+RESO HOTELS             DEC PDP 11/23                          "
+CREST HOTELS            DEC PDP 11/23 (X2)                      "
+                        VAX 11/750                             "
+OTIS                    IBM 370                                VS3780
+VULNAX                  TI 1100                
+HITACHI                 IBM 43XX                               VS3780
+PPL                     IBM 43XX                                  "
+
+THESE CLIENT ARE ALL USING 2780 BISYNCHRONOUS ACCESS METHODS FOR 2 REASONS.
+
+-  TRANSMITTING SIGNIFICANT VOLUMES OF DATA
+                                                                Page  2
+
+-  NEED FOR ERROR FREE TRANSMISSION
+
+LET ME KNOW IF YOU NEED ANY MORE INFORMATION.
+
+SEE YOU IN LONDON - LET ME KNOW IF YOU HAVE MANAGED TO RE-ARRANGE YOUR DAYS
+(A27606).
+
+REGARDS,  ANNE GREEN
+
+
+- 22 -
+Posted: April 27, 1983 19:21
+To:   Adele
+From: MCH:930
+Re:   Phone Move
+
+Yes, please arrange to get the key info together for the phone move.
+Brian can help with the details and/or Lois and/or Vivian.  Neither
+you nor I have the time right now to run around drawing maps or
+looking at phones to read off the station numbers.  /Mike
+- 23 -
+Posted: April 28, 1983 09:18
+To:   Lois
+From: ADELE:930
+Cc:   Adele
+Re:   phones for move
+- 26 -
+Posted: April 29, 1983 19:49
+To:   Adele
+From: MCH:930
+Re:   1Q Earnings
+
+If you are interested, look at (mch)earn.1q.  /Mike
+- 32 -
+Posted: May 27, 1983 12:06
+To:   carl
+From: LOIS:930
+Cc:   adele, mch
+Re:   New SPOOL features
+
+Just wanted to let you know that the new LOCATION command has come in
+very handy on at least four recent occurrences to enable one SPOOL
+location to print another's request.  The Post Office has been transferring
+to locations that are still in the SPOOL map but are actually not presently
+active printing locations.  As we get that mess cleaned up, at least the
+customer has been able to get their requests processed.
+-Lois
+
+- 36 -
+Posted: June 10, 1983 18:04
+To:   carl, matoka, greg
+From: LOIS:930
+Cc:   adele
+Re:   Status of 1051
+
+At present (6:00 p.m. Friday June 10) the node has been reloaded, but
+the network is reporting "host down".  I did not ask if the console for
+the 2020 was "beeping" as in trying to resync with the node, as I did not
+feel like trying to talk the operations center through the reboot.  I know
+that is relatively simple but wasn't sure where Darren, etc had left them
+all.
+
+Necessary information that you need to reload the node is in (lois:930)
+nd1051.mem--it also includes pertinent phone numbers.
+
+They should be able to reboot the 2020 with just a BT to the KS10> prompt
+and a carriage return to the BOOT:  prompt.
+
+Let us hope we can get them up and happy on Monday.
+-Lois
+
+- 43 -
+Posted: June 22, 1983 01:23
+To:   adele
+From: WRS:930
+Re:   PAYROL.TYM
+
+By the way, the culprit has been found (and he is me).
+I'll be discussing this with Fred asap.
+-Bill
+
+- 44 -
+Posted: June 22, 1983 14:08
+To:   Adele, Bill, Ken
+From: DWS:930
+Re:   Thanks for being references ...
+
+I'll be starting at Tolerant Systems on July 5.  Initially
+responsible for a network debugger.  More to follow.
+
+- 45 -
+Posted: June 22, 1983 16:28
+To:   darren, matoka
+From: LOIS:930
+Cc:   adele
+Re:   TID field in SCNSER
+
+Dennis Ernst reported that SCNSER has a four bit field for the TID rather
+than the 5 bit field that is needed--result is that field shows 2400 baud,
+which should be 10000, as 0000 which is an aux circuit, and things like
+password which are picky about aux circuits will not work.
+-Lois
+
+- 46 -
+Posted: June 23, 1983 06:57
+To:   adele
+From: WRS:930
+Re:   SYSTAT [3,*]
+
+This seems to no longer work.  Is this a bug in the new SYSTAT?
+-Bill
+
+(if it is, this is an ITSR)
+
+- 47 -
+Posted: June 23, 1983 23:05
+To:   adele, lois, greg, darren
+From: WRS:930
+Re:   P034/L on 39
+
+Now that the hardware has stabalized on 39, I'd like to try /L again.
+I'll keep a close eye on it and make sure it gets backed up if there are
+any problems.  What do you say?  -Bill
+
+- 49 -
+Posted: June 29, 1983 16:46
+To:   adele
+From: CARL:930
+Re:   PERP
+
+
+
+To:    Keith Curtis				CC: Adele Newman
+       INSD.K/CURTIS				    TXS.A/NEWMAN
+
+From:  Carl Baltrunas
+       TXS.C/BALTRUNAS
+
+Re:    PERP JOB problems, MEDQC & NJCL4
+
+--------------------------------------------------------------------
+
+Keith,
+
+    After looking through the PERP logs for the jobs in question,
+all of my research indicates that the reason your customer's PERP
+job would not complete was that the HOST (System 5) broke the
+circuit before the job was finished.  This could have been caused
+by a few different things.  (1) The customer's program broke the
+circuit, (2) the host system broke the circuit by going down, or
+(3) the network broke the circuit.  PERP attempted to re-establish
+the circuit to system 5, but the system was unavailable.  This
+could have been caused by (1) the host system being DOWN, (2) the
+host system out of jobs or ports, or (3) a network problem.
+
+    There is no indication that the customer's PERP file was at
+fault, or that any time limit was reached.  The job should be able
+to be re-submitted and run to completion depending upon the
+schedules of SYSTEM 5 (the execution system) and SYSTEM 8 (the
+PERP controller for non-internal customers).  (SYSTEM 2 is used
+for internal users).
+
+
+					/Carl
+
+
+- 50 -
+Posted: July 1, 1983 03:16
+To:   Lois, Adele, Carl
+From: DARREN:930
+Cc:   Zonnie
+Re:   RANIER
+
+Steve Sundquist will probably call us sometime this morning (Friday).
+Zonnie has the support line, so I appraised him as to the state of
+the problem. Even so, here is a synopsis of the situation.
+  The DEC engineer and I were able to get the system part-way up by
+patching out the line printer (going into DDT and patching NXDLPT
+from 1 to 0).  He may be back in Friday to work on the line printer,
+but maybe not.  We were able to bring the system to the point where
+the operator sets license and runs RELOAD, except that the system
+never comes back from the OPER program.
+  Possible things to try include:  a) using SETE instead of OPER (in
+case the OPER program is broken),  b) trying other commands like
+DIRIT to see whether we might have another disk problem on our hands,
+c) bringing the system up MANUAL, loading the node from the net, then
+trying  a) or  b) or anything else that comes to mind.
+  If the DEC engineer doesn't come back in Friday, they will need to
+have SYSTEM.SAV patched to ignore the line printer (same as above) for
+the time being.
+  If anyone runs out of things to try, call me at home, since I will
+probably need to come in Friday anyway.  G'night now.
+						Darren
+
+- 54 -
+Posted: July 6, 1983 10:39
+To:   Carl
+From: ADELE:930
+Cc:   Adele
+Re:   Tops-20 Stream Scanner Proposal
+
+I took a look at the stream scanner proposal.  It sounds very promising.
+However, I need clarification on a couple of things.
+  1.  Clue me in on the signficance of your reminder (1st paragraph).
+  2.  Do you propose to read raw data into the relations on a routine
+      basis, and keep the MAGNUM relations around for a while?  (That's the
+      way I'm reading it.)
+
+Anyway, what's needed at this point is a more detailed design which gets us
+to the point where the schema and relations can be defined.  I think Vivian
+could work on the templates for the stream record types if she has a clear
+explanation of what she is doing and has supervision.
+
+When we are both in this afternoon, let's talk briefly about what is on your
+stack and how you feel about having this project and product list project
+going simultaneously.
+
+Before we get around to the schema and relations, the design should expand
+to answer the following questions:
+  1.  How will the sections of the scanner interact?
+  2.  How will a user use it?  (To know this, you need to know what kind
+      of information to keep and make available.)
+  3.  Have a rough design of a report generator (probably an interactive one
+      on the order of SCREAM.
+Please be thinking about how long it will take you to get the design worked
+out.
+
+We can assume as an objective for now that we will have a scanning tool with
+a simple report procedure.  This can be built upon.  So we are looking at
+your phases 1-4 for the moment.
+
+- 61 -
+Posted: July 27, 1983 09:07
+To:   TXS
+From: ADELE:930
+Re:   Division meetings
+
+In the future, plan on a division meeting every month - on the fourth
+Thursday of the month.		/Adele
+
+- 65 -
+Posted: August 9, 1983 00:03
+To:   txs
+From: WRS:930
+Re:   New DDT
+
+New DDT in
+    (M33)EDDT
+    (M33)FILDDT
+    (M33)DDT
+    (M33)FRMDDT
+    (SYS)DDT
+    (SYS)FILDDT
+    (SYS)FRMDDT
+
+New features include being callable by a program at CCL entry.
+Also some bug fixes in EDDT allowing it to assemble.  -Bill
+
+- 66 -
+Posted: August 10, 1983 03:50
+To:   txs
+From: WRS:930
+Re:   New MDDT in (M33)
+
+The new MDDT version now on M33 uses the new naming convention of
+F#####.SAV for FILDDT's, where ##### is the numeric part of the
+monitor serial number extracted from M#####.  This eliminates
+confusion with the old scheme when more than one version exists
+with the same name.  Especially prevelent when a system is backed
+up to another hardware and is running a monitor with the same name,
+but with different symbols.  Please note that the new version will
+attempt to create a FILDDT with the proper symbols if none exists.
+This will invaribly fail on pre-/L monitors due to the lack of
+license passing.  I suggest that you create the F#####.SAV file by
+hand when necessary on /K or earlier monitors.  The procedure is
+similar to before:
+    R FILDDT
+    Input file: (SYS)SYSTEM/S
+    Input file: /X
+    SAVE F#####
+Comments and suggestions welcome (as if...)
+-Bill
+
+    - 1 -
+Posted: August 10, 1983 16:42
+To:   darren, wrs
+From: LOIS:930
+Cc:   adele
+Re:   25 rebuild
+
+Dallas rebuilt 25 last weekend from an all files.  The first tape took almost
+an hour at 6250, subsequent tapes took as much as 2 hours each.  Tapes appeared
+to be writing a very small amount at one time.  Any explanation?
+-Lois
+
+- 2 -
+Posted: August 11, 1983 05:53
+To:   Lois
+From: DARREN:930
+Cc:   Bill, Adele
+Re:   D25 rebuild
+
+I have just discovered that D25 has one directory (TYMNET) which contains
+over 13,000 files.  This may have introduced additional overhead when
+performing ENTERs on that directory. /D
+
+- 3 -
+Posted: August 11, 1983 12:50
+To:   wrs
+From: LOIS:930
+Cc:   adele
+Re:   Node numbers > 4000
+
+Bill,
+From what I can learn there are 12 bits allowed for the node number in
+the stream accounting.  However the programs we have that read stream
+accounting (SCAN and SCREAM) allow for node numbers < 4000.  There are
+four nodes with numbers greater than 4000 coming up in Paris in September.
+Do you see any potential problems with stream accounting?  (SPOOL is
+unable to handle these numbers at present).
+-Lois
+
+- 4 -
+Posted: August 11, 1983 17:24
+To:   Lois, Carl, Hiatt, Tsucoop, Zonnie
+From: ADELE:930
+Cc:   Adele
+Re:   OPER names/passwords
+
+I received a message from SRA requesting us to change passwords on the
+following usernames (since none have been changed for a while).
+	LOIS
+	ADELE	(yes... I've also been remiss)
+	CARL
+	HIATT
+	SPOOLRM
+	TSUCOOP
+	ZONNIE
+Please do so, and confirm with me when finished.  I promise I'll change
+mine too.  Please could someone clue me in on use of SPOOLRM.
+
+--Thanks very much, Adele
+
+- 5 -
+Posted: August 12, 1983 12:51
+To:   carl, adele, wrs, darren
+From: LOIS:930
+Re:   Billing10 files on 55
+
+To Adele, Bill, Carl and Darren:
+
+Leonard Ricken of MIS came over to try and trace what happened yesterday.
+On system 55 all files from directory BILLING10 disappeared some time
+between 3 and 5 p.m.  They have had some other mysterious file deletions.
+Any ideas on tracing?  I have read stream accounting for anyone logging
+in as BILLING10 which was not helpful.  All ideas welcom.
+-Lois
+
+- 6 -
+Posted: August 12, 1983 13:12
+To:   adele, mch
+From: LOIS:930
+Re:   PEAK command on COEES machines
+
+FYI Angela called this morning to report that the patch to the monitor which
+inserted the verbs PEAK, PCOM and DCOM had COEES quite upset.  It turned out
+that they have a lot command files that do PERFORM but specify it by PE--and
+they were bombing out with an ambiguous command.  So PEAK was backed out from
+the running monitors on 26 and 29 and the system.sav on those machines and
+36.
+
+- 7 -
+Posted: August 12, 1983 16:43
+To:   wrs, adele
+From: LOIS:930
+Re:   55 BILLING10 files
+
+Our analysis was that an Operator had deleted the BILLING10 files by
+mistake and didn't confess.  Operations evidently came to the same
+conclusion (according to Leonard).
+-Lois
+
+- 8 -
+Posted: August 15, 1983 08:26
+To:   Ken
+From: ADELE:930
+Cc:   Adele
+Re:   PEAK plans
+
+Please put together a quick report on your plans for this week, and get
+them to me this afternoon.  It can be a file on line.       /Thanks, Adele
+
+- 9 -
+Posted: August 15, 1983 15:52
+To:   Ken
+From: ADELE:930
+Cc:   Adele
+Re:   PEAK plans
+
+Thanks for the rundown.  I have a few questions though.  Usually, when I
+say "implement", I mean code & debug (ie. feature is complete).  Do you
+mean that here?  Or do you mean coding?  What about next week's plans --
+are the features to be coded or completed?  (My understanding as of last
+week was that you were still working on the components needed to integrate
+and compile a TOPS-20 version.)
+
+I know we talked last week about what, in total, was left to do.  I should
+have made notes.  Could you include with your report on this week, a summary
+of what is left (ie.  features to code, integration, testing, documentation
+update, etc.).
+
+/Thanks very much, Adele
+
+- 10 -
+Posted: August 15, 1983 23:45
+To:   Lois
+From: WRS:930
+Cc:   wrs, adele
+Re:   BILLING10:55 (your message of 12-Aug-83 16:43)
+
+Yes, that seems plausible to me.  GFD'ing to BILLING10 is part of
+their daily duties, I can see them leaving a terminal in such a state
+and having someone else come up to it.  It's possible the culprit
+doesn't even know who he is.  (I've proven it possible, after all,
+to delete files without knowing it)  Is this the same computer center
+that tried to archive and delete (UFD) because it wasn't in the MUD?
+-Bill
+
+- 11 -
+Posted: August 16, 1983 13:43
+To:   darren
+From: LOIS:930
+Cc:   adele, lois
+Re:   25 problem
+
+Thanks for looking at the 25 crashes.  Jeff Oliveto said you spoke to him
+about the cause.  I did call Tom Marconi and explain what had been
+happening.  This delighted him as Jeff was the one that kept calling
+Tom, very annoyed because 25 kept crashing under him.  One might think
+Jeff might have suspected he was the cause, but that would probably be
+expecting too much.
+
+Probably would have been better if I had known you had called Jeff before
+I called him, but maybe two phone calls made more of an impression.
+-Lois
+
+- 12 -
+Posted: August 17, 1983 10:45
+To:   darren, wrs, matoka
+From: LOIS:930
+Cc:   adele
+Re:   23 error
+
+Pat Knorr from Valley Forge reported that ERRCHK on 23 was again reporting
+sense error 0900 which was being reported before the SA10 problems.  Then
+they were checking sense light 0 for further information, but there is no
+data now.
+
+Does all this mean something to someone?  Any ideas as to why no data this
+time?  They are all very nervous because of the two rebuilds recently on
+23.
+-Lois
+
+- 13 -
+Posted: August 20, 1983 14:38
+To:   Carl
+From: WRS:930
+Cc:   Adele, Wrs
+Re:   ALARM
+
+Carl, please keep me posted on ALARM.  The username was validated about 5
+years ago (maybe 6) by Randy Gobbel for keeping sources to his alarm program.
+I used it a while back (no idea when but could find out) to record who's
+hardwaire lines went where.  I gave up when I found out ISIS lied about
+those things.  
+
+Also, please keep Bob Martinez informed.  
+
+-Bill
+
+  ?S(
