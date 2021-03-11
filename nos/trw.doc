@@ -1,0 +1,149 @@
+                                                                  Page 1 of 3
+
+
+                                     M E M O
+
+     To:                Mike Hinckley
+
+     From:              Adele Gadol
+
+     Copies:            Sherman Gavette
+                        Homer Jamison
+                        TYMCOM-X Section members
+
+     Date:              December 10, 1981  9:29
+
+     Subject:           Trip to TRW of December 3-4
+
+
+             -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+
+
+
+     The visit to TRW dealt with concerns about the 20/20 installation in the
+     areas of network accounting, the TYMCOM-XX monitor and utilities
+     software, and the microbase-11.  I will talk about the issues relating
+     to our section.
+
+     In general, the bad publicity we heard about seems to relate more to
+     lack of follow-through and missed communications rather than to the
+     severity of any one problem (sound familiar?).  Although much was
+     accomplished during the considerable "hands-on" machine time we were
+     allowed, the satisfactory resolution of the remaining items and improved
+     over-all support will be key to retaining their confidence.
+
+     Given the importance of the support issue, it is disappointing to learn
+     that Nathan Gregory does not expect to continue as TRW's contact in the
+     TYMNET support organization.  He is filling that role until someone is
+     found in the Los Angeles area (Nathan's base is in Houston, and he has
+     no plans to relocate) to replace him.  It is unlikely that he will be
+     able to do much filtering of software problems on the 20/20, but at
+     least we and TRW do have a contact.
+
+     There are three major complaints or requests that TRW has in relation to
+     our systems software.  The first of these is that the printer connected
+     directly to the 20/20 has never worked properly.  Secondly, they need
+     more documentation on the programs which are used by them for normal
+     operation and maintenance of the machine.  Third, they want a faster way
+     to do backups.
+
+     We were able to make some progress on the printer problems but were not
+     able to solve them, as the hardware was not functioning.  It appeared to
+     be a problem in the printer interface which must be dealt with by the
+     DEC service people who handle TRW's 20/20.  This is an item for our
+     follow-up when the interface is working.
+
+     I was not able to find documentation on-line for many utilities which
+Trip to TRW of December 3-4                                       Page 2 of 3
+
+
+     are needed for maintenance of the 20/20.  (Blain asked specifically for
+     anything we might have on PIP.)  They did have a System XX Concepts
+     Manual and a YAMM.  I left an additional YAMM and a preliminary copy of
+     EPM's System XX Reference Manual.  Also, the new 20/20 releases of
+     software which I took along contained documentation files.  There is no
+     reason why they should not have copies of the on-line documents found on
+     most of our TYMCOM-X systems in directories such as (sysnews) and
+     (*6news) for the operation related programs which TRW uses.  This would
+     take care of most older programs for which there have been no recent
+     releases.  I can attend to this one.
+
+     Lacking a means to copy disk packs on the 20/20, Blain Anderson of TRW
+     has devised his own scheme using TITO and the incremental dumps to keep
+     two sets of packs reasonably synchronized.  The ASP program is now being
+     distributed as part of the standard 20/20 software, and TRW now has a
+     copy of it with documentation.  This will probably help them out.
+
+     The following list is a summary of issues, major and minor, which
+     require resolution.
+
+        a. Make sure that TRW has a working version of LP20FS (load vertical
+        forms program) ASAP.
+
+        b. Get the 20/20 system printer to work.
+
+        c. TRW wants to know how to make boot tapes; provide that
+        information.
+
+        d. Get support documentation on their systems programs (I have a list
+        of them) moved to the TRW system.
+
+        e. In addition to the two latest 20/20 software updates, I brought a
+        "J60" monitor, and to date, it is running well.  Blain says that he
+        will clean out (sys) and report new crashes, so that OSU can have the
+        opportunity to look at them.  I need to check whether the other
+        software updates have been completely installed and are in use.  (For
+        lack of time, most of these were put in my directory to be moved
+        later.)
+
+        f. Work with software distribution to see that TRW gets their
+        releases in the future.  This has been dropping through the cracks.
+        The fact that TRW's contract calls for machine-readable sources is a
+        large problem, but we can't afford to ignore them altogether.  It is
+        reasonable, in my opinion, to expect that releases to them will occur
+        somewhat later than to other sites due to the extra work involved.
+        In the longer term, the distribution procedure could be automated.
+        Releases for 20/20 systems could be saved together, including
+        sources, as they are archived.
+
+        g. Blain Anderson thinks that the tape drive must be assigned during
+        accounting processing.  He will check to verify if that is really so.
+
+        h. I need to check the progress of the new release of TIO and monitor
+Trip to TRW of December 3-4                                       Page 3 of 3
+
+
+        enhancements to support it.  Someone mentioned that TIO reports a
+        baud rate of 110 for input and output on the 20/20.
+
+     In order to finish this list, some direct contact will probably be
+     necessary.  For other problem reports, TRW will contact Nathan.  In
+     general, direct contact should not be the rule.
+
+     I checked on the protocol for obtaining permission to log on to the TRW
+     20/20.  As I understand it, we have the permission if we have been
+     contacted about a problem.  If not, we should clear the request through
+     their representative, Nathan Gregory (713-870-0913).
+
+     Here are a few other thoughts and asides that I found interesting.
+
+        a. The TRW people seem interested in Tymshare's future plans for the
+        20/20 system . . .
+
+        b. There was some discussion about the fact that they cannot run
+        their two tape drives in parallel; this was once a feature but
+        disappeared with the installation in November, 1980.  Apparently it
+        wasn't intended as a feature, and the additional tape drive was sold
+        to TRW with the understanding that it was a backup.  I lack some of
+        the history of this one.
+
+        c. An important point to remember is that the TRW 20/20 was sold as a
+        network monitor and accounting collection machine and not as a
+        development tool.
+
+        d. I think that a tool such as LPTSPL would be extremely helpful to
+        TRW and to 20/20 sites in general.  However, it is not an "approved"
+        project, and we currently have no commitments to support it.
+
+      
+
