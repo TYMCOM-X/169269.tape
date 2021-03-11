@@ -1,0 +1,156 @@
+19:15:47   6   1   LMN	Loading module COMMON
+19:15:47   4   1   EXP	Expanding low segment to 10K
+19:15:47   1   1   MOV	Moving low segment to expand area LC
+19:15:48   4   1   EXP	Expanding low segment to 13K
+19:15:48   1   1   MOV	Moving low segment to expand area LC
+19:15:48   4   1   EXP	Expanding low segment to 15K
+19:15:48   1   1   MOV	Moving low segment to expand area LC
+19:15:49   1   1   RGS	Rehashing global symbol table from 251 to 509
+19:15:49   4   1   EXP	Expanding low segment to 17K
+19:15:49   1   1   MOV	Moving low segment to expand area LS
+19:15:51   1   1   RGS	Rehashing global symbol table from 509 to 1021
+19:15:52   4   1   EXP	Expanding low segment to 19K
+19:15:53   1   1   MOV	Moving low segment to expand area LS
+19:15:53   4   1   EXP	Expanding low segment to 21K
+19:15:53   6   1   LMN	Loading module COMMOD
+19:15:55   1   1   RGS	Rehashing global symbol table from 1021 to 1531
+19:15:55   4   1   EXP	Expanding low segment to 23K
+19:15:55   4   1   EXP	Expanding low segment to 25K
+19:15:55   1   1   MOV	Moving low segment to expand area LS
+19:15:56   1   1   RGS	Rehashing global symbol table from 1531 to 2557
+19:15:56   4   1   EXP	Expanding low segment to 28K
+19:15:57   4   1   EXP	Expanding low segment to 30K
+19:15:57   1   1   MOV	Moving low segment to expand area LS
+19:15:57   6   1   LMN	Loading module SETETY
+19:15:57   6   1   LMN	Loading module FILUUO
+19:15:57   1   1   MOV	Moving low segment to expand area LC
+19:15:59   4   1   EXP	Expanding low segment to 32K
+19:15:59   1   1   MOV	Moving low segment to expand area LC
+19:16:04   4   1   EXP	Expanding low segment to 34K
+19:16:04   1   1   MOV	Moving low segment to expand area LS
+19:16:06   6   1   LMN	Loading module FILIO
+19:16:06   1   1   MOV	Moving low segment to expand area LC
+19:16:07   6   1   LMN	Loading module FRMSER
+19:16:07   4   1   EXP	Expanding low segment to 36K
+19:16:07   1   1   MOV	Moving low segment to expand area LS
+19:16:08   1   1   MOV	Moving low segment to expand area LC
+19:16:08   4   1   EXP	Expanding low segment to 38K
+19:16:08   1   1   MOV	Moving low segment to expand area LC
+19:16:13   6   1   LMN	Loading module PCBIO
+19:16:14   4   1   EXP	Expanding low segment to 40K
+19:16:14   1   1   MOV	Moving low segment to expand area LS
+19:16:16   6   1   LMN	Loading module SWAMP
+19:16:16   4   1   EXP	Expanding low segment to 42K
+19:16:16   1   1   MOV	Moving low segment to expand area LC
+19:16:18   6   1   LMN	Loading module MAPIO
+19:16:18   4   1   EXP	Expanding low segment to 44K
+19:16:18   1   1   MOV	Moving low segment to expand area LC
+19:16:24   6   1   LMN	Loading module CLUBS
+19:16:24   4   1   EXP	Expanding low segment to 46K
+19:16:24   1   1   MOV	Moving low segment to expand area LC
+19:16:25   6   1   LMN	Loading module FILFND
+19:16:26   1   1   RGS	Rehashing global symbol table from 2557 to 4093
+19:16:26   4   1   EXP	Expanding low segment to 51K
+19:16:27   4   1   EXP	Expanding low segment to 53K
+19:16:27   1   1   MOV	Moving low segment to expand area LS
+19:16:28   6   1   LMN	Loading module FILRIB
+19:16:28   1   1   MOV	Moving low segment to expand area LC
+19:16:30   6   1   LMN	Loading module APXKON
+19:16:31   6   1   LMN	Loading module F3TSER
+19:16:31   4   1   EXP	Expanding low segment to 55K
+19:16:31   1   1   MOV	Moving low segment to expand area LC
+19:16:36   4   1   EXP	Expanding low segment to 71K
+19:16:36   1   1   MOV	Moving low segment to expand area LC
+19:16:38   6   1   LMN	Loading module CLOCK1
+19:16:44   4   1   EXP	Expanding low segment to 73K
+19:16:44   1   1   MOV	Moving low segment to expand area LS
+19:16:48   6   1   LMN	Loading module COMCON
+19:16:48   1   1   MOV	Moving low segment to expand area LC
+19:16:52   4   1   EXP	Expanding low segment to 75K
+19:16:52   1   1   MOV	Moving low segment to expand area LC
+19:17:07   4   1   EXP	Expanding low segment to 77K
+19:17:07   1   1   MOV	Moving low segment to expand area LS
+19:17:08   6   1   LMN	Loading module CORE1
+19:17:08   1   1   MOV	Moving low segment to expand area LC
+19:17:09   4   1   EXP	Expanding low segment to 79K
+19:17:09   1   1   MOV	Moving low segment to expand area LC
+19:17:11   4   1   EXP	Expanding low segment to 81K
+19:17:11   1   1   MOV	Moving low segment to expand area LC
+19:17:14   4   1   EXP	Expanding low segment to 83K
+19:17:14   1   1   MOV	Moving low segment to expand area LS
+19:17:16   6   1   LMN	Loading module ERRCON
+19:17:16   1   1   MOV	Moving low segment to expand area LC
+19:17:18   6   1   LMN	Loading module JOBDAT
+19:17:19   4   1   EXP	Expanding low segment to 85K
+19:17:19   1   1   MOV	Moving low segment to expand area LS
+19:17:19   6   1   LMN	Loading module ACTSER
+19:17:19   1   1   MOV	Moving low segment to expand area LC
+19:17:21   4   1   EXP	Expanding low segment to 87K
+19:17:21   1   1   MOV	Moving low segment to expand area DY
+19:17:22   6   1   LMN	Loading module .MAIN
+19:17:23   6   1   LMN	Loading module PICON
+19:17:25   4   1   EXP	Expanding low segment to 89K
+19:17:25   1   1   MOV	Moving low segment to expand area LS
+19:17:27   6   1   LMN	Loading module SCHED1
+19:17:27   1   1   MOV	Moving low segment to expand area LC
+19:17:28   4   1   EXP	Expanding low segment to 91K
+19:17:28   1   1   MOV	Moving low segment to expand area LC
+19:17:30   1   1   MOV	Moving low segment to expand area LS
+19:17:31   4   1   EXP	Expanding low segment to 93K
+19:17:32   6   1   LMN	Loading module SCNSER
+19:17:32   1   1   MOV	Moving low segment to expand area LC
+19:17:33   4   1   EXP	Expanding low segment to 95K
+19:17:33   1   1   MOV	Moving low segment to expand area LC
+19:17:35   1   1   MOV	Moving low segment to expand area LC
+19:17:35   4   1   EXP	Expanding low segment to 97K
+19:17:35   1   1   MOV	Moving low segment to expand area LC
+19:17:36   1   1   MOV	Moving low segment to expand area LC
+19:17:37   4   1   EXP	Expanding low segment to 99K
+19:17:37   1   1   MOV	Moving low segment to expand area LC
+19:17:38   4   1   EXP	Expanding low segment to 101K
+19:17:38   1   1   MOV	Moving low segment to expand area LS
+19:17:39   1   1   MOV	Moving low segment to expand area LS
+19:17:39   4   1   EXP	Expanding low segment to 103K
+19:17:39   1   1   MOV	Moving low segment to expand area LS
+19:17:41   6   1   LMN	Loading module CIOPR
+19:17:41   6   1   LMN	Loading module CTYSIM
+19:17:41   4   1   EXP	Expanding low segment to 105K
+19:17:41   1   1   MOV	Moving low segment to expand area LC
+19:17:42   6   1   LMN	Loading module SEGCON
+19:17:42   4   1   EXP	Expanding low segment to 107K
+19:17:42   1   1   MOV	Moving low segment to expand area LC
+19:17:45   6   1   LMN	Loading module TMPUUO
+19:17:45   6   1   LMN	Loading module SIMIO
+19:17:45   1   1   MOV	Moving low segment to expand area LS
+19:17:46   6   1   LMN	Loading module IOCSS
+19:17:46   4   1   EXP	Expanding low segment to 109K
+19:17:46   1   1   MOV	Moving low segment to expand area LC
+19:17:47   1   1   MOV	Moving low segment to expand area LC
+19:17:48   4   1   EXP	Expanding low segment to 111K
+19:17:48   1   1   MOV	Moving low segment to expand area LC
+19:17:50   1   1   MOV	Moving low segment to expand area LS
+19:17:51   6   1   LMN	Loading module UUOCON
+19:17:52   4   1   EXP	Expanding low segment to 113K
+19:17:52   1   1   MOV	Moving low segment to expand area LC
+19:17:52   1   1   MOV	Moving low segment to expand area LC
+19:17:54   4   1   EXP	Expanding low segment to 115K
+19:17:54   1   1   MOV	Moving low segment to expand area LS
+19:17:56   6   1   LMN	Loading module PATCH
+19:17:56   6   1   LMN	Loading module DEBUG
+19:17:56   4   1   EXP	Expanding low segment to 117K
+19:17:56   1   1   MOV	Moving low segment to expand area LC
+19:17:57   6   1   LMN	Loading module EDDT
+19:17:57   4   1   EXP	Expanding low segment to 119K
+19:17:57   1   1   MOV	Moving low segment to expand area LC
+19:17:58   1   1   MOV	Moving low segment to expand area LC
+19:17:59   4   1   EXP	Expanding low segment to 121K
+19:17:59   1   1   MOV	Moving low segment to expand area LC
+19:17:59   1   1   MOV	Moving low segment to expand area LC
+19:18:00   4   1   EXP	Expanding low segment to 123K
+19:18:00   1   1   MOV	Moving low segment to expand area LC
+19:18:02   6   1   LMN	Loading module ONCE
+19:18:04   4   1   EXP	Expanding low segment to 125K
+19:18:04   1   1   MOV	Moving low segment to expand area LC
+19:18:07   4   1   EXP	Expanding low segment to 127K
+19:18:07   1   1   MOV	Moving low segment to expand area LS
+ 
