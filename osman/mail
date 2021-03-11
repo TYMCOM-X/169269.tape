@@ -1,0 +1,650 @@
+From: <OSMAN@930.Tymnet>
+Date: Tue, 24 Jul 84 15:10:56 PDT
+To: OSMAN
+Subject: TESTING
+
+
+TESTING.
+From: <CARL@930.Tymnet>
+Date: Wed, 25 Jul 84 0:51:44 PDT
+To: osman
+Subject: Schedule
+
+Hi!
+  What happenned with Ranier Bank?  (if nothing, then I'll talk to
+you about it later....)
+  I expect to be in and out, working mostly from home tomorrow, maybe
+Thursday too.  Send me mail, or try to call me. If I'm not home, it's
+because I'm looking at carpet or talking to the people about my house.
+
+/Carl
+
+Home # is 415-961-1082.
+
+Goodnight!
+From: <CARL@930.Tymnet>
+Date: Wed, 25 Jul 84 9:41:17 PDT
+To: fletcherc,sppoper,osman
+Subject: SOURCES!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I found them, or some facsimile... will tell you all later after I've
+had time to check them out.  They were with some old transmittals from
+1975/1976 era.
+/Carl
+From: <FLETCHERC@930.Tymnet>
+Date: Wed, 25 Jul 84 14:00:15 PDT
+To: osman
+Subject: answering service
+
+Could you find the address and phone number of the ans
+
+wering service anywhere in Lois's files?  and a contact name
+
+I need to send a letter to them.
+
+		Craig
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 22:43:37 PDT
+To: osman
+Subject: Well,... at work
+
+I'm getting a couple of things done.... like finding documentation on
+CARMEL, so that I can get the work I need to finish on LIB40 done
+so that I can give it to COEES.
+  (That is what I'm supposed to be working on...)
+/Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 22:52:39 PDT
+To: osman
+Subject: Is it soup yet?
+
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 22:59:56 PDT
+To: osman
+Subject: Schedule
+
+My shedule will depend a lot on how long it takes me to get LIB40 squared
+away for COEES.  After that is done, it looks like someone, (me?) will
+have to look through the previous transmittals of LIB40, and the sources
+that I've found, and basically make sure that we can at least re-build
+the LIB40 we have, or as much as is possible.
+
+I'd show it to you, but at this stage, until you transmit something or
+see enough "correct" transmittals, looking through "bad" transmittals
+for information will only confuse you more...
+
+I was really tired this afternoon, so I slept after I got home until 8:00
+tonight, so I don't expect to get to sleep early.  So, don't expect me tp
+be in the office till afternoon, 2ish... /Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 23:07:22 PDT
+To: osman
+Subject: PHONES is in (M33)PHONES
+
+Type "WHERE" and it should tell you from inside the INFO program.
+From: <CARL@930.Tymnet>
+Date: Fri, 27 Jul 84 12:30:46 PDT
+To: osman
+Subject: where?  Bldg C.   FIne.  see you later.
+
+From: <CARL@930.Tymnet>
+Date: Sun, 29 Jul 84 19:06:30 PDT
+To: osman
+Subject: ..SOUP..
+
+Hmmmm.  It sounds like it's still coming along, so I will keep
+my fingers out of your broth until we get to talk about the
+ingredients again.
+
+I'm still working on the LIB40 transmittal.  CARMEL lets me "replace"
+a module with a revision, but there is no way to "extract" a module
+an make sure that I have a matching source.  So, my 1/2 hour is turning
+into 1/2 hr of code/replacement, but 3-4 days of tracing/rebuilding
+the history of LIB40 at Tymshare.   * Sigh *
+
+PS:  I've been logged in, but I was so tired from my morning workout
+    that I've been asleep.  Just got up...  If you have any questions
+    in particular, send mail, and I will try and look at it.
+
+-Carl
+From: <CARL@930.Tymnet>
+Date: Sun, 29 Jul 84 20:52:10 PDT
+To: osman
+Subject: Olympics!
+
+Well, now that I'm awake, I am watching them from time to time...
+...just came back up to see what you were sending me last time I
+looked...  See you tomorrow.   /Carl
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Tue, 31 Jul 84 1:04:02 UT
+From: TXS.C/BALTRUNAS@Ontyme.Tymnet
+Date: 30 JUL 84 17:02:46  
+To: TXS.O/GUVEN@Ontyme.Tymnet
+Message-id: A00300@EMSTXS.Ontyme.Tymnet
+Subject: TYMCOM-X operating system release P034/N - procedure changes Release P034/N of the TYMCOM-X operating system
+
+From: <CARL@930.Tymnet>
+Date: Mon, 30 Jul 84 17:01:29 PDT
+To: tcms.wco@ontyme,tcms.eco@ontyme,tcms.b/fairchild@ontyme,tcms.l/yarbrough@ontyme,tcms.e/barens@ontyme,tcms.t/marconi@ontyme,tcms.m/muratore@ontyme,tcms.s/metcalf@ontyme,tcms.r/daniels@ontyme,txs.c/baltrunas@ontyme,txs.o/guven@ontyme,txs.c/fletcher@ontyme,txs.j/mosser@ontyme
+Cc: carl
+Subject: TYMCOM-X operating system release P034/N - procedure changes
+
+    Date:    19-Jul-84
+
+    To:      All Tymshare Data Center Managers
+
+    Copies:  Software Distribution
+             Craig Fletcher, Manager TYMCOM-X Operating Systems
+             Robert Klute, INSG TYMCOM-X marketing support
+
+    From:    Carl Baltrunas, TYMCOM-X Operating Systems
+             Ontyme:[AA] (TXS.C/BALTRUNAS)
+
+    Subject: Release P034/N of the TYMCOM-X operating system
+
+------------------------------------------------------------------------
+
+    The current release of TYMCOM-X, version P034/N has been sent to
+    the software distribution department to be installed on all Tymshare
+    PDP-10s and customer DEC-2020s.
+
+    The P034/N release of TYMCOM-X contains several changes which may
+    affect current operational procedures.  The changes are minor in
+    nature and affect functions which are NOT performed on a regular
+    basis.  These procedures are as follows:
+
+        A.  Defining (re-building) a structure.
+        B.  Changing a system number.
+        C.  Bringing the system up on the console terminal.
+        D.  Diagnosing system startup errors.
+
+
+    The attached document, OPER.MEM, contains a detailed explanation of
+    the changes and how they may affect current procedures.  A detailed
+    list of other changes should be available from software distribution
+    as included with the release announcement which they send out with
+    each new software release.
+
+    If you have any questions, please send an ONTYME to me at the above
+    mailbox address.  Thank you.
+OPER.MEM							Page  1
+Operational changes for TYMCOM-X release P034/N
+
+
+    The P034/N release of TYMCOM-X contains several changes which may
+  affect current operational procedures.  The changes are as follows:
+
+    A.  Defining a structure.
+	All references to swapping space has been removed.
+
+	1.  There is no active swapping list.
+	2.  The TYPE and CHANGE SWAP commands have been removed.
+	3.  The question "PAGES FOR SWAPPING ON UNIT" has been removed.
+	4.  All messages about units in swapping list and units having
+	    swapping space have been removed.
+
+    B.  Changing a system number.
+	Hosts connected PDP-11 or micro-net bases are no longer
+	restricted to system numbers between 1 and 255.  The system
+	number may be set to any number between 1 and 99999 on any
+	KS-10 (DEC-2020 or Tymshare SYSTEM-XX), Foonly F3 (SYSTEM XXV)
+	or Foonly F4 (SYSTEM XXVI or XXVI-KL).
+
+	Note: Hosts connected to VARIAN bases (KI-10 and KL-10) are
+	still restricted to system numbers between 1 and 255.
+
+    C.  Bringing the system up on the console terminal.
+	The function of the CONSOLE command has been modified to allow
+	the system to be brought up on the console terminal in ANY mode.
+	This command sets a flag which tells the system to ignore the
+	network and the base and to ONLY talk to the console terminal.
+	When the CONSOLE command is given, the system responds with:
+
+	  Console selected.
+	  Please type GO, FULL, MANUAL or READONLY to bring up the system.
+
+	Previously, the CONSOLE command brought the system up on the
+	console terminal in MANUAL mode only.
+
+    D.  New "NETWORK" command added.
+	This is the default.  After the CONSOLE command is given, the
+	system will come up using only the console terminal.  If it is
+	desired to use the network instead of the console, this command
+	must be given before typing GO, FULL, MANUAL or READONLY.  When
+	the NETWORK command is given, the system responds with:
+
+	  Network selected.
+	  Please type GO, FULL, MANUAL or READONLY to bring up the system.
+
+    E.  Various messages have been changed in ONCE and INITIA in order
+        to make it easier to diagnose startup problems. 
+
+        As an aid in updating documentation, the following help messages
+        have been copied verbatim from the monitor sources.  Please see
+        that your staff understands the wording of each text and that
+        the procedures and documents using portions of these messages
+        are updated to reflect the changes.
+
+OPER.MEM							Page  2
+Operational changes for TYMCOM-X release P034/N
+
+
+ONCE DIALOG:
+    ONCE> HELP
+
+    TYPE     Report information about the system.
+             TYPE CORE   - the default minimum core available to users.
+             TYPE SYSTEM - reports the system number.
+
+    CHANGE   Change information about the system.
+             CHANGE CORE   - changes the default minimum user core.
+             CHANGE SYSTEM - changes the system number.
+
+    FULL     Bring up the system with a FULL DSKCLN.  If there is any
+             question about the integrity of the file system, then this
+             command should be used in place of GO.  Unleshorized,
+             DO NOT enter the FILES dialogue to set the DSKCLN type.
+
+    GO       Bring up the system with the default settings and start
+             the auto-restart process.
+
+    FILES    Enter the FILES dialogue.  This is the subsystem of ONCE
+             which is normally used ONLY for restructuring or repairing
+             the disk file system.  The commands in this subsystem could
+             damage the file system if they are used incorrectly.  If you
+             are NOT sure of what you are doing, DO NOT enter this section.
+
+    READONLY Bring up the system SHUT for emergency examination.
+             Writing on the disk is prevented until DSKCLN has been run.
+             Note: You may not UNSHUT the system until DSKCLN has been run.
+
+    CONSOLE  Allow the system to be brought up on the CONSOLE terminal ONLY.
+             The system MUST be reloaded before it can be brought up on the
+             network.  This command should be followed by a command to bring
+             up the system (one of: GO, FULL, MANUAL or READONLY).
+
+    NETWORK  Allow the system to be brought up on the NETWORK (default).
+             This allows normal access to the system and overrides any
+             previous CONSOLE or NETWORK commands.  This command should be
+             followed by a command to bring up the system. (see CONSOLE.)
+
+    DDT      Enter executive DDT.  To be used ONLY by software wizards
+             for emergency patching and examination of the monitor.
+             UNDER NO CIRCUMSTANCES SHOULD YOU NORMALLY USE THIS COMMAND!
+
+    MANUAL   Bring up the system in the SHUT state for DEBUGGING ONLY!
+             The auto-restart process is not performed.
+             Note: You may not UNSHUT the system until DSKCLN has been run.
+
+    BOOTS    Crash the system with "BOOTS LOADED" immediately.
+
+For KS-10 only:
+    KMC      Bring the system up loading the KMC-11 but without the
+             rest of the automatic restart procedure.  This must NEVER
+             be used for a restart after a system CRASH.  ONLY to be
+             used when the system has been taken down gracefully and
+             DSKCLN has already been run.
+
+OPER.MEM							Page  3
+Operational changes for TYMCOM-X release P034/N
+
+
+ONCE DIALOG:
+    ONCE> HELP TYPE
+
+    TYPE CORE   - Type the default minimum core available to users.
+    TYPE SYSTEM - Type the system number.
+    TYPE HELP   - Type out this message.
+
+
+ONCE DIALOG:
+    ONCE> HELP TYPE
+
+    CHANGE CORE   - Change the default minimum core available to users.
+    CHANGE SYSTEM - Change the system number.  (This should ONLY be
+                    done when bringing up a system on hardware other
+                    than what it was originally built for).
+    CHANGE HELP   - Type out this message.
+
+
+FILES DIALOG:
+    FILES* HELP
+
+    DSKCLN  Query or Select DSKCLN mode.
+            List the current mode and allow the operator to change it.
+
+    TYPE    List information about the structure.
+            Type "TYPE HELP" for a list of options.
+
+    CHANGE  Change information about the structure.
+            Type "CHANGE HELP" for a list of options.
+
+    ADD     Add a unit to the structure.
+            Reconfigure the disk structure and add another pack.
+
+    DISOLVE Disolve the structure.
+            Remove all units from the system structure.
+
+    DEFINE  Define a NEW structure.
+            Create a completely new system structure.
+
+    REFRESH Refresh the structure.
+            Erase the current file system and start over
+            with a "FRESH" disk.
+
+    GO      Leave the FILES dialogue and return to the ONCE
+            dialogue.
+
+    HELP    Type this message.
+
+OPER.MEM							Page  4
+Operational changes for TYMCOM-X release P034/N
+
+
+FILES DIALOG:
+    FILES* HELP TYPE
+
+    STR     Name of the STRUCTURE and UNITS on it.
+    UNITS   Names of all units NOT in a file structure.
+    BAT     Number of BAD pages and regions for a unit.
+    SATPCBS Number of SAT PCBs.
+    RIBPCBS Number of RIB PCBs.
+    ALL     All of the above.
+    str-name  Type information about the structure.
+    unit-name Type information about the unit.
+    HELP    Type this message.
+
+
+FILES DIALOG:
+    FILES* HELP CHANGE
+
+    SATPCBS   Change the number of SAT PCBs.
+    RIBPCBS   Change the number of RIB PCBs.
+    BAT       Refresh the BAT pages for a UNIT.
+    str-name  Change parameters for the structure
+    unit-name Change parameters for a unit.
+    HELP      Type this message.
+
+
+FILES DIALOGUE:
+    Type "TYPE str-name HELP" for a list of options.        (or)
+    Type "CHANGE str-name HELP" for a list of options.
+
+    FILES* TYPE str-name HELP
+
+    ... OVERDRAW  The number of pages for overdraw.
+    ... CRASH     The number of pages for CRASH.SAV.
+    ... ALL       All of the ABOVE.
+  
+
+
+
+
+
+
+
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 1:16:58 PDT
+To: osman,fletcherc
+Cc: sppoper,wilkes,  carl
+Subject: TRULIM/FORSE sources to match (SYS:26)LIB40.REL
+
+Well,
+  After a week of scrounging, with little or no "luck", I found a
+source file which generated a binary .REL file the same size as the
+one included in LIB40.REL on system 26.  In a stroke of luck, it was
+found that although it didn't match, the only difference was the
+version number in module FORSE.  I changed the version, re-assembled
+it, and VOILA!!!!  FORSE.MAC which generates the proper .REL file!
+
+  A similar comparison shows that no changes were made to TRAPS.REL
+(which contains TRULIM) and the ancient source that I found is still
+valid.
+
+  One last note:  System 26 has a different LIB40 than that of most
+                  of the rest of the world, so I still need to perform
+                  a cursory set of tests on system 26 before we give
+		  it to COEES for testing.
+
+  Delay!  System 26 has been down from 11pm til 5am for the past two
+          days, so the testing will have to wait until this afternoon.
+
+
+PS:  Jon, feel free to contact Angela and tell her she will have a new
+     FTLIB40.REL for COEES to test by tomorrow (Thursday) morning at
+     the very latest.  If all goes well in my testing, sooner. I will
+     try to call her sometime Wednesday afternoon.
+
+/Carl
+
+---------------------------------------------------------------------
+
+If it pases their tests, I will have to build them a separate version
+to use on their production systems.
+
+---------------------------------------------------------------------
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 14:02:16 PDT
+To: osman
+Subject: My schedule
+
+Osman,
+  I may be by the office a little later, but for now, I'm planning
+on working at home for most of the day.  If you need anything at all
+then call me at home, 415-961-1082.   /Carl
+From: <FLETCHERC@930.Tymnet>
+Date: Wed, 1 Aug 84 15:23:08 PDT
+To: osman
+Subject: results
+
+
+
+Results of 31 July monitor meeting in (fletcherc)31jul4.mem
+
+	Craig
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 15:57:02 PDT
+To: osman,sppoper,fletcherc
+Subject: TRU limit code
+
+I've just completed my testing and installed the new LIB40 on system 26
+for COEES to test.  I've sent mail to Angela (rather than a phone call
+since it is well after 6pm east-coast time) on system 26 relating the
+current status.
+
+Notes on general release of the TRU interrupt code for the rest of the
+world....
+
+  1.  F40 - LIB40 on other systems than 26 still need to track down
+            proper source files via "trial and error" before a general
+            release can be properly made.
+  2. P034/P will be the first general release of the monitor to support
+            the TRU interrupt, scheduled for October release.
+  3. YAMM - Documentation release, also due in October will include TRU
+            limit and interrupt descriptions as well as any other changes
+            made for P034/P.
+
+-------------------------------------------------------------------------
+From: <FLETCHERC@930.Tymnet>
+Date: Thu, 2 Aug 84 10:12:51 PDT
+To: osman
+Subject: system 37
+
+
+I see that system 37 is working properly now, and learned from Jon Mosser
+that CE's had it last night.  The remaining loose end, for our
+problem casebook, is.... just what was fixed so we can have an idea
+what failure would cause the problems we saw.
+Will you follow up with the ce's to find out what was fixed.
+
+		Craig
+From: <OSMAN@930.Tymnet>
+Date: Thu, 2 Aug 84 10:19:29 PDT
+To: osman,carl
+Subject: test.
+
+test.
+From: <OSMAN@930.Tymnet>
+Date: Thu, 2 Aug 84 10:36:47 PDT
+To: Fletcherc,Sppoper,Carl,Osman
+Subject: D37's Problem..
+
+
+	I just talked with some one from Operation and Maintenence in Dallas
+about the yesterday's problem with D37. They told me that it  was a solid CPU
+problem. Since they were going to move the D37 software to a KL this week end,
+last night they went ahead and moved D37 to KL,  so as of today D37 is running
+on KL health and happy...
+
+Osman..
+
+From: <FLETCHERC@930.Tymnet>
+Date: Thu, 2 Aug 84 11:34:20 PDT
+To: osman
+Subject: d37's problem
+
+
+Could you find out details of the cpu problem experienced yesteerday when
+d37 was on the ki?
+
+	Craig
+From: <OSMAN@930.Tymnet>
+Date: Thu, 2 Aug 84 12:30:51 PDT
+To: Fletcher,Carl,Osman
+Subject: CPU on D37's KI
+
+
+	When T/M ran CPU diagnostics, it failed with :
+
+	Diagnostic= DBKAE
+	Failure   = MOVN & MOVM Instructions.
+
+Osman..
+
+
+From: Postmaster
+Date: Thu, 2 Aug 84 12:30:53 PDT
+To: <OSMAN@930.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+Invalid address(s):
+<Fletcher>
+
+
+----------
+RCPT To: <Fletcher>
+From: <OSMAN@930.Tymnet>
+Date: Thu, 2 Aug 84 12:30:51 PDT
+To: Fletcher,Carl,Osman
+Subject: CPU on D37's KI
+
+
+	When T/M ran CPU diagnostics, it failed with :
+
+	Diagnostic= DBKAE
+	Failure   = MOVN & MOVM Instructions.
+
+Osman..
+
+
+From: <CARL@930.Tymnet>
+Date: Thu, 2 Aug 84 21:44:24 PDT
+To: osman
+Subject: Dave Miller? ? ???
+
+Call me immediately, 415-961-1082 !!!!!!!!!!!!!!!!!!!!!!!
+/Carl
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 3 Aug 84 13:00:50 UT
+From: THS.ROD@Ontyme.Tymnet
+Date: 03 AUG 84 05:32:55  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E23139@EMSEE.Ontyme.Tymnet
+
+HI OSMAN
+
+I TALKED TO BILL &WE ARE GOING TO PEPE'S TODAYAT 1:15 P.M.
+
+BE THERE !!!!!!!
+
+
+
+
+
+
+
+
+
+
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 3 Aug 84 14:00:53 UT
+From: THS.RICHB@Ontyme.Tymnet
+Date: 03 AUG 84 06:42:32  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E23193@EMSEE.Ontyme.Tymnet
+
+GOOF, WE GO TO PEPES TODAY.U CALL ME AT 12:15 IN CASE I SLEEPING.
+OK? WE HAVE BURRITOS AND ENCHILADAS AND MARGUERITAS AND
+ALL KINDS OF STUFF! WHAT U TINK OF DAT? MAYBE 3 PITCHERS OF
+MARGUERITAS!!!! MAYBE SOME SALSA ! I GO HOME NOW.
+
+SLEEPY.
+
+
+
+
+
+
+
+
+From: <FLETCHERC@930.Tymnet>
+Date: Fri, 3 Aug 84 15:22:19 PDT
+To: osman
+Subject: datacenter list
+
+Where does the list of data center contacts come from that you
+have posted on your wall.  I neet a few copies.
+
+	Craig
+From: <CARL@930.Tymnet>
+Date: Mon, 6 Aug 84 13:13:26 PDT
+To: osman
+Subject: system 26, mysterious hotline call
+
+Osman,
+  I talked to Angela, everything is straightened out.
+
+  The hotline call yesterday was from Angela.  (She said, about 10am
+our time???) I noticed it at 5pm our time and called CUPC opertions and
+they didn't know anything about a hotline call.  Odd, because Angela
+was working with CUPC operations until 7pm our time trying to back-off
+the COEES software...
+
+  C26 /L21 is runing because the system crashed and many of the RPA
+appeared to be hung and the system would not load from disk.  So, they
+reloaded from tape on /L21.  Angela is going to call them to schedule
+a system reload for /N04 later tonight.
+
+  I'm going to work at home and/or run some errands today.  Call me or
+send me mail if you need/want anything.
+
+  Also, as far as the monitors for Dallas, we can link together and you
+can watch & log what needs to be done.  Let me know when.... /Carl
+From: <CARL@930.Tymnet>
+Date: Mon, 6 Aug 84 23:00:16 PDT
+To: osman
+Subject: Lois's old office
+
+Yes, I guess we need to do something....  I may obscond with Lois's
+other lateral file, or so... I've got all that stuff I've moved into
+my office to take care of.  Sigh.  Since they're not taking any of
+her furniture to Fremont.
+
+There is the other possibility, calling and talking with Jon Mosser
+and maybe just moving the stuff downstairs somewhere is possible.  I'd
+like to have the stuff nearby... REALLY!  And since we're still here,
+I'd like to keep it in the building somewhere. (Even if we have to move
+it ourselves... which we can do with the aid of a hand-truck!!!!)
+
+
+I'll be in around 11ish and we can talk about it..  I've dropped off
+the other fiche reader. ...
+   ,&=”
