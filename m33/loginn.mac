@@ -1,0 +1,2476 @@
+tymspc==67	;major release no.
+tymrel==3	;bugfix no.
+jobver==137
+
+define titl(ts,tr)<
+title loginn version ts'.'tr
+vcompil=<ts,,tr>>
+
+titl(\tymspc,\tymrel)
+
+subttl for p030 & later. wfw/ag/aaa
+
+if2 <printx	lic needed: op sy st hf jl rf>
+if2 <printx	see/update (m33:930)loginn.inf history of this program>
+
+loc jobver
+exp vcompile
+	reloc
+
+	twoseg
+	reloc 400000
+
+define lvar<
+	reloc
+	var
+	reloc
+>
+
+
+
+;parameters from commod.mac
+
+ribppn==1
+ribnam==2
+ribext==3
+ribprv==4
+ribsiz==5
+ribalc==11
+ribqtf==22
+ribqto==23
+ribqtr==24
+ribusd==25
+ribaut==26
+ribunm==27
+ribsts==17
+  ripbda==1
+  ripcrh==4
+  ripbfa==10
+  riphre==100
+  riphwe==200
+  ripbdr=2000
+  riplog==400000
+  ripdir==400000
+
+devnam==0
+prv.rd==4	; rd protection code
+
+;end of parameters from commod.mac
+
+intern vcompil,jobver,p,calc,t1,t2,t3
+
+deb==0		;debug switch: 0 production, 1 debug
+
+oprgan==1	; gan for operators
+sysgan==3	;gan for system development users
+sysres==3	;number of jobs to reserve for sys dev.
+
+;-	external getfct,append,appver		;-needed
+
+;ac assignments
+
+f=0	;flags
+a=1	;4 acs for lookups and general work
+t1=a
+b=2
+t2=b
+c=3
+t3=c	;for append
+d=4
+
+t=5	;temp
+e==t	;for ufdset
+calc=6	;for accounting
+r=7	;for radix print
+m=10	;message addresses
+bp=11	;byte pointer
+pp=12	;project programmer pair
+n=13	;numbers in or out
+n1=14	;n+1 for radix print
+ch=15	;characters
+wd=16	;words
+p=17	;pushdown pointer
+
+;io channels
+
+ufd==2	;for disk io
+usr==3	;for checking user files
+us1==4	;these two used by ufdset
+msg==5  ;for access.msg (wrs)
+pasio==7;for password checking
+;-fct==6	;for the fact file	;not needed
+
+mlon	;for macro
+
+extern jobff,jobrel,jobsa	;in jobdat
+;flags - lh of f
+
+fl.sts==1		;user has status (! before name) shut override
+  s.shov==1	;shut override set flag in stmdat+5
+fl.npt==2		;do not prompt for proj code (; in input)
+l.pend==4		;on for not a new structure
+f.dett==10		;there are detached jobs
+f.bcast==20		;broadcast letter(s) waiting
+f.mor==40		;more job slots available
+fl.rst==100	;system is restricted
+fl.fuf==200	;this is the first ufd processed
+f.det2==400	;in attach code used to distinguish 1 from
+		;more than 1 available job to attach to.
+f.gem==1000	;in lokmal, tells where to look for mail
+		;in case user is gemode (japan)
+f.ejob==2000	;a job exists already under this aun
+f.onej==4000	;lud says he can have only one job logged
+		;in at a time.
+f.nopjc==10000	;LUD said not to ask this user for a proj code
+fl.pass==20000	;do not prompt for password(ks)
+f.half==40000	;half duplex flag
+
+comment ! fl.fuf used in ufdset to cause "tru limit exceeded"
+to come out on return in fs1 from ufdset. most routines in ufdset
+tlz fl,fl.fuf if they are sreturning; or if they freturn,
+they have already printed some message.    
+!
+
+uptim==15	;a gettab argument
+nswtbl==12	;and another
+
+hiblin==20	;argument to hibernate for break chr
+ufd5==1		;indicates 5 word ufds
+
+timcas==4	;reasone for timer interupt
+
+datitm==11	;item for date
+dattab==11	;table for date
+timitm==10	;item for time
+timtab==11	;table for time
+alritm==36	;item for alarm cell
+alrtab==12	;table for alarm cell
+
+suudat==4	;setuuo code for date
+suutim==3	;setuuo code for time
+suuopr==5	;setuuo code for opr
+suumsg==0	;setuuo code to type cty/opr tty msg
+
+almcty==400	;alarm bit for cty msg
+almrmt==200	;alarm bit for rps
+opritm==13
+oprtab==11	;item and table for name of device opr
+jfyitm==26	;item and table for jiffies/sec
+jfymin==27	;item # for jiffy/min
+jfytab==11
+;ascii characters
+
+cntrlc==3	;control c
+cntrlg==7	;control g (bell)
+nulchr==0	;null
+escchr==33	;escape
+lf==12		;line feed
+vt==13		;vertical tab
+ff==14		;form feed
+cr==15		;carriage return
+altmod==33	;standard altmode
+nonull==4	;number of null characters for spacing
+
+.fsdsl==1	;function to define search list
+
+opdef pjrst [jrst]
+opdef putsar [calli -62]	;-put stream acct'g record
+opdef chpjc  [calli -61]	;-change project code
+opdef setrcf	[calli -57]	;-set restr cmd file
+;definitions of words in the lud
+
+lppn==0		;ppn for user
+laun==0		;aun for user
+lbits==2	;bits (run bit, watch bits, etc)
+ lcspb==400	;bit indicates a cusp to run is present
+ ltrub==(1b4)	;tru budget present bit
+ lnoatt==(1b5)	;no attach in loginn even if job exists
+ lfrcat==(1b6)	;forced attach..cannot create new job
+ lonejb==(1b7)	;allow only 1 job on system at a time, this aun
+ lnopjc==(1b8)	;dont ask for project code
+ lovrid==1b19	;shut override bit in LUD ,right half
+llink==2	;has size of entry in right 7 bits
+lprv==3		;prv bits
+  rescmd==1000	;-restr. command mode if on.
+lhun==4		;hased user name
+ltru==5		;tru budget word
+lcsn==5		;cusp to run (if present)
+lcsu==6	;user name of cusp to run (0=this user)
+lcsu1==7		;second half of user name
+
+lfsnam==5	;file structure in reference to file structure information
+lfsbts==5	;satus bits
+lfsqin==6	;logged in quota
+lfsqot==7	;logged out quota
+
+llet1==1000		;send broadcast letter 1
+llet2==2000
+llet3==4000
+llet4==10000
+llet5==20000
+llet6==40000
+
+llete==llet6		;highest letter (maybe some day more than 6)
+lleta==llet1!llet2!llet3!llet4!llet5!llet6	;any letters
+lnolog==400000		;do not let him log in here
+lnomes==200000		;do not give user the tymshare message
+lrstr==100000	;user is restricted
+
+;layout of jbtprv
+prvmod==600	;mask for mode bits in jbtprv word
+prvtru==2000	;bit set by loginn if tru budget present (in jbtprv)
+pvnoat==1b1	;bit set if job doesn't want to be attached to
+pvexo==1B18	;execute only
+pvdop==3B20	;mask for disconnect options field
+  .jpcon==2B20  ;continue-on-disconnect (so LOGINN traps zappers)
+
+;structure of password file (pas.sys), 2 word entries, last
+;  entry in the block , right half of first element, points to
+;  overflow block if any
+
+phun==0		;hashed user name entry
+ppw==1		;hashed password entry
+pentsz==2	;size of each password file entry
+exlppn==ribppn	;entry for directory name (project, programmer number)
+exlnam==ribnam	;file name
+exlext==ribext	;ext
+exlerr==ribext	;error code
+exlalc==ribalc	;blocks allocated
+exlqtr==ribqtr	;reserved quota
+exlqtf==ribqtf	;first come, first served quota
+exlqto==ribqto	;logged-out quota
+exlusd==ribusd	;free blocks left with respect to logged-in quota
+exlsts==ribsts	;status bits
+
+;gettab args
+
+jbtprv==6
+prjprg==2
+jbtprg==3
+ttytab==10
+jbtsts==0		;job status bits
+jlog==4			;logged in bit
+jacct==1		;jacct bit. to be turned off after login
+licjal==1000		;loginn runs with these
+licopr==100000		;for setuuo msgs
+licsys==40000		;systat (for checking detached jobs)
+licst==4000		;structure (to interlock ufd)
+lichf==2000		;home files (lud,mailboxes,..)
+
+jbtlic==-20	;for getting our licenses
+linjob==-26	;table linking ports to jobs, indexed by port
+cnftbl==11
+numlin==24		;number of ports
+stawrd==17	;states word in config table
+devopr==13
+gsyspp==<xwd 1,16>	;gettab for sysppn
+gmfdpp==<xwd 0,16>	;gettab for mfdppn
+gserno==<xwd 20,11>	;gettab for serial number
+
+logsiz==5		;size of login block to monitor
+tabaun==-23		;gettab for aun
+tabttb==-27		;tty name
+tabsts==0		;jbtsts
+ldblog==-24		;gettab for ldblog (supervisor info)
+
+jna==40000		;this job number is assigned
+
+ludhsh==^d887	;hash value for lud
+malhsh==177	;hash value for mailbox
+
+;places in mailbox for broadcast letters
+
+malnam==0	;name
+maldat==2	;date
+malexp==4	;expiration date
+malcnt==5	;count of not recieved
+maltxt==12	;text starts here (in asciz)
+array buf[200],cmd,pdl[40],rh.usr[3],runblk[6]
+integer mfdppn,sysppn,hshblk,hshnam,strptr,strnum
+integer cspnam,inbits,ufdfsn,datime
+array lkbmsg[4],bufmsg[3],twtmsg[1]	; stuff for typmsg routine
+array logtab[logsiz],cspusr[2],inttab[2]
+integer kspass,ksmach,hpw,pblknum,lftpas,rtpas,bdpwct
+maxpwf==4	;maximum number of trys at getting the password right
+
+lvar
+
+inppn=logtab
+ gemode==2
+inprv=logtab+1
+inaun=logtab+2
+innam=logtab+3
+innam1=logtab+4
+
+comment ! 
+persons loging in from the nodes listed in the following
+table are forced into the corresponding xexec mode regardless
+of the mode recorded for them in the lud
+!
+
+pdpmod==0
+xexmod==1
+japmod==2
+sudmod==3
+
+nodtab: xwd 1270,japmod
+	xwd 1271,japmod
+	xwd 1272,japmod
+	xwd 1273,japmod
+	xwd 1274,japmod
+	xwd 1275,japmod
+	xwd 1276,japmod
+nodtbl==.-nodtab
+;start here
+
+stpt:	jfcl		;in case of ccl entry
+	reset		;reset the world
+	move	p,[iowd 40,pdl]	;get the pushdown stack
+	movsi f,fl.fuf		;just first ufd bit
+	hrroi a,jbtsts	;get jobs status
+	gettab a,
+	 jsp n,uuoerr	;fatal if cannot get this
+	tlne a,jlog	;must not be logged in
+ife deb,<	jrst alrdin
+	hrroi b,jbtlic
+	gettab b,		;see that loginn has needed licenses
+	 movei b,0		;say none
+	tlc b,licopr!licsys!licst!lichf!licjal
+	tlce b,licopr!licsys!licst!lichf!licjal
+	 jsp n,licerr		;not all were set
+	tlo a,jacct		;a/jbtsts still
+	setjal a,		;set up jacct
+	 jsp n, jalerr>
+ifn deb,<	jfcl>
+	movei a,1200	;break 2 and no echo
+	setmod a,	;set tty mode
+	movei a,17
+	hrli a,400000	;physical only
+	movsi b,'SYS'
+	movei c,0
+	open ufd,a	;phys only,iodmp=17 mode,no buff ring hdr
+	 jsp n, syserr	
+	move a,[iowd 200,buf]
+	movem a,cmd
+	setzm cmdfix up for dump input
+	move a,[gsyspp]
+	gettab a,	;get sys ppn
+	 move a,[xwd 1,4]
+	movem a,sysppn
+	move a,[gmfdpp]
+	gettab a,
+	 move a,[xwd 1,1]
+	movem a,mfdppn
+;;;SDD: new wonderful FOO only carries across halves on stack stuff
+;;; You wouldn't want to do this in non-0 section (global stack and all)
+	movei	a,-1	; 0,,top-of-memory
+	push	a,0	; 1,,0 if no carry, 2,,0 elsewise (and 0 <- 0)
+	tlz	a,1	;make the result 0 for good (DEC) CPUs
+;;	seto	a,
+;;	aobjn	a,.+1
+;;^^ end-of-change ^^
+	jumpn	a,itsaf3	;f3 like ka, halves overflow
+	move a,[gserno]
+	gettab a,	;get serial number
+	  jsp n,uuoerr	;if we can't get this, we're in deep trouble
+	andi a,30000	;ks serial numbers are .gt. 7777
+itsaf3:	movem  a,kspass	
+	movem a,ksmach	
+;KSPASS and KSMACH control LOGINN behavior under these
+;conditions:
+;1) This system is a KS or F3 and it is connected to NEXILIS network
+;2) This system is a KS or F3 connected to TYMNET
+;3) This system is a KS or F3 coming up under CTYSIM (no network)
+;4) This system is not a KS or F3 (and therefore is not coming
+;	up under NEXILIS.  It must be a KI or KL coming up
+;	under TYMNET or CTYSIM.  The case of a KI/KL
+;	coming up under NEXILIS is not supposed to happen.)
+;KS or F3 systems have a LUD bit which says whether or not the
+;user has shut override.  So if case (2), check from LUD even
+;if TYMNET says "!". 
+;NEXILIS net has no supervisor, does no password checking. That
+;must be done by the host.  In case (2), turn off KS or F3 password-checking
+;since TYMNET already did it.
+;NEXILIS net puts a vertical bar "|" before the username to
+;identify itself (TYMNET never puts "|" in the char stream)
+;and to force KS or F3 password verification.
+	hrroi a,jbtprv
+	gettab a,	;must set initial disconnect options
+	 jsp n,uuoerr
+	trz a,pvdop	;from whatever default monitor leaves 
+	iori a,.jpcon	;to continue-on-disconnect, so that
+	setprv a,	;SETINT arming for zapper-int will work
+	movei m,^d600	;wait a long time for the first stuff
+	pushj p,setint	;set up all software interrupts, start timer
+	pushj p,tyi
+	cain ch,"|"-40	;vertical bar from NEX net?
+	jrst rdunm	;yes. leave KSPASS set non-zero ; this
+			;is a KS or F3 system.
+
+	setzm kspass	;TYMNET, turn off KS or F3 passwd verify
+	caie ch,"!"	;did TYMNET put in "!" for shut override?
+	jrst rdunm1	;no, CH/ 1st char of username
+	skipn ksmach		;on KS or F3 check override from lud
+	 tlo f,fl.sts		;not KS or F3, accept TYMNET override
+;KSMACH/ 0 if KL or KI system
+;KSMACH/<>0 if KS or F3
+;KSPASS/ 0 if TYMNET already checked password
+;KSPASS/<>0 if KS or F3 password checking must be done
+rdunm:	pushj p,tyi		;get ch/ 1st char of username
+;fall thru from above with timer set and ch/ 1st char username
+rdunm1:	skipe kspass
+	  pushj p,seehaf	;for pw check see if line is halfdup
+	pushj p,rdnam		;deposit name in core area,
+	  jrst	notval		;pretend not valid if too many chars
+;ch/ term char from RDNAM all thru below
+	pushj p,clrtim		;no timer while doing LUD operations
+	movsi a,(sixbit /lud/)		;see if he's in the lud
+	movsi b,(sixbit /sys/)
+	movei c,0
+	move d,sysppn
+	lookup ufd,a	;lookup lud.sys in sysppn
+	  jrst nolud	;*****
+	move n,name
+	movem n,innam
+	move n1,name+1
+	movem n1,innam1
+	pushj p,hashit			;go hash user name
+	jumpe a,notval	;*****
+	movem a,hshnam
+	movem n1,hshblk
+	pushj p,fndusr	;find the user
+	 jrst notval	;*****
+;fall thru, still have ch/ term char
+	movei	m,^d120	;give 2 more mins for passwd or for
+	pushj	p,rsttim	;input of final term chr if not KS
+	skipn kspass		;skip if password must be checked
+	 jrst lkusr
+	movem wd,savwd	;WD gets clobbered in passwd lookup
+	movei	m,maxpwf	;init passwd fail count
+	movem	m,bdpwct
+	pushj	p,chsemi	;if prev input term char =";"
+	tlo	f,fl.pas	;suppress prompt for passwd
+	tlnn	f,fl.pas
+	outstr	[asciz/
+password: /]
+	pushj	p,getpas	;get & hash it, term char in CH
+	pushj p,fndpas	;verify password correct
+	 pushj p,badpas	;***** password didn't match, go ask again
+	move wd,savwd
+
+;arrive here with ch/ term char from RDNAM (or GETPAS if KS)
+;timer is running; wd/ index for LUD lookup
+lkusr:	pushj	p,chsemi  ;if term chr =";"
+	tlo	f,fl.npt ;then suppress "proj code" prompt
+			 ;and suck up possible CR LF
+	pushj p,clrtim	;reset timeout
+	move a,buf+lppn(wd)
+	movem a,inppn
+	move a,buf+laun(wd)
+	movem a,inaun
+	move b,buf+llink(wd)
+	andi b,177
+	setzm cspnam
+	move a,buf+lbits(wd)
+	trne a,lovrid		;see if override allowed
+	 tlo f,fl.sts		;set flag, override allowed
+	move m,[stawrd,,cnftbl]
+	gettab m,
+	 jsp n,uuoerr		;cannot get STATES ? fatal
+	skipe ksmach		;dont test shutness unless on ks
+	trnn m,400000		;skip if  shut
+	 jrst lkus1		;not shut, go on
+	tlnn f,fl.sts		;skip if override  allowed
+	 jrst syshut		;complain- sys shut
+	skipn kspass		;skip if need to say shut
+	 jrst lkus1
+	outchi cntrlg		;put out bell
+	outstr [asciz /shut/]	;output the shut message
+repeat nonull,<outchi nulchr>	;output nulls to space the bells'
+	outchi cntrlg		;put out bell
+lkus1:
+	tlne a,lnolog		;is this a prohibited user??
+	 jrst notvl1
+	tlne a,lnopjc		;no proj code from this guy?
+	  tlo f,f.nopjc		;  nope
+	tlne a,lonejb		;lud sez one job only at a time?
+	tloa f,f.onej		;yes, remember in f & skip
+	tdza c,c		;not lonejb; c_0 setup opt att
+	movsi c,(1b0)		;lonejb; set for forced attach
+	tlne a,lfrcat
+	tlo c,(1b0)
+	tlne a,lnoatt
+	hrri c,1
+	movem c,attflg#		;attflg <0 if forced att,
+				;attflg =0 if optional att (normal)
+				;attflg >0 if no att
+	move c,buf+lprv(wd)
+	trz c,prvtru		;assume not TRU limit until later
+	movem c,inprv		;save priv bits
+	setom intru#		;assume no TRU budget until later
+
+	hlrz t,inaun		;get aun
+	cain t,sysgan		;gan 3?
+	 jrst nonres
+
+	tlne a,ltrub	;is tru budget present for this user?
+	 tro c,prvtru	;yes, set it
+	movem c,inprv	;and save them again
+	trne m,100000	;is it sched 100000
+	 tloa f,fl.rst	;set restrict bit
+	  jrst nonres	;no, not restricted
+	tlne a,lrstr	;is user restricted? (only ref this symbol)
+	 tlne f,fl.sts	;and not override
+	  skipa
+	   jrst rstrct	;yes, restricted, kick him off
+;fall thru
+nonres: tlnn a,ltrub
+	 jrst notru
+	move m,buf+ltru(wd)	;get word
+	caie t,sysgan		;gan 3
+	 movem m,intru
+	addi wd,1
+	subi b,1
+;fall thru
+notru:	movem a,inbits
+	trnn a,lcspb		;is there a cusp name?
+	jrst nocsp
+	move a,buf+lcsn(wd)
+	movem a,cspnam
+	move a,buf+lcsu(wd)
+	movem a,cspusr
+	move a,buf+lcsu1(wd)
+	movem a,cspusr+1
+	addi wd,3
+	subi b,3
+;fall thru
+nocsp:	movem wd,strptr
+	subi b,lcsn
+	idivi b,3
+	movem b,strnum
+	close ufd,0	;lud.sys
+;see if necessary to force user into special xexec mode
+;due to loging in from special node
+	hrroi a,ldblog
+	gettab a,		;get supervisor info
+	 jsp n,uuoerr
+	ldb b,[point 6,a,19]	;node number top 6 bits
+	ldb a,[point 6,a,27]	;low 6
+	dpb b,[point 6,a,29]	;a/12 bit node number
+	movsi b,-nodtbl
+nodl0:	hlrz c,nodtab(b)
+	came c,a		;does a match any node in table
+	aobjn b,nodl0
+	jumpge b,nodl1		;fell thru whole table no match
+	hrrz c,nodtab(b)
+	dpb c,[point 2,inprv,28];force mode specific for this node
+nodl1:
+	move a,inprv
+	pvexo==1b18
+	iori a,pvexo	;loginn is run-only
+	movem a,inprv
+	setprv a,	;set time zone,etc.
+	movei m,0		;turn on tty echo,
+	setmod m,		;etc.
+	;jrst getprj		;fall thru
+;input the project code
+
+getprj:	setzm name		;null project code!
+	setzm name+1
+	setzm name+2
+	tlnn f,f.nopjc			;LUD says to input one?
+	 jrst rdpjc			;yes
+	tlnn f,fl.npt			;prev input term char =";"?
+	tdza ch,ch			;not going to read pjc, fake
+	movei ch,";"			;initial setting of ATTFL2
+	jrst det0			;init for det loop
+rdpjc:	tlnn f,fl.npt
+	outstr [asciz /proj code: /]
+	movei m,^d120	;2 min
+	pushj p,rsttim
+	pushj p,rdnam1
+	cain ch,15	;if <cr> after <proj code>
+	pushj p,tyi	;need to absorb 1 more
+comment ! ATTACH-to-job stuff.  Fall into this code from above.
+Code at DET1 begins a loop which repeats if failure
+	below during ATTACH.
+;exits from this code are:
+;1)chkslt--may not attach to existing job or none exists,
+;  	   or doesnt want to attach (<cr> to "job no." question)
+;2)timer interrupt-- comout
+;3)attach uuo succeeds
+;4)comout-- if detcnt runs down
+;attflg set from lud:
+; <0	forced attach to any job present belonging to this user
+; =0	optional attach..usual case
+; >0	no attach to job(s) which may exist for this user
+!
+
+det0:	movei m,detlc
+	movem m,detcnt#	;loop limiter for det1 attach code
+	cain ch,";"	;did he type <proj code>;<job number [possibly null]> <cr> ?
+	tdza ch,ch	;well, he typed the ";" at least
+			;skip & fall into det1 attach code
+
+det1:	seto ch,		;after <proj code>, what did he type?
+	movem ch,attfl2#	;attfl2/0 if user typed ";"
+				;attfl2/-1 if he gave <cr>
+				;attfl2 needed so that we can
+				;type msgs on <possible> 2nd, 3rd
+				;passes thru here even if fl.npt
+				;is set.
+	sosg detcnt
+	jrst comout
+	pushj p,clrtim
+	pushj p,inimbf	;init msg buffer
+	movei a,[asciz/type job number to attach, job /]
+	pushj p,appmsg	;append (a) string to msg
+	setzm frejob#
+	setzm spcjob#	;initialize for ckdet
+	tlz f,f.mor!f.dett!f.det2
+	move a,[xwd segptr,cnftbl]
+	gettab a,	;get no. of 1st hiseg,
+	 jsp n,uuoerr
+	movei a,-1(a)	;highest job=1 less than gettab returns
+
+;scan all jobs for ones belonging to us and detached
+;for a:=highest job step -1 until 1 do:
+
+det2:	pushj p,ckdet	;skip if (a) is ours & detached
+			;count frejob and spcjob
+	jrst det3	;doesnt qualify
+	skipl	attflg	;forced attach?
+	jrst	[hrl	b,a	;no, check "no attach" bit
+		hrri	b,jbtprv	;in jbtprv
+		gettab	b,
+		 jfcl
+		tlne	b,(pvnoat)
+		jrst	det3	;no attach set - skip this one
+		jrst	.+1]
+	movem a,att1jb#	;save incase it's the only one
+	tloe f,f.dett	;got one
+	tlo f,f.det2	;got more than one
+	pushj p,appnum	;append (a) as decimal number to msg
+	movei ch,","
+	sosle msgct
+	idpb ch,msg	;number,number,...
+det3:	sojg a,det2	;next job
+
+;done scanning. spcjob,frejob,f.dett set
+
+	skipge attflg	;skip if optional or no attach
+	jrst [	tlnn f,f.dett	;forced attach,do we have any ?
+		jrst .+1	;no
+		tlnn f,f.det2	;did we find just one job?
+		jrst det4	;yes,auto attach to it
+		jrst .+1]	;let him select which one
+	pushj p,frechk	;set f.mor if ok to create new job
+	skipg attflg	;if may not attach to existing job,
+	tlnn f,f.dett	;or no detached jobs for this guy,
+	jrst chkslt	;go attempt to create new job
+	movei a,[asciz/ or c.r. to login: /]
+	skipn attflg
+	tlnn f,f.mor	;mention c.r. option only if new job ok,
+	movei a,[asciz/ to login: /]	;and not forced attach
+	pushj p,appmsg	;append (a) msg
+	move a,[point 7,msgbuf]
+	skipe attfl2	;print entire msg unless user finished
+	outptr a	;proj code string with ";"
+	movei m,^d120	;now set timer and
+	pushj p,rsttim	;read job number
+;read job number, complain if garbage offered
+	pushj p,decrd
+	cain ch,15	;did he type <job no><cr> ?
+	jrst det5	;yes
+	pushj p,tyi	;no, eat chars until lf
+	caie ch,12
+	jrst .-2
+	outstr [asciz /
+not a number
+/]
+	jrst det1
+
+comment ! 
+here if forced attach mode and only one job exists
+!
+
+det4:	pushj p,inimbf	;re-init msg buff
+	movei a,[asciz/attaching you to job /]
+	pushj p,appmsg
+	move a,att1jb
+	pushj p,appnum
+	movei a,[asciz/
+/]
+	pushj p,appmsg	;trailing crlf so monitor prompt on new line
+	move bp,[point 7,msgbuf]
+	outptr bp
+	move a,att1jb	;restore a/job no. for det6
+	jrst det6
+
+comment !
+here we have a/job no.  to try attaching to
+(if he typed just <cr>, a/0.  )
+!
+
+det5:	pushj p,tyi	;get the lf after <job no><cr>
+	skipn attflg	;skip if forced attach
+	jumpe a,chkslt	;<job no> not typed, doesnt want attach
+	jumpe a,det1	;dont let him do it if forced attach
+	pushj p,ckdet	;make sure this one if for him
+	jrst det1	;the klutz typed somebody else's job no.
+det6:	skipe name	;in case he typed a proj code, tell him:
+	outstr [asciz/
+project code ignored on attach
+/]
+	attach a,	;doesnt return if success since login
+		;uuo not yet done, this process will be
+		;killed by monitor. if it returns:
+	outstr [asciz/
+can not attach to job
+/]
+	jrst det1	;start over again
+
+comment ! routine decrd
+function: return (a)=decimal number from tty, ch/term char
+!
+
+decrd:	movei a,0
+dcrd:	pushj p,tyi
+	caig ch,"9"
+	caige ch,"0"
+	popj p,
+	imuli a,^d10
+	addi a,-"0"(ch)
+	jrst dcrd
+comment ! routine inimbf
+function: initialize msg buffer & params
+returns: msgbuf zeroed
+	msg/ b.p. to start of buffer
+	msgct/ chars left to end of buffer
+destroy: a
+!
+
+inimbf:
+	move a,[point 7,msgbuf]
+	movem a,msg
+	movei a,msgsiz*5
+	movem a,msgct	;set up msg params for appmsg,appnum
+	setzm msgbuf
+	move a,[xwd msgbuf,msgbuf+1]
+	blt a,msgbuf+msgsiz-1
+	popj p,
+
+
+
+comment ! routine appmsg
+function: append string to msg
+expects: a/addr of asciz string to append
+	msg/ b.p. to current spot in msgbuf for idpb
+	msgct/ chars left to go in msgbuf
+
+destroy: a
+!
+
+appmsg: hrli a,(point 7,0)
+	push p,a
+app2:	ildb a,(p)
+	jumpe a,appx
+	sosg msgct
+	jrst appx
+	idpb a,msg
+	jrst app2
+appx:	pop p,a
+	popj p,
+
+comment ! routine appnum
+function: append decimal number in (a) onto string in msgbuf
+expects: a/number	msg/ b.p. into msgbuf for idpb
+	msgct/ space left in msgbuf
+destroy: n,n+1 (=n1), ch
+!
+
+appnum:	move n,a
+appn2:	idivi n,^d10
+	hrlm n+1,(p)
+	skipe n
+	pushj p,appn2
+	hlrz ch,(p)
+	addi ch,"0"
+	sosle msgct
+	idpb ch,msg
+	popj p,
+
+integer msg,msgct
+msgsiz==^d20
+array msgbuf[msgsiz]
+detlc==^d10	;max of 10 times thru attach code, then die
+
+;here when attach code previous page has finished scanning
+;all jobs to see if this guy should be allowed on.
+;f.mor set if ok to use up a job slot by letting
+;this guy on.
+;f.ejob set by det code during system scan if there exists a
+;job for this guy already.
+
+chkslt:
+	tlnn f,f.mor
+	jrst jcapyx		;"job cap'y exceeded"
+	tlc f,f.ejob!f.onej
+	tlce f,f.ejob!f.onej	;were both set?
+	skipa			;none on yet or can have >1 job
+	jrst alredy		;yes, say sorry,bye
+
+;fall thru
+chktim:	pushj p,clrtim
+	move a,inppn
+  ife deb, <
+	chgppn a,	;change ppn so can access files
+	 jsp n, uuoerr	;fatal trouble
+	 >; end ife deb.  No CHGPPN if debugging
+	move a,[datitm,,dattab]
+	gettab a,
+	 jsp n,uuoerr
+	jumpge a,fs0		;time ok
+;***********************************
+
+;time not received from tymnet. user must deal with it.
+
+;fall thru from above if date not set.  Only exit
+;is COMOUT (timeout) or FS0 when date entered properly
+
+;************************************
+
+
+
+	movei m,^d120
+	pushj p,rsttim
+rrddat:	outstr [asciz /
+date not set, type date as mm-dd-yyyy /]
+	pushj p,decrd
+	jumpe a,baddat
+	caig a,^d12
+	cain ch,15
+	jrst baddat		;date is bad
+	move b,a
+	pushj p,decrd
+	caig a,^d31
+	cain ch,15
+	jrst baddat
+	sosge c,a
+	jrst baddat
+	pushj p,decrd
+	cail a,^d1964
+	caile a,^d2008
+	jrst baddat
+	caie ch,15
+	jrst baddat
+	pushj p,tyi	;get the line feed
+	subi a,^d1964
+	imuli a,^d12
+	addi a,-1(b)
+	imuli a,^d31
+	add c,a		;now have date in c
+
+rrdtim:	outstr [asciz /
+type time as hhmm /]
+	pushj p,decrd
+	caie ch,15
+	jrst badtim
+	pushj p,tyi
+	idivi a,^d100
+	imuli a,^d60
+	add a,b
+	cail a,^d<24*60>	;see if time too big
+	jrst badtim		;yes, tell him and make him retype
+	hrli c,suudat
+	setuuo c,
+	 jfcl
+	hrli a,suutim
+	setuuo a,
+	 jfcl
+;******************************
+	jrst fs0
+;******************************
+
+
+baddat:	clrbfi
+	outstr [asciz /
+incorrect date/]
+	jrst rrddat
+
+badtim:	clrbfi
+	outstr [asciz /
+incorrect time/]
+	jrst rrdtim
+
+;here from chktim if time already set or after time
+;set up prev. pg.
+
+;scan all file structures and do ufdset for each one
+;(temporary kludge: look only at /dskb/)
+;exit to strdon.
+
+;strnum and strptr initialized from lud entry at nocsp
+
+fs0:	pushj p,clrtim
+fs1:	ife deb,<sosge strnum>	;structures left?
+	ifn deb,<jfcl>
+	jrst strdon	;go finish logging him in
+	move wd,strptr
+	move m,buf+lfsnam(wd)	;get name
+	trz m,7777	;only 4 characters
+	move a,buf+lfsbts(wd)	;status bits
+	andi a,3	;only these two
+	move b,buf+lfsqin(wd)	;quota in
+	move c,buf+lfsqot(wd)	;and out
+	ash b,-2;kludge conv blocks to pages.aaa
+	ash c,-2;kludge ". lud values are in blocks.aaa
+	addi wd,3	;point to next
+	movem wd,strptr
+	came m,[sixbit /dskb/]
+	jrst fs1
+	pushj p,ufdset		;set up ufd
+	 jfcl
+	tlnn f,fl.fuf	;is first ufd flag still set?
+	jrst strdon
+	outstr [asciz /
+tru limit exceeded/]	;must be out of time
+	jrst comout
+
+;fall tru from fs1
+strdon:	pushj p,acct	;write accounting entry
+	pushj p,typmsg	;print access.msg (if there)
+	pushj p,inmss	;print login message
+	tlne f,fl.sts	;is this an override password?
+	pushj p,inopr	;yes, give alarms
+	reset
+	move b,[xwd 5,runblk]	;read&clear tmpcor dir
+	setzm runblk		;runblk is a handy buffer
+ife deb,<tmpcor b,	;clear tempcore files
+	 jfcl		;ignore error return>
+
+
+	jrst pjctst		;-go test proj code class,etc.
+comment ! Project-Code database def'ns   !
+
+;-class info is in 3 words of ufd rib. it is as follows:
+;-class 'a'	xlpjpp/ 0
+;		xlpjfn/ 0
+;		xlpjcl/ 0
+;-class 'b'
+;		xlpjpp/ ppn
+;		xlpjfn/ filename to run
+;	xlpjcl=	xlpjxt/ 0,,1
+;
+;-class 'c'	xlpjpp/ ppn
+;		xlpjfn/ filename for another prog to look in
+;	xlpjcl=	xlpjxt/ ext,,2
+
+;-whatever pjc user gave is sitting in name,name+1,
+; name+2
+;-ac definitions for passing args to project-code programs
+;-none of these may be ac 1 or ac 17 (for run 1, & popj p,)
+logac1==7	;proj code, 3 regs
+logac2==10
+logac3==11
+logac4==12	;date,time
+logac5==2	;"inprv" fr loginn, user status for jbtprv
+logac6==3	;init fn,username 3 regs
+  logrcm==1000	;restr. command mode, in rh logac5
+logac7==4
+logac8==5
+logac9==13	;values from ufd: ufdpjc/ ppn
+lgac10==14	;ufdpj1/ filename or progname
+lgac11==15	;ufdpj2/ext,,class designator
+
+;-new positions in ufd rib contain class info
+xlpjpp==35
+xlpjfn==36
+xlpjcl==37
+xlpjxt==37	;ext & class in same word
+;-bp's for class & "verify bit"
+pjclas:	point 3,srcbuf+xlpjcl,35
+pjcvfy:	point 1,name+2,35	;bit says verify this pjc if 1
+pjcca==0 ; class a
+pjccb==1
+pjccc==2
+;-dispatch for 3 classes
+pjcdsp:	pushj p,upjca
+	pushj p,upjcb
+	pushj p,upjcc
+.pjdl==.-pjcdsp	;leng for double-ck
+
+;-************standard (sys)projec for class 'c' users*****
+sfnpjc:	sixbit /projec/
+;**********************************************************
+;Here is where we do the last few things then exit LOGINN
+;to monitor, init file, or project-code-verification program.
+;-here determine whether user subject to pjc-verify
+; or not (class a is not, b,c are). if class a, set session
+; pjc & exit (run any init file).  if verify required,
+; run the appropriate program, passing the proposed
+; project code, initfilename, login jbtsts word from lud,
+; class info, etc. force restricted command mode.
+
+
+
+pjctst:
+	
+	ldb a,pjclas
+	caile a,.pjdl	;catch garbage
+	jrst [outstr [asciz/
+project-code info in ufd bad. logging you out./]
+		jrst comout]
+	movei b,0
+	skipe a
+	movei b,1
+	dpb b,pjcvfy	;if not class 'a', turn on verify
+	move b,[xwd runblk,runblk+1]
+	setzm runblk
+	blt b,runblk+5	;clear entire runblk
+	xct pjcdsp(a)	;call setup routine per class
+	;ac 1 set by setup routine for proper entry pt.
+	;ac 1 = 0 if no init file or pjc verifier
+	;rh(runblk+5) has license to pass to next program if any
+	;(usually zero,but jl passed to (sys)projec. reduce
+	; license now to nothing or whatever license to be passed)
+	hllz b,runblk+5
+	setlic b,
+	jumpe a,lgixit
+	run 1,	;-exit login to init file or proj code verifier.
+	jfcl
+	outstr [asciz/
+can't run required program/]
+	ldb a,pjclas
+	jumpe a,lgixit	;if class a,run failed on initfile,
+			;so no need to be nasty. otherwise,
+			;must kick the guy off.
+	outstr [asciz/
+logging you out/]
+	jrst comout
+
+lgixit:	exit 1,	;***exit loginn, no initfile or pjc prog***
+	exit		;in case he says .con
+
+;-upjca .. setup for class 'a' user.
+;1. set priviledges from lud
+;2. set sesssion pjc if not null
+;3. return a=0, runblk[0 - 5]=0 if no init file
+;4. set runblk for initfile
+;5. set registers to pass. (just 7,10,11,12 relevant)
+;6. return
+
+upjca:	move a,inprv	;from lud
+	setprv a,
+	dmove b,name	;load up project code into
+	move d,name+2	;b,c,d
+	jumpe b,upjca2	;none, no need for uuo
+	move a,[3,,b]	;set pjc from b,c,d=name..name+2,
+	chpjc a,	;set vfybit from bit 35 of d
+	 jrst [outstr [asciz/
+cannot set project code.system trouble/]
+		jrst comout]
+upjca2:	skipn a,cspnam	;skip if initfile present
+	popj p,		;return a=0 no license no run uuo
+	movem a,runblk+1;init fn
+	movei a,cspusr	;pt at username
+	skipn cspusr
+	setz a,
+	movem a,runblk+4;username
+	movsi a,(sixbit/dsk/)
+	movem a,runblk	;dev
+	movei a,runblk	;run init file at entry+0
+	jrst upjxit	;common xit, load regs & return
+
+;-upjcb..setup for class 'b' user.
+;1. set priv from lud with restr cmd mode forced.
+;2. set rcm file=prog in ufd xlpjfn,xlpjpp (acct. super prog)
+;3. set runblk for run acct. super prog
+;4. set ac 1 for run at entry+1
+;5. load regs & return
+
+upjcb:	move a,inprv
+	iori a,rescmd
+	setprv a,
+	move a,srcbuf+xlpjfn
+	move b,srcbuf+xlpjpp
+	movei c,a	;set rcm fil c/loc
+	setrcf c,	;loc/fn loc+1/ppn
+	movem a,runblk+1;fn
+	movem b,runblk+4;ppn
+	movsi b,(sixbit/dsk/)
+	movem b,runblk	;dev
+	move 1,[1,,runblk]	;run at entry+1
+;common load regs & exit for upjca,upjcb,upjcc
+
+upjxit:	dmove logac1,name	;pjc0,1
+	move logac3,name+2;pjc2 with vfybit set
+	move logac4,datime
+	move logac5,inprv	;actual lud priviledges
+	move logac6,cspnam	;init fn
+	dmove logac7,cspusr	;& username
+	dmove logac9,srcbuf+xlpjpp	;ppn,fn ufd info
+	move lgac11,srcbuf+xlpjxt	;&ext,,class
+	popj p,
+
+;-upjcc..setup for class c user
+;1. set priv with forced rcm
+;2. set rcf file = standard project program
+;3. set runblk for run standard program. pass jl license ***
+;4. set ac 1 for run entry+1
+;5. load regs & return. logac9-11 tell std prog where
+;	to look for users list of pjc's
+
+upjcc:	move a,inprv
+	iori a,rescmd
+	setprv a,
+	move a,sfnpjc	;std file name
+	move b,sysppn
+	movei c,a	;rcm file:=(sys)dsk:stdnam
+	setrcf c,	;so "resrun" in uuocon will work
+	movem a,runblk+1;std nam
+	movsi b,(sixbit/sys/)
+	movem b,runblk	;dev=sys.
+	movsi a,licjal
+	movem a,runblk+5	;pass jl lic ***
+	move a,[1,,runblk]	;run at entry+1
+	jrst upjxit
+
+subttl various utility routines
+
+;subroutine to output accumulator m as sixbit chars
+
+sixmsg:	push	p,m
+	move	m,[point 6,(p)]	;m=byte pointer
+sixmsl:	ildb	ch,m
+	jumpe	ch,mpopj	;quit at first null byte
+	addi	ch,40
+	outchr ch
+	tlne	m,770000	;or end of word
+	jrst	sixmsl
+mpopj:	pop	p,m
+	popj	p,
+
+
+comment ! ckdet - check out jobs on system for detached
+	ones and others belonging to this aun
+expects: a/ job number
+function: if job(a) detached and has our aun, skip rtn.
+	if job(a) has our aun (attached or not) set f.ejob
+; increment frejob if job(a) not assigned
+; increment spcjob if job(a) in sysgan
+; if job is not a candidate for attaching, (attached or
+;  wrong aun or bad job no) return no skip
+;
+;destroy: b
+!
+
+ckdet:
+	move b,[xwd segptr,cnftbl]
+	gettab b,	;get b/highest job+1=no. 1st "hiseg"
+	 jsp n,uuoerr
+	caile a,-1(b)	;if job no>highest existing job,
+	 popj p,	;say it can't be attached to.
+	hrl b,a
+	hrri b,tabaun
+	gettab b,
+	 jsp n, uuoerr
+	jumpe b,[aos frejob	;unoccupied job,count it
+		jrst cpopj]	;noskip rtn
+	hlrz m,b
+	cain m,sysgan
+	aos spcjob	;this is a special one
+	came b,inaun
+	popj p,
+	tlo f,f.ejob	;note that there exists job this aun already
+	hrl b,a
+	hrri b,tabttb
+	gettab b,	;get b/sixbit "tty###" or 0,,###
+	 jsp n, uuoerr
+	jumpe b,cpopj		;no name or something
+	tlnn b,-1		;lh is tty if not det
+cpopj1:	aos (p)
+cpopj:	popj p,
+
+
+comment ! routine frechk
+function: to set f.mor if user is to be allowed to create
+	a new job & occupy another job number.
+	set f.mor if frejob.ne.0 and
+	user is in sysgan, or if frejob.ne.0 ,user
+	in another gan, and frejob.gt.(sysres-spcjob)
+expects: frejob/ count of job nos. whose jna is reset
+	 spcjob/ count of jobs logged in from gan (sysgan)
+	f.mor/ 0
+clobbers: a,b
+!
+frechk:	skipn b,frejob	;any free?
+	popj p,	;no
+	hlrz a,inaun
+	cain a,sysgan	;system?
+	jrst freck1	;yes, ok if any slots
+	add b,spcjob
+	caile b,sysres	;if not must be enough slots left
+freck1:	tlo f,f.mor
+	popj p,
+
+
+comment ! routine fndusr
+function: skip if user is in lud
+expects: lud open on chann ufd
+	hshblk/ set up
+	hshnam/ set up
+	cmd/ 200 wd io command list
+destroy: a,b,wd and former contents of buf (200 wrds)
+returns: wd/ index in buf of the lud entry
+
+!
+fndusr:	move a,hshnam
+	move b,hshblk
+	addi b,1
+srus1:	hrrzm b,usrblk#	;save for changing broadcast bits
+	useti ufd,(b)
+	input ufd,cmd
+srus0:	movei wd,0
+srusr:	camn a,buf+lhun(wd)
+	jrst cpopj1		;found
+nuser:	skipg b,buf+lppn(wd)
+	jrst blklnk
+	move b,buf+llink(wd)
+	andi b,177
+	add wd,b
+	caile wd,177
+	popj p,		;lud is bad
+	jrst srusr
+
+blklnk:	jumpe b,cpopj		;invalid user
+	hrrz b,b	;isolate the pointer to next block
+	camg b,usrblk	;must always go forward
+	popj p,
+	jrst srus1	;set block numbeer and read
+
+
+;routine to hash values in n & n1 and return then hashed value in
+;  register a and the block number in register n1
+
+hashit:	move a,[555555555555]
+	move b,[361275431652]
+	move c,[612754316523]
+	movei wd,0
+	pushj p,rnd
+	pushj p,rnd
+	pushj p,rnd
+	pushj p,rnd
+	xor c,b
+	move n,c
+	tlz n,400000
+	idivi n,ludhsh
+	xor a,c
+	popj p,
+
+;randomizer for lud hashing
+
+rnd:	add b,n
+	rotc n,-22
+	movei bp,5
+rnd1:	move d,b(wd)
+	mul d,[5*5*5*5*5*5*5*5*5*5*5*5*5*5*5]	;5^15
+	addm e,c(wd)
+	aoje wd,rnd2
+	movni wd,1
+	trne b,1
+	skipl c
+	movei wd,0
+	exch a,c
+rnd2:	sojg bp,rnd1
+	popj p,
+
+;get chr from input
+
+tyi:	inchwl ch	;here in case no hibernate uuo
+	andi ch,177	;mask to character
+	jumpe ch,tyi	;ignore nulls
+	cain ch,177	;and rubouts
+	jrst tyi
+	cain ch,cntrlc
+	jrst comout	;get out on ^c
+	cain ch,escchr
+	jrst comout	;get out on "esc"
+	cail ch,140
+	subi ch,40
+	popj p,
+
+
+comment ! routine CHSEMI
+function:  see if previous input terminator was ";",
+	set proper flag if so, and exit. Check for CR LF and
+	suck them in & echo them .
+call:  pushj p,chsemi
+	tlx f,flag	;this gets xct'd if ch/semi
+	always return here
+expects:  ch/ term chr last input
+!
+
+chsemi:	cain ch,";"
+	xct  @(p)
+	outchr ch	;echo it (port is in no-echo mode)
+	cail ch,40	;ctrl char (prob CR) ?
+	jrst cpopj1	;no
+	pushj p,tyi	;get probable LF
+	outchr ch
+	jrst cpopj1
+
+
+
+comment ! routine RDNAM..reads username in login string
+expects:  ch/ 1st char of name
+returns:  ch/ terminating char, name/ username, (skip return)
+	or (error return) if too many characters for field (>12)
+destroys: wd,bp
+!
+;put 12-char string into "name", a pseudonym for
+;the project-code spot in login stream records. ascii
+rdnam:	movei wd,^d12	;read 12 character name
+	setzm name
+	setzm name+1
+	move bp,[point 6,name]
+rdlp:	caie ch,";"
+	 caige ch,40
+	  jrst cpopj1
+rdlpa:	subi ch,40
+	sojl wd,cpopj		;deposit up to ^d12 chars
+	idpb ch,bp
+	pushj p,tyi
+	jrst rdlp
+
+crlf:	outstr [asciz /
+/]
+	popj p,
+
+octprt:	movei	r,^d8
+	jrst	rdxprt
+
+decpr2:	caig	n,11
+	outchr ["0"]
+decprt:	movei	r,12
+rdxprt:	idivi	n,(r)
+	hrlm	n+1,0(p)
+	skipe	n
+	pushj	p,rdxprt
+	hlrz	ch,0(p)
+	addi	ch,"0"
+	outchr ch
+	popj p,
+
+
+rdnam1:	movei wd,^d12
+	setzm name
+	setzm name+1
+	setzm name+2
+	move bp,[point 7,name]
+rdlp1:	pushj p,tyi
+	caie ch,";"
+	cain ch,15
+	popj p,
+	sojl wd,rdlp1
+	idpb ch,bp
+	jrst rdlp1
+
+
+comment ! SETINT;  set up timer,zapper interrupts & set
+	initial timeout for (m) sec by falling into RSTTIM.  Both
+	timer and zapper are armed on channel 1 to cause
+	control to go to COMOUT where LOGINN cleans up
+	and goes away.
+expects: m/ sec
+!
+
+setint:	movei ch,comout
+	movem ch,inttab+1	;set up interupts
+	move ch,[4B17+2B17+inttab]	;IA.REE+IA.CLR+trap vector addr
+	intadr ch,
+	 jsp n,uuoerr
+	movei ch,0
+	settim ch,	;reset timer
+	 jsp n,uuoerr
+	move ch,[timcas,,1]	;timer on chl 1
+	intass ch,
+	 jsp n,uuoerr
+	.IAZAP==7	;zapper-seen cause
+	move ch,[<.IAZAP>B8+1B17+777777] ;assign also to channel 1
+	tinass ch,	;on command port
+	 jsp n,uuoerr
+	movsi ch,(1B0+1B1)
+	intenb ch,	;enable channel
+	 jsp n,uuoerr
+	;pjrst rsttim	;fall thru
+
+comment ! routine RSTTIM
+function: set up timer for new timeout
+expects:  m/ seconds
+!
+rsttim:	hrli m,1	;m/ 1,,seconds
+	settim m,
+	 jsp n,uuoerr
+	popj p,
+
+clrtim:	movei m,0	;routine to turn off timer completely
+	settim m,
+	 jsp n,uuoerr
+	popj p,
+
+
+comment	! Routines to do KS2020 special processing !
+
+	array pwcmd[2]
+	array pwbuf[200]
+	integer savwd
+
+;getpas - routine to get the password
+
+getpas:	tlne f,f.half		;see if half duplex
+	 pushj p,prtmsk	;yes,go print mask
+;fall through from above
+
+getpa2:	pushj p,tyi		;get next char
+	pushj p,get12		;get  12 char in a & b
+	movem a,lftpas
+	movem b,rtpas
+	pushj p,testch		;see if password done
+	 jrst getpa4		;yes, exit
+	pushj p,get12		;get next 12
+	rot a,2			;shift to preserve position
+	rot b,2
+	xorm a,lftpas		;xor to rest
+	xorm b,rtpas
+	pushj p,testch		;see if done
+	 jrst getpa4		;yes, exit
+	pushj p,get12		;get next 12
+	rot a,4
+	rot b,4
+	xorm a,lftpas
+	xorm b,rtpas
+	pushj p,testch		;see if done
+	 jrst getpa4
+getpa3:	pushj p,tyi		;ignore password after 36 char
+	pushj p,testch
+	 jrst getpa4		;exit
+	jrst getpa3		;loop until past password
+
+getpa4: move n,lftpas		;set up for hash routine
+	move n1,rtpas
+	pushj p,hashit		;go hash it
+	movem a,hpw		;save hashed password
+	movem n1,pblknum		;save block number in pass file
+	popj p,		;now exit
+
+;subroutine to see if ch = ";" or less than 40
+;  retrun if it is, skip return if not
+
+testch:	cain ch,";"
+	 popj p,
+	caige ch,40
+	 popj p,
+	jrst cpopj1		;no, skip return
+
+; subroutine to print 15 character mask for password
+
+prtmsk:	outstr [asciz/
+/]
+	outstr [asciz/###############/]
+	outchi 15
+	outstr [asciz/***************/]
+	outchi 15
+	outstr [asciz/OOOOOOOOOOOOOOO/]
+	outchi 15
+	popj p,
+
+; subroutine to check for half duplex line
+
+seehaf:	setz a,
+	getlch a		;get line characteristics
+	tlne a,10000	;see if half duplex
+	 tlo f,f.half	;yes, set half duplex flag
+	popj p,
+
+;subroutine to get up to 12 char and store them in a and b
+
+get12:	movei wd,^d12	;initialize char. count
+	setz a,
+	setz b,
+	move bp,[point 6,a]
+get12a:	caie ch,";"
+	 caige ch,40
+	popj p,		;found not valid letter
+
+	sosge wd		;skip if not done
+	 popj p,	;done 12, exit
+	subi ch,40
+	idpb ch,bp	;store character
+	pushj p,tyi	;get next char
+	jrst get12a	;loop back for next character
+
+;subroutine to find if password is in pas.sys file, and that it
+;  correct for the user name. Skip return if found, non-skip
+;  if not found or not correct for user name.
+;Destroys registers a,b,c, and d 
+
+fndpas:	movei	a,17
+	
+	hrli a,400000	;physical only
+	move b,[iowd 200,pwbuf]
+	movem b,pwcmd	;set up ioword for password file read
+	movsi b,'SYS'
+	movei c,0
+	
+	open pasio,a		;physical only, lodmp = 17 mode no buff ring hdr
+	 jsp n, syserr
+	movsi a,(sixbit/PAS/)
+	movsi b,(sixbit/SYS/)
+	movei c,0
+	move d,sysppn
+	lookup pasio,a		;lookup pas.sys in sysppn directory
+	 jrst nopas		;***** lookupfailed
+	move a,hpw		;hashed password
+	move c,hshnam		;hashed username
+	move b,hshblk		;hashed user name block number
+	addi b,1
+fndp1:	hrrzm b,pasblk#		;save for varifing forward search
+	useti pasio,(b)		;get block
+	input pasio,pwcmd
+fndp2:	movei wd,0
+fndp3:	came c,pwbuf+phun(wd)	;see if match on hashed name
+	 jrst fndp4		;no, go get next entry
+	camn a,pwbuf+ppw(wd)	;check match on hashed user password
+	 jrst skip		;found, skip return
+;on not found fall through
+
+fndp4:	addi wd,pentsz		;position to next entry
+	caige wd,^d128/pentsz*pentsz -pentsz ;are we at end?
+	 jrst fndp3		;no
+	hrrz b,pwbuf+phun(wd)	;get pointer to next block
+	skipg b			;got pointer if non zero
+	 jrst noskp		;exit, not found
+	camg b,usrblk		;must move forward in file
+	 jrst noskp		;exit, not found
+	jrst fndp1		;go read next block
+
+noskp:	releas pasio,		;release channel
+	popj p,			;non skip return, not found
+
+skip:	releas pasio		;release pas file channel
+	jrst cpopj1		;skip return, found mtch
+
+comment ! end of special KS2020 routines !
+nolud:	outstr [asciz /
+can not access lud/]
+
+comment ! COMOUT..common LOGINN panic/error exit.  Something
+	has gone wrong so we attempt to clean up and leave.
+	Timer/zapper interrupts come here.
+!
+
+comout:	clrbfi 0	;clear input so no garbage printed
+	hrroi a,tabsts	;get jbtsts
+	gettab a,
+	 movsi a,jlog	;say logged in
+	tlnn a,jlog	;login uuo done yet?
+	logout		;no,this is sufficient
+	move b,[xwd runblk,runblk+1]
+	setzm runblk
+	blt b,runblk+5	;zero runblk
+	move b,[sixbit /logout/]
+	movem b,runblk+1
+	movsi b,(sixbit /sys/)
+	movem b,runblk
+	move a,[1,,runblk]	;fake an xexec "exit" command
+	run a,
+	halt		;monitor takes this if fails
+
+
+
+notval:	outstr [asciz /
+not valid user on this computer/]
+	jrst comout
+
+badpas: sosg bdpwct	;see if allowed number of failures exceeded
+	 jrst comout	;if yes then get out
+	clrbfi		;clear the input buffer
+	tlz f,fl.npt	;clear the no prompt for project code
+	outstr [asciz/
+error, type password: /]
+	pushj p,getpas		;get password again
+	pushj p,fndpas		;test again
+	 jrst badpas		;still didnt match
+	popj p,
+
+alrdin:	outstr [asciz /
+already logged in/]
+	exit		;this code is for people who .r loginn
+
+alredy: move m,innam
+	pushj p,sixmsg
+	skipe m,innam1
+	pushj p,sixmsg
+	outstr [asciz/ already logged in/]
+	jrst comout	;this code for those with lonejb who
+			;try to log in a second job
+
+jcapyx:	outstr [asciz/
+job capacity exceeded/]
+	jrst comout	;here for no more slots to log him in
+
+notvl1:	outstr [asciz /
+can not login under this user name/]
+	jrst comout
+
+rstrct:	outstr [asciz /
+restricted/]
+	jrst comout	;do not let him in
+
+syshut: outstr [asciz/
+host shut/]
+	jrst comout	;do not let him in
+
+repmsg:	asciz/
+system problem, please see your representative/
+
+nopas:	outstr [asciz/
+can not access pas file/]
+	jrst comout
+
+
+licerr:	;get here with b/licenses we've currently got
+	;some are missing. send special msg to users
+	;in case licopr is missing & cty doesnt get msg
+	movei a,[asciz/
+system problem "l", please see your representative/]
+	movei	b,[asciz /
+loginn program missing license(s)
+/]
+	pushj	p,errmsg
+	jrst	comout
+
+uuoerr:
+jalerr:
+syserr:
+	movei	b,[asciz /
+loginn program uuo failure at /]
+	movei	a,repmsg
+	pushj	p,errmsg
+; Now append UUO address to CTY message
+	subi	n,2		;Adjust JSP return to address of UUO
+	movei	t1,6		;Counter for octal address type-out
+	push	p,t1		;Save count, since T1 is needed
+	hrlz	n,n		;Set up octal address for loop
+	move	t1,[point 7,t2-1,35] ;ASCII byte pointer into t2-t3
+	setzb	t2,t3		;String storage
+uuoer1:	hrri	n,"0"_-3	;High-order four bits of ASCII digit
+	rot	n,3		;Shift in low-order three bits
+	idpb	n,t1		;Build string in t2-t3
+	sosle	(p)		;Loop on count
+	jrst	uuoer1		;Back for more
+	ior	t3,[byte (7) 0,15,12,15,12] ;Add CR-LF's after 6th digit
+	move	t1,[suumsg,,t2]	;Arg word for SETUUO
+	setuuo	t1,		;Write address to CTY
+	  jfcl
+	pop	p,t1		;Adjust stack
+	jrst	comout		;Die ignobly
+
+
+comment ! routine errmsg
+function: type the asciz at t1 to the user, setuuo the
+	asciz at t2 to cty & opr tty (will fail if licopr missing)
+destroy: lh of t2
+!
+errmsg: outstr (t1)
+	hrli t2,suumsg
+	setuuo t2,
+	jfcl
+	popj p,
+COMMENT ! ROUTINE ACCT
+FUNCTION:  LOG THE USER INTO SYSTEM (SET JBTAUN,PRV,PPN,UNM/UN1
+	VIA LOGIN UUO) AND PUT HIS STREAM ACCOUNTING LOGIN RECORD
+	INTO STREAM IF POSSIBLE.
+EXPECTS:  STREAM RECORD ALREADY PARTIALLY COMPOSED IN STMDAT
+	ARRAY (RDNAM1 PUTS PJC THERE).
+	  ARRAY LOGTAB SET UP FOR LOGIN UUO.
+!
+
+ACCT:
+	move a,[xwd -logsiz,logtab]
+  ife deb,<
+	login a,		;***do the login uuo***
+	jfcl			;(so it returns)
+	 >;end ife deb. No UUO if debugging
+	hrroi a,tabsts
+	gettab a,
+	jsp n, uuoerr		;failed,bomb him out
+	tlz a,jacct
+	setjal a,		;clear jacct in jbtsts
+	jfcl
+
+	move a,stmhed
+	movem a,stmdat	;login type record header word
+	hrroi a,ldblog
+	gettab a,
+	 jsp n,uuoerr	;sorry
+	movem a,stmdat+6;supervisor info
+	ldb a,[point 4,a,11];terminal type
+	dpb a,[point 12,stmdat,29]
+	pjob a,		;job no.
+	dpb a,[point 9,stmdat,17]
+	move a,inaun	;users aun to word 2
+	movem a,stmdat+2
+	movei a,s.shov	;get location of shut override bit
+	andcam a,stmdat+5	;make sure bit clear
+	tlne f,fl.sts	;skip if shut override not set
+	iorm a,stmdat+5	;indicate shut over was on in stream
+	movei a,stmdat	;monitor will date-stamp
+	putsar a,	;this stream record
+	 jrst acctf	;failed, analyze
+	popj p,
+;-this rec contains pjc in words 3,4,5 written by rdnam1.
+
+acctf:	jumpe a,cpopj	;a=err code from putsar. 0 means no acctg for sys
+	movei a,repmsg
+	movei b,[asciz/
+loginn bad putsar arguments. potential
+acct'g problem. leave system up. notify o.s. group
+/]
+	pushj p,errmsg		;tell user one thing & oper the other
+	popj p,		;go on without login record
+
+
+subttl type date, time, and message of the day
+inmss:	mstime a,
+	idivi a,^d1000	;to minutes
+	hrrm a,datime
+	date a,
+	hrlm a,datime
+	movsi a,lnomes
+	tdne a,inbits	;should this user get the tymshare msg?
+	jrst inmss2	;no
+	outstr [asciz /
+tymshare  /]
+	hrrz a,datime
+	idivi a,^d60
+	idivi	a,^d60		;now break in mins and hrs
+	move	n,a		;hours
+	pushj	p,decpr2
+	move	n,b		;minutes
+	pushj	p,decpr2
+	outchr [11]
+	hlrz a,datime
+	pushj p,datpr
+inmss2:	tlz f,f.bcast		;no broadcastt letters yee
+	movei a,lleta		;are there any?
+	tdnn a,inbits
+	jrst lokmal		;no, see if mail waiting
+	tlo f,f.bcast		;yes, remember to send
+	movei a,16
+	hrli a,400000	;physical only
+	movsi b,'DSK'
+	movei c,0
+	open ufd,a
+	 jrst gotmal		;can't get lud, just say mail
+	movsi a,(sixbit /lud/)
+	movsi b,(sixbit /sys/)
+	movei c,0
+	move d,sysppn
+	lookup ufd,a
+	 jrst gotmal		;again, can't get it
+	movei n,^d12		;number of times to try
+entlud:	movei c,0
+	move d,sysppn
+	enter ufd,a		;get lud in update mode
+	 jrst ludbsy		;busy
+	pushj p,fndusr		;find this user
+	 jrst gotmal		;can't, say mail waiting
+	movei a,lleta
+	andcam a,buf+lbits(wd)	;reset bits
+	useto ufd,@usrblk
+	output ufd,cmd
+	close ufd,0
+	jrst lokmal		;now send and see about mail
+
+ludbsy:	sojl n,gotmal		;give up waiting
+	movei d,^d10
+	sleep d,		;wait
+	jrst entlud		;and retry
+
+comment ! lokmal
+function: 1)type any broadcast letters from (sys)xoblam
+	if user's lud entry had letter bits on. update the
+	xoblam file letter "already sent" counts if possible.
+	2) see if "mail" is waiting in (sys)xoblam
+	for non-japan-exec-mode (gemode) users, or (sys)xobnpo
+	for japan-exec users; type "opnotice waiting" (japan user)
+	or "mail waiting" (other users).
+(For further understanding, refer to RPG.MAC SEND & MAIL code
+where a description of the mail structure lives.)
+!
+
+; check for new style mail and print message
+;	if (MAIL)aun.MAI exists
+;
+LOKMAL:	movei a,16
+	hrli a,400000
+	movsi b,'DSK'
+	movei c,0
+	open ufd,a
+	 jrst nomail
+	move a,inaun		; file (MAIL)aun.MAI
+	movsi b,(sixbit "MAI")
+	setz c,
+	movei d,[sixbit "MAIL"
+		exp 0]
+	lookup ufd,a
+	 jrst lokma2
+	ldb a,[point 2,inprv,28]	;his jbtprv mode
+	cain a,gemode
+	 skipa a,[[asciz "[opnotice waiting]
+"]]
+	 movei a,[asciz "[mail waiting]
+"]
+	outstr (a)
+
+lokma2:	ldb a,[point 2,inprv,28]	;his jbtprv mode
+	cain a,gemode
+	tlo f,f.gem
+	tlnn f,f.bcast		;do any broadcast letters exist
+	jrst lkml2		;no
+	move a,[sixbit /xoblam/]
+	setzb b,c
+	move d,sysppn
+	lookup ufd,a
+	 jrst nomail
+	pushj p,sendbc	;send them
+	release ufd,0	;possibly updating (sys)xoblam
+lkml2:	movei a,16
+	hrli a,400000
+	movsi b,'DSK'
+	movei c,0
+	open ufd,a
+	jrst nomail
+	setzb b,c
+	move d,sysppn
+	tlne f,f.gem
+	skipa a,[sixbit/xobnpo/] ;"opnbox"--opnotice box
+	move a,[sixbit/xoblam/]		;"malbox" - for non-japan
+	lookup ufd,a	;lookup (sys)xob###
+	jrst nomail
+	move a,innam	;find hash
+	add a,innam+1
+	tlz a,400000
+	idivi a,malhsh
+	useti ufd,2(b)	;this is the block he should be in
+	move a,innam	;get ready to search
+	move b,innam+1
+nxmbk:	input ufd,cmd
+	move c,[xwd -40,0]	;40, 4-word blocks
+msrc:	skipn buf(c)	;zero is end of mail
+	jrst nomail
+	camn a,buf(c)
+	came b,buf+1(c)
+	skipa
+	jrst gotmal		;found some
+	addi c,3
+	aobjn c,msrc
+	jrst nxmbk		;read next block and try it
+gotmal:
+	ldb a,[point 2,inprv,28]	;if ge-(japan) mode, dont
+	cain a,gemode	;use the word "mail"--japanese dont like 
+	skipa a,[exp [asciz/
+opnotice waiting
+/]  ]
+	movei a,[asciz/
+mail waiting
+/]
+	outstr (a)
+nomail:	close ufd,0
+	popj p,
+datpr:	idivi	a,^d31		;the usual date printer
+	movei	n,1(b)		;day of month
+	pushj	p,decpr2
+	idivi	a,^d12		;month and year
+	move	b,montab(b)
+	movem	b,datemp
+	setzm	datemp+1	;for asciz, ddtout
+	outstr datemp
+	movei	n,^d1964(a)	;year
+	pushj	p,decpr2
+	pjrst crlf
+
+array datemp[2]
+
+montab:	ascii /-jan-/
+	ascii /-feb-/
+	ascii /-mar-/
+	ascii /-apr-/
+	ascii /-may-/
+	ascii /-jun-/
+	ascii /-jul-/
+	ascii /-aug-/
+	ascii /-sep-/
+	ascii /-oct-/
+	ascii /-nov-/
+	ascii /-dec-/
+
+comment ! SENDBC; send Broadcast Letters.  !
+
+sendbc:	movei n,^d12	;set to wait a whille
+entmal:	movei c,0
+	move d,sysppn
+	enter ufd,a
+	 jrst malbsy	;try again later
+malset:	movei a,llet1
+	movei b,1
+nxbrd:	tdne a,inbits	;send this one?
+	pushj p,brdcst	;yes
+	trne a,llete	;last one to look at?
+	popj p,		;yes, done
+	lsh a,1
+	aoja b,nxbrd
+
+malbsy:	movei d,^d10
+	sleep d,
+	sojge n,entmal	;try again
+	tlz f,f.bcast	;send anyway but don't change count
+	jrst malset
+
+brdcst:	move c,b
+	trnn c,1	;which half
+	tdza wd,wd
+	movei wd,100
+	lsh c,-1	;which block
+	useti ufd,202(c)
+	input ufd,cmd
+	date d,	;get current date
+	sosl buf+malcnt(wd)	;if count is 0
+	caml d,buf+malexp(wd)	;or mail expired
+	popj p,		;don't print
+	skipn buf+malnam(wd)	;also if name has gone to 0
+	popj p,
+	push p,a
+	push p,b
+	move a,buf+maldat(wd)	;print date
+	pushj p,datpr
+	outstr buf+maltxt(wd)	;and text of letter
+	outstr [asciz /
+/]
+	pop p,b
+	pop p,a
+	tlnn f,f.bcast		;do we have mailbox in update?
+	popj p,
+	useto ufd,202(c)
+	output ufd,cmd		;change count
+	popj p,
+
+comment ! INOPR;  stuff to do when OPERs are logging in !
+
+inopr:	hrroi a,ldblog
+	gettab a,
+	 jsp n,uuoerr
+	tlnn a,2	;is is node 1000-1777 (remotes)
+	popj p,		;no, assume aux circuit of some kind
+	hlrz a,inaun	;do these things for OPERs only
+	caie a,oprgan
+	  popj p,
+	move a,[alritm,,alrtab]
+	gettab a,		;get alarms
+	 jsp n,uuoerr
+	trne a,almcty
+	outstr [asciz /
+message on console teletype
+/]
+	trne a,almrmt
+	outstr [asciz /
+rps 620 down
+/]
+	move a,[opritm,,oprtab]
+	gettab a,
+	 jsp n,uuoerr
+	jumpn a,cpopj
+	movsi a,suuopr		;no opr set
+	setuuo a,
+	 popj p,
+	outstr [asciz /
+no opr terminal - set opr done for this terminal
+/]
+	popj p,
+
+subttl login stream rec def'n & buffers
+
+logtyp==40	;stream record type for login records
+loglng==7	;length
+stmhed:	byte (9)logtyp,0 (18)loglng
+array stmdat[loglng]	;"acct" composes rec in this buffer.
+lvar
+name==stmdat+3	;this is how pjc gets into login record
+
+subttl ufdset--check out user's files, make ufd if needed
+;subroutine to set up a ufd for use  v002
+;	a=status bits
+;	b=a+1=first come first served quota
+;	c=b+1=logged out quota
+;	m=name of str
+;	ch=accumulator to contain char to be typed
+;	f=flag register
+;	p=push down list pointer
+;
+;if c=-1 assume no ufd desired - perform other operations
+;
+;	usr=free i/o channel
+;	us1=free i/o channel
+;
+;call	pushj	p,ufdset
+;error	dont proceed (message typed)
+;ok	str is in search list (warning may be typed)
+;
+;
+;only call:  fs1+xx/ pushj p,ufdset
+;		+1 /  jfcl		;ignore fail ret
+
+
+;assumes symbols for ac's above defined, locations cpopj, cpopj1 defined
+;
+;uses u and uu macros to reserve storage for either high or low
+;segment operation.
+;
+;routines defined here:
+;
+;msg:	 types string of ascii chars to first null
+;sixmsg:	 types contents of m as sixbit chars
+;crlf:	 types carriage return line feed
+;octprt: types contents of n as octal number
+;mpopj:	 pop p,m follwed by popj p,
+;r.usr:	 reads next word from channel usr into a (buffer header rh.usr, buffer b.usr)
+;addstr: add file structure to search list
+;disstr: delete file structure from search list
+
+mntsub==1		;declare in case dismount subroutine also appears
+ufdgil==^d360		;times to try to get ufd interlock
+;ufdalc==0;oblosete. aaa;blocks to allocate for ufds (0=standard)
+racey==2		;value of level d field in states word for monitors
+			;which include race condition improvements
+
+;arguments for extended lookup, enter, rename
+
+;-exllen==34	;length arg list, before pjc facility
+exllen==41	;new length, 3 new rib locns for pjc,etc.
+exlppn==1	;directory name
+exlnam==2	;file name
+exlext==3	;ext
+exlalc==11	;blocks allocated for file
+exldev==16	;device on which file looked up is
+exlsts==17	;status bits
+  riplog==400000	;lh bit is logged in bit
+  ripdir==400000	;rh bit is directory bit
+exlmxa==24	;reserved quota
+exlqtf==22	;first come, first served quota
+exlqto==23	;logged-out quota
+exlusd==25	;blocks used
+exlun1==27	;first part of user name in dir
+exlun2==30	;second part of user name in dir
+exltru==31
+exlalp==33
+
+chrufb==1	;ufbtal word
+chrlen==14	;length of dskchr block
+  d.mc==10000	;bit in lh of dskchr ac return=1 if mount count=0
+
+  cnftbl==11	;configuration table for gettab
+  segptr==15	;index for segments, jobs
+
+srcdsl==1	;struuo function to set new search list
+  strjmx==9	;maximum number of strs per job
+  srwps==3	;words per str entry in search list
+  s.swl==400000	;software write lock
+s.ncr==200000	;no create bit
+rdffst==3	;struuo function to redefine file structure ***
+  s.sin==200000	;single access
+ulkstr==6	;struuo function to test/set ufd interlock
+uclstr==7	;struuo function to clear ufd interlock
+ufperr==100000	;bit on sez some ripxxx bit on,lookup file
+
+
+gobjob==0	;index for job number in arg list
+gobppn==1	;index for ppn
+gobnam==2	;index for str name
+
+	opdef pjrst [jrst]
+
+	define ufdsem(text)<
+	xlist
+	movei	n1,[asciz \text\]
+	jrst	ufdsmp
+	list
+>
+
+array srcbuf[exllen],chrbuf[chrlen],secbuf[exlsts+1]
+array ufnarg[10],ufnbuf[4*^d102]
+lvar
+
+
+	extern	jobff
+
+ufdset:	movem	m,ufdfsn	;and name of str
+	movei	n,0		;n=reserved quota
+	move	m,b		;m=fcfs quota fr lud conv to pgs aaa
+	move	ch,c		;ch=logged out quota,also in pgs
+	move wd,a		;satus bits
+	movei	n1,ufdgil	;number of times to try for ufd interlock
+ufdsta:	movei	b,ulkstr	;user-mode ufd interlock function
+	pushj	p,stufc1	;test/set ufd interlock
+	  jrst	stufbs		;busy, sleep and retry
+	move	b,ufdfsn
+	movei	a,17
+	hrli a,400000
+	movei	c,rh.usr ;inbuf needs a buffer ring hder. aaa
+	open	usr,a		;init this file structure
+	  jrst	ufdse2		;how can this be?
+	inbuf	usr,1;this looks unnecessary to me.aaa	;declare our 1 buffer
+	pushj	p,setexl	;set up srcbuf for extended lookup of ufd
+	setzb	c,srcbuf+4	;clear rest of lookup block
+	move	a,[xwd srcbuf+4,srcbuf+5]
+	blt	a,srcbuf+exllen-1
+	lookup	usr,srcbuf	;lookup ufd
+	  skipa	a,srcbuf+exlext	;get error code in a
+	jrst	ufdex		;ufd exists, look at it
+	trne	a,-1		;skip if no ufd
+	jrst	ufdse3		;there's something wrong with this ufd
+
+;here if must create a ufd
+
+	movem	n,srcbuf+exlmxa	;store maximum
+	movem	m,srcbuf+exlqtf	;and fcfs
+	movem	ch,srcbuf+exlqto ;and logged out quota
+	setzm srcbuf+exltru	;zero this when creating a ufd
+	tlz f,fl.fuf		;so it does not look like out of time
+	pushj	p,setexl	;set up for extended enter of ufd
+	move	a,[xwd riplog,ripdir]	;set directory bit and logged in bit
+	movem	a,srcbuf+exlsts
+	move a,innam
+	movem a,srcbuf+exlun1
+	move a,innam1
+	movem a,srcbuf+exlun2
+	enter	usr,srcbuf	;try to create a ufd
+	  jrst	ufdse1		;identify enter failure
+	close	usr,		;an empty ufd
+	jrst	ufdok		;all set
+
+;here if ufd already exists
+
+ufdex:	movem	m,srcbuf+exlqtf	;and fcfs
+	movem	ch,srcbuf+exlqto ;and logged out quota
+	tlze f,fl.fuf
+	jrst chktru	;tru need checking
+oktru:	movsi	a,riplog!ripbfa!ripcrh!riphre!riphwe!ripbdr!ripbda	;logged in bit and error bits
+	tdnn	a,srcbuf+exlsts	;skip if bit on in ufd
+	jrst	ufdex2		;no, can proceed
+	move b,[xwd segptr,cnftbl]
+	gettab b,		;get number of jobs
+	 jsp n,uuoerr
+	movni b,-1(b)
+	hrlzs b
+	pjob e,			;e:=this job. aaa
+ufdex1:	move c,ufdfsn
+	movem c,chrbuf+gobnam
+	move c,inppn
+	movem c,chrbuf+gobppn
+	movei c,1(b)	;job
+	camn c,e		;dont look at this job
+	jrst .fdex2		;keep looking at others
+	movem c,chrbuf+gobjob
+	movei c,chrbuf
+	gobstr c,
+	 skipa		;not in this jobs search list or not same ppn
+	jrst ufdex5	;go
+.fdex2:	aobjn b,ufdex1
+	andcam a,srcbuf+exlsts	;reset
+	movsi a,riplog
+	iorm a,srcbuf+exlsts	;and set logged in
+
+;here to lookup all files and recompute ribusd
+
+	setzb	a,c
+	hrli a,400000
+	move	b,ufdfsn
+	open	us1,a		;open file structure
+	  jrst	ufdse2
+	setzm	srcbuf+exlusd	;clear used word
+	move a,[-4*^d102,,ufnbuf]
+	movem a,ufnarg
+	movsi a,(sixbit/*/)
+	movem a,ufnarg+1
+	movem a,ufnarg+2	;file *.*
+	setzm ufnarg+4
+	movsi a,220000
+	movem a,ufnarg+3
+allk0:	move a,[33,,usr]
+	chanio a,ufnarg
+	 jrst ufdrer
+	move c,ufnarg
+allk1:	sosge ufnarg+7
+	jrst allk0
+	move a,(c)
+	movem a,secbuf+exlnam
+	move a,1(c)
+	movem a,secbuf+exlext
+	move	a,inppn	;user's ppn
+	movem	a,secbuf+exlppn
+	movei	a,exlalp
+	movem	a,secbuf	;set number of args to get alp word
+	move a,2(c)
+	jumpl a,allku	;lookup required
+	movei b,ufperr
+	tdne b,3(c)	;check special status flag
+	jrst allku
+	ash a,-2 ;kludge convert blocks->pgs.aaa.dec 76
+	addm a,srcbuf+exlusd
+allk2:	addi c,4
+	jrst allk1
+
+allku:	lookup	us1,secbuf	;lookup file
+	jrst	[hrrz a,secbuf+exlext ;did this fail because
+		caie a,6	;of a rib error?
+		jrst allk2	;no.
+		movsi a,ripbdr ;yes, warn the
+		jrst allk4]	;user.
+	move	a,secbuf+exlalp ;get blocks allocated for this file
+	addm	a,srcbuf+exlusd ;count for all files
+	hrlz a,secbuf+exlsts
+	tlne a,ripcrh
+	pushj p,crhfil
+	tlne a,ripbfa
+	pushj p,bfafil
+	tlne a,ripbda
+	pushj p,bdafil
+allk4:	tlne	a,ripbdr
+	pushj	p,bdrfil
+	tlne a,riphwe
+	pushj p,hwefil
+	tlne a,riphre
+	pushj p,hrefil
+	and a,[xwd ripbfa!ripcrh!riphre!riphwe!ripbdr!ripbda,0]
+	iorm a,srcbuf+exlsts	;put bits back in dir
+	jrst allk2
+
+strfil:	move m,ufdfsn
+	pushj p,sixmsg
+	outchr [":"]
+	move m,secbuf+exlnam
+	pushj p,sixmsg
+	hllz m,secbuf+exlext
+	jumpe m,cpopj
+	outchr ["."]
+	pjrst sixmsg
+
+crhfil:	pushj p,strfil
+	outstr [asciz / partially written file closed after monitor stopped
+/]
+	popj p,
+
+bfafil:	pushj p,strfil
+	outstr [asciz / found bad by restore
+/]
+	popj p,
+
+bdafil:	pushj p,strfil
+	outstr [asciz / found bad by damage assessment program
+/]
+	popj p,
+
+bdrfil:	pushj p,strfil
+	outstr [asciz / rib error
+/]
+	popj p,
+
+hrefil:	pushj p,strfil
+	outstr [asciz / hardware data read error detected
+/]
+	popj p,
+
+hwefil:	pushj p,strfil
+	outstr [asciz / hardware data write error detected
+/]
+	popj p,
+
+chktru:	tlne f,fl.rst	;is system restrict bit on
+	skipge a,intru	;and really a limit there?
+	jrst oktru	;no to either, ok
+	caml a,srcbuf+exltru	;is it exceeded
+	jrst oktru
+	tlo f,fl.fuf
+	pushj p,stufcl	;clear interlock
+	 jrst cpopj1
+	jrst cpopj1
+
+;here if read error (may be eof)
+
+ufdrer:	close	us1,
+	getsts	usr,a		;a=error code
+	movei	m,[asciz . ufd read error, status = .]
+	trnn	a,20000		;skip if error, not eof
+	jrst	ufdse4		;tell user about error, no ufd
+	jrst	ufdex3		;all set
+
+
+ufdex2:	movsi a,riplog	;here fr oktru+2 when no err bits on in ufd ribsts
+	iorm	a,srcbuf+exlsts	;make sure logged in bit on
+ufdex5:	setom	srcbuf+exlusd	;use monitor's copy of ufbtal to compute ribusd
+ufdex3:	move a,innam
+	movem a,srcbuf+exlun1
+	move a,innam1
+	movem a,srcbuf+exlun2
+	setom srcbuf+exlmxa
+	pushj	p,setexl	;set up srcbuf for extended rename
+  ife deb,<
+	rename	usr,srcbuf
+	  skipa	a,srcbuf+exlext
+	 >;end ife deb. Leave UFD alone if debugging
+	jrst	ufdok
+
+	movei	m,[asciz . ufd rename failure .]
+	jrst	ufdse4
+
+ufdse3:	movei	m,[asciz . ufd lookup failure .]
+	tlz f,fl.fuf	;reset flag
+ufdse4:	exch	m,ufdfsn
+	pushj	p,sixmsg
+	exch	m,ufdfsn
+	outstr (m)
+	hrrz	n,a		;n=error code
+	pushj	p,octprt
+	pushj	p,crlf
+	jrst	ufdok
+
+ufdse1:	move	m,ufdfsn
+	pushj	p,sixmsg
+	outstr [asciz . ufd enter failure .]
+	hrrz	n,srcbuf+exlext
+	pushj	p,octprt
+	outstr [asciz .
+no ufd created
+.]
+
+ufdok:
+ufdok1:
+
+;here to clear ufd interlock
+
+	pushj	p,stufcl	;clear ufd interlock
+	  jrst	cpopj1		;what?
+	jrst	cpopj1		;all done
+
+ufdsmp:	outchi "?"
+	move m,ufdfsn
+	pushj p,sixmsg
+	outchi " "
+	outstr (n1)
+	pjrst crlf
+
+;here when ufd interlock is busy - sleep and retry
+
+stufbs:	movei	a,1
+	sleep	a,	;sleep for 1 second
+	sojg	n1,ufdsta
+	tlz f,fl.fuf
+	ufdsem <ufd interlock busy>
+
+ufdse2:	tlz f,fl.fuf
+	pushj	p,stufcl
+	  jfcl
+	ufdsem <cant open>
+
+
+;subroutine to test/set or clear ufd interlock
+;enter at stufcl to clear
+;enter at stufc1 with b=function
+;return popj if failed
+;return cpopj1 if ok
+
+stufcl:	movei	b,uclstr
+stufc1:	move	a,[xwd 3,b]
+	move	c,ufdfsn
+	move	d,inppn
+  ife deb,<
+	struuo	a,
+	  popj	p,
+	 >;end ife deb
+	pjrst	cpopj1
+
+;subroutine to set up header for extended lookup/enter/rename of ufd
+
+setexl:	movei	a,exllen-1	;length of arg list
+	movem	a,srcbuf
+	move	a,inppn	;name is user's ppn
+	movem	a,srcbuf+exlnam
+	movsi	a,(sixbit .ufd.)	;ext is ufd
+	movem	a,srcbuf+exlext
+	move	a,mfdppn	;directory is mfd
+	movem	a,srcbuf+exlppn
+	popj	p,
+
+subttl	typmsg - look for dsk:access.msg and type if present
+
+ifndef msg,<msg==0>
+
+typmsg:	init msg,1
+	sixbit "SYS"
+	xwd 0,bufmsg
+	  skipa
+	pushj p,msgtry	; try device sys
+	init msg,1
+	sixbit "DSK"
+	xwd 0,bufmsg
+	  jrst msgdon
+		; try device dsk and return to main
+msgtry:	move t1,[sixbit "ACCESS"]
+	movem t1,lkbmsg
+	movsi t1,'MSG'
+	movem t1,lkbmsg+1
+ 	setzm lkbmsg+3
+	lookup msg,lkbmsg
+	  jrst msgdon
+	ldb t2,[point 3,lkbmsg+2,2]	; get owner protection field
+	caile t2,prv.rd	; no lk or run?
+	  jrst msgdon	;   yes - can't read it
+	setzm twtmsg	; clear flag to ignore line numbers
+msgin:	sosge bufmsg+2
+	  jrst msginp
+	ildb t2,bufmsg+1
+	jumpe t2,msgin	; ignore nulls
+	move t1,@bufmsg+1
+	trne t1,1
+	  setom twtmsg	; set flag that this a line number
+	skipe twtmsg
+	  jrst msgtab	; skip to tab check
+	cain t2,177	; a rubout?
+	  hrroi t2,"#"-100
+	cain t2,"~"	; a tilde?
+	  hrroi t2,"%"-100
+	cail t2," "	; control character?
+	  jrst msgchi	; no!
+	cail t2,"G"-100	; allow bell thru carriage return
+	caile t2,"M"-100
+	 caia
+	jrst msgchi	; print it
+	outchi	"^"	; else print as ^ char
+	movei t2,"@"(t2)
+msgchi:	outchi (t2)
+msgtab:	cain t2,11
+	  setzm twtmsg
+	jrst msgin
+msginp:	in msg,
+	  jrst msgin
+msgdon:	releas msg,
+	popj p,
+
+	xlist	;literals
+	lit
+	list	;literals
+
+lgiend:	end	stpt
+ &¯
