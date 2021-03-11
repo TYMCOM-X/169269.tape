@@ -1,0 +1,7 @@
+$menu MONITOR;TYMCOM-X monitor documentation tree.
+*(MONDOC)EXTERN.NFO:EXTERNAL;External monitor documentation.
+*(MONDOC)FORMAT.NFO:FORMAT;System File Formats.
+*(MONDOC)INTERN.NFO:INTERNAL;Internal monitor documentation.
+*(MONDOC)MONPRO.NFO:PROCEDURES;Monitor Group Procedures.
+*(MONDOC)PEOPLE.NFO:PEOPLE;Information about TYMCOM-X people.
+*(MONDOC)STANDA.NFO:STANDALONE;Stand alone programs.
