@@ -1,0 +1,2210 @@
+!! title 5.18.84:
+
+!dir (MAIL)/y
+MAIL    LOG      32  18-MAY-84  706.32 ALL RD  NO     15701           (WRS)
+"0+&6J  MAI       2  17-MAY-84 1548.33 ALL RD  NO        42           (KEN)
+"0+52G  MAI       2  17-MAY-84 1548.33 ALL RD  NO        42           (KEN)
+
+!dir (KEN)/y
+WRDMSK  PRT       3  17-MAY-84 1514.33 ALL RD  NO       849           (PARNES)
+MAIL              5  17-MAY-84 1548.47 ALL RD  NO      1800           (KEN)
+
+!dir (NEWFDM)/y
+VMCOPY  SAI       5  17-MAY-84 1621.24 ALL RD  NO      1900           (CARL)
+
+!dir (KDEV2)/y
+NAMES   CTL       3  17-MAY-84   40.03 ALL RD  NO       543           (KEN)
+NAMES   LOG       1  17-MAY-84 1002.00 ALL RD  NO      2560           (KEN)
+DUMP    REL       3  17-MAY-84 1310.09 ALL RD  NO       752           (KEN)
+COPYPC  SAI      13  17-MAY-84 1556.50 ALL RD  NO      5700           (KEN)
+DUMP    SAI       2  17-MAY-84 1244.44 ALL RD  NO       281           (KEN)
+DUMP    SAV      20  17-MAY-84 1310.36 ALL RD  NO      9247           (KEN)
+
+!dir (KLIB)/y
+SYS     BAK       2  17-MAY-84 1255.52 ALL RD  NO        24           (KEN)
+SAIL    HDR       3  17-MAY-84 1210.29 ALL RD  NO       930           (KEN)
+SYS     REQ       2  17-MAY-84 1309.51 ALL RD  NO        25           (KEN)
+
+!dir (SPPOPER)/y
+P034    MKR       2  17-MAY-84 1255.47 ALL RD  NO         2           (SPPOPER)
+
+!dir (LOIS)/y
+P034    MKR       2  17-MAY-84 1606.02 ALL RD  NO         2           (LOIS)
+DUMP    SAI       2  17-MAY-84 1150.00 ALL RD  NO       158           (LOIS)
+56      TH       24  17-MAY-84 1139.49 ALL RD  NO     11652           (LOIS)
+MAIL              4  17-MAY-84  927.28 ALL RD  NO      1338           (LOIS)
+
+!dir (JW.DSKCLN)/y
+CHNGS   BAK       5  18-MAY-84   10.00 ALL RD  NO      1596           (WILKES)
+DSKCLN  BAK      35  17-MAY-84 2358.10 ALL RD  NO     17137           (WILKES)
+DSKINT  BAK       2  17-MAY-84 2159.45 ALL RD  NO       312           (WILKES)
+FOO     BAK       2  17-MAY-84 2025.07 ALL RD  NO        18           (WILKES)
+CHNGS   MAC       5  18-MAY-84   21.09 ALL RD  NO      1672           (WILKES)
+DSKCLN  MAC      35  18-MAY-84    0.44 ALL RD  NO     17137           (WILKES)
+DSKINT  MAC       2  17-MAY-84 2202.32 ALL RD  NO       312           (WILKES)
+FOO     MAC       2  17-MAY-84 2026.59 ALL RD  NO        18           (WILKES)
+INTERR  MAC       2  17-MAY-84 1015.55 ALL RD  NO       357           (WILKES)
+DSKERR  MEM       2  17-MAY-84 1310.10 ALL RD  NO       149           (WILKES)
+DSKCLN  REL      11  18-MAY-84    0.52 ALL RD  NO      4977           (WILKES)
+INTERR  REL       2  17-MAY-84 1016.02 ALL RD  NO       192           (WILKES)
+
+!dir (WILKES)/y
+CARL    BAK       2  17-MAY-84 1059.09 ALL RD  NO       312           (WILKES)
+PAGERR  MAI       2  17-MAY-84 1112.35 ALL RD  NO       414           (WILKES)
+MAIL              6  17-MAY-84 1224.00 ALL RD  NO      2112           (WILKES)
+PHONES            2  17-MAY-84 1322.21 ALL RD  NO       173           (WILKES)
+
+!dir (TSUCOOP)/y
+TH0517  INC       5  17-MAY-84 1007.26 ALL RD  NO      1887           (TSUCOOP)
+TURNUP  MSG       2  17-MAY-84  944.09 ALL RD  NO       102           (TSUCOOP)
+
+!dir (M33)/y
+NOTICE  107       2  18-MAY-84  429.16 ALL RD  NO       192           (M33)
+NOTICE  108       2  18-MAY-84  128.57 ALL RD  NO       410           (M33)
+NOTICE  25        2  17-MAY-84 1103.25 ALL RD  NO        78           (M33)
+NOTICE  26        1  18-MAY-84  104.05 ALL RD  NO         0           (M33)
+NOTICE  29        2  18-MAY-84  352.10 ALL RD  NO        71           (M33)
+NOTICE  30        2  18-MAY-84  445.01 ALL RD  NO        84           (M33)
+NOTICE  33        2  17-MAY-84  926.27 ALL RD  NO       344           (M33)
+NOTICE  36        2  18-MAY-84    3.57 ALL RD  NO        54           (M33)
+NOTICE  38        2  17-MAY-84  938.15 ALL RD  NO       102           (M33)
+NOTICE  39        2  17-MAY-84 1851.44 ALL RD  NO       209           (M33)
+NOTICE  57        1  18-MAY-84  337.43 ALL RD  NO         0           (M33)
+NOTICE  70        2  17-MAY-84  939.57 ALL RD  NO       285           (M33)
+NOTICE  90        2  17-MAY-84  936.51 ALL RD  NO        95           (M33)
+
+!dir (CARL)/y
+SCAN    SYS      38  17-MAY-84 1845.33 ALL RD  NO     18658           (CARL)
+!! title 5.19.84:
+
+!dir (MAIL)/aft 19
+MAIL    LOG      35  21-MAY-84 1108.15 ALL RD  NO     17312           (WRS)
+
+!dir (KDEV2)/aft 19
+NAMES   CTL       3  21-MAY-84 1137.25 ALL RD  NO       713           (KEN)
+NAMS    LOG       3  21-MAY-84 1136.28 ALL RD  NO       862           (KEN)
+
+!dir (LOIS)/aft 19
+P034    MKR       2  21-MAY-84 1144.06 ALL RD  NO         2           (LOIS)
+56      MON      21  21-MAY-84 1105.38 ALL RD  NO     10180           (LOIS)
+TURNUP  MSG       2  21-MAY-84 1053.22 ALL RD  NO        15           (LOIS)
+MAIL              4  21-MAY-84  909.31 ALL RD  NO      1392           (LOIS)
+
+!dir (TSUCOOP)/aft 19
+0521    INC       4  21-MAY-84  907.58 ALL RD  NO      1371           (TSUCOOP)
+TURNUP  MSG       2  21-MAY-84  859.02 ALL RD  NO       102           (TSUCOOP)
+
+!dir (M33)/aft 19
+PHONES            2  21-MAY-84  952.38 ALL RD  NO       352           (LOIS)
+NOTICE  22        2  21-MAY-84  904.59 ALL RD  NO       171           (M33)
+NOTICE  23        2  19-MAY-84  332.42 ALL RD  NO        14           (M33)
+NOTICE  25        2  21-MAY-84  900.18 ALL RD  NO       114           (M33)
+NOTICE  26        1  19-MAY-84  216.14 ALL RD  NO         0           (M33)
+NOTICE  28        2  21-MAY-84  912.11 ALL RD  NO        28           (M33)
+NOTICE  30        2  21-MAY-84  858.21 ALL RD  NO        84           (M33)
+NOTICE  34        2  21-MAY-84  855.49 ALL RD  NO        14           (M33)
+NOTICE  35        2  21-MAY-84  913.04 ALL RD  NO       220           (M33)
+NOTICE  36        2  21-MAY-84  855.25 ALL RD  NO        68           (M33)
+NOTICE  38        2  21-MAY-84  858.48 ALL RD  NO       102           (M33)
+NOTICE  39        2  21-MAY-84  911.40 ALL RD  NO       224           (M33)
+NOTICE  55        2  21-MAY-84  855.25 ALL RD  NO        38           (M33)
+NOTICE  56        2  21-MAY-84 1118.16 ALL RD  NO       307           (M33)
+NOTICE  57        1  19-MAY-84  547.47 ALL RD  NO         0           (M33)
+NOTICE  70        2  21-MAY-84  915.09 ALL RD  NO       283           (M33)
+NOTICE  72        2  21-MAY-84  914.05 ALL RD  NO       457           (M33)
+NOTICE  74        2  21-MAY-84  908.39 ALL ALL ALL       17           (M33)
+NOTICE  90        2  21-MAY-84  908.43 ALL RD  NO        62           (M33)
+!! title 5.21.84:
+
+!dir (K.C)/aft 21
+UTIL    BAK       2  21-MAY-84 1204.17 ALL RD  NO       372           (KEN)
+U       C         3  21-MAY-84 1520.48 ALL RD  NO       563           (KEN)
+UTIL    C         3  21-MAY-84 1511.25 ALL RD  NO       563           (KEN)
+C       PEA       2  21-MAY-84 1204.18 ALL RD  NO        35           (KEN)
+UTIL    PRT       3  21-MAY-84 1511.34 ALL RD  NO       833           (KEN)
+
+!dir (MAIL)/aft 21
+MAIL    LOG      38  22-MAY-84  706.12 ALL RD  NO     18512           (WRS)
+  #>_:  MAI       2  21-MAY-84 2239.17 ALL RD  NO        85           (CARL)
+
+!dir (KEN)/aft 21
+TURNUP  BAK       2  21-MAY-84 1519.57 ALL RD  NO        55           (KEN)
+TURNUP  MSG       2  21-MAY-84 2045.50 ALL RD  NO        46           (KEN)
+MAIL              5  21-MAY-84 1117.13 ALL RD  NO      1922           (KEN)
+
+!dir (KDEV2)/aft 21
+NAMES   CTL       3  21-MAY-84 1212.27 ALL RD  NO       713           (KEN)
+NAMES   LOG       1  22-MAY-84  730.54 ALL RD  NO      2560           (KEN)
+NAMS    LOG       4  21-MAY-84 1211.36 ALL RD  NO      1319           (KEN)
+
+!dir (LOIS)/aft 21
+LIND1   MEM       2  21-MAY-84 1159.06 ALL RD  NO       348           (LOIS)
+P034    MKR       2  21-MAY-84 1644.40 ALL RD  NO         2           (LOIS)
+56      MON      21  21-MAY-84 1105.38 ALL RD  NO     10180           (LOIS)
+TURNUP  MSG       2  21-MAY-84 1053.22 ALL RD  NO        15           (LOIS)
+MAIL              4  21-MAY-84  909.31 ALL RD  NO      1392           (LOIS)
+
+!dir (MPL)/aft 21
+ND1051  MEM       2  21-MAY-84 1728.43 ALL RD  NO       175           (LOIS)
+ND421   MEM       2  21-MAY-84 1725.16 ALL RD  NO       161           (LOIS)
+
+!dir (JW.DSKCLN)/aft 21
+DSKCLN  BAK      36  21-MAY-84 1436.15 ALL RD  NO     17828           (WILKES)
+DSKCLN  DDT      15  21-MAY-84 1404.21 ALL RD  NO      6751           (WILKES)
+DSKCLN  DIF      14  21-MAY-84 1405.28 ALL RD  NO      6458           (WILKES)
+DSKCLN  MAC      36  21-MAY-84 1441.29 ALL RD  NO     17893           (WILKES)
+DSKCLN  SAV       8  21-MAY-84 1402.25 ALL RD  NO      3114           (WILKES)
+DSKCLN  UPD      38  21-MAY-84 1406.34 ALL RD  NO     18569           (WILKES)
+CARL              2  21-MAY-84 1451.33 ALL RD  NO        88           (WILKES)
+
+!dir (SPL)/aft 21
+SFTP    SAV       4  21-MAY-84 2154.48 ALL RD  NO      1323           (SPL)
+
+!dir (TSUCOOP)/aft 21
+CARL    BAK       2  22-MAY-84  258.35 ALL RD  NO        32           (TSUCOOP)
+LOIS    BAK       2  21-MAY-84 1218.10 ALL RD  NO        24           (TSUCOOP)
+0521    INC       4  21-MAY-84  907.58 ALL RD  NO      1371         UCOOP)
+CARL    LET       2  22-MAY-84  308.01 ALL RD  NO        97           (TSUCOOP)
+LOIS    LET       2  22-MAY-84  204.39 ALL RD  NO       197           (TSUCOOP)
+ACCESS  MSG       2  22-MAY-84  121.05 ALL RD  NO        50           (TSUCOOP)
+TURNUP  MSG       2  22-MAY-84  704.51 ALL RD  NO       102           (TSUCOOP)
+
+!dir (M33)/aft 21
+PHONES            2  21-MAY-84  952.38 ALL RD  NO       352           (LOIS)
+NOTICE  22        2  21-MAY-84 1211.24 ALL RD  NO       171           (M33)
+NOTICE  25        2  21-MAY-84  900.18 ALL RD  NO       114           (M33)
+NOTICE  26        1  22-MAY-84  224.06 ALL RD  NO         0           (M33)
+NOTICE  28        2  21-MAY-84  912.11 ALL RD  NO        28           (M33)
+NOTICE  29        2  22-MAY-84  102.04 ALL RD  NO        71           (M33)
+NOTICE  30        2  21-MAY-84  858.21 ALL RD  NO        84           (M33)
+NOTICE  33        2  22-MAY-84  644.00 ALL RD  NO       344           (M33)
+NOTICE  34        2  21-MAY-84 2142.28 ALL RD  NO        14           (M33)
+NOTICE  35        2  21-MAY-84 1226.22 ALL RD  NO       220           (M33)
+NOTICE  36        2  22-MAY-84  651.00 ALL RD  NO        68           (M33)
+NOTICE  38        2  21-MAY-84  858.48 ALL RD  NO       102           (M33)
+NOTICE  39        2  21-MAY-84 1450.14 ALL RD  NO       238           (M33)
+NOTICE  55        2  21-MAY-84  855.25 ALL RD  NO        38           (M33)
+NOTICE  56        2  22-MAY-84  401.27 ALL RD  NO       307           (M33)
+NOTICE  70        2  21-MAY-84  915.09 ALL RD  NO       283           (M33)
+NOTICE  72        2  21-MAY-84  914.05 ALL RD  NO       457           (M33)
+NOTICE  74        2  21-MAY-84  908.39 ALL ALL ALL       17           (M33)
+NOTICE  90        2  21-MAY-84 2306.52 ALL RD  NO        62           (M33)
+
+!dir (CARL)/aft 21
+CHERYL  BAK       3  21-MAY-84 1847.14 ALL RD  NO       657           (CARL)
+003TEL  COM       2  21-MAY-84 2037.58 ALL RD  NO        14           (CARL)
+005TEL  COM       2  21-MAY-84 1601.49 ALL RD  NO        24           (CARL)
+003TEL  OUT       2  21-MAY-84 2038.01 ALL RD  NO        32           (CARL)
+005TEL  OUT       2  21-MAY-84 1601.52 ALL RD  NO        47           (CARL)
+CHERYL  RES       3  21-MAY-84 1850.27 ALL RD  NO       654           (CARL)
+MAIN01  VUE       3  21-MAY-84 1628.27 ALL RD  NO       792           (CARL)
+
+!dir (FLETCHERC)/aft 21
+MAIL    BOX       2  21-MAY-84 1418.42 ALL RD  NO       448           (FLETCHERC)
+!! title 5.22.84:
+
+!dir (K.C)/aft 22
+UTIL    A         2  22-MAY-84 1207.12 ALL RD  NO       458           (KEN)
+SPNCPY  BAK       5  23-MAY-84  953.29 ALL RD  NO      1636           (KEN)
+RTN     C         2  22-MAY-84  737.42 ALL RD  NO        85           (KEN)
+SPNCPY  C         5  23-MAY-84 1025.06 ALL RD  NO      1801           (KEN)
+UTIL    C         3  22-MAY-84 1125.43 ALL RD  NO       749           (KEN)
+C       H         2  22-MAY-84 1210.05 ALL RD  NO       221           (KEN)
+SPNCPY  PRT       6  23-MAY-84 1026.19 ALL RD  NO      2510           (KEN)
+
+!dir (MAIL)/aft 22
+MAIL    LOG      41  23-MAY-84 1105.22 ALL RD  NO     19997           (WRS)
+  #=4_  MAI       2  23-MAY-84 1105.18 ALL RD  NO        68           (MAIL)
+
+!dir (KEN)/aft 22
+TURNUP  MSG       2  22-MAY-84 1530.52 ALL RD  NO        59           (KEN)
+
+!dir (KDEV2)/aft 22
+NAMES   CTL       3  22-MAY-84  809.19 ALL RD  NO       713           (KEN)
+NAMES   LOG       1  23-MAY-84 1108.49 ALL RD  NO      2560           (KEN)
+NAMS    LOG       6  22-MAY-84  804.42 ALL RD  NO      2346           (KEN)
+
+!dir (LOIS)/aft 22
+COEES   ADR       2  22-MAY-84 1225.15 ALL RD  NO        21           (LOIS)
+F3      BAK       6  23-MAY-84  838.48 ALL RD  NO      2223           (LOIS)
+FIN     BAK       5  23-MAY-84  815.31 ALL RD  NO      1725           (LOIS)
+FIN1    BAK       5  22-MAY-84 1219.28 ALL RD  NO      1725           (LOIS)
+ND421   BAK       2  22-MAY-84 1548.00 ALL RD  NO       161           (LOIS)
+001TEL  COM       2  23-MAY-84  926.31 ALL RD  NO        14           (LOIS)
+005TEL  COM       2  23-MAY-84  850.55 ALL RD  NO        14           (LOIS)
+006TEL  COM       2  22-MAY-84 1211.00 ALL RD  NO        27           (LOIS)
+MAGNUM  DIR       2  23-MAY-84  840.41 CP  NO  NO       512           (LOIS)
+ADD     LIS       2  22-MAY-84 1222.55 ALL RD  NO        34           (LOIS)
+A88WUD  MA0       7  23-MAY-84  809.00 ALL CP  NO      3072           (LOIS)
+BC7WZZ  MA2       7  23-MAY-84  840.00 ALL UPD NO      3072           (LOIS)
+F3      MAN       6  23-MAY-84  915.19 ALL RD  NO      2180           (LOIS)
+A88WUD  MD0       7  23-MAY-84  810.00 ALL RD  NO      3072           (LOIS)
+DMPMWR  ME0       5  23-MAY-84  809.14 ALL RD  NO      1838           (LOIS)
+ND421   MEM       2  23-MAY-84  831.27 ALL RD  NO       417           (LOIS)
+P034    MKR       2  23-MAY-84 1001.21 ALL RD  NO         2           (LOIS)
+DMPMWR  MP0      10  23-MAY-84  810.39 ALL ALL NO      4608 XC        (LOIS)
+BEBA7V  MR0       7  22-MAY-84  812.00 ALL RD  NO      3072           (LOIS)
+UOLUHI  MR0       4  23-MAY-84  815.00 ALL RD  NO      1536           (LOIS)
+STATS   MZ0       2  23-MAY-84  815.00 ALL RD  NO       512           (LOIS)
+001TEL  OUT       2  23-MAY-84  926.34 ALL RD  NO        32           (SYSNEWS)
+005TEL  OUT       2  23-MAY-84  850.58 ALL RD  NO        25           (SYSNEWS)
+006TEL  OUT       2  22-MAY-84 1211.03 ALL RD  NO        57           (LOIS)
+INITR   REL      13  22-MAY-84 1437.49 ALL RD  NO      5725           (LOIS)
+FIN     RPT       5  23-MAY-84  840.42 ALL RD  NO      1629           (LOIS)
+INITR   SAI       2  22-MAY-84 1437.40 ALL RD  NO       395           (LOIS)
+INITR   SAV      33  22-MAY-84 1438.19 ALL RD  NO     16045 SY        (LOIS)
+FIN1              3  22-MAY-84 1221.24 ALL RD  NO       530           (LOIS)
+MAIL              4  22-MAY-84 1034.49 ALL RD  NO      1472           (LOIS)
+
+!dir (MPL)/aft 22
+ND421   MEM       2  22-MAY-84 1548.15 ALL RD  NO       161           (LOIS)
+NODLOD  MEM       2  23-MAY-84  819.09 ALL RD  RD       454           (LOIS)
+
+!dir (TSUCOOP)/aft 22
+CARL    BAK       2  22-MAY-84  258.35 ALL RD  NO        32           (TSUCOOP)
+0522    INC       5  22-MAY-84 1143.15 ALL RD  NO      1904           (TSUCOOP)
+0523    INC       5  23-MAY-84 1038.11 ALL RD  NO      1974           (TSUCOOP)
+CARL    LET       2  22-MAY-84  308.01 ALL RD  NO        97           (TSUCOOP)
+LOIS    LET       2  22-MAY-84  204.39 ALL RD  NO       197           (TSUCOOP)
+ACCESS  MSG       2  22-MAY-84  121.05 ALL RD  NO        50           (TSUCOOP)
+TURNUP  MSG       2  23-MAY-84 1029.55 ALL RD  NO       102           (TSUCOOP)
+
+!dir (WRS)/aft 22
+P034    MKR       2  22-MAY-84 1802.20 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 22
+006TEL  COM       2  23-MAY-84  806.51 ALL RD  NO        15           (LOIS)
+CNFNF3  MAC       3  22-MAY-84 1818.52 ALL RD  NO       618           (WRS)
+PICON   MAC      31  22-MAY-84 1821.50 ALL RD  NO     15336           (WRS)
+ACCESS  MSG       2  22-MAY-84 1818.53 ALL RD  NO         6           (WRS)
+006TEL  OUT       2  23-MAY-84  806.53 ALL RD  NO        34           (M33)
+CMTF3F  REL       2  22-MAY-84 1819.10 ALL RD  NO        67           (WRS)
+COMFKF  REL       2  22-MAY-84 1821.59 ALL RD  NO        21           (WRS)
+PICONF  REL       9  22-MAY-84 1822.12 ALL RD  NO      3676           (WRS)
+SETTYF  REL       2  22-MAY-84 1819.26 ALL RD  NO        85           (WRS)
+F3XL24  SAV     145  22-MAY-84 1824.26 ALL RD  NO     73556           (WRS)
+NOTICE  107       2  23-MAY-84  258.00 ALL RD  NO       192           (M33)
+NOTICE  25        2  22-MAY-84 1912.27 ALL RD  NO       127           (M33)
+NOTICE  26        1  23-MAY-84  345.10 ALL RD  NO         0           (M33)
+NOTICE  28        2  23-MAY-84  804.48 ALL RD  NO        28           (M33)
+NOTICE  29        2  23-MAY-84  340.09 ALL RD  NO        71           (M33)
+NOTICE  33        2  22-MAY-84 1020.42 ALL RD  NO       344           (M33)
+NOTICE  36        2  22-MAY-84  651.00 ALL RD  NO        68           (M33)
+NOTICE  55        2  22-MAY-84 2020.45 ALL RD  NO        38           (M33)
+NOTICE  56        2  23-MAY-84  202.43 ALL RD  NO       307           (M33)
+NOTICE  70        2  23-MAY-84  805.44 ALL RD  NO       307           (M33)
+NOTICE  72        2  23-MAY-84  815.36 ALL RD  NO       472           (M33)
+NOTICE  897       2  22-MAY-84 1654.42 ALL RD  NO        74           (M33)
+NOTICE  90        2  23-MAY-84   40.39 ALL RD  NO        62           (M33)
+
+!dir (CARL)/aft 22
+MAIL             13  23-MAY-84 1001.31 ALL RD  NO      5909           (CARL)
+!! title 5.23.84:
+
+!dir (K.C)/aft 23
+SPNCPY  A         6  24-MAY-84  729.48 ALL RD  NO      2538           (KEN)
+S1      BAK       6  24-MAY-84  716.40 ALL RD  NO      2528           (KEN)
+S2      BAK       8  24-MAY-84  730.26 ALL RD  NO      3454           (KEN)
+SPNCPY  C         5  23-MAY-84 1641.55 ALL RD  NO      1817           (KEN)
+S1      PRT       6  24-MAY-84  733.00 ALL RD  NO      2528           (KEN)
+S2      PRT       8  24-MAY-84  732.59 ALL RD  NO      3454           (KEN)
+
+!dir (MAIL)/aft 23
+ONTYME  DAT       2  23-MAY-84 1443.42 ALL RD  NO        71           (KEN)
+MAIL    LOG      44  24-MAY-84  703.45 ALL RD  NO     21593           (WRS)
+  #+W[  MAI       2  23-MAY-84 1340.14 ALL RD  NO        86           (CARL)
+  #2LC  MAI       2  23-MAY-84 1809.41 ALL RD  NO        78           (LOIS)
+  #8'E  MAI       2  23-MAY-84 1340.15 ALL RD  NO        86           (CARL)
+
+!dir (KEN)/aft 23
+SWITCH  INI       2  24-MAY-84  715.29 ALL RD  NO       182           (KEN)
+MAIL              6  23-MAY-84 1517.59 ALL RD  NO      2187           (KEN)
+
+!dir (KDEV2)/aft 23
+NAMS    BAK      10  23-MAY-84 1147.07 ALL RD  NO      4126           (KEN)
+NAMES   CTL       3  24-MAY-84  734.05 ALL RD  NO       713           (KEN)
+NAMES   LOG       1  23-MAY-84 1145.00 ALL RD  NO      2560           (KEN)
+NAMS    LOG       9  23-MAY-84 1146.52 ALL RD  NO      3591           (KEN)
+NAMS    PEA       2  23-MAY-84 1140.11 ALL RD  NO         8           (KEN)
+NAMS    PRT       4  23-MAY-84 1149.23 ALL RD  NO      1411           (KEN)
+
+!dir (XEXEC)/aft 23
+LPR     SAV       7  23-MAY-84 1653.46 ALL RD  NO      2801           (XEXEC)
+
+!dir (INFO)/aft 23
+INFO    DAT       7  23-MAY-84 1330.58 ALL RD  NO      2730           (CARL)
+CENTER  MEM       2  23-MAY-84 1309.28 ALL RD  NO       422           (CARL)
+SUPPOR  NFO       2  23-MAY-84 1319.52 ALL RD  NO        22           (CARL)
+
+!dir (LOIS)/aft 23
+MAIL    BOX      11  23-MAY-84 1213.00 ALL RD  NO      5056           (LOIS)
+DUSAGE  DAT       4  23-MAY-84 1125.00 ALL RD  NO      1036           (LOIS)
+MAGNUM  DIR       2  23-MAY-84  840.41 CP  NO  NO       512           (LOIS)
+56      LAT      13  23-MAY-84 1840.01 ALL RD  NO      5641           (LOIS)
+A88WUD  MA0       7  23-MAY-84  809.00 ALL CP  NO      3072           (LOIS)
+BC7WZZ  MA2       7  23-MAY-84  840.00 ALL UPD NO      3072           (LOIS)
+APR84   MAI      12  23-MAY-84 1504.39 ALL RD  NO      5408           (LOIS)
+F3      MAN       6  23-MAY-84  915.19 ALL RD  NO      2180           (LOIS)
+A88WUD  MD0       7  23-MAY-84  810.00 ALL RD  NO      3072           (LOIS)
+DMPMWR  ME0       5  23-MAY-84  809.14 ALL RD  NO      1838           (LOIS)
+P034    MKR       2  23-MAY-84 1836.10 ALL RD  NO         2           (LOIS)
+DMPMWR  MP0      10  23-MAY-84  810.39 ALL ALL NO      4608 XC        (LOIS)
+UOLUHI  MR0       4  23-MAY-84  815.00 ALL RD  NO      1536           (LOIS)
+STATS   MZ0       2  23-MAY-84  815.00 ALL RD  NO       512           (LOIS)
+DUSAGE  RPT      15  23-MAY-84 1125.00 ALL RD  NO      6843           (LOIS)
+FIN     RPT       6  23-MAY-84 1140.39 ALL RD  NO      2306           (LOIS)
+INIT9   SAI       2  23-MAY-84 1823.36 ALL RD  NO       344           (LOIS)
+MAIL              5  23-MAY-84 1445.43 ALL RD  NO      1553           (LOIS)
+
+!dir (MPL)/aft 23
+NODLOD  MEM       2  23-MAY-84  819.09 ALL RD  RD       454           (LOIS)
+
+!dir (TSUCOOP)/aft 23
+0523    INC       5  23-MAY-84 1038.11 ALL RD  NO      1974           (TSUCOOP)
+TURNUP  MSG       2  23-MAY-84 1738.15 ALL RD  NO       102           (TSUCOOP)
+
+!dir (KL10)/aft 23
+MTA0*   BIN      17  23-MAY-84 1556.07 ALL RD  NO      8064           (LOIS)
+
+!dir (WRS)/aft 23
+P034    MKR       2  23-MAY-84 1701.39 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 23
+006TEL  COM       2  23-MAY-84  806.51 ALL RD  NO        15           (LOIS)
+TAKEIT  LPR      28  23-MAY-84 1700.46 ALL RD  NO     13331           (WRS)
+006TEL  OUT       2  23-MAY-84  806.53 ALL RD  NO        34           (M33)
+TEST              2  23-MAY-84 1659.40 ALL RD  NO        11           (WRS)
+NOTICE  107       2  23-MAY-84  258.00 ALL RD  NO       192           (M33)
+NOTICE  25        2  23-MAY-84 2128.23 ALL RD  NO       146           (M33)
+NOTICE  26        1  23-MAY-84  345.10 ALL RD  NO         0           (M33)
+NOTICE  27        2  24-MAY-84  204.27 ALL RD  NO        30           (M33)
+NOTICE  28        2  24-MAY-84    5.32 ALL RD  NO        28           (M33)
+NOTICE  29        2  23-MAY-84 1900.33 ALL RD  NO        71           (M33)
+NOTICE  33        2  24-MAY-84  554.41 ALL RD  NO       344           (M33)
+NOTICE  34        2  23-MAY-84 1713.05 ALL RD  NO        14           (M33)
+NOTICE  36        2  24-MAY-84  245.30 ALL RD  NO        68           (M33)
+NOTICE  38        2  24-MAY-84  624.14 ALL RD  NO       102           (M33)
+NOTICE  55        2  23-MAY-84 2217.21 ALL RD  NO        38           (M33)
+NOTICE  56        2  23-MAY-84  202.43 ALL RD  NO       307           (M33)
+NOTICE  57        2  23-MAY-84 2036.25 ALL RD  NO        15           (M33)
+NOTICE  70        2  23-MAY-84  805.44 ALL RD  NO       307           (M33)
+NOTICE  72        2  23-MAY-84  815.36 ALL RD  NO       472           (M33)
+NOTICE  897       2  24-MAY-84  741.44 ALL RD  NO        97           (M33)
+NOTICE  90        2  23-MAY-84   40.39 ALL RD  NO        62           (M33)
+
+!dir (CARL)/aft 23
+SWITCH  BAK       2  23-MAY-84 1542.54 ALL RD  NO       280           (CARL)
+SWITCH  INI       2  23-MAY-84 1645.23 ALL RD  NO       284           (CARL)
+LOGON   SHR      13  23-MAY-84 1704.37 ALL RUN RUN     5863 SY RF     (CARL)
+MAIN01  VUE       2  23-MAY-84 1645.23 ALL RD  NO       422           (CARL)
+MAIL             14  23-MAY-84 1234.37 ALL RD  NO      6518           (CARL)
+006PEA  001      16  23-MAY-84 1240.59 ALL RD  NO      7670           (CARL)
+006PEA  002       4  23-MAY-84 1254.07 ALL RD  NO      1357           (CARL)
+
+!dir (NEWSCAN)/aft 23
+LOGON   BAK      26  23-MAY-84 1654.41 ALL RD  NO     12553           (CARL)
+LOGON   MAC      26  23-MAY-84 1658.29 ALL RD  NO     12546           (CARL)
+LOGON   REL       7  23-MAY-84 1658.36 ALL RD  NO      2780           (CARL)
+LOGON   SHR      13  23-MAY-84 1704.29 ALL RD  NO      5863 SY RF     (CARL)
+MAIN01  VUE      26  23-MAY-84 1658.26 ALL RD  NO     12329           (CARL)
+!! title 5.24.84:
+
+!dir (K.C)/aft 24
+SPNCPY  A         6  24-MAY-84  729.48 ALL RD  NO      2538           (KEN)
+S1      BAK       6  24-MAY-84  716.40 ALL RD  NO      2528           (KEN)
+S2      BAK       8  24-MAY-84  730.26 ALL RD  NO      3454           (KEN)
+
+!dir (K.TAPE)/aft 24
+PEADIR  NEW      10  24-MAY-84 1542.43 ALL RD  NO      4572           (KEN)
+PEAK    NEW       6  24-MAY-84 1523.23 ALL RD  NO      2135           (KEN)
+
+!dir (MAIL)/aft 24
+MAIL    LOG      47  25-MAY-84  708.04 ALL RD  NO     23341           (WRS)
+  #=4_  MAI       2  25-MAY-84   49.04 ALL RD  NO        90           (KEN)
+  #>_:  MAI       2  25-MAY-84   49.04 ALL RD  NO       311           (MAIL)
+MAILER  SAV      15  24-MAY-84 2117.14 ALL RD  NO      7100 WC SY JL WF (WRS)
+ONTYME  SAV      21  24-MAY-84 2115.10 ALL RD  NO     10196 SY AC WF  (WRS)
+RDMAIL  SAV      15  24-MAY-84 2113.48 ALL RD  NO      6806 SY WF     (MAIL)
+
+!dir (KEN)/aft 24
+SWITCH  BAK       2  24-MAY-84  942.33 ALL RD  NO       176           (KEN)
+SWITCH  INI       2  24-MAY-84 1557.02 ALL RD  NO       181           (CARL)
+T       SAV       4  24-MAY-84 1539.23 ALL RD  NO      1444           (KEN)
+MAIL              6  24-MAY-84 1117.36 ALL RD  NO      2271           (KEN)
+
+!dir (KDEV2)/aft 24
+NAMES   BAK       3  24-MAY-84  734.05 ALL RD  NO       713           (KEN)
+NAMES   CTL       3  25-MAY-84  706.25 ALL RD  NO       713           (KEN)
+NAMES   LOG       1  25-MAY-84  706.34 ALL RD  NO      2560           (KEN)
+NAMS    LOG      11  24-MAY-84 1031.21 ALL RD  NO      4891           (KEN)
+T1      REL       2  24-MAY-84 1538.34 ALL RD  NO       166           (KEN)
+T1      SAI       2  24-MAY-84 1538.22 ALL RD  NO       343           (KEN)
+
+!dir (LOIS)/aft 24
+USER    DS       10  24-MAY-84 1151.56 ALL RD  NO      4317           (LOIS)
+P034    MKR       2  24-MAY-84 1305.58 ALL RD  NO         2           (LOIS)
+USER    SRT       6  24-MAY-84 1115.34 ALL RD  NO      2458           (LOIS)
+
+!dir (JW.DSKCLN)/aft 24
+DSKCLN  MAC      36  24-MAY-84 1626.12 ALL RD  NO     17893           (WILKES)
+DSKCLN  REL      11  24-MAY-84 1626.22 ALL RD  NO      5036           (WILKES)
+DSKCLN  SAV       8  24-MAY-84 1629.21 ALL RD  NO      3114           (WILKES)
+
+!dir (SPL)/aft 24
+SYSTEM  MEM       3  24-MAY-84 1158.38 ALL RD  RD       712           (LOIS)
+
+!dir (MCH)/aft 24
+P034    MKR       2  24-MAY-84 1534.23 ALL RD  NO         2           (MCH)
+
+!dir (WILKES)/aft 24
+DSKCLN  MAC      36  25-MAY-84  100.43 ALL RD  NO     17886           (WILKES)
+LOIS              2  25-MAY-84   50.50 ALL RD  NO       119           (WILKES)
+MAIL              7  25-MAY-84   49.50 ALL RD  NO      2750           (WILKES)
+PHONES            2  24-MAY-84 1400.02 ALL RD  NO       172           (WILKES)
+
+!dir (TSUCOOP)/aft 24
+TH0524  INC       5  24-MAY-84  915.51 ALL RD  NO      2041           (TSUCOOP)
+TURNUP  MSG       2  24-MAY-84 1224.54 ALL RD  NO       102           (TSUCOOP)
+
+!dir (WRS)/aft 24
+MAIL              4  24-MAY-84 1555.26 ALL RD  NO      1047           (WRS)
+
+!dir (M33)/aft 24
+NOTICE  22        2  24-MAY-84 2235.59 ALL RD  NO       171           (M33)
+NOTICE  25        2  25-MAY-84   54.38 ALL RD  NO       146           (M33)
+NOTICE  27        2  24-MAY-84  204.27 ALL RD  NO        30           (M33)
+NOTICE  28        2  24-MAY-84    5.32 ALL RD  NO        28           (M33)
+NOTICE  30        2  25-MAY-84  502.48 ALL RD  NO        84           (M33)
+NOTICE  33        2  24-MAY-84 2341.50 ALL RD  NO       373           (M33)
+NOTICE  36        2  24-MAY-84  245.30 ALL RD  NO        68           (M33)
+NOTICE  38        2  24-MAY-84  624.14 ALL RD  NO       102           (M33)
+NOTICE  54        2  25-MAY-84  511.20 ALL RD  NO        72           (M33)
+NOTICE  897       2  24-MAY-84 1739.10 ALL RD  NO       171           (M33)
+NOTICE  90        2  24-MAY-84 1340.21 ALL RD  NO        62           (M33)
+
+!dir (CARL)/aft 24
+003TEL  COM       2  24-MAY-84 1629.47 ALL RD  NO        24           (CARL)
+P034    MKR       2  24-MAY-84 1041.56 ALL RD  NO         2           (CARL)
+003TEL  OUT       2  24-MAY-84 1629.50 ALL RD  NO        71           (CARL)
+MAIL             16  24-MAY-84 1542.38 ALL RD  NO      7499           (CARL)
+J       1         4  24-MAY-84 1626.53 ALL RD  NO      1097           (CARL)
+K1      1         4  24-MAY-84 1625.01 ALL RD  NO      1098           (CARL)
+K2      1         4  24-MAY-84 1623.22 ALL RD  NO      1098           (CARL)
+L       1         4  24-MAY-84 1621.33 ALL RD  NO      1098           (CARL)
+J       2         4  24-MAY-84 1625.52 ALL RD  NO      1097           (CARL)
+K1      2         4  24-MAY-84 1623.57 ALL RD  NO      1098           (CARL)
+L       2         4  24-MAY-84 1620.59 ALL RD  NO      1098           (CARL)
+J       3         4  24-MAY-84 1625.40 ALL RD  NO      1097           (CARL)
+K1      3         4  24-MAY-84 1623.51 ALL RD  NO      1099           (CARL)
+L       3         4  24-MAY-84 1619.30 ALL RD  NO      1098           (CARL)
+J       4         4  24-MAY-84 1625.28 ALL RD  NO      1097           (CARL)
+L       4         4  24-MAY-84 1615.13 ALL RD  NO      1098           (CARL)
+K16     69        4  24-MAY-84 1610.25 ALL RD  NO      1222           (CARL)
+
+!dir (ZONNIE)/aft 24
+MAIL              3  24-MAY-84 1040.53 ALL RD  NO       582           (ZONNIE)
+!! title 5.25.84:
+!dir (K.C)/aft 25
+MAIN    A         2  25-MAY-84 1452.32 ALL RD  NO       479           (KEN)
+MAIN    BAK       3  25-MAY-84 1452.43 ALL RD  NO       643           (KEN)
+1       BAK       3  25-MAY-84 1454.07 ALL RD  NO       623           (KEN)
+MAIN    C         2  25-MAY-84 1429.59 ALL RD  NO       430           (KEN)
+MDL     C         2  25-MAY-84 1131.50 ALL RD  NO       257           (KEN)
+
+!dir (K.TAPE)/aft 25
+003PEA  002      30  29-MAY-84  904.07 ALL RD  NO     14771           (KEN)
+
+!dir (MAIL)/aft 25
+ONTYME  DAT       2  26-MAY-84  208.23 ALL RD  NO        70           (WRS)
+MAIL    LOG      54  29-MAY-84  904.59 ALL RD  NO     26926           (WRS)
+ONTMTP  SAV      23  25-MAY-84 2008.59 ALL RD  NO     10803 SY AC WF  (WRS)
+ONTYME  SAV      21  25-MAY-84 2006.55 ALL RD  NO     10219 SY AC WF  (WRS)
+
+!dir (KEN)/aft 25
+TMP     BAK       4  25-MAY-84  738.37 ALL RD  NO      1499           (KEN)
+TURNUP  MSG       2  25-MAY-84 1315.09 ALL RD  NO        67           (KEN)
+MAIL              6  29-MAY-84  846.35 ALL RD  NO      2395           (KEN)
+TMP               2  25-MAY-84 1556.30 ALL RD  NO        73           (KEN)
+
+!dir (SYSTECH)/aft 25
+FIND    DIF       4  25-MAY-84  900.11 ALL RD  NO      1074           (LOIS)
+FIND    HLP       3  25-MAY-84  841.50 ALL RD  NO       576           (LOIS)
+FIND    V15      12  25-MAY-84  845.14 ALL RD  NO      5418           (LOIS)
+
+!dir (KDEV2)/aft 25
+NAMES   CTL       3  29-MAY-84  900.59 ALL RD  NO       730           (KEN)
+NAMES   LOG       1  29-MAY-84  901.12 ALL RD  NO      2560           (KEN)
+NAMS    LOG      13  25-MAY-84  747.17 ALL RD  NO      5975           (KEN)
+NAMS    PRT       4  25-MAY-84  749.35 ALL RD  NO      1284           (KEN)
+
+!dir (XEXEC)/aft 25
+005TEL  COM       2  25-MAY-84 1703.59 ALL RD  NO        15           (CARL)
+005TEL  OUT       2  25-MAY-84 1704.02 ALL RD  NO        40           (XEXEC)
+
+!dir (LOIS)/aft 25
+DUSAGE  DAT       3  25-MAY-84 1653.43 ALL RD  NO       884           (LOIS)
+P034    MKR       2  25-MAY-84 1634.00 ALL RD  NO         2           (LOIS)
+TURNUP  MSG       2  25-MAY-84 1414.48 ALL RD  NO        14           (LOIS)
+DUSAGE  RPT      13  25-MAY-84 1653.43 ALL RD  NO      5855           (LOIS)
+MAIL              5  25-MAY-84  819.05 ALL RD  NO      1851           (LOIS)
+
+!dir (JW.DSKCLN)/aft 25
+DSKCLN  MAC      36  25-MAY-84  100.00 ALL RD  NO     17886           (WILKES)
+DSKCLN  REL      11  28-MAY-84 2113.21 ALL RD  NO      5034           (WILKES)
+DSKCLN  SAV       8  28-MAY-84 2114.21 ALL RD  NO      3112           (WILKES)
+CRAIG             2  25-MAY-84 1014.07 ALL RD  NO       159           (WILKES)
+
+!dir (WILKES)/aft 25
+DSKCLN  MAC      36  25-MAY-84  100.43 ALL RD  NO     17886           (WILKES)
+LOIS              2  29-MAY-84  906.07 ALL RD  NO       145           (WILKES)
+MAIL              7  25-MAY-84   49.50 ALL RD  NO      2750           (WILKES)
+
+!dir (TSUCOOP)/aft 25
+MO0529  INC       7  29-MAY-84  843.38 ALL RD  NO      3038           (TSUCOOP)
+0525    INC       6  25-MAY-84  852.42 ALL RD  NO      2298           (TSUCOOP)
+TURNUP  MSG       2  29-MAY-84  830.17 ALL RD  NO       102           (TSUCOOP)
+
+!dir (WRS)/aft 25
+P034    MKR       2  26-MAY-84  203.15 ALL RD  NO         2           (WRS)
+MAIL              4  26-MAY-84  221.51 ALL RD  NO      1047           (WRS)
+
+!dir (M33)/aft 25
+ONCE    DIF      17  25-MAY-84 1439.06 ALL RD  NO      8038           (LOIS)
+ONCE    NEW       2  25-MAY-84 1438.51 ALL RD  NO       239           (LOIS)
+NOTICE  22        2  28-MAY-84 1521.03 ALL RD  NO       171           (M33)
+NOTICE  23        2  25-MAY-84 1614.52 ALL RD  NO        28           (M33)
+NOTICE  25        2  28-MAY-84 2326.53 ALL RD  NO       146           (M33)
+NOTICE  26        2  26-MAY-84  351.55 ALL RD  NO        15           (M33)
+NOTICE  28        2  28-MAY-84 1515.45 ALL RD  NO        28           (M33)
+NOTICE  29        2  29-MAY-84  901.53 ALL RD  NO        99           (M33)
+NOTICE  30        2  28-MAY-84 2015.23 ALL RD  NO        84           (M33)
+NOTICE  32        2  28-MAY-84 1530.06 ALL RD  NO        59           (M33)
+NOTICE  33        2  29-MAY-84  511.34 ALL RD  NO       409           (M33)
+NOTICE  34        2  28-MAY-84 1521.00 ALL RD  NO        14           (M33)
+NOTICE  35        2  28-MAY-84 1528.25 ALL RD  NO       220           (M33)
+NOTICE  36        2  29-MAY-84  214.51 ALL RD  NO        68           (M33)
+NOTICE  38        2  26-MAY-84   13.18 ALL RD  NO       102           (M33)
+NOTICE  39        2  28-MAY-84 1518.53 ALL RD  NO       238           (M33)
+NOTICE  54        2  28-MAY-84 1515.55 ALL RD  NO       108           (M33)
+NOTICE  55        2  28-MAY-84 1513.47 ALL RD  NO        38           (M33)
+NOTICE  56        2  25-MAY-84 1157.59 ALL RD  NO       333           (M33)
+NOTICE  57        2  28-MAY-84 1515.16 ALL RD  NO        15           (M33)
+NOTICE  70        2  28-MAY-84 1515.57 ALL RD  NO       307           (M33)
+NOTICE  72        2  29-MAY-84    3.59 ALL RD  NO       472           (M33)
+NOTICE  897       2  25-MAY-84 1408.40 ALL RD  NO       171           (M33)
+NOTICE  90        2  28-MAY-84 1519.14 ALL RD  NO        80           (M33)
+
+!dir (VUE)/aft 25
+SWITCH  INI       2  25-MAY-84 1218.23 ALL RD  NO       285           (CARL)
+
+!dir (CB.MAGNUM)/aft 25
+MAGNUM  DIR       2  25-MAY-84 1458.38 ALL RD  NO       512           (CARL)
+
+!dir (CARL)/aft 25
+PHONES  DAT       8  25-MAY-84 1503.42 ALL RD  NO      3138           (CARL)
+MAIL             17  26-MAY-84   14.52 ALL RD  NO      7974           (CARL)
+
+!dir (CTMKTG7)/aft 25
+X1200   BAK       5  29-MAY-84  809.53 ALL RD  RD      1599           (CTMKTG7)
+X1200   REL       7  29-MAY-84  919.34 ALL RD  NO      2631           (CTMKTG7)
+X1200   SAI       5  29-MAY-84  820.22 ALL RD  RD      1597           (CTMKTG7)
+;G                1  29-MAY-84  737.12 ALL RD  NO         0           (CTMKTG7)
+!! title 5.29.84:
+!dir (K.C)/aft 29
+MAIN    C         2  29-MAY-84 1510.48 ALL RD  NO       442           (KEN)
+MAIN    PRT       3  29-MAY-84 1510.54 ALL RD  NO       640           (KEN)
+
+!dir (K.TAPE)/aft 29
+PEADI2  TAP      10  29-MAY-84 1013.22 ALL RD  NO      4457           (KEN)
+PEAKX   TAP       6  29-MAY-84  922.31 ALL RD  NO      2155           (KEN)
+
+!dir (MAIL)/aft 29
+MAIL    LOG      58  30-MAY-84 1141.33 ALL RD  NO     28717           (WRS)
+
+!dir (KEN)/aft 29
+MSC     DAT       2  30-MAY-84 1149.16 ALL RD  NO       208           (KEN)
+WRSMAL  DAT       2  29-MAY-84 1503.22 ALL RD  NO        74           (KEN)
+NAMS    PRT      18  29-MAY-84 1340.27 ALL RD  NO      8460           (KEN)
+MAIL              6  29-MAY-84  846.35 ALL RD  NO      2395           (KEN)
+
+!dir (SYSTECH)/aft 29
+ONCE    BAK      30  30-MAY-84 1010.20 ALL RD  NO     14602           (LOIS)
+ONCE    MAC      30  30-MAY-84 1027.47 ALL RD  NO     14531           (LOIS)
+
+!dir (KDEV2)/aft 29
+NAMES   BAK       3  29-MAY-84  900.59 ALL RD  NO       730           (KEN)
+NAMS    BAK      16  29-MAY-84 1021.59 ALL RD  NO      7179           (KEN)
+NAMES   CTL       3  30-MAY-84 1145.52 ALL RD  NO       730           (KEN)
+NAMES   LOG       1  30-MAY-84 1146.00 ALL RD  NO      2560           (KEN)
+NAMS    LOG      16  29-MAY-84 1340.16 ALL RD  NO      7179           (KEN)
+NAMS    PEA       2  29-MAY-84  942.00 ALL RD  NO        10           (KEN)
+
+!dir (LOIS)/aft 29
+PHONES  BAK       2  29-MAY-84  919.54 ALL RD  NO       296           (LOIS)
+56      BAK      18  29-MAY-84 1211.57 ALL RD  NO      8557           (LOIS)
+PHONES  MEM       2  29-MAY-84  936.16 ALL RD  NO       304           (LOIS)
+P034    MKR       2  30-MAY-84 1142.03 ALL RD  NO         2           (LOIS)
+56      RPT      14  29-MAY-84 1233.56 ALL RD  NO      6177           (LOIS)
+
+!dir (WILKES)/aft 29
+LOIS              2  29-MAY-84  906.07 ALL RD  NO       145           (WILKES)
+
+!dir (TSUCOOP)/aft 29
+MO0529  INC       7  29-MAY-84  843.38 ALL RD  NO      3038           (TSUCOOP)
+TURNUP  MSG       2  30-MAY-84  801.48 ALL RD  NO       102           (TSUCOOP)
+
+!dir (WRS)/aft 29
+P034    MKR       2  29-MAY-84 2259.08 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 29
+NOTICE  25        2  29-MAY-84 2132.46 ALL RD  NO       175           (M33)
+NOTICE  26        2  29-MAY-84 1541.54 ALL RD  NO        15           (M33)
+NOTICE  29        2  29-MAY-84 1843.50 ALL RD  NO        99           (M33)
+NOTICE  33        2  29-MAY-84 1842.43 ALL RD  NO       409           (M33)
+NOTICE  34        2  29-MAY-84 1600.01 ALL RD  NO        14           (M33)
+NOTICE  35        2  29-MAY-84 1613.52 ALL RD  NO       220           (M33)
+NOTICE  36        2  29-MAY-84 1508.42 ALL RD  NO        68           (M33)
+NOTICE  39        2  29-MAY-84 1543.10 ALL RD  NO       238           (M33)
+NOTICE  55        2  29-MAY-84 1515.42 ALL RD  NO        38           (M33)
+NOTICE  57        2  29-MAY-84 1522.20 ALL RD  NO        15           (M33)
+NOTICE  72        2  30-MAY-84  139.27 ALL RD  NO       472           (M33)
+NOTICE  897       2  29-MAY-84 1751.29 ALL RD  NO       199           (M33)
+NOTICE  90        2  29-MAY-84 1249.24 ALL RD  NO        80           (M33)
+!dir (CARL)/aft 29
+J       BAK       5  29-MAY-84 1219.29 ALL RD  NO      1685           (CARL)
+K       BAK       5  29-MAY-84 1220.10 ALL RD  NO      1687           (CARL)
+K1      BAK       3  29-MAY-84 1116.25 ALL RD  NO       799           (CARL)
+K2      BAK       3  29-MAY-84 1107.49 ALL RD  NO       799           (CARL)
+L       BAK       5  29-MAY-84 1220.43 ALL RD  NO      1687           (CARL)
+TEST    BAK      12  29-MAY-84 1300.18 ALL RD  NO      5421           (CARL)
+TWOJOB  BAK      11  29-MAY-84 1227.26 ALL RD  NO      5061           (CARL)
+TEST    DAT      12  29-MAY-84 1318.11 ALL RD  NO      5410           (CARL)
+J       TST       5  29-MAY-84 1225.23 ALL RD  NO      1686           (CARL)
+K       TST       5  29-MAY-84 1226.00 ALL RD  NO      1688           (CARL)
+L       TST       5  29-MAY-84 1226.31 ALL RD  NO      1688           (CARL)
+TWOJOB  TST      12  29-MAY-84 1252.34 ALL RD  NO      5421           (CARL)
+MAIN01  VUE      12  29-MAY-84 1318.09 ALL RD  NO      5479           (CARL)
+FF                2  29-MAY-84 1218.55 ALL RD  NO         1           (CARL)
+MAIL             18  30-MAY-84 1146.21 ALL RD  NO      8562           (CARL)
+J       1         2  29-MAY-84 1218.21 ALL RD  NO       421           (CARL)
+K1      1         2  29-MAY-84 1209.38 ALL RD  NO       420           (CARL)
+K2      1         2  29-MAY-84 1203.36 ALL RD  NO       421           (CARL)
+L       1         2  29-MAY-84 1201.06 ALL RD  NO       421           (CARL)
+J       2         2  29-MAY-84 1217.05 ALL RD  NO       421           (CARL)
+K1      2         2  29-MAY-84 1207.40 ALL RD  NO       421           (CARL)
+L       2         2  29-MAY-84 1159.12 ALL RD  NO       421           (CARL)
+J       3         2  29-MAY-84 1215.11 ALL RD  NO       420           (CARL)
+K1      3         2  29-MAY-84 1205.19 ALL RD  NO       422           (CARL)
+L       3         2  29-MAY-84 1156.02 ALL RD  NO       421           (CARL)
+J       4         2  29-MAY-84 1211.03 ALL RD  NO       420           (CARL)
+L       4         2  29-MAY-84 1150.47 ALL RD  NO       421           (CARL)
+
+!dir (CTMKTG7)/aft 29
+EBCDIC  BAK       2  29-MAY-84  945.50 ALL RD  NO        29           (CTMKTG7)
+X1200   BAK       5  29-MAY-84 1019.34 ALL RD  RD      1601           (CTMKTG7)
+X1200   REL       7  29-MAY-84 1021.57 ALL RD  NO      2733           (CTMKTG7)
+EBCDIC  SAI       2  29-MAY-84 1041.40 ALL RD  NO        90           (CTMKTG7)
+X1200   SAI       5  29-MAY-84 1021.48 ALL RD  RD      1601           (CTMKTG7)
+;G                1  29-MAY-84  737.12 ALL RD  NO         0           (CTMKTG7)
+!! title 5.30.84:
+!dir (SAILIB)/aft 30
+MATCHS  REL       2  30-MAY-84 1233.57 ALL RD  RD       491           (CARL)
+MATCHS  REQ       2  30-MAY-84 1235.26 ALL RD  RD        32           (CARL)
+MAIN08  VUE       2  30-MAY-84 1235.25 ALL RD  NO       179           (CARL)
+
+!dir (MAIL)/aft 30
+MAIL    LOG      63  31-MAY-84  916.05 ALL RD  NO     31436           (WRS)
+ONTYME  Q         2  31-MAY-84  907.40 ALL RD  NO        73           (MAIL)
+ONTYME  SAV      21  31-MAY-84   53.33 ALL RD  NO     10234 SY AC WF  (WRS)
+
+!dir (KEN)/aft 30
+MSC     DAT       2  30-MAY-84 1149.16 ALL RD  NO       208           (KEN)
+MAIL             10  31-MAY-84  914.07 ALL RD  NO      4238           (KEN)
+
+!dir (SYSTECH)/aft 30
+ONCE    BAK      30  30-MAY-84 1010.20 ALL RD  NO     14602           (LOIS)
+ONCE    MAC      30  30-MAY-84 1027.47 ALL RD  NO     14531           (LOIS)
+
+!dir (KDEV2)/aft 30
+NAMES   BAK       3  30-MAY-84 1145.52 ALL RD  NO       730           (KEN)
+NAMES   CTL       3  31-MAY-84  930.32 ALL RD  NO       730           (KEN)
+NAMES   LOG       1  31-MAY-84  930.45 ALL RD  NO      2560           (KEN)
+NAMS    LOG      18  30-MAY-84 1229.22 ALL RD  NO      8364           (KEN)
+NAMS    PEA       2  30-MAY-84 1224.30 ALL RD  NO        16           (KEN)
+005PEA  001       4  30-MAY-84 1323.26 ALL RD  NO      1164           (KEN)
+
+!dir (XEXEC)/aft 30
+LPR     SAV       7  30-MAY-84 2317.52 ALL RD  NO      2799           (XEXEC)
+
+!dir (SPPOPER)/aft 30
+COLD    BAK       2  30-MAY-84 1642.56 ALL RD  NO       165           (LOIS)
+COLD84  BAK       3  30-MAY-84 1623.14 ALL RD  NO       942           (LOIS)
+HOT     BAK       2  30-MAY-84 1643.08 ALL RD  NO       433           (LOIS)
+JUN84   CAL       2  30-MAY-84 1616.50 ALL RD  NO       441           (LOIS)
+MAGNUM  DIR       2  30-MAY-84 1608.38 CP  NO  NO       512           (LOIS)
+COLD84  DOC       3  30-MAY-84 1631.29 ALL RD  NO       940           (LOIS)
+A8896Z  MA0       7  30-MAY-84 1608.00 ALL CP  NO      3072           (LOIS)
+FMODHL  MR0       4  30-MAY-84 1615.00 ALL RD  NO      1536           (LOIS)
+Y97BMB  MR0       4  30-MAY-84 1610.00 ALL RD  NO      1536           (LOIS)
+Z7SD7H  MR0       4  30-MAY-84 1616.00 ALL RD  NO      1536           (TSUCOOP)
+STATS   MZ0       2  30-MAY-84 1616.00 ALL RD  NO       512           (LOIS)
+COLD    SEC       2  30-MAY-84 1654.02 ALL RD  NO       165           (LOIS)
+HOT     SEC       2  31-MAY-84  905.14 ALL RD  NO       443           (LOIS)
+!dir (LOIS)/aft 30
+P034    MKR       2  31-MAY-84  915.58 ALL RD  NO         2           (LOIS)
+CLR     REL       2  30-MAY-84 1337.36 ALL RD  NO       157           (LOIS)
+MAIL              5  31-MAY-84  856.09 ALL RD  NO      1905           (LOIS)
+
+!dir (DARREN)/aft 30
+P034    MKR       2  31-MAY-84    5.47 ALL RD  NO         2           (DARREN)
+MAIL              1  30-MAY-84 2038.35 ALL RD  NO         0           (DARREN)
+
+!dir (MATOKA)/aft 30
+P034    MKR       2  30-MAY-84 1608.18 ALL RD  NO         2           (MATOKA)
+
+!dir (WILKES)/aft 30
+SWITCH  BAK       2  30-MAY-84 1338.36 ALL RD  NO       160           (WILKES)
+SWITCH  INI       2  30-MAY-84 1404.15 ALL RD  NO       168           (WILKES)
+HOTLIN  TXT       2  31-MAY-84  822.02 ALL RD  NO       291           (WILKES)
+BILL              2  30-MAY-84 1625.48 ALL RD  NO        50           (WILKES)
+CARL              2  31-MAY-84  817.56 ALL RD  NO       413           (WILKES)
+MAIL              8  31-MAY-84  751.07 ALL RD  NO      3188           (WILKES)
+
+!dir (TSUCOOP)/aft 30
+MAGNUM  DIR       2  30-MAY-84 1532.17 CP  NO  NO       512           (LOIS)
+TH0531  INC      14  31-MAY-84  938.12 ALL RD  NO      6168           (TSUCOOP)
+TURNUP  MSG       2  31-MAY-84  901.07 ALL RD  NO       102           (TSUCOOP)
+
+!dir (WRS)/aft 30
+P034    MKR       2  31-MAY-84   36.07 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 30
+NOTICE  108       2  31-MAY-84  249.24 ALL RD  NO       374           (M33)
+NOTICE  22        2  30-MAY-84 2255.44 ALL RD  NO       171           (M33)
+NOTICE  25        2  31-MAY-84  847.54 ALL RD  NO       209           (M33)
+NOTICE  30        2  31-MAY-84  545.14 ALL RD  NO       125           (M33)
+NOTICE  32        2  30-MAY-84 2130.29 ALL RD  NO        59           (M33)
+NOTICE  33        2  31-MAY-84  827.49 ALL RD  NO       438           (M33)
+NOTICE  35        2  31-MAY-84  402.18 ALL RD  NO       220           (M33)
+NOTICE  39        2  30-MAY-84 1418.09 ALL RD  NO       238           (M33)
+NOTICE  56        2  31-MAY-84  337.27 ALL RD  NO       333           (M33)
+NOTICE  72        2  30-MAY-84  139.27 ALL RD  NO       472           (M33)
+NOTICE  897       2  30-MAY-84 1503.19 ALL RD  NO       199           (M33)
+
+!dir (CARL)/aft 30
+FICHE   REL      11  31-MAY-84   43.03 ALL RD  NO      4652           (CARL)
+FICHE   SAI       9  31-MAY-84   42.58 ALL RD  NO      3596           (CARL)
+FICHE   SAV      23  31-MAY-84   43.32 ALL RD  NO     11262           (CARL)
+MAIL             18  30-MAY-84 2138.17 ALL RD  NO      8639           (CARL)
+!! title 6.1.84:
+!dir (MAIL)/aft 1-jun
+ONTYME  DAT       2   3-JUN-84 2329.03 ALL RD  NO        70           (WRS)
+MAIL    LOG      73   4-JUN-84  701.40 ALL RD  NO     36815           (WRS)
+  #8'E  MAI       6   1-JUN-84 1904.19 ALL RD  NO      2343           (MAIL)
+  #=4_  MAI       2   3-JUN-84 2320.19 ALL RD  NO        47           (WRS)
+
+!dir (KEN)/aft 1-jun
+005PCO  LOG      14   1-JUN-84  952.09 ALL RD  NO      6362           (KEN)
+ACCESS  MSG       2   4-JUN-84  708.19 ALL RD  NO        51           (KEN)
+MAIL             11   1-JUN-84 1016.44 ALL RD  NO      4793           (KEN)
+
+!dir (CSTEMPLATE)/aft 1-jun
+BRKINI  REL       3   1-JUN-84 1835.31 ALL RD  NO       567           (CARL)
+BRKINI  SAI       3   1-JUN-84 1835.25 ALL RD  NO       571           (CARL)
+
+!dir (VMAP)/aft 1-jun
+BRKINI  REL       3   1-JUN-84 1835.31 ALL RD  NO       567           (CARL)
+
+!dir (NEWFDM)/aft 1-jun
+BRKINI  REL       3   1-JUN-84 1835.31 ALL RD  NO       567           (CARL)
+
+!dir (KDEV2)/aft 1-jun
+NAMES   CTL       3   4-JUN-84  715.38 ALL RD  NO       834           (KEN)
+NAMES   LOG       1   1-JUN-84  728.00 ALL RD  NO      2560           (KEN)
+
+!dir (XEXEC)/aft 1-jun
+LPR     SAV       7   1-JUN-84 1746.00 ALL RD  NO      2800           (XEXEC)
+
+!dir (LOIS)/aft 1-jun
+KEN     BAK       2   1-JUN-84  922.43 ALL RD  NO       244           (LOIS)
+P034    MKR       2   3-JUN-84  914.22 ALL RD  NO         2           (LOIS)
+KEN     NOT       2   1-JUN-84 1541.01 ALL RD  NO       245           (LOIS)
+MAIL              3   1-JUN-84  807.21 ALL RD  NO       871           (LOIS)
+
+!dir (CB.SAIL)/aft 1-jun
+BRKINI  REL       3   1-JUN-84 1835.31 ALL RD  NO       567           (CARL)
+BRKINI  SAI       3   1-JUN-84 1835.25 ALL ALL ALL      571           (CARL)
+MAIN03  VUE       3   1-JUN-84 1835.24 ALL RD  NO       707           (CARL)
+
+!dir (OSP)/aft 1-jun
+FSHFMT  CMD       2   1-JUN-84 1459.49 ALL RD  NO       118           (CARL)
+FSH001  FSH      73   1-JUN-84 1856.25 ALL RD  NO     36390           (CARL)
+FSH002  FSH      68   1-JUN-84 1856.58 ALL RD  NO     34195           (CARL)
+FSH003  FSH      50   1-JUN-84 1857.32 ALL RD  NO     24620           (CARL)
+FSH004  FSH      64   1-JUN-84 1857.56 ALL RD  NO     32220           (CARL)
+FSH005  FSH      85   1-JUN-84 1858.32 ALL RD  NO     42981           (CARL)
+FSH006  FSH      78   1-JUN-84 1859.17 ALL RD  NO     39424           (CARL)
+FSH007  FSH     106   1-JUN-84 1900.00 ALL RD  NO     53416           (CARL)
+FSH008  FSH      47   1-JUN-84 1901.05 ALL RD  NO     23378           (CARL)
+FSH009  FSH      77   1-JUN-84 1901.31 ALL RD  NO     38800           (CARL)
+FSH010  FSH      94   1-JUN-84 1902.26 ALL RD  NO     47587           (CARL)
+FSH011  FSH      93   1-JUN-84 1903.25 ALL RD  NO     46830           (CARL)
+FSH012  FSH     110   1-JUN-84 1904.40 ALL RD  NO     55353           (CARL)
+FSH013  FSH      59   1-JUN-84 1906.00 ALL RD  NO     29647           (CARL)
+FSH014  FSH      64   1-JUN-84 1906.33 ALL RD  NO     32025           (CARL)
+FSH015  FSH     107   1-JUN-84 1907.20 ALL RD  NO     53784           (CARL)
+FSH016  FSH      64   1-JUN-84 1908.24 ALL RD  NO     31897           (CARL)
+FSH017  FSH      78   1-JUN-84 1909.07 ALL RD  NO     39034           (CARL)
+FSH018  FSH      86   1-JUN-84 1909.58 ALL RD  NO     43057           (CARL)
+FSH019  FSH      66   1-JUN-84 1910.53 ALL RD  NO     32825           (CARL)
+FSH020  FSH      67   1-JUN-84 1911.31 ALL RD  NO     33599           (CARL)
+FSH021  FSH      46   1-JUN-84 1912.09 ALL RD  NO     22609           (CARL)
+FSH022  FSH      63   1-JUN-84 1912.33 ALL RD  NO     31342           (CARL)
+MAIN03  VUE       3   1-JUN-84 1459.49 ALL RD  NO       736           (CARL)
+
+!dir (MCH)/aft 1-jun
+P034    MKR       2   3-JUN-84 1522.14 ALL RD  NO         2           (MCH)
+
+!dir (WILKES)/aft 1-jun
+MAIL              9   1-JUN-84  851.47 ALL RD  NO      3847           (WILKES)
+WRS               2   1-JUN-84  849.32 ALL RD  NO       126           (WILKES)
+
+!dir (TSUCOOP)/aft 1-jun
+FR0601  INC      10   1-JUN-84  902.44 ALL RD  NO      4415           (TSUCOOP)
+LOIS    LET       2   3-JUN-84 1203.15 ALL RD  NO        32           (TSUCOOP)
+ACCESS  MSG       2   3-JUN-84 1237.46 ALL RD  NO        75           (TSUCOOP)
+TURNUP  MSG       2   3-JUN-84 1238.04 ALL RD  NO        47           (TSUCOOP)
+
+!dir (WRS)/aft 1-jun
+P034    MKR       2   3-JUN-84 2326.44 ALL RD  NO         2           (WRS)
+MAIL              4   3-JUN-84 2329.43 ALL RD  NO      1248           (WRS)
+
+!dir (M33)/aft 1-jun
+NOTICE  107       2   1-JUN-84  145.47 ALL RD  NO       192           (M33)
+NOTICE  22        2   4-JUN-84  728.23 ALL RD  NO       187           (M33)
+NOTICE  23        2   4-JUN-84  704.35 ALL RD  NO        28           (M33)
+NOTICE  26        2   3-JUN-84  929.59 ALL RD  NO        15           (M33)
+NOTICE  28        2   1-JUN-84  541.00 ALL RD  NO        47           (M33)
+NOTICE  30        2   1-JUN-84 1945.08 ALL RD  NO       125           (M33)
+NOTICE  33        2   4-JUN-84  600.20 ALL RD  NO       480           (M33)
+NOTICE  34        2   3-JUN-84  924.27 ALL RD  NO        14           (M33)
+NOTICE  35        2   3-JUN-84  929.00 ALL RD  NO       220           (M33)
+NOTICE  36        2   4-JUN-84  125.58 ALL RD  NO        68           (M33)
+NOTICE  38        2   3-JUN-84  930.42 ALL RD  NO       102           (M33)
+NOTICE  39        2   4-JUN-84  535.38 ALL RD  NO       147           (M33)
+NOTICE  55        2   3-JUN-84  919.36 ALL RD  NO        38           (M33)
+NOTICE  57        2   3-JUN-84  923.00 ALL RD  NO        15           (M33)
+NOTICE  65        2   3-JUN-84  917.13 ALL RD  NO        26           (M33)
+NOTICE  72        2   4-JUN-84  550.25 ALL RD  NO       495           (M33)
+NOTICE  74        2   4-JUN-84  609.41 ALL ALL ALL       17           (M33)
+NOTICE  79        2   1-JUN-84  603.18 ALL RD  NO        60           (M33)
+NOTICE  897       2   1-JUN-84 1700.10 ALL RD  NO       222           (M33)
+
+!dir (CARL)/aft 1-jun
+FICHE   BAK      10   1-JUN-84 1853.10 ALL RD  NO      4550           (CARL)
+BRKINI  REL       3   1-JUN-84 1835.31 ALL RD  NO       567           (CARL)
+FICHE   REL      13   1-JUN-84 1916.04 ALL RD  NO      5893           (CARL)
+FICHE   SAI      10   1-JUN-84 1915.58 ALL RD  NO      4509           (CARL)
+FICHE   SAV      25   1-JUN-84 1916.37 ALL RD  NO     12028           (CARL)
+MAIN03  VUE      10   1-JUN-84 1915.56 ALL RD  NO      4551           (CARL)
+MAIL             21   3-JUN-84 1337.54 ALL RD  NO     10068           (CARL)
+!! title 6.4.84:
+!dir (MAIL)/aft 4-jun
+MAIL    LOG      77   5-JUN-84  701.16 ALL RD  NO     38537           (WRS)
+  #+W[  MAI       2   4-JUN-84 1532.20 ALL RD  NO       177           (CARL)
+  #3F0  MAI       2   4-JUN-84 1603.50 ALL RD  NO       167           (KEN)
+  #8'E  MAI       6   4-JUN-84 1532.21 ALL RD  NO      2519           (MAIL)
+  #>_:  MAI       2   5-JUN-84  216.35 ALL RD  NO        61           (MAIL)
+
+!dir (KEN)/aft 4-jun
+TMP     BAK       2   4-JUN-84 1558.39 ALL RD  NO       142           (KEN)
+003TEL  COM       2   5-JUN-84  706.11 ALL RD  NO       239           (KEN)
+DIR     CTL       2   4-JUN-84 1015.58 ALL RD  NO        56           (KEN)
+DIR     LOG      16   4-JUN-84 1016.18 ALL RD  NO      7519           (KEN)
+ACCESS  MSG       2   4-JUN-84  951.57 ALL RD  NO        54           (KEN)
+003TEL  OUT       3   5-JUN-84  706.16 ALL RD  NO       539           (KEN)
+MAIL             12   4-JUN-84 1604.00 ALL RD  NO      5128           (KEN)
+TMP               2   4-JUN-84 1602.57 ALL RD  NO       141           (KEN)
+
+!dir (KDEV2)/aft 4-jun
+NAMES   CTL       3   5-JUN-84  707.18 ALL RD  NO       834           (KEN)
+TMP     CTL       2   4-JUN-84 1129.07 ALL RD  NO         8           (KEN)
+DUSAGE  DAT       3   4-JUN-84 1120.02 ALL RD  NO       886           (KEN)
+NAMES   LOG       1   5-JUN-84  707.30 ALL RD  NO      2560           (KEN)
+NAMS    LOG      22   4-JUN-84  937.11 ALL RD  NO     10721           (KEN)
+TMP     LOG       2   4-JUN-84 1129.16 ALL RD  NO       325           (KEN)
+DUSAGE  RPT      13   4-JUN-84 1120.02 ALL RD  NO      5868           (KEN)
+
+!dir (INFO)/aft 4-jun
+INFO    DAT       7   4-JUN-84 1510.30 ALL RD  NO      2743           (CARL)
+SUPPOR  NFO       2   4-JUN-84 1509.07 ALL RD  NO        34           (CARL)
+MAIN05  VUE       7   4-JUN-84 1509.00 ALL RD  NO      2837           (CARL)
+
+!dir (SPPOPER)/aft 4-jun
+MAIL              1   4-JUN-84 1515.59 ALL RD  NO         0           (SPPOPER)
+
+!dir (LOIS)/aft 4-jun
+SW      BAK       3   4-JUN-84 1325.45 ALL RD  NO       964           (LOIS)
+PHONES  MEM       2   4-JUN-84 1159.50 ALL RD  NO       303           (LOIS)
+SW      MEM       2   4-JUN-84 1342.53 ALL RD  NO       319           (LOIS)
+P034    MKR       2   4-JUN-84 1637.47 ALL RD  NO         2           (LOIS)
+TURNUP  MSG       2   4-JUN-84 1107.08 ALL RD  NO        21           (LOIS)
+MAIL              4   4-JUN-84 1615.36 ALL RD  NO      1303           (LOIS)
+
+!dir (TSUCOOP)/aft 4-jun
+MO0604  INC       7   4-JUN-84 1152.40 ALL RD  NO      2781           (TSUCOOP)
+ACCESS  MSG       2   4-JUN-84  925.07 ALL RD  NO        50           (TSUCOOP)
+TURNUP  MSG       2   4-JUN-84 1307.58 ALL RD  NO        47           (TSUCOOP)
+
+!dir (M33)/aft 4-jun
+HOTLIN  LOG       2   4-JUN-84 1523.38 ALL ALL ALL      103           (CARL)
+MAIN05  VUE       3   4-JUN-84 1518.00 ALL RD  NO       662           (CARL)
+NOTICE  22        2   4-JUN-84  728.23 ALL RD  NO       187           (M33)
+NOTICE  23        2   4-JUN-84  704.35 ALL RD  NO        28           (M33)
+NOTICE  27        2   4-JUN-84 1220.44 ALL RD  NO        66           (M33)
+NOTICE  29        2   5-JUN-84  311.56 ALL RD  NO        99           (M33)
+NOTICE  33        2   5-JUN-84  537.00 ALL RD  NO       480           (M33)
+NOTICE  36        2   4-JUN-84  125.58 ALL RD  NO        68           (M33)
+NOTICE  39        2   4-JUN-84  535.38 ALL RD  NO       147           (M33)
+NOTICE  70        2   5-JUN-84   40.48 ALL RD  NO       356           (M33)
+NOTICE  72        2   4-JUN-84  550.25 ALL RD  NO       495           (M33)
+NOTICE  74        2   4-JUN-84  609.41 ALL ALL ALL       17           (M33)
+NOTICE  897       2   4-JUN-84 2228.27 ALL RD  NO       246           (M33)
+
+!dir (CARL)/aft 4-jun
+MAIL             22   4-JUN-84 1957.56 ALL RD  NO     10284           (CARL)
+!! title 6.5.84:
+!dir (K.LISP)/aft 5-jun
+ACCESS  MSG       2   5-JUN-84 1526.08 ALL RD  NO        11           (KEN)
+
+!dir (K.SAIL)/aft 5-jun
+ACCESS  MSG       2   5-JUN-84 1527.49 ALL RD  NO         7           (KEN)
+
+!dir (MAIL)/aft 5-jun
+MAIL    LOG      80   6-JUN-84  901.54 ALL RD  NO     40309           (WRS)
+  #3F0  MAI       2   5-JUN-84  725.11 ALL RD  NO       392           (KEN)
+  #=4_  MAI       2   6-JUN-84  838.45 ALL RD  NO        54           (LOIS)
+
+!dir (KEN)/aft 5-jun
+MAIL    BOX       8   5-JUN-84 1338.26 ALL RD  NO      3136           (KEN)
+COPY    CTL       2   5-JUN-84  735.03 ALL RD  NO         9           (KEN)
+8305M   M        14   5-JUN-84 1305.25 ALL RD  NO      6214           (KEN)
+8305N   M         2   5-JUN-84 1342.03 ALL RD  NO       411           (KEN)
+8306M   M         9   5-JUN-84 1307.39 ALL RD  NO      3818           (KEN)
+8306N   M         2   5-JUN-84 1342.45 ALL RD  NO       122           (KEN)
+8307M   M         4   5-JUN-84 1328.46 ALL RD  NO      1514           (KEN)
+8307N   M         2   5-JUN-84 1343.13 ALL RD  NO        83           (KEN)
+8308M   M         5   5-JUN-84 1330.10 ALL RD  NO      2017           (KEN)
+8308N   M         2   5-JUN-84 1343.58 ALL RD  NO       490           (KEN)
+8309M   M        14   5-JUN-84 1332.21 ALL RD  NO      6178           (KEN)
+8309N   M         2   5-JUN-84 1344.27 ALL RD  NO        58           (KEN)
+8310M   M         6   5-JUN-84 1334.03 ALL RD  NO      2321           (KEN)
+8310N   M         3   5-JUN-84 1345.29 ALL RD  NO       605           (KEN)
+8311M   M         6   5-JUN-84 1334.45 ALL RD  NO      2168           (KEN)
+8311N   M         2   5-JUN-84 1346.12 ALL RD  NO       418           (KEN)
+8312M   M         6   5-JUN-84 1335.52 ALL RD  NO      2271           (KEN)
+8312N   M         2   5-JUN-84 1346.53 ALL RD  NO        48           (KEN)
+8401M   M         7   5-JUN-84 1336.24 ALL RD  NO      2714           (KEN)
+8401N   M         2   5-JUN-84 1347.43 ALL RD  NO       146           (KEN)
+8402M   M         3   5-JUN-84 1337.03 ALL RD  NO       952           (KEN)
+8402N   M         2   5-JUN-84 1347.55 ALL RD  NO        30           (KEN)
+8403M   M         6   5-JUN-84 1337.28 ALL RD  NO      2201           (KEN)
+8404M   M        10   5-JUN-84 1338.03 ALL RD  NO      4153           (KEN)
+DIRECT  MAP       2   5-JUN-84  959.08 ALL RD  NO       130           (KEN)
+PERM    MSG       2   5-JUN-84 1522.17 ALL RD  NO        88           (KEN)
+TURNUP  MSG       2   5-JUN-84 1410.46 ALL RD  NO        39           (KEN)
+MAIL             11   5-JUN-84 1256.26 ALL RD  NO      4865           (KEN)
+
+!dir (KDEV1)/aft 5-jun
+HANS    REL       2   5-JUN-84  934.44 ALL RD  NO       168           (KEN)
+HANS    SAI       2   5-JUN-84  934.35 ALL RD  NO       349           (KEN)
+HANS    SAV      19   5-JUN-84  935.32 ALL RD  NO      9033           (KEN)
+
+!dir (KDEV2)/aft 5-jun
+NAMES   BAK       3   5-JUN-84 1026.42 ALL RD  NO       765           (KEN)
+NAMES   CTL       3   6-JUN-84  927.03 ALL RD  NO       765           (KEN)
+DUSAGE  DAT       3   6-JUN-84  904.24 ALL RD  NO       890           (KEN)
+NAMES   LOG       1   6-JUN-84  927.13 ALL RD  NO      3072           (KEN)
+NAMS    LOG      24   5-JUN-84  742.06 ALL RD  NO     11500           (KEN)
+NAMS    PEA       2   5-JUN-84 1055.38 ALL RD  NO        19           (KEN)
+DUSAGE  RPT      13   6-JUN-84  904.24 ALL RD  NO      5894           (KEN)
+TMP               5   5-JUN-84  916.28 ALL RD  NO      1798           (KEN)
+
+!dir (LOIS)/aft 5-jun
+SW      BAK       2   6-JUN-84  810.35 ALL RD  NO       322           (LOIS)
+SW      MEM       2   6-JUN-84  827.21 ALL RD  NO       322           (LOIS)
+P034    MKR       2   6-JUN-84  837.53 ALL RD  NO         2           (LOIS)
+MAIL              4   6-JUN-84  740.47 ALL RD  NO      1359           (LOIS)
+
+!dir (MATOKA)/aft 5-jun
+P034    MKR       2   5-JUN-84 1607.53 ALL RD  NO         2           (MATOKA)
+
+!dir (OSP)/aft 5-jun
+CNFN    DIR       2   5-JUN-84 1646.13 ALL ALL ALL       32           (CARL)
+MON     DIR       2   5-JUN-84 1649.02 CP  ALL ALL      135           (CARL)
+FSH001  FSH      73   5-JUN-84 1548.55 ALL RD  NO     36390           (CARL)
+FSH002  FSH     106   5-JUN-84 1549.59 ALL RD  NO     53416           (CARL)
+FSH003  FSH     108   5-JUN-84 1551.01 ALL RD  NO     54318           (CARL)
+FSH004  FSH     108   5-JUN-84 1552.02 ALL RD  NO     54679           (CARL)
+FSH005  FSH     110   5-JUN-84 1553.00 ALL RD  NO     55805           (CARL)
+FSH006  FSH      25   5-JUN-84 1554.02 ALL RD  NO     12148           (CARL)
+FSH007  FSH     139   5-JUN-84 1555.35 ALL RD  NO     70490           (CARL)
+FSH008  FSH       9   5-JUN-84 1556.59 ALL RD  NO      3939           (CARL)
+FSH009  FSH      18   5-JUN-84 1557.18 ALL RD  NO      8294           (CARL)
+FSH010  FSH      25   5-JUN-84 1558.01 ALL RD  NO     11938           (CARL)
+FSH463  FSH       2   5-JUN-84 1610.49 ALL RD  NO        20           (CARL)
+FSH464  FSH      19   5-JUN-84 1612.38 ALL RD  NO      8717           (CARL)
+ACTSER  LST      29   5-JUN-84 1836.45 ALL RD  NO     14134           (CARL)
+BPXKON  LST      39   5-JUN-84 1833.46 ALL RD  NO     18952           (CARL)
+CDRSER  LST      14   5-JUN-84 1836.56 ALL RD  NO      6161           (CARL)
+CLOCK1  LST      49   5-JUN-84 1834.01 ALL RD  NO     24218           (CARL)
+CLUBS   LST      27   5-JUN-84 1832.53 ALL RD  NO     13274           (CARL)
+COMCON  LST     116   5-JUN-84 1834.20 ALL RD  NO     58494           (CARL)
+COMMOD  LST     113   5-JUN-84 1828.43 ALL RD  NO     57298           (CARL)
+COMMON  LST     176   5-JUN-84 1827.31 ALL RD  NO     89545           (CARL)
+COMTXT  LST       4   5-JUN-84 1827.29 ALL RD  NO      1158           (CARL)
+CORE1   LST     189   5-JUN-84 1835.06 ALL RD  NO     96008           (CARL)
+CTYSIM  LST      20   5-JUN-84 1841.10 ALL RD  NO      9568           (CARL)
+DEBUG   LST      11   5-JUN-84 1843.58 ALL RD  NO      4661           (CARL)
+ERRCON  LST      54   5-JUN-84 1836.20 ALL RD  NO     27127           (CARL)
+FILFND  LST      63   5-JUN-84 1833.04 ALL RD  NO     31375           (CARL)
+FILIO   LST      46   5-JUN-84 1830.30 ALL RD  NO     23035           (CARL)
+FILRIB  LST      50   5-JUN-84 1833.28 ALL RD  NO     24714           (CARL)
+FILUUO  LST     138   5-JUN-84 1829.30 ALL RD  NO     69803           (CARL)
+FRMSER  LST     108   5-JUN-84 1830.48 ALL RD  NO     54294           (CARL)
+FTASER  LST     114   5-JUN-84 1837.00 ALL RD  NO     57627           (CARL)
+IOCSS   LST     116   5-JUN-84 1842.15 ALL RD  NO     58491           (CARL)
+JOBDAT  LST      10   5-JUN-84 1836.41 ALL RD  NO      4399           (CARL)
+LPTSER  LST      22   5-JUN-84 1837.44 ALL RD  NO     10297           (CARL)
+MAPIO   LST     100   5-JUN-84 1832.15 ALL RD  NO     50444           (CARL)
+ONCDSK  LST      90   5-JUN-84 1844.58 ALL RD  NO     45425           (CARL)
+ONCE    LST      97   5-JUN-84 1844.23 ALL RD  NO     48685           (CARL)
+PATCH   LST       2   5-JUN-84 1843.57 ALL RD  NO       315           (CARL)
+PCBIO   LST      63   5-JUN-84 1831.34 ALL RD  NO     31743           (CARL)
+PICON   LST      80   5-JUN-84 1837.51 ALL RD  NO     40019           (CARL)
+PLTSER  LST       8   5-JUN-84 1838.24 ALL RD  NO      3141           (CARL)
+PTPSER  LST      13   5-JUN-84 1838.27 ALL RD  NO      5900           (CARL)
+PTRSER  LST       9   5-JUN-84 1838.32 ALL RD  NO      3660           (CARL)
+REFSTR  LST      50   5-JUN-84 1845.30 ALL RD  NO     24669           (CARL)
+RMTSER  LST       2   5-JUN-84 1838.35 ALL RD  NO       146           (CARL)
+SCHED1  LST      90   5-JUN-84 1838.36 ALL RD  NO     45370           (CARL)
+SCNSER  LST     313   5-JUN-84 1839.11 ALL RD  NO    159334           (CARL)
+SEGCON  LST      81   5-JUN-84 1841.18 ALL RD  NO     40874           (CARL)
+SETETY  LST       4   5-JUN-84 1829.28 ALL RD  NO      1118           (CARL)
+SIMIO   LST      47   5-JUN-84 1841.57 ALL RD  NO     23271           (CARL)
+SIMKL   LST      63   5-JUN-84 1844.02 ALL RD  NO     31652           (CARL)
+SWAMP   LST      46   5-JUN-84 1831.58 ALL RD  NO     22808           (CARL)
+TMPUUO  LST      12   5-JUN-84 1841.53 ALL RD  NO      5174           (CARL)
+UUOCON  LST     111   5-JUN-84 1843.07 ALL RD  NO     56034           (CARL)
+CNFN39  MAC       2   5-JUN-84 1726.56 ALL RD  NO       142           (CARL)
+ACCESS  MSG       2   5-JUN-84 1726.56 ALL RD  NO         6           (CARL)
+ACTSRL  REL       4   5-JUN-84 1756.11 ALL RD  NO      1071           (CARL)
+BPXKNL  REL       5   5-JUN-84 1747.55 ALL RD  NO      1676           (CARL)
+CDRSRL  REL       3   5-JUN-84 1756.44 ALL RD  NO       590           (CARL)
+CLOCKL  REL       6   5-JUN-84 1748.30 ALL RD  NO      2289           (CARL)
+CLUBSL  REL       3   5-JUN-84 1745.41 ALL RD  NO       803           (CARL)
+CMD39L  REL      10   5-JUN-84 1733.18 ALL RD  NO      4439           (CARL)
+CMN39L  REL      10   5-JUN-84 1731.02 ALL RD  NO      4383           (CARL)
+CMT39L  REL       2   5-JUN-84 1730.44 ALL RD  NO        86           (CARL)
+COMCNL  REL      11   5-JUN-84 1749.16 ALL RD  NO      5091           (CARL)
+COMFKL  REL       2   5-JUN-84 1730.27 ALL RD  NO        40           (CARL)
+CORE1L  REL      17   5-JUN-84 1751.06 ALL RD  NO      7856           (CARL)
+CTYSML  REL       3   5-JUN-84 1808.26 ALL RD  NO      1022           (CARL)
+DEBUGL  REL       2   5-JUN-84 1821.11 ALL RD  NO       510           (CARL)
+EDDT    REL      18   5-JUN-84 1822.18 ALL RD  NO      8364           (CARL)
+ERRCNL  REL       7   5-JUN-84 1754.13 ALL RD  NO      2864           (CARL)
+FILFNL  REL       8   5-JUN-84 1746.20 ALL RD  NO      3321           (CARL)
+FILIOL  REL       5   5-JUN-84 1738.46 ALL RD  NO      1947           (CARL)
+FILRBL  REL       7   5-JUN-84 1747.12 ALL RD  NO      2739           (CARL)
+FILUUL  REL      17   5-JUN-84 1735.16 ALL RD  NO      7686           (CARL)
+FRMSRL  REL      11   5-JUN-84 1739.27 ALL RD  NO      4981           (CARL)
+FTASRL  REL      10   5-JUN-84 1757.04 ALL RD  NO      4428           (CARL)
+IOCSSL  REL      11   5-JUN-84 1813.06 ALL RD  NO      4618           (CARL)
+LPTSRL  REL       2   5-JUN-84 1758.31 ALL RD  NO       418           (CARL)
+MAPIOL  REL      10   5-JUN-84 1744.18 ALL RD  NO      4373           (CARL)
+MJBDTL  REL       2   5-JUN-84 1755.51 ALL RD  NO       221           (CARL)
+ONCDSL  REL      11   5-JUN-84 1825.34 ALL RD  NO      4903           (CARL)
+ONCEL   REL      11   5-JUN-84 1824.16 ALL RD  NO      5014           (CARL)
+PATCHL  REL       2   5-JUN-84 1821.10 ALL RD  NO        31           (CARL)
+PCBIOL  REL       7   5-JUN-84 1742.42 ALL RD  NO      2623           (CARL)
+PICONL  REL       9   5-JUN-84 1758.56 ALL RD  NO      3901           (CARL)
+PLTSRL  REL       2   5-JUN-84 1800.50 ALL RD  NO       329           (CARL)
+PTPSRL  REL       3   5-JUN-84 1801.08 ALL RD  NO       575           (CARL)
+PTRSRL  REL       2   5-JUN-84 1801.29 ALL RD  NO       392           (CARL)
+REFSTL  REL       6   5-JUN-84 1826.44 ALL RD  NO      2381           (CARL)
+RMTSRL  REL       2   5-JUN-84 1801.46 ALL RD  NO        38           (CARL)
+SCHEDL  REL       9   5-JUN-84 1802.00 ALL RD  NO      3588           (CARL)
+SCNSRL  REL      26   5-JUN-84 1803.11 ALL RD  NO     12690           (CARL)
+SEGCNL  REL       9   5-JUN-84 1808.53 ALL RD  NO      3587           (CARL)
+SETTYL  REL       2   5-JUN-84 1735.02 ALL RD  NO        86           (CARL)
+SIMIOL  REL       6   5-JUN-84 1812.09 ALL RD  NO      2070           (CARL)
+SIMKLL  REL       2   5-JUN-84 1821.30 ALL RD  NO        25           (CARL)
+SWAMPL  REL       5   5-JUN-84 1743.35 ALL RD  NO      2046           (CARL)
+TMPUUL  REL       2   5-JUN-84 1811.40 ALL RD  NO       288           (CARL)
+UUOCNL  REL      11   5-JUN-84 1817.16 ALL RD  NO      5030           (CARL)
+ACTSRL  SWT       4   5-JUN-84 1836.45 ALL RD  NO      1244           (CARL)
+BPXKNL  SWT       5   5-JUN-84 1833.46 ALL RD  NO      1882           (CARL)
+CDRSRL  SWT       3   5-JUN-84 1836.56 ALL RD  NO       655           (CARL)
+CLOCKL  SWT       6   5-JUN-84 1834.01 ALL RD  NO      2483           (CARL)
+CLUBSL  SWT       4   5-JUN-84 1832.53 ALL RD  NO      1050           (CARL)
+CMD39L  SWT      17   5-JUN-84 1828.43 ALL RD  NO      8034           (CARL)
+CMN39L  SWT      26   5-JUN-84 1827.31 ALL RD  NO     12471           (CARL)
+CMT39L  SWT       2   5-JUN-84 1827.29 ALL RD  NO       207           (CARL)
+COMCNL  SWT      12   5-JUN-84 1834.20 ALL RD  NO      5556           (CARL)
+CORE1L  SWT      17   5-JUN-84 1835.06 ALL RD  NO      8167           (CARL)
+CTYSML  SWT       3   5-JUN-84 1841.10 ALL RD  NO       998           (CARL)
+DEBUGL  SWT       3   5-JUN-84 1843.58 ALL RD  NO       566           (CARL)
+ERRCNL  SWT       8   5-JUN-84 1836.20 ALL RD  NO      3361           (CARL)
+FILFNL  SWT       8   5-JUN-84 1833.04 ALL RD  NO      3161           (CARL)
+FILIOL  SWT       6   5-JUN-84 1830.31 ALL RD  NO      2417           (CARL)
+FILRBL  SWT       6   5-JUN-84 1833.28 ALL RD  NO      2352           (CARL)
+FILUUL  SWT      17   5-JUN-84 1829.30 ALL RD  NO      8125           (CARL)
+FRMSRL  SWT      12   5-JUN-84 1830.48 ALL RD  NO      5603           (CARL)
+FTASRL  SWT      11   5-JUN-84 1837.01 ALL RD  NO      4772           (CARL)
+IOCSSL  SWT      12   5-JUN-84 1842.15 ALL RD  NO      5598           (CARL)
+LPTSRL  SWT       3   5-JUN-84 1837.44 ALL RD  NO       610           (CARL)
+MAPIOL  SWT      10   5-JUN-84 1832.15 ALL RD  NO      4553           (CARL)
+MJBDTL  SWT       2   5-JUN-84 1836.41 ALL RD  NO       496           (CARL)
+ONCDSL  SWT       9   5-JUN-84 1844.58 ALL RD  NO      3960           (CARL)
+ONCEL   SWT      10   5-JUN-84 1844.23 ALL RD  NO      4504           (CARL)
+PATCHL  SWT       2   5-JUN-84 1843.57 ALL RD  NO        27           (CARL)
+PCBIOL  SWT       7   5-JUN-84 1831.34 ALL RD  NO      3004           (CARL)
+PICONL  SWT      10   5-JUN-84 1837.51 ALL RD  NO      4163           (CARL)
+PLTSRL  SWT       2   5-JUN-84 1838.24 ALL RD  NO       451           (CARL)
+PTPSRL  SWT       3   5-JUN-84 1838.27 ALL RD  NO       781           (CARL)
+PTRSRL  SWT       3   5-JUN-84 1838.32 ALL RD  NO       525           (CARL)
+REFSTL  SWT       6   5-JUN-84 1845.30 ALL RD  NO      2229           (CARL)
+RMTSRL  SWT       2   5-JUN-84 1838.35 ALL RD  NO         1           (CARL)
+SCHEDL  SWT      10   5-JUN-84 1838.36 ALL RD  NO      4300           (CARL)
+SCNSRL  SWT      30   5-JUN-84 1839.11 ALL RD  NO     14757           (CARL)
+SEGCNL  SWT       9   5-JUN-84 1841.18 ALL RD  NO      3691           (CARL)
+SETTYL  SWT       2   5-JUN-84 1829.28 ALL RD  NO        95           (CARL)
+SIMIOL  SWT       5   5-JUN-84 1841.57 ALL RD  NO      1883           (CARL)
+SIMKLL  SWT       2   5-JUN-84 1844.02 ALL RD  NO        30           (CARL)
+SWAMPL  SWT       6   5-JUN-84 1831.58 ALL RD  NO      2076           (CARL)
+TMPUUL  SWT       2   5-JUN-84 1841.53 ALL RD  NO       422           (CARL)
+UUOCNL  SWT      14   5-JUN-84 1843.08 ALL RD  NO      6242           (CARL)
+CONF    VUE       3   5-JUN-84 1646.21 ALL RD  NO       662           (CARL)
+MAIN01  VUE       3   5-JUN-84 1646.03 ALL RD  NO       845           (CARL)
+MAC               3   5-JUN-84 1638.07 ALL RD  NO       718           (CARL)
+
+!dir (TSUCOOP)/aft 5-jun
+SWITCH  BAK       2   5-JUN-84 1448.50 ALL RD  NO       109           (TSUCOOP)
+TU0605  INC       4   5-JUN-84  818.42 ALL RD  NO      1148           (TSUCOOP)
+WE0606  INC      11   6-JUN-84  758.59 ALL RD  NO      4723           (TSUCOOP)
+SWITCH  INI       2   5-JUN-84 1449.52 ALL RD  NO       109           (TSUCOOP)
+TURNUP  MSG       2   6-JUN-84  848.55 ALL RD  NO        47           (TSUCOOP)
+CURSLS            2   5-JUN-84 1451.12 ALL RD  NO         4           (TSUCOOP)
+001PEA  001       4   6-JUN-84  918.48 ALL RD  NO      1357           (TSUCOOP)
+
+!dir (WRS)/aft 5-jun
+P034    MKR       2   5-JUN-84 1557.59 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 5-jun
+NOTICE  107       2   5-JUN-84 2355.06 ALL RD  NO       192           (M33)
+NOTICE  25        2   6-JUN-84  344.02 ALL RD  NO       209           (M33)
+NOTICE  28        2   6-JUN-84  542.48 ALL RD  NO        47           (M33)
+NOTICE  29        2   5-JUN-84  311.56 ALL RD  NO        99           (M33)
+NOTICE  33        2   6-JUN-84  543.52 ALL RD  NO       480           (M33)
+NOTICE  34        2   6-JUN-84  652.08 ALL RD  NO        14           (M33)
+NOTICE  39        2   5-JUN-84 1626.25 ALL RD  NO       160           (M33)
+NOTICE  57        2   6-JUN-84   25.49 ALL RD  NO        28           (M33)
+NOTICE  65        2   5-JUN-84 2246.30 ALL RD  NO        26           (M33)
+NOTICE  70        2   5-JUN-84   40.48 ALL RD  NO       356           (M33)
+NOTICE  90        2   5-JUN-84  856.23 ALL RD  NO        99           (M33)
+
+!dir (CARL)/aft 5-jun
+CHECK   LOW       2   5-JUN-84 1655.44 ALL RD  NO        15 RF        (CARL)
+CULL    REL       4   5-JUN-84 1452.41 ALL RD  NO      1407           (TSUCOOP)
+FICHE   REL      13   5-JUN-84 1632.53 ALL RD  NO      5930           (CARL)
+HUGE    REL       2   5-JUN-84 1504.06 ALL RD  NO       195           (CARL)
+FICHE   SAI      10   5-JUN-84 1632.46 ALL RD  NO      4537           (CARL)
+FICHE   SAV      25   5-JUN-84 1633.51 ALL RD  NO     12045           (CARL)
+CHECK   SHR      22   5-JUN-84 1654.35 ALL RD  NO     10385 RF        (CARL)
+MAIL             22   5-JUN-84 1512.05 ALL RD  NO     10284           (CARL)
+
+!dir (FLETCHERC)/aft 5-jun
+NAMES   TXT       2   5-JUN-84 1614.43 ALL RD  NO       446           (FLETCHERC)
+!! title 6.6.84:
+!dir (K.TAPE)/aft 6-jun
+MAIL    TAP       5   6-JUN-84  955.52 ALL RD  NO      1673           (KEN)
+
+!dir (MAIL)/aft 6-jun
+MAIL    LOG      83   7-JUN-84  701.32 ALL RD  NO     41762           (WRS)
+  #8'E  MAI       7   6-JUN-84 1705.30 ALL RD  NO      2754           (MAIL)
+ONTMTP  SAV      23   6-JUN-84 2252.34 ALL RD  NO     10835 SY AC WF  (WRS)
+33      SAV      21   6-JUN-84 2242.26 ALL RD  NO      9738 SY AC WF  (WRS)
+39      SAV      21   6-JUN-84 2244.23 ALL RD  NO      9738 SY AC WF  (WRS)
+57      SAV      21   6-JUN-84 2246.24 ALL RD  NO      9738 SY AC WF  (WRS)
+897     SAV      21   6-JUN-84 2250.37 ALL RD  NO      9738 SY AC WF  (WRS)
+930     SAV      21   6-JUN-84 2248.20 ALL RD  NO      9738           (MAIL)
+
+!dir (PEAK.BAK)/aft 6-jun
+FSH     BAK       2   6-JUN-84 1454.23 ALL RD  NO        48           (KEN)
+FSH     CMD       2   6-JUN-84 1458.06 ALL RD  NO        59           (KEN)
+006TEL  COM       2   6-JUN-84 1520.25 ALL RD  NO        43           (KEN)
+FSH     CTL       2   6-JUN-84 1422.20 ALL RD  NO        50           (KEN)
+DED     DEF      14   6-JUN-84 1353.13 ALL RD  NO      6494           (KEN)
+HOST    DEF       2   6-JUN-84 1353.26 ALL RD  NO       203           (KEN)
+FSH     LOG       2   6-JUN-84 1444.08 ALL RD  NO       404           (KEN)
+006TEL  OUT       2   6-JUN-84 1520.28 ALL RD  NO        95           (KEN)
+FSH     PRT       3   6-JUN-84 1444.23 ALL RD  NO       600           (KEN)
+COMM1   REQ      18   6-JUN-84 1353.28 ALL RD  NO      8322           (KEN)
+COMM2   REQ      29   6-JUN-84 1353.40 ALL RD  NO     14329           (KEN)
+COMM3   REQ      14   6-JUN-84 1353.58 ALL RD  NO      6421           (KEN)
+COMM4   REQ       9   6-JUN-84 1354.06 ALL RD  NO      3687           (KEN)
+COMM5   REQ       3   6-JUN-84 1354.14 ALL RD  NO       558           (KEN)
+COMM6   REQ       3   6-JUN-84 1354.16 ALL RD  NO       706           (KEN)
+COMM7   REQ       4   6-JUN-84 1354.19 ALL RD  NO      1334           (KEN)
+COMM8   REQ       3   6-JUN-84 1354.22 ALL RD  NO       677           (KEN)
+COMSUB  REQ      19   6-JUN-84 1354.23 ALL RD  NO      8848           (KEN)
+XXBUF1  REQ      37   6-JUN-84 1354.35 ALL RD  NO     18053           (KEN)
+XXBUF2  REQ      15   6-JUN-84 1354.58 ALL RD  NO      6680           (KEN)
+AUXWIN  SAI      17   6-JUN-84 1355.07 ALL RD  NO      8029           (KEN)
+COMAND  SAI      35   6-JUN-84 1355.18 ALL RD  NO     17245           (KEN)
+DED     SAI       4   6-JUN-84 1355.41 ALL RD  NO      1273           (KEN)
+REDISP  SAI      23   6-JUN-84 1355.43 ALL RD  NO     11063           (KEN)
+UTIL    SAI       6   6-JUN-84 1355.59 ALL RD  NO      2083           (KEN)
+WINDOW  SAI      16   6-JUN-84 1356.04 ALL RD  NO      7611           (KEN)
+XBUFF   SAI      28   6-JUN-84 1356.18 ALL RD  NO     13658           (KEN)
+XFILE   SAI      19   6-JUN-84 1356.38 ALL RD  NO      8995           (KEN)
+XXBUFF  SAI      16   6-JUN-84 1356.53 ALL RD  NO      7191           (KEN)
+XXFILE  SAI      15   6-JUN-84 1357.16 ALL RD  NO      6669           (KEN)
+
+!dir (KEN)/aft 6-jun
+MAIL             11   6-JUN-84 2048.45 ALL RD  NO      4888           (KEN)
+
+!dir (PEAKX)/aft 6-jun
+PRT     CTL       2   6-JUN-84 1346.55 ALL RD  NO       146           (KEN)
+PRT     LOG       2   6-JUN-84 1353.09 ALL RD  NO       333           (KEN)
+AUXWIN  SAI      12   6-JUN-84 1105.01 ALL RD  NO      5317           (KEN)
+
+!dir (KDEV2)/aft 6-jun
+NAMES   CTL       3   7-JUN-84  720.52 ALL RD  NO       765           (KEN)
+DUSAGE  DAT       3   7-JUN-84  702.15 ALL RD  NO       892           (KEN)
+NAMES   LOG       1   6-JUN-84 1018.00 ALL RD  NO      3072           (KEN)
+NAMS    LOG      31   6-JUN-84 1020.27 ALL RD  NO     15066           (KEN)
+NAMS    PEA       2   6-JUN-84 1017.18 ALL RD  NO        21           (KEN)
+NAMS    PRT       9   6-JUN-84 1022.40 ALL RD  NO      4081           (KEN)
+DUSAGE  RPT      13   7-JUN-84  702.15 ALL RD  NO      5907           (KEN)
+
+!dir (SPPOPER)/aft 6-jun
+P034    MKR       2   6-JUN-84 1537.20 ALL RD  NO         2           (SPPOPER)
+MAIL              2   6-JUN-84 1537.34 ALL RD  NO       384           (SPPOPER)
+
+!dir (LOIS)/aft 6-jun
+SW      BAK       2   6-JUN-84 1322.25 ALL RD  NO       327           (LOIS)
+SW      MEM       2   6-JUN-84 1322.40 ALL RD  NO       327           (LOIS)
+P034    MKR       2   6-JUN-84 1321.16 ALL RD  NO         2           (LOIS)
+MAIL              4   6-JUN-84 1210.30 ALL RD  NO      1450           (LOIS)
+
+!dir (OSP)/aft 6-jun
+FSHFMT  CMD       2   6-JUN-84 1637.09 ALL RD  NO       118           (CARL)
+COMMON  LST     137   6-JUN-84 1647.33 ALL RD  NO     69269           (CARL)
+CORE1   LST     189   6-JUN-84 2309.42 ALL RD  NO     95980           (CARL)
+S       LST      41   6-JUN-84 1635.24 ALL RD  NO     20275           (CARL)
+
+!dir (SPL)/aft 6-jun
+006TEL  COM       2   6-JUN-84 1538.48 ALL RD  NO        14           (WRS)
+CRSHID  LOG       2   6-JUN-84 1052.20 ALL RD  NO        49           (LOIS)
+006TEL  OUT       2   6-JUN-84 1538.54 ALL RD  NO        25           (WRS)
+
+!dir (TSUCOOP)/aft 6-jun
+P1      BAK       6   6-JUN-84 1801.36 ALL RD  NO      2220           (TSUCOOP)
+P1      CBL       6   6-JUN-84 1802.39 ALL RD  NO      2226           (TSUCOOP)
+WE0606  INC      11   6-JUN-84  758.59 ALL RD  NO      4723           (TSUCOOP)
+P1      LST       8   6-JUN-84 1802.49 ALL RD  NO      3228           (TSUCOOP)
+TURNUP  MSG       2   7-JUN-84  125.51 ALL RD  NO        47           (TSUCOOP)
+FILE    OUT       2   6-JUN-84 1814.18 ALL RD  NO        82           (TSUCOOP)
+P1      REL       8   6-JUN-84 1802.49 ALL RD  NO      3490           (TSUCOOP)
+MAIN01  VUE       6   6-JUN-84 1626.17 ALL RD  NO      2237           (TSUCOOP)
+CURSLS            2   6-JUN-84 1407.54 ALL RD  NO        35           (TSUCOOP)
+OLDMAS            1   6-JUN-84 1814.18 ALL RD  NO         0           (TSUCOOP)
+SLSPRS            2   6-JUN-84 1426.58 ALL RD  NO       228           (TSUCOOP)
+
+!dir (WRS)/aft 6-jun
+P034    MKR       2   6-JUN-84 2245.27 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 6-jun
+HOTLIN  BAK       2   6-JUN-84 1124.34 ALL RD  NO       234           (CARL)
+HOTLIN  LOG       2   6-JUN-84 1126.17 ALL RD  NO       233           (CARL)
+SCHED1  MAC      40   6-JUN-84 1142.01 ALL RD  NO     19668           (WRS)
+NOTICE  107       2   7-JUN-84  255.27 ALL RD  NO       192           (M33)
+NOTICE  25        2   6-JUN-84 1019.18 ALL RD  NO       209           (M33)
+NOTICE  27        2   6-JUN-84 2257.32 ALL RD  NO        97           (M33)
+NOTICE  28        2   6-JUN-84  542.48 ALL RD  NO        47           (M33)
+NOTICE  32        2   6-JUN-84 2150.45 ALL RD  NO        59           (M33)
+NOTICE  33        2   7-JUN-84  545.51 ALL RD  NO       480           (M33)
+NOTICE  34        2   6-JUN-84  652.08 ALL RD  NO        14           (M33)
+NOTICE  36        2   7-JUN-84  147.13 ALL RD  NO        68           (M33)
+NOTICE  38        2   7-JUN-84  631.11 ALL RD  NO       102           (M33)
+NOTICE  57        2   6-JUN-84   25.49 ALL RD  NO        28           (M33)
+NOTICE  897       2   6-JUN-84 2308.08 ALL RD  NO       246           (M33)
+
+!dir (CARL)/aft 6-jun
+FSH001  FSH     158   6-JUN-84 1640.49 ALL RD  NO     79964           (CARL)
+TEST    TST     154   6-JUN-84 1540.50 ALL ALL ALL    78336           (CARL)
+MAIN08  VUE       4   6-JUN-84 1506.49 ALL RD  NO      1174           (CARL)
+MAIL             22   6-JUN-84 1537.11 ALL RD  NO     10449           (CARL)
+!! title 6.7.84:
+!dir (MAIL)/aft 7-jun
+MAIL    LOG      87   8-JUN-84  902.45 ALL RD  NO     43753           (WRS)
+  #=4_  MAI       2   8-JUN-84  900.17 ALL RD  NO       202           (LOIS)
+MAIL              1   7-JUN-84 1403.01 ALL RD  NO         0           (MAIL)
+
+!dir (PEAK.BAK)/aft 7-jun
+TMP     BAK       2   7-JUN-84 1549.08 ALL RD  NO       145           (KEN)
+001TEL  COM       2   7-JUN-84 1612.09 ALL RD  NO       241           (KEN)
+005TEL  COM       2   7-JUN-84 1615.12 ALL RD  NO       241           (KEN)
+TMP     CTL       2   7-JUN-84 1549.58 ALL RD  NO       154           (KEN)
+TMP     LOG       2   7-JUN-84 1550.06 ALL RD  NO       367           (KEN)
+8301M   M        16   7-JUN-84 1550.09 ALL RD  NO      7660           (KEN)
+8301N   M         5   7-JUN-84 1550.18 ALL RD  NO      1729           (KEN)
+8302M   M        16   7-JUN-84 1550.21 ALL RD  NO      7678           (KEN)
+8302N   M         7   7-JUN-84 1550.30 ALL RD  NO      2940           (KEN)
+8303M   M        21   7-JUN-84 1550.34 ALL RD  NO     10030           (KEN)
+8303N   M         7   7-JUN-84 1550.45 ALL RD  NO      2561           (KEN)
+8304M   M        16   7-JUN-84 1550.49 ALL RD  NO      7375           (KEN)
+8304N   M         9   7-JUN-84 1550.58 ALL RD  NO      3794           (KEN)
+8305M   M        18   7-JUN-84 1551.04 ALL RD  NO      8297           (KEN)
+8305N   M         3   7-JUN-84 1551.14 ALL RD  NO       520           (KEN)
+8306M   M        11   7-JUN-84 1551.15 ALL RD  NO      5094           (KEN)
+8306N   M         2   7-JUN-84 1551.21 ALL RD  NO       162           (KEN)
+8307M   M         6   7-JUN-84 1551.23 ALL RD  NO      2061           (KEN)
+8307N   M         2   7-JUN-84 1551.26 ALL RD  NO       127           (KEN)
+8308M   M         7   7-JUN-84 1551.27 ALL RD  NO      2712           (KEN)
+8308N   M         3   7-JUN-84 1551.30 ALL RD  NO       630           (KEN)
+8309M   M        17   7-JUN-84 1551.32 ALL RD  NO      8042           (KEN)
+8309N   M         2   7-JUN-84 1551.42 ALL RD  NO        91           (KEN)
+8310M   M         7   7-JUN-84 1551.43 ALL RD  NO      3072           (KEN)
+8310N   M         3   7-JUN-84 1551.47 ALL RD  NO       822           (KEN)
+8311M   M         7   7-JUN-84 1551.49 ALL RD  NO      2845           (KEN)
+8311N   M         3   7-JUN-84 1551.54 ALL RD  NO       525           (KEN)
+8312M   M         7   7-JUN-84 1551.55 ALL RD  NO      2951           (KEN)
+8312N   M         2   7-JUN-84 1552.00 ALL RD  NO        83           (KEN)
+8401M   M         8   7-JUN-84 1552.01 ALL RD  NO      3526           (KEN)
+8401N   M         2   7-JUN-84 1552.06 ALL RD  NO       211           (KEN)
+8402M   M         4   7-JUN-84 1552.07 ALL RD  NO      1270           (KEN)
+8402N   M         2   7-JUN-84 1552.09 ALL RD  NO        61           (KEN)
+8403M   M         7   7-JUN-84 1552.10 ALL RD  NO      2888           (KEN)
+8404M   M        13   7-JUN-84 1552.15 ALL RD  NO      5681           (KEN)
+001TEL  OUT       2   7-JUN-84 1612.12 ALL RD  NO       409           (KEN)
+005TEL  OUT       3   7-JUN-84 1615.15 ALL RD  NO       704           (KEN)
+
+!dir (KEN)/aft 7-jun
+TURNUP  BAK       2   7-JUN-84  957.23 ALL RD  NO        39           (KEN)
+TURNUP  MSG       2   7-JUN-84 1016.33 ALL RD  NO        64           (KEN)
+MAIL             11   7-JUN-84 1413.56 ALL RD  NO      5072           (KEN)
+
+!dir (KDEV2)/aft 7-jun
+NAMES   CTL       3   8-JUN-84  937.24 ALL RD  NO       765           (KEN)
+DUSAGE  DAT       3   8-JUN-84  934.33 ALL RD  NO       892           (KEN)
+NAMES   LOG       1   8-JUN-84  937.40 ALL RD  NO      3072           (KEN)
+NAMS    LOG      34   7-JUN-84 1017.04 ALL RD  NO     16587           (KEN)
+DUSAGE  RPT      13   8-JUN-84  934.33 ALL RD  NO      5907           (KEN)
+
+!dir (LOIS)/aft 7-jun
+NODELD  BAK       3   8-JUN-84  807.28 ALL RD  NO       661           (LOIS)
+P034    MKR       2   8-JUN-84  850.02 ALL RD  NO         2           (LOIS)
+MAIL              5   8-JUN-84  755.50 ALL RD  NO      1660           (LOIS)
+
+!dir (MPL)/aft 7-jun
+DOC     MEM       3   8-JUN-84  821.55 ALL RD  RD       767           (LOIS)
+NODELD  MEM       3   8-JUN-84  811.12 ALL RD  NO       675           (LOIS)
+
+!dir (OSP)/aft 7-jun
+ONCDSK  MAC      29   7-JUN-84 2216.48 ALL RD  NO     14020           (CARL)
+ONCE    MAC      30   8-JUN-84  207.12 ALL RD  NO     14690           (CARL)
+PICON   MAC      31   7-JUN-84 1802.30 ALL RD  NO     15275           (CARL)
+
+!dir (TSUCOOP)/aft 7-jun
+FR0608  INC       6   8-JUN-84  927.49 ALL RD  NO      2370           (TSUCOOP)
+TH0607  INC       9   7-JUN-84  822.16 ALL RD  NO      3616           (TSUCOOP)
+TURNUP  MSG       2   8-JUN-84  900.19 ALL RD  NO        47           (TSUCOOP)
+
+!dir (M33)/aft 7-jun
+ONCE    BAK      30   8-JUN-84  117.21 ALL RD  NO     14643           (CARL)
+P034    BAK      64   8-JUN-84   41.00 ALL RD  NO     32144           (CARL)
+PICON   BAK      31   7-JUN-84 1759.44 ALL RD  NO     15284           (CARL)
+CNFNF3  MAC       3   8-JUN-84  216.01 ALL RD  NO       617           (CARL)
+ONCDSK  MAC      29   7-JUN-84 2216.48 ALL RD  NO     14020           (CARL)
+ONCE    MAC      30   8-JUN-84  207.12 ALL RD  NO     14690           (CARL)
+PICON   MAC      31   7-JUN-84 1802.30 ALL RD  NO     15275           (CARL)
+P034    MEM      64   8-JUN-84  215.00 ALL RD  NO     32143           (CARL)
+ACCESS  MSG       2   8-JUN-84  216.02 ALL RD  NO         6           (CARL)
+CMTF3F  REL       2   8-JUN-84  216.22 ALL RD  NO        68           (CARL)
+COMFKF  REL       2   8-JUN-84  216.07 ALL RD  NO        22           (CARL)
+ONCDSF  REL      11   7-JUN-84 2319.28 ALL RD  NO      4946           (CARL)
+ONCEF   REL      11   8-JUN-84  216.40 ALL RD  NO      4629           (CARL)
+PICONF  REL       8   7-JUN-84 2315.54 ALL RD  NO      3549           (CARL)
+SCHEDF  REL       8   7-JUN-84 2317.31 ALL RD  NO      3550           (CARL)
+F3XL25  SAV     145   8-JUN-84  219.31 ALL RD  NO     73516           (CARL)
+NOTICE  107       2   8-JUN-84  220.03 ALL RD  NO       192           (M33)
+NOTICE  25        2   7-JUN-84 1505.39 ALL RD  NO       105           (CARL)
+NOTICE  26        2   7-JUN-84  801.57 ALL RD  NO        15           (M33)
+NOTICE  30        2   8-JUN-84  512.49 ALL RD  NO       125           (M33)
+NOTICE  32        2   7-JUN-84 1033.13 ALL RD  NO        73           (M33)
+NOTICE  33        2   8-JUN-84  330.33 ALL RD  NO       341           (M33)
+NOTICE  36        2   8-JUN-84  853.04 ALL RD  NO       107           (M33)
+NOTICE  38        2   7-JUN-84  631.11 ALL RD  NO       102           (M33)
+NOTICE  57        2   8-JUN-84  648.56 ALL RD  NO        28           (M33)
+
+!dir (VUE)/aft 7-jun
+MOO     BAK       2   7-JUN-84 1410.49 ALL RD  NO       198           (VUE)
+MOO     MAI       2   7-JUN-84 2032.43 ALL RD  NO       100           (VUE)
+MAIL              2   7-JUN-84 2229.14 ALL RD  NO       130           (VUE)
+
+!dir (CARL)/aft 7-jun
+FICHE   BAK      10   7-JUN-84 1109.05 ALL RD  NO      4545           (CARL)
+P034    MKR       2   8-JUN-84  256.20 ALL RD  NO         2           (CARL)
+FICHE   REL      13   7-JUN-84 1110.43 ALL RD  NO      5919           (CARL)
+FICHE   SAI      10   7-JUN-84 1110.37 ALL RD  NO      4537           (CARL)
+FICHE   SAV      25   7-JUN-84 1112.08 ALL RD  NO     12040           (CARL)
+MAIN01  VUE      10   7-JUN-84 1110.35 ALL RD  NO      4547           (CARL)
+MAIL             23   7-JUN-84 1501.47 ALL RD  NO     10879           (CARL)
+!! title 6.8.84:
+!dir (MAIL)/aft 8-jun 
+MAIL    LOG      97  11-JUN-84 2104.43 ALL RD  NO     48746           (WRS)
+  #+W[  MAI       2  11-JUN-84  935.04 ALL RD  NO       177           (WILKES)
+  #<UI  MAI       3  11-JUN-84  935.10 ALL RD  NO       646           (CARL)
+  #=4_  MAI       4  11-JUN-84 2104.42 ALL RD  NO      1114           (WILKES)
+!+FVVV  MAI       2   9-JUN-84 2100.25 ALL RD  NO       194           (OSMAN)
+39      Q         2  11-JUN-84  935.08 ALL RD  NO       306           (WILKES)
+
+!dir (KEN)/aft 8-jun
+MAIL             13  11-JUN-84 2102.42 ALL RD  NO      5730           (KEN)
+
+!dir (KDEV2)/aft 8-jun
+NAMES   BAK       3   8-JUN-84  937.24 ALL RD  NO       765           (KEN)
+NAMS    BAK      43   8-JUN-84 1050.59 ALL RD  NO     21300           (KEN)
+NAMES   CTL       3  11-JUN-84 2125.45 ALL RD  NO       765           (KEN)
+DUSAGE  DAT       3  11-JUN-84 2127.40 ALL RD  NO       892           (KEN)
+NAMES   LOG       1  11-JUN-84 2126.14 ALL RD  NO      2560           (KEN)
+NAMS    LOG      37   8-JUN-84 1050.39 ALL RD  NO     18163           (KEN)
+NAMS    PRT       5   8-JUN-84 1054.43 ALL RD  NO      1862           (KEN)
+DUSAGE  RPT      13  11-JUN-84 2127.41 ALL RD  NO      5907           (KEN)
+
+!dir (XEXEC)/aft 8-jun
+FIND    BAK      14   8-JUN-84 1810.49 ALL RD  NO      6386           (XEXEC)
+003TEL  COM       2   8-JUN-84 1846.10 ALL RD  NO        15           (CARL)
+003TEL  OUT       2   8-JUN-84 1846.13 ALL RD  NO        33           (XEXEC)
+FIND    SAI      14   8-JUN-84 1844.05 ALL RD  NO      6396           (CARL)
+FIND    SAV      23   8-JUN-84 1819.38 ALL RUN RUN    11056           (XEXEC)
+
+!dir (SPPOPER)/aft 8-jun
+P034    MKR       2  11-JUN-84 2111.00 ALL RD  NO         2           (SPPOPER)
+MAIL              2  11-JUN-84 2111.17 ALL RD  NO       384           (SPPOPER)
+
+!dir (LOIS)/aft 8-jun
+J       J         2  11-JUN-84 2028.41 ALL RD  NO       481           (LOIS)
+P034    MKR       2  11-JUN-84 2029.08 ALL RD  NO         2           (LOIS)
+MAIL             12  11-JUN-84 2011.14 ALL RD  NO      5565           (LOIS)
+
+!dir (MPL)/aft 8-jun
+DOC     MEM       3   8-JUN-84  821.55 ALL RD  RD       767           (LOIS)
+NODELD  MEM       3   8-JUN-84  811.12 ALL RD  NO       675           (LOIS)
+
+!dir (CB.SAIL)/aft 8-jun
+003TEL  COM       2   9-JUN-84 1619.45 ALL RD  NO       262           (CARL)
+003TEL  OUT       3   9-JUN-84 1619.50 ALL RD  NO       773           (MPL)
+TTYTAB  SAI       3   9-JUN-84 1616.04 ALL RD  NO       847           (CARL)
+TTYTAB  SAV       3   9-JUN-84 1618.07 ALL RD  NO       637 RC SY     (CARL)
+FOO     VUE       3   9-JUN-84 1459.51 ALL RD  NO       686           (CARL)
+MAIN01  VUE       3   9-JUN-84 1616.03 ALL RD  NO       953           (CARL)
+MAIN06  VUE       4   9-JUN-84 1423.00 ALL RD  NO      1178           (CARL)
+S       VUE      18   9-JUN-84 1419.20 ALL RD  NO      8321           (CARL)
+
+!dir (OSP)/aft 8-jun
+ONCE    MAC      30   8-JUN-84 1323.08 ALL RD  NO     14702           (CARL)
+
+!dir (MCH)/aft 8-jun
+P034    MKR       2   8-JUN-84 1754.54 ALL RD  NO         2           (MCH)
+
+!dir (WILKES)/aft 8-jun
+HOTLIN  MAI       2  11-JUN-84 2055.32 ALL RD  NO       161           (WILKES)
+HL                2  11-JUN-84 2041.43 ALL RD  NO       485           (WILKES)
+MAIL             15  11-JUN-84  935.47 ALL RD  NO      6928           (WILKES)
+
+!dir (TSUCOOP)/aft 8-jun
+P1      BAK       6   8-JUN-84 1214.11 ALL RD  NO      2226           (TSUCOOP)
+P1      CBL       6   8-JUN-84 1723.48 ALL RD  NO      2248           (TSUCOOP)
+MAGNUM  DIR       2   8-JUN-84 1625.17 CP  NO  NO       512           (LOIS)
+FR0608  INC       6   8-JUN-84  927.49 ALL RD  NO      2370           (TSUCOOP)
+MO0611  INC       7  11-JUN-84 2035.55 ALL RD  NO      2987           (TSUCOOP)
+P1      LST       8   8-JUN-84 1723.51 ALL RD  NO      3250           (TSUCOOP)
+BC7WZZ  MA0       7   8-JUN-84 1541.00 ALL CP  NO      3072           (TSUCOOP)
+A8Y9VB  MA1       7   8-JUN-84 1606.00 ALL CP  NO      3072           (TSUCOOP)
+A8Y9VB  MD1       6   8-JUN-84 1625.35 ALL RD  NO      2560           (TSUCOOP)
+A8Y9VB  MS1       9   8-JUN-84 1625.33 ALL RD  NO      3595           (TSUCOOP)
+TURNUP  MSG       2  11-JUN-84 2025.38 ALL RD  NO        47           (TSUCOOP)
+FILE    OUT       2   8-JUN-84 1724.10 ALL RD  NO       273           (TSUCOOP)
+P2      PAS       2   8-JUN-84 1103.41 ALL RD  NO        33           (TSUCOOP)
+JON     REL       3   8-JUN-84 1405.14 ALL RD  NO       584           (TSUCOOP)
+P1      REL       8   8-JUN-84 1723.51 ALL RD  NO      3488           (TSUCOOP)
+P2      REL       2   8-JUN-84 1104.45 ALL RD  NO        35           (TSUCOOP)
+LRN               2   8-JUN-84 1211.30 ALL RD  NO         8           (TSUCOOP)
+OLDMAS            2   8-JUN-84 1724.10 ALL RD  NO       296           (TSUCOOP)
+
+!dir (WRS)/aft 8-jun
+P034    MKR       2  11-JUN-84 1243.52 ALL RD  NO         2           (WRS)
+MAIL              5  11-JUN-84 1229.33 ALL RD  NO      1884           (WRS)
+
+!dir (M33)/aft 8-jun
+HOTLIN  BAK       2  11-JUN-84 2026.21 ALL RD  NO       425           (LOIS)
+HOTLIN  LOG       2  11-JUN-84 2046.09 ALL RD  NO       495           (WILKES)
+TAKEIT  LOG       2   8-JUN-84 2119.26 ALL RD  NO       332           (CARL)
+CNFN39  MAC       2   9-JUN-84 1221.44 ALL RD  NO       102           (CARL)
+CNFNCA  MAC       2   9-JUN-84 1242.12 ALL RD  NO        71           (CARL)
+CNFNF3  MAC       3   8-JUN-84 1323.31 ALL RD  NO       618           (CARL)
+ONCE    MAC      30   8-JUN-84 1323.08 ALL RD  NO     14702           (CARL)
+P034    MEM      64   8-JUN-84  215.00 ALL RD  NO     32143           (CARL)
+ACCESS  MSG       2   9-JUN-84 1242.12 ALL RD  NO         6           (CARL)
+CMT39L  REL       2   9-JUN-84 1222.02 ALL RD  NO        85           (CARL)
+CMTCAF  REL       2   9-JUN-84 1242.30 ALL RD  NO        67           (CARL)
+CMTF3F  REL       2   8-JUN-84 1323.52 ALL RD  NO        68           (CARL)
+COMFKF  REL       2   9-JUN-84 1242.18 ALL RD  NO        21           (CARL)
+COMFKL  REL       2   9-JUN-84 1221.49 ALL RD  NO        39           (CARL)
+ONCDSL  REL      11   9-JUN-84 1225.33 ALL RD  NO      4924           (CARL)
+ONCEF   REL      11   8-JUN-84 1324.10 ALL RD  NO      4642           (CARL)
+ONCEL   REL      11   9-JUN-84 1224.41 ALL RD  NO      5049           (CARL)
+PICONL  REL       9   9-JUN-84 1222.29 ALL RD  NO      4012           (CARL)
+SCHEDL  REL       9   9-JUN-84 1223.52 ALL RD  NO      3622           (CARL)
+SETTYL  REL       2   9-JUN-84 1222.17 ALL RD  NO        85           (CARL)
+CAXL25  SAV     145   9-JUN-84 1243.38 ALL RD  NO     73603           (CARL)
+F01082  SAV      57   8-JUN-84 2125.42 ALL RD  NO     28190           (CARL)
+F3XL25  SAV     145   8-JUN-84 1327.01 ALL RD  NO     73526           (CARL)
+39XL25  SAV     153   9-JUN-84 1227.15 ALL RD  NO     77682           (CARL)
+MAIN06  VUE      29   8-JUN-84 1323.05 ALL RD  NO     14328           (CARL)
+NOTICE  107       2   8-JUN-84  220.03 ALL RD  NO       192           (M33)
+NOTICE  22        2   9-JUN-84 2304.14 ALL RD  NO       187           (M33)
+NOTICE  23        2  11-JUN-84 2018.47 ALL RD  NO        64           (M33)
+NOTICE  26        2  11-JUN-84 2011.11 ALL RD  NO        15           (M33)
+NOTICE  28        2   9-JUN-84 2337.17 ALL RD  NO        47           (M33)
+NOTICE  29        2  11-JUN-84 2025.34 ALL RD  NO        99           (M33)
+NOTICE  30        2  11-JUN-84 2020.17 ALL RD  NO       125           (M33)
+NOTICE  33        2  11-JUN-84 2027.28 ALL RD  NO       360           (M33)
+NOTICE  34        2  11-JUN-84 2021.35 ALL RD  NO        14           (M33)
+NOTICE  35        2  11-JUN-84 2020.25 ALL RD  NO       220           (M33)
+NOTICE  36        2  11-JUN-84 2012.19 ALL RD  NO       107           (M33)
+NOTICE  38        2  11-JUN-84 2016.16 ALL RD  NO       102           (M33)
+NOTICE  39        2  11-JUN-84 2016.38 ALL RD  NO       133           (M33)
+NOTICE  55        2  11-JUN-84 2014.54 ALL RD  NO        38           (M33)
+NOTICE  56        1  10-JUN-84  110.13 ALL RD  NO         0           (M33)
+NOTICE  57        2  11-JUN-84 2032.13 ALL RD  NO        28           (M33)
+NOTICE  65        2   8-JUN-84 2139.17 ALL RD  NO        26           (M33)
+NOTICE  70        2  11-JUN-84 2013.37 ALL RD  NO       375           (M33)
+NOTICE  72        2  10-JUN-84  151.22 ALL RD  NO       495           (M33)
+NOTICE  74        2  11-JUN-84 2027.40 ALL ALL ALL       17           (M33)
+NOTICE  897       2  11-JUN-84 2011.44 ALL RD  NO        24           (M33)
+
+!dir (CARL)/aft 8-jun
+MAIL    BAK      24   8-JUN-84 1246.23 ALL RD  NO     11353           (CARL)
+FOO     MAI       2   8-JUN-84 1256.55 ALL ALL ALL      250           (CARL)
+P034    MKR       2   9-JUN-84 1251.03 ALL RD  NO         2           (CARL)
+MAIN06  VUE      23   8-JUN-84 1303.57 ALL RD  NO     11170           (CARL)
+MAIL             24   9-JUN-84 1423.15 ALL RD  NO     11449           (CARL)
+
+!dir (ZONNIE)/aft 8-jun
+MAIL              3   8-JUN-84 1103.08 ALL RD  NO       640           (ZONNIE)
+!! title 6.11.84:
+!dir (MAIL)/aft 11-jun
+MAIL    LOG     100  11-JUN-84 1901.03 ALL RD  NO     50420           (WRS)
+  #+W[  MAI       2  11-JUN-84  935.04 ALL RD  NO       177           (WILKES)
+  #<UI  MAI       3  11-JUN-84  228.44 ALL RD  NO       795           (CARL)
+!(.8!4  MAI       2  11-JUN-84  228.43 ALL RD  NO       149           (CARL)
+$=)8F7  MAI       2  11-JUN-84  228.43 ALL RD  NO       149           (CARL)
+
+!dir (KEN)/aft 11-jun
+TURNUP  MSG       2  11-JUN-84 2141.46 ALL RD  NO        71           (KEN)
+MAIL             13  11-JUN-84 2102.42 ALL RD  NO      5730           (KEN)
+
+!dir (KDEV2)/aft 11-jun
+NAMES   CTL       3  12-JUN-84  755.57 ALL RD  NO       797           (KEN)
+DUSAGE  DAT       3  12-JUN-84  752.39 ALL RD  NO       892           (KEN)
+NAMES   LOG       1  12-JUN-84  756.13 ALL RD  NO      2560           (KEN)
+NAMS    LOG      40  11-JUN-84 2216.31 ALL RD  NO     19944           (KEN)
+DUSAGE  RPT      13  12-JUN-84  752.39 ALL RD  NO      5907           (KEN)
+
+!dir (SPPOPER)/aft 11-jun
+P034    MKR       2  11-JUN-84  328.34 ALL RD  NO         2           (SPPOPER)
+MAIL              3  11-JUN-84  328.43 ALL RD  NO       528           (SPPOPER)
+
+!dir (LOIS)/aft 11-jun
+J       J         2  11-JUN-84 2028.41 ALL RD  NO       481           (LOIS)
+P034    MKR       2  11-JUN-84  431.36 ALL RD  NO         2           (LOIS)
+MAIL             13  11-JUN-84  340.11 ALL RD  NO      5709           (LOIS)
+
+!dir (CB.SAIL)/aft 11-jun
+008TEL  COM       2  11-JUN-84  614.08 ALL RD  NO       262           (CARL)
+009TEL  COM       2  11-JUN-84  614.32 ALL RD  NO        16           (CARL)
+008TEL  OUT       3  11-JUN-84  614.12 ALL RD  NO       752           (M33)
+009TEL  OUT       2  11-JUN-84  614.35 ALL RD  NO        34           (M33)
+
+!dir (OSP)/aft 11-jun
+FLEXIT            2  11-JUN-84 2339.30 ALL RD  NO       192           (LOIS)
+KERCHN            2  11-JUN-84 2358.25 ALL RD  NO       421           (LOIS)
+
+!dir (WILKES)/aft 11-jun
+HOTLIN  MAI       2  11-JUN-84 2055.32 ALL RD  NO       161           (WILKES)
+HL                2  11-JUN-84 2041.43 ALL RD  NO       485           (WILKES)
+MAIL             15  11-JUN-84  509.51 ALL RD  NO      7072           (WILKES)
+
+!dir (TSUCOOP)/aft 11-jun
+P2      BAK       2  11-JUN-84  402.04 ALL RD  NO        54           (TSUCOOP)
+MO0611  INC       7  11-JUN-84 2035.55 ALL RD  NO      2987           (TSUCOOP)
+TURNUP  MSG       2  11-JUN-84 1554.44 ALL RD  NO        47           (TSUCOOP)
+P1      REL       2  12-JUN-84  136.38 ALL RD  NO       247           (TSUCOOP)
+P2      REL       2  11-JUN-84  402.12 ALL RD  NO       267           (TSUCOOP)
+P1      SAI       2  12-JUN-84  136.35 ALL RD  NO        46           (TSUCOOP)
+P2      SAI       2  11-JUN-84  441.25 ALL RD  NO        54           (TSUCOOP)
+P1      SAV      12  12-JUN-84  136.53 ALL RD  NO      5450           (TSUCOOP)
+LRN               2  11-JUN-84  427.13 ALL RD  NO        12           (TSUCOOP)
+
+!dir (WRS)/aft 11-jun
+P034    MKR       2  12-JUN-84    2.28 ALL RD  NO         2           (WRS)
+MAIL              5  11-JUN-84 1229.33 ALL RD  NO      1884           (WRS)
+
+!dir (M33)/aft 11-jun
+HOTLIN  BAK       2  11-JUN-84  556.21 ALL RD  NO       495           (CARL)
+HOTLIN  LOG       2  11-JUN-84  559.31 ALL RD  NO       495           (CARL)
+TAKEIT  LOG       2  12-JUN-84  137.44 ALL RD  NO       365           (KEN)
+NOTICE  107       2  11-JUN-84 1319.00 ALL RD  NO       192           (M33)
+NOTICE  23        2  11-JUN-84 2018.47 ALL RD  NO        64           (M33)
+NOTICE  26        2  11-JUN-84  251.11 ALL RD  NO        15           (M33)
+NOTICE  28        2  11-JUN-84 1744.08 ALL RD  NO        47           (M33)
+NOTICE  29        2  11-JUN-84 1519.38 ALL RD  NO       118           (M33)
+NOTICE  30        2  11-JUN-84 2020.17 ALL RD  NO       125           (M33)
+NOTICE  33        2  11-JUN-84 1827.03 ALL RD  NO       360           (M33)
+NOTICE  34        2  12-JUN-84  800.41 ALL RD  NO        14           (M33)
+NOTICE  35        2  12-JUN-84  101.55 ALL RD  NO       220           (M33)
+NOTICE  36        2  12-JUN-84  108.02 ALL RD  NO       126           (M33)
+NOTICE  38        2  11-JUN-84 2016.16 ALL RD  NO       102           (M33)
+NOTICE  39        2  12-JUN-84  136.03 ALL RD  NO       133           (M33)
+NOTICE  55        2  12-JUN-84   50.30 ALL RD  NO        38           (M33)
+NOTICE  57        2  12-JUN-84  105.24 ALL RD  NO        28           (M33)
+NOTICE  70        2  11-JUN-84 1227.21 ALL RD  NO       375           (M33)
+NOTICE  74        2  11-JUN-84 2027.40 ALL ALL ALL       17           (M33)
+NOTICE  897       2  11-JUN-84 1450.59 ALL RD  NO        24           (M33)
+NOTICE  90        2  11-JUN-84 1147.56 ALL RD  NO        99           (M33)
+
+!dir (CARL)/aft 11-jun
+MAIL             26  11-JUN-84  549.25 ALL RD  NO     12692           (CARL)
+!! title 6.12.84:
+!dir (MAIL)/aft 12-jun
+MAIL    LOG     103  13-JUN-84  701.00 ALL RD  NO     52035           (WRS)
+  #8'E  MAI       2  13-JUN-84  116.25 ALL RD  NO       147           (CARL)
+  #=4_  MAI       2  13-JUN-84  723.18 ALL RD  NO        78           (KEN)
+  #>_:  MAI       2  13-JUN-84  723.18 ALL RD  NO       409           (CARL)
+
+!dir (KEN)/aft 12-jun
+MAIL    BOX       8  13-JUN-84  724.42 ALL RD  NO      3136           (KEN)
+TURNUP  MSG       2  12-JUN-84 1348.27 ALL RD  NO        53           (KEN)
+MAIL             13  13-JUN-84  723.26 ALL RD  NO      5805           (KEN)
+
+!dir (OSB)/aft 12-jun
+CONFMA  BAK       3  12-JUN-84 1549.21 ALL RD  NO       606           (LOIS)
+MONMA   BAK       2  12-JUN-84 1547.57 ALL RD  NO       174           (LOIS)
+MONMA   CMD       2  12-JUN-84 1623.00 ALL RD  NO       175           (LOIS)
+007TEL  COM       2  12-JUN-84 1635.15 ALL RD  NO        23           (LOIS)
+CNFNMA  MAC       2  12-JUN-84 1623.48 ALL RD  NO        83           (LOIS)
+CONFMA  MAC       3  12-JUN-84 1623.33 ALL RD  NO       606           (LOIS)
+ACCESS  MSG       2  12-JUN-84 1623.49 ALL RD  NO        19           (LOIS)
+007TEL  OUT       2  12-JUN-84 1635.18 ALL RD  NO        13           (LOIS)
+ACTSRS  REL       4  12-JUN-84 1446.49 ALL RD  NO      1122           (LOIS)
+CIOPRS  REL       3  12-JUN-84 1454.16 ALL RD  NO       694           (LOIS)
+CLOCKS  REL       6  12-JUN-84 1441.55 ALL RD  NO      2255           (LOIS)
+CLUBSS  REL       3  12-JUN-84 1440.13 ALL RD  NO       797           (LOIS)
+CMDMAS  REL       7  12-JUN-84 1625.42 ALL RD  NO      2698           (LOIS)
+CMNMAS  REL       9  12-JUN-84 1624.20 ALL RD  NO      3816           (LOIS)
+CMTMAS  REL       2  12-JUN-84 1624.05 ALL RD  NO       215           (LOIS)
+COMCNS  REL      11  12-JUN-84 1442.26 ALL RD  NO      4822           (LOIS)
+COMFMA  REL       2  12-JUN-84 1623.52 ALL RD  NO       167           (LOIS)
+CORE1S  REL      18  12-JUN-84 1443.35 ALL RD  NO      8202           (LOIS)
+CTYSMS  REL       3  12-JUN-84 1452.57 ALL RD  NO       967           (LOIS)
+DEBUGS  REL       3  12-JUN-84 1501.02 ALL RD  NO       519           (LOIS)
+DR11CS  REL       3  12-JUN-84 1453.44 ALL RD  NO       609           (LOIS)
+DZKONS  REL       6  12-JUN-84 1453.16 ALL RD  NO      2087           (LOIS)
+EDDT    REL      18  12-JUN-84 1501.25 ALL RD  NO      8226           (LOIS)
+ERRCNS  REL       7  12-JUN-84 1445.20 ALL RD  NO      2922           (LOIS)
+FILFNS  REL       8  12-JUN-84 1440.32 ALL RD  NO      3304           (LOIS)
+FILIOS  REL       5  12-JUN-84 1437.59 ALL RD  NO      1869           (LOIS)
+FILRBS  REL       7  12-JUN-84 1441.06 ALL RD  NO      2828           (LOIS)
+FILUUS  REL      16  12-JUN-84 1434.57 ALL RD  NO      7651           (LOIS)
+FRMSRS  REL      11  12-JUN-84 1436.28 ALL RD  NO      5064           (LOIS)
+IOCSSS  REL      10  12-JUN-84 1457.09 ALL RD  NO      4414           (LOIS)
+KMCDDS  REL       3  12-JUN-84 1501.17 ALL RD  NO       987           (LOIS)
+KMCSRS  REL       3  12-JUN-84 1454.00 ALL RD  NO       610           (LOIS)
+LPTSRS  REL       3  12-JUN-84 1447.45 ALL RD  NO       990           (LOIS)
+MAGSRS  REL       6  12-JUN-84 1447.11 ALL RD  NO      2107           (LOIS)
+MAPIOS  REL       9  12-JUN-84 1439.29 ALL RD  NO      3851           (LOIS)
+MJBDTS  REL       2  12-JUN-84 1446.34 ALL RD  NO       220           (LOIS)
+ONCDSS  REL      13  12-JUN-84 1503.58 ALL RD  NO      5992           (LOIS)
+ONCES   REL      11  12-JUN-84 1503.07 ALL RD  NO      4913           (LOIS)
+PATCHS  REL       2  12-JUN-84 1501.02 ALL RD  NO        30           (LOIS)
+PCBIOS  REL       7  12-JUN-84 1438.25 ALL RD  NO      2601           (LOIS)
+PICONS  REL       9  12-JUN-84 1448.06 ALL RD  NO      4004           (LOIS)
+REFSTS  REL       7  12-JUN-84 1504.52 ALL RD  NO      2611           (LOIS)
+RMXKNS  REL       4  12-JUN-84 1441.34 ALL RD  NO      1241           (LOIS)
+SCHEDS  REL       9  12-JUN-84 1449.10 ALL RD  NO      3706           (LOIS)
+SCNSRS  REL      27  12-JUN-84 1449.57 ALL RD  NO     13054           (LOIS)
+SEGCNS  REL       9  12-JUN-84 1454.33 ALL RD  NO      3808           (LOIS)
+SETMAS  REL       2  12-JUN-84 1626.36 ALL RD  NO       243           (LOIS)
+SIMIOS  REL       6  12-JUN-84 1456.32 ALL RD  NO      2113           (LOIS)
+SWAMPS  REL       6  12-JUN-84 1439.01 ALL RD  NO      2100           (LOIS)
+TMPUUS  REL       2  12-JUN-84 1456.14 ALL RD  NO       285           (LOIS)
+UUOCNS  REL      11  12-JUN-84 1459.34 ALL RD  NO      5090           (LOIS)
+
+!dir (KDEV2)/aft 12-jun
+NAMES   BAK       3  12-JUN-84  755.57 ALL RD  NO       797           (KEN)
+NAMES   CTL       3  13-JUN-84  739.14 ALL RD  NO       797           (KEN)
+DUSAGE  DAT       3  13-JUN-84  728.14 ALL RD  NO       892           (KEN)
+NAMES   LOG       1  12-JUN-84  835.00 ALL RD  NO      3072           (KEN)
+NAMS    LOG      42  12-JUN-84  837.00 ALL RD  NO     20934           (KEN)
+DUSAGE  RPT      13  13-JUN-84  728.14 ALL RD  NO      5907           (KEN)
+
+!dir (SPPOPER)/aft 12-jun
+P034    MKR       2  12-JUN-84  832.51 ALL RD  NO         2           (SPPOPER)
+MAIL              3  12-JUN-84  833.01 ALL RD  NO       528           (SPPOPER)
+
+!dir (LOIS)/aft 12-jun
+JUN     MAI      21  12-JUN-84  854.23 ALL RD  NO      9905           (LOIS)
+RDM4    MAI       6  12-JUN-84  905.44 ALL RD  NO      2548           (LOIS)
+P034    MKR       2  12-JUN-84 1747.55 ALL RD  NO         2           (LOIS)
+MA034K  SAV     154  12-JUN-84 1633.37 ALL RD  NO     77854           (LOIS)
+MAP34K  SAV     155  12-JUN-84 1620.37 ALL RD  NO     78746           (LOIS)
+MAXL25  SAV     156  12-JUN-84 1713.15 ALL RD  NO     78905           (LOIS)
+MAIL             13  12-JUN-84 1653.38 ALL RD  NO      5758           (LOIS)
+
+!dir (MPL)/aft 12-jun
+DOC     MEM       3  12-JUN-84 1237.28 ALL RD  RD       782           (LOIS)
+KSSITE  MEM       2  12-JUN-84 1235.30 ALL RD  NO       148           (LOIS)
+
+!dir (OSP)/aft 12-jun
+CREFRM            3  12-JUN-84 1226.05 ALL RD  NO       618           (LOIS)
+
+!dir (TSUCOOP)/aft 12-jun
+TU0612  INC       6  12-JUN-84  836.09 ALL RD  NO      2351           (TSUCOOP)
+TURNUP  MSG       2  12-JUN-84 1248.25 ALL RD  NO        47           (TSUCOOP)
+P1      REL       2  12-JUN-84  136.38 ALL RD  NO       247           (TSUCOOP)
+P1      SAI       2  12-JUN-84  136.35 ALL RD  NO        46           (TSUCOOP)
+P1      SAV      12  12-JUN-84  136.53 ALL RD  NO      5450           (TSUCOOP)
+
+!dir (WRS)/aft 12-jun
+P034    MKR       2  12-JUN-84 1347.23 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 12-jun
+HOTLIN  LOG       3  13-JUN-84  131.22 ALL RD  NO       639           (CARL)
+TAKEIT  LOG       2  12-JUN-84  137.44 ALL RD  NO       365           (KEN)
+CNFNMA  MAC       2  12-JUN-84 1824.38 ALL RD  NO        85           (CARL)
+ACCESS  MSG       2  12-JUN-84 1824.39 ALL RD  NO         7           (CARL)
+ACTSRS  REL       4  12-JUN-84 1915.47 ALL RD  NO      1094           (CARL)
+CIOPRS  REL       3  12-JUN-84 1923.17 ALL RD  NO       688           (CARL)
+CLOCKS  REL       6  12-JUN-84 1910.46 ALL RD  NO      2324           (CARL)
+CLUBSS  REL       3  12-JUN-84 1909.02 ALL RD  NO       797           (CARL)
+CMDMAS  REL       6  12-JUN-84 1902.23 ALL RD  NO      2540           (CARL)
+CMNMAS  REL       9  12-JUN-84 1900.47 ALL RD  NO      4016           (CARL)
+CMTMAS  REL       2  12-JUN-84 1900.33 ALL RD  NO        61           (CARL)
+COMCNS  REL      11  12-JUN-84 1911.18 ALL RD  NO      5000           (CARL)
+COMFMA  REL       2  12-JUN-84 1900.21 ALL RD  NO        15           (CARL)
+CORE1S  REL      17  12-JUN-84 1912.28 ALL RD  NO      7985           (CARL)
+CTYSMS  REL       3  12-JUN-84 1921.58 ALL RD  NO      1023           (CARL)
+DEBUGS  REL       3  12-JUN-84 1929.57 ALL RD  NO       519           (CARL)
+DR11CS  REL       3  12-JUN-84 1922.45 ALL RD  NO       610           (CARL)
+DZKONS  REL       6  12-JUN-84 1922.17 ALL RD  NO      2088           (CARL)
+ERRCNS  REL       7  12-JUN-84 1914.13 ALL RD  NO      3002           (CARL)
+FILFNS  REL       8  12-JUN-84 1909.22 ALL RD  NO      3350           (CARL)
+FILIOS  REL       5  12-JUN-84 1906.41 ALL RD  NO      1888           (CARL)
+FILRBS  REL       7  12-JUN-84 1909.57 ALL RD  NO      2770           (CARL)
+FILUUS  REL      16  12-JUN-84 1903.32 ALL RD  NO      7664           (CARL)
+FRMSRS  REL      12  12-JUN-84 1905.03 ALL RD  NO      5390           (CARL)
+IOCSSS  REL      10  12-JUN-84 1926.14 ALL RD  NO      4415           (CARL)
+KMCDDS  REL       3  12-JUN-84 1930.11 ALL RD  NO       987           (CARL)
+KMCSRS  REL       3  12-JUN-84 1923.01 ALL RD  NO       611           (CARL)
+LPTSRS  REL       3  12-JUN-84 1916.44 ALL RD  NO       990           (CARL)
+MAGSRS  REL       6  12-JUN-84 1916.09 ALL RD  NO      2107           (CARL)
+MAPIOS  REL      10  12-JUN-84 1908.11 ALL RD  NO      4384           (CARL)
+MJBDTS  REL       2  12-JUN-84 1915.29 ALL RD  NO       220           (CARL)
+ONCDSS  REL      11  12-JUN-84 1931.13 ALL RD  NO      4914           (CARL)
+ONCES   REL      11  12-JUN-84 1930.19 ALL RD  NO      5051           (CARL)
+PATCHS  REL       2  12-JUN-84 1929.56 ALL RD  NO        30           (CARL)
+PCBIOS  REL       7  12-JUN-84 1907.09 ALL RD  NO      2601           (CARL)
+PICONS  REL       9  12-JUN-84 1917.05 ALL RD  NO      3890           (CARL)
+REFSTS  REL       6  12-JUN-84 1931.59 ALL RD  NO      2395           (CARL)
+RMXKNS  REL       4  12-JUN-84 1910.25 ALL RD  NO      1241           (CARL)
+SCHEDS  REL       8  12-JUN-84 1918.08 ALL RD  NO      3578           (CARL)
+SCNSRS  REL      27  12-JUN-84 1918.56 ALL RD  NO     13049           (CARL)
+SEGCNS  REL       9  12-JUN-84 1923.37 ALL RD  NO      3810           (CARL)
+SETMAS  REL       2  12-JUN-84 1903.18 ALL RD  NO        91           (CARL)
+SIMIOS  REL       6  12-JUN-84 1925.36 ALL RD  NO      2111           (CARL)
+SWAMPS  REL       6  12-JUN-84 1907.43 ALL RD  NO      2093           (CARL)
+TMPUUS  REL       2  12-JUN-84 1925.18 ALL RD  NO       285           (CARL)
+UUOCNS  REL      11  12-JUN-84 1928.39 ALL RD  NO      5033           (CARL)
+MAXL25  SAV     155  12-JUN-84 1934.30 ALL RD  NO     78821           (CARL)
+NOTICE  22        2  12-JUN-84 2025.59 ALL RD  NO       187           (M33)
+NOTICE  23        2  13-JUN-84  543.14 ALL RD  NO        89           (M33)
+NOTICE  28        2  13-JUN-84  530.04 ALL RD  NO        47           (M33)
+NOTICE  34        2  12-JUN-84  800.41 ALL RD  NO        14           (M33)
+NOTICE  35        2  13-JUN-84  321.30 ALL RD  NO       220           (M33)
+NOTICE  36        2  12-JUN-84  935.00 ALL RD  NO       126           (M33)
+NOTICE  39        2  12-JUN-84 1129.50 ALL RD  NO       147           (M33)
+NOTICE  54        2  13-JUN-84  358.35 ALL RD  NO       108           (M33)
+NOTICE  55        2  12-JUN-84   50.30 ALL RD  NO        38           (M33)
+NOTICE  56        1  12-JUN-84 2223.04 ALL RD  NO         0           (M33)
+NOTICE  57        2  12-JUN-84 1844.34 ALL RD  NO        28           (M33)
+NOTICE  79        2  12-JUN-84 2239.54 ALL RD  NO        24           (M33)
+NOTICE  90        2  12-JUN-84 2249.06 ALL RD  NO        99           (M33)
+
+!dir (CARL)/aft 12-jun
+MAIL             26  12-JUN-84 1344.23 ALL RD  NO     12748           (CARL)
+
+!dir (JOSB)/aft 12-jun
+RB034J  SAV     153  12-JUN-84 1035.52 ALL RD  NO     77519           (LOIS)
+
+!dir (ZONNIE)/aft 12-jun
+MAIL              3  12-JUN-84 1740.58 ALL RD  NO       813           (ZONNIE)
+
+!dir (ZONNIE)/aft 12-jun
+MAIL              3  12-JUN-84 1740.58 ALL RD  NO       813           (ZONNIE)
+!! title 6.13.84:
+!dir (MAIL)/aft 13-jun
+MAIL    LOG     107  14-JUN-84  902.14 ALL RD  NO     54083           (WRS)
+  #8'E  MAI       2  14-JUN-84  206.58 ALL RD  NO       155           (CARL)
+
+!dir (KEN)/aft 13-jun
+MAIL    BOX       8  13-JUN-84  724.00 ALL RD  NO      3264           (KEN)
+MAIL             13  14-JUN-84  849.27 ALL RD  NO      5987           (KEN)
+
+!dir (KDEV2)/aft 13-jun
+NAMES   BAK       3  13-JUN-84  739.14 ALL RD  NO       797           (KEN)
+NAMES   CTL       3  14-JUN-84  909.51 ALL RD  NO       797           (KEN)
+DUSAGE  DAT       3  14-JUN-84  903.33 ALL RD  NO       892           (KEN)
+NAMES   LOG       1  14-JUN-84  910.04 ALL RD  NO      2560           (KEN)
+NAMS    LOG      47  13-JUN-84  938.50 ALL RD  NO     23294           (KEN)
+DUSAGE  RPT      13  14-JUN-84  903.33 ALL RD  NO      5907           (KEN)
+
+!dir (SPPOPER)/aft 13-jun
+MAIL    BOX       2  13-JUN-84 1320.12 ALL RD  NO        64           (SPPOPER)
+MA169   MEM       3  13-JUN-84 1306.52 ALL RD  NO       940           (LOIS)
+P034    MKR       2  14-JUN-84  829.13 ALL RD  NO         2           (SPPOPER)
+MAIL              3  14-JUN-84  829.31 ALL RD  NO       528           (SPPOPER)
+
+!dir (LOIS)/aft 13-jun
+P034    MKR       2  14-JUN-84  920.35 ALL RD  NO         2           (LOIS)
+MAIL             15  14-JUN-84  848.43 ALL RD  NO      6768           (LOIS)
+
+!dir (WILKES)/aft 13-jun
+SWITCH  BAK       2  13-JUN-84 1654.21 ALL RD  NO       176           (WILKES)
+SWITCH  INI       2  13-JUN-84 1657.36 ALL RD  NO       176           (WILKES)
+MAIL             16  13-JUN-84 1024.43 ALL RD  NO      7215           (WILKES)
+
+!dir (TSUCOOP)/aft 13-jun
+SU0603  ALL     154  13-JUN-84 1100.32 ALL RD  NO     78058           (TSUCOOP)
+BNOT    BAK       3  13-JUN-84 1639.33 ALL RD  NO       876           (TSUCOOP)
+TURNUP  MSG       2  14-JUN-84  924.02 ALL RD  NO        47           (TSUCOOP)
+SU0603  NXT     335  13-JUN-84 1218.23 ALL RD  NO    170697           (TSUCOOP)
+BNOT              6  13-JUN-84 2121.01 ALL RD  NO      2164           (TSUCOOP)
+
+!dir (M33)/aft 13-jun
+005TEL  COM       2  13-JUN-84 1943.12 ALL RD  NO        23           (CARL)
+007TEL  COM       2  13-JUN-84 2014.02 ALL RD  NO        15           (CARL)
+HOTLIN  LOG       3  13-JUN-84  131.22 ALL RD  NO       639           (CARL)
+CNFN24  MAC       2  13-JUN-84 1910.35 ALL RD  NO        72           (CARL)
+CNFN39  MAC       2  13-JUN-84 1829.15 ALL RD  NO       109           (CARL)
+CNFNF3  MAC       3  13-JUN-84 1640.29 ALL RD  NO       618           (CARL)
+CNFNMA  MAC       2  13-JUN-84 1735.44 ALL RD  NO        92           (CARL)
+S       MAC      18  13-JUN-84 1625.55 ALL RD  NO      8423           (CARL)
+P034    MEM      64  13-JUN-84 1629.00 ALL RD  NO     32158           (CARL)
+ACCESS  MSG       2  13-JUN-84 1910.35 ALL RD  NO         7           (CARL)
+005TEL  OUT       2  13-JUN-84 1943.15 ALL RD  NO        48           (M33)
+007TEL  OUT       2  13-JUN-84 2014.05 ALL RD  NO        33           (M33)
+ACTSRF  REL       4  13-JUN-84 1701.25 ALL RD  NO      1098           (CARL)
+ACTSRL  REL       4  13-JUN-84 1847.57 ALL RD  NO      1098           (CARL)
+ACTSRS  REL       4  13-JUN-84 1752.21 ALL RD  NO      1094           (CARL)
+APXKNF  REL       4  13-JUN-84 1653.58 ALL RD  NO      1372           (CARL)
+BPXKNL  REL       5  13-JUN-84 1841.56 ALL RD  NO      1736           (CARL)
+CDRSRL  REL       3  13-JUN-84 1848.22 ALL RD  NO       589           (CARL)
+CIOPRF  REL       2  13-JUN-84 1707.56 ALL RD  NO       207           (CARL)
+CIOPRS  REL       3  13-JUN-84 1800.45 ALL RD  NO       688           (CARL)
+CLOCKF  REL       6  13-JUN-84 1655.18 ALL RD  NO      2277           (CARL)
+CLOCKL  REL       6  13-JUN-84 1842.20 ALL RD  NO      2384           (CARL)
+CLOCKS  REL       6  13-JUN-84 1746.47 ALL RD  NO      2324           (CARL)
+CLUBSF  REL       3  13-JUN-84 1652.14 ALL RD  NO       805           (CARL)
+CLUBSL  REL       3  13-JUN-84 1840.20 ALL RD  NO       805           (CARL)
+CLUBSS  REL       3  13-JUN-84 1744.29 ALL RD  NO       797           (CARL)
+CMD24S  REL       6  13-JUN-84 1912.32 ALL RD  NO      2540           (CARL)
+CMD39L  REL      11  13-JUN-84 1831.23 ALL RD  NO      4642           (CARL)
+CMDF3F  REL       6  13-JUN-84 1643.23 ALL RD  NO      2553           (CARL)
+CMDMAS  REL       6  13-JUN-84 1737.41 ALL RD  NO      2540           (CARL)
+CMN24S  REL       9  13-JUN-84 1911.07 ALL RD  NO      4014           (CARL)
+CMN39L  REL      10  13-JUN-84 1829.48 ALL RD  NO      4383           (CARL)
+CMNF3F  REL       9  13-JUN-84 1642.02 ALL RD  NO      3917           (CARL)
+CMNMAS  REL       9  13-JUN-84 1736.15 ALL RD  NO      4016           (CARL)
+CMT24S  REL       2  13-JUN-84 1910.53 ALL RD  NO        61           (CARL)
+CMT39L  REL       2  13-JUN-84 1829.33 ALL RD  NO        85           (CARL)
+CMTF3F  REL       2  13-JUN-84 1641.47 ALL RD  NO        67           (CARL)
+CMTMAS  REL       2  13-JUN-84 1736.01 ALL RD  NO        61           (CARL)
+COMCNF  REL      11  13-JUN-84 1656.01 ALL RD  NO      4991           (CARL)
+COMCNL  REL      12  13-JUN-84 1842.53 ALL RD  NO      5159           (CARL)
+COMCNS  REL      11  13-JUN-84 1747.24 ALL RD  NO      5000           (CARL)
+COMF24  REL       2  13-JUN-84 1910.41 ALL RD  NO        15           (CARL)
+COMFKF  REL       2  13-JUN-84 1641.34 ALL RD  NO        21           (CARL)
+COMFKL  REL       2  13-JUN-84 1829.20 ALL RD  NO        39           (CARL)
+COMFMA  REL       2  13-JUN-84 1735.49 ALL RD  NO        15           (CARL)
+CORE1F  REL      17  13-JUN-84 1657.22 ALL RD  NO      7987           (CARL)
+CORE1L  REL      17  13-JUN-84 1844.10 ALL RD  NO      8033           (CARL)
+CORE1S  REL      17  13-JUN-84 1748.37 ALL RD  NO      7985           (CARL)
+CTYSMF  REL       3  13-JUN-84 1708.15 ALL RD  NO       919           (CARL)
+CTYSML  REL       3  13-JUN-84 1856.29 ALL RD  NO      1011           (CARL)
+CTYSMS  REL       3  13-JUN-84 1759.03 ALL RD  NO      1023           (CARL)
+DEBUGF  REL       3  13-JUN-84 1717.44 ALL RD  NO       519           (CARL)
+DEBUGL  REL       3  13-JUN-84 1906.13 ALL RD  NO       519           (CARL)
+DEBUGS  REL       3  13-JUN-84 1808.02 ALL RD  NO       519           (CARL)
+DR11CS  REL       3  13-JUN-84 1800.04 ALL RD  NO       610           (CARL)
+DZKONS  REL       6  13-JUN-84 1759.36 ALL RD  NO      2088           (CARL)
+ERRCNF  REL       7  13-JUN-84 1659.52 ALL RD  NO      3001           (CARL)
+ERRCNL  REL       7  13-JUN-84 1846.23 ALL RD  NO      3003           (CARL)
+ERRCNS  REL       7  13-JUN-84 1750.30 ALL RD  NO      3002           (CARL)
+F3TSRF  REL       5  13-JUN-84 1654.24 ALL RD  NO      1961           (CARL)
+FILFNF  REL       8  13-JUN-84 1652.47 ALL RD  NO      3350           (CARL)
+FILFNL  REL       8  13-JUN-84 1840.50 ALL RD  NO      3350           (CARL)
+FILFNS  REL       8  13-JUN-84 1744.53 ALL RD  NO      3350           (CARL)
+FILIOF  REL       5  13-JUN-84 1647.02 ALL RD  NO      1884           (CARL)
+FILIOL  REL       5  13-JUN-84 1835.23 ALL RD  NO      1939           (CARL)
+FILIOS  REL       5  13-JUN-84 1741.54 ALL RD  NO      1888           (CARL)
+FILRBF  REL       7  13-JUN-84 1653.26 ALL RD  NO      2770           (CARL)
+FILRBL  REL       7  13-JUN-84 1841.26 ALL RD  NO      2770           (CARL)
+FILRBS  REL       7  13-JUN-84 1745.39 ALL RD  NO      2770           (CARL)
+FILUUF  REL      17  13-JUN-84 1644.27 ALL RD  NO      7706           (CARL)
+FILUUL  REL      17  13-JUN-84 1832.50 ALL RD  NO      7746           (CARL)
+FILUUS  REL      16  13-JUN-84 1738.44 ALL RD  NO      7664           (CARL)
+FRMSRF  REL      12  13-JUN-84 1647.30 ALL RD  NO      5407           (CARL)
+FRMSRL  REL      12  13-JUN-84 1835.51 ALL RD  NO      5447           (CARL)
+FRMSRS  REL      12  13-JUN-84 1740.16 ALL RD  NO      5390           (CARL)
+FTASRL  REL      10  13-JUN-84 1848.37 ALL RD  NO      4314           (CARL)
+IOCSSF  REL      10  13-JUN-84 1711.44 ALL RD  NO      4438           (CARL)
+IOCSSL  REL      11  13-JUN-84 1900.00 ALL RD  NO      4624           (CARL)
+IOCSSS  REL      10  13-JUN-84 1804.09 ALL RD  NO      4415           (CARL)
+KMCSRS  REL       3  13-JUN-84 1800.24 ALL RD  NO       611           (CARL)
+LPTSRF  REL       2  13-JUN-84 1701.49 ALL RD  NO        21           (CARL)
+LPTSRL  REL       2  13-JUN-84 1849.35 ALL RD  NO       417           (CARL)
+LPTSRS  REL       3  13-JUN-84 1753.24 ALL RD  NO       990           (CARL)
+MAGSRS  REL       6  13-JUN-84 1752.44 ALL RD  NO      2107           (CARL)
+MAPIOF  REL      10  13-JUN-84 1651.05 ALL RD  NO      4382           (CARL)
+MAPIOL  REL      10  13-JUN-84 1839.24 ALL RD  NO      4395           (CARL)
+MAPIOS  REL      10  13-JUN-84 1743.33 ALL RD  NO      4384           (CARL)
+MJBDTF  REL       2  13-JUN-84 1701.09 ALL RD  NO       220           (CARL)
+MJBDTL  REL       2  13-JUN-84 1847.41 ALL RD  NO       220           (CARL)
+MJBDTS  REL       2  13-JUN-84 1752.06 ALL RD  NO       220           (CARL)
+ONCDSF  REL      11  13-JUN-84 1718.50 ALL RD  NO      4953           (CARL)
+ONCDSL  REL      11  13-JUN-84 1907.56 ALL RD  NO      4924           (CARL)
+ONCDSS  REL      11  13-JUN-84 1809.17 ALL RD  NO      4914           (CARL)
+ONCEF   REL      11  13-JUN-84 1717.58 ALL RD  NO      4616           (CARL)
+ONCEL   REL      11  13-JUN-84 1907.04 ALL RD  NO      5049           (CARL)
+ONCES   REL      11  13-JUN-84 1808.20 ALL RD  NO      5051           (CARL)
+PCBIOF  REL       7  13-JUN-84 1649.58 ALL RD  NO      2601           (CARL)
+PCBIOL  REL       7  13-JUN-84 1838.19 ALL RD  NO      2601           (CARL)
+PCBIOS  REL       7  13-JUN-84 1742.21 ALL RD  NO      2601           (CARL)
+PICONF  REL       9  13-JUN-84 1702.07 ALL RD  NO      3665           (CARL)
+PICONL  REL       9  13-JUN-84 1849.54 ALL RD  NO      4012           (CARL)
+PICONS  REL       9  13-JUN-84 1753.47 ALL RD  NO      3890           (CARL)
+PLTSRL  REL       2  13-JUN-84 1851.18 ALL RD  NO       328           (CARL)
+PTPSRL  REL       3  13-JUN-84 1851.32 ALL RD  NO       574           (CARL)
+PTRSRL  REL       2  13-JUN-84 1851.48 ALL RD  NO       391           (CARL)
+REFSTF  REL       6  13-JUN-84 1719.36 ALL RD  NO      2395           (CARL)
+REFSTL  REL       6  13-JUN-84 1908.44 ALL RD  NO      2395           (CARL)
+REFSTS  REL       6  13-JUN-84 1810.07 ALL RD  NO      2395           (CARL)
+RMTSRL  REL       2  13-JUN-84 1852.02 ALL RD  NO        37           (CARL)
+RMXKNS  REL       4  13-JUN-84 1746.19 ALL RD  NO      1241           (CARL)
+SCHEDF  REL       8  13-JUN-84 1703.41 ALL RD  NO      3580           (CARL)
+SCHEDL  REL       9  13-JUN-84 1852.13 ALL RD  NO      3622           (CARL)
+SCHEDS  REL       8  13-JUN-84 1754.50 ALL RD  NO      3578           (CARL)
+SCNSRF  REL      25  13-JUN-84 1704.32 ALL RD  NO     12186           (CARL)
+SCNSRL  REL      26  13-JUN-84 1853.03 ALL RD  NO     12642           (CARL)
+SCNSRS  REL      27  13-JUN-84 1755.39 ALL RD  NO     13049           (CARL)
+SEGCNF  REL       9  13-JUN-84 1708.34 ALL RD  NO      3835           (CARL)
+SEGCNL  REL       9  13-JUN-84 1856.49 ALL RD  NO      3845           (CARL)
+SEGCNS  REL       9  13-JUN-84 1801.03 ALL RD  NO      3810           (CARL)
+SET24S  REL       2  13-JUN-84 1913.24 ALL RD  NO        91           (CARL)
+SETMAS  REL       2  13-JUN-84 1738.32 ALL RD  NO        91           (CARL)
+SETTYF  REL       2  13-JUN-84 1644.14 ALL RD  NO        85           (CARL)
+SETTYL  REL       2  13-JUN-84 1832.38 ALL RD  NO        85           (CARL)
+SIMIOF  REL       6  13-JUN-84 1711.02 ALL RD  NO      2112           (CARL)
+SIMIOL  REL       6  13-JUN-84 1859.18 ALL RD  NO      2141           (CARL)
+SIMIOS  REL       6  13-JUN-84 1803.26 ALL RD  NO      2111           (CARL)
+SIMKLL  REL       2  13-JUN-84 1906.28 ALL RD  NO        24           (CARL)
+SWAMPF  REL       6  13-JUN-84 1650.33 ALL RD  NO      2101           (CARL)
+SWAMPL  REL       6  13-JUN-84 1838.55 ALL RD  NO      2101           (CARL)
+SWAMPS  REL       6  13-JUN-84 1743.03 ALL RD  NO      2093           (CARL)
+TMPUUF  REL       2  13-JUN-84 1710.40 ALL RD  NO       287           (CARL)
+TMPUUL  REL       2  13-JUN-84 1858.56 ALL RD  NO       287           (CARL)
+TMPUUS  REL       2  13-JUN-84 1803.06 ALL RD  NO       285           (CARL)
+UUOCNF  REL      11  13-JUN-84 1714.51 ALL RD  NO      5116           (CARL)
+UUOCNL  REL      11  13-JUN-84 1903.21 ALL RD  NO      5095           (CARL)
+UUOCNS  REL      11  13-JUN-84 1806.43 ALL RD  NO      5033           (CARL)
+F3XL25  SAV     145  13-JUN-84 1721.00 ALL RD  NO     73602           (CARL)
+MAXL25  SAV     156  13-JUN-84 1811.36 ALL RD  NO     78905           (CARL)
+24XL25  SAV     156  13-JUN-84 1914.31 ALL RD  NO     78905           (CARL)
+39XL25  SAV     153  13-JUN-84 1910.08 ALL RD  NO     77682           (CARL)
+MAIN01  VUE      63  13-JUN-84 1629.43 ALL RD  NO     31357           (CARL)
+PHONES            2  13-JUN-84 1044.14 ALL RD  NO       362           (LOIS)
+NOTICE  107       2  14-JUN-84  106.01 ALL RD  NO       192           (M33)
+NOTICE  23        2  13-JUN-84  543.14 ALL RD  NO        89           (M33)
+NOTICE  26        2  14-JUN-84  323.15 ALL RD  NO        29           (M33)
+NOTICE  28        2  13-JUN-84  530.04 ALL RD  NO        47           (M33)
+NOTICE  30        2  14-JUN-84  319.26 ALL RD  NO       159           (M33)
+NOTICE  33        2  14-JUN-84  639.47 ALL RD  NO       360           (M33)
+NOTICE  35        2  13-JUN-84  321.30 ALL RD  NO       220           (M33)
+NOTICE  38        2  14-JUN-84  625.25 ALL RD  NO       102           (M33)
+NOTICE  54        2  13-JUN-84  358.35 ALL RD  NO       108           (M33)
+NOTICE  897       2  13-JUN-84  933.33 ALL RD  NO        24           (M33)
+NOTICE  90        2  14-JUN-84  615.10 ALL RD  NO        99           (M33)
+
+!dir (CARL)/aft 13-jun
+MAIL    BAK      27  13-JUN-84 1450.29 ALL RD  NO     13308           (CARL)
+MAIN01  VUE      27  13-JUN-84 1452.51 ALL RD  NO     13082           (CARL)
+MAIL             28  13-JUN-84 1822.38 ALL RD  NO     13487           (CARL)
+!! title 6.15.84:
+!dir (SAILIB)/aft 15-jun
+WARP    BAK       2  15-JUN-84 2303.33 ALL RD  NO        15           (SAILIB)
+WARPLD  CMD       2  15-JUN-84 2303.30 ALL RD  NO         4           (SAILIB)
+WARPT   CTL       2  15-JUN-84 2302.54 ALL RD  NO        48           (SAILIB)
+WARP    DCL       2  15-JUN-84 2302.57 ALL RD  NO        91           (SAILIB)
+WARP    DOC       2  15-JUN-84 2302.25 ALL RD  NO       189           (SAILIB)
+WARPLD  MAC       3  15-JUN-84 2303.22 ALL RD  NO       675           (SAILIB)
+WARP    REL       3  15-JUN-84 2303.04 ALL RD  NO       595           (SAILIB)
+WARPLD  REL       2  15-JUN-84 2303.18 ALL RD  NO       170           (SAILIB)
+WARPT   REL       2  15-JUN-84 2302.45 ALL RD  NO       266           (SAILIB)
+WARP    REQ       2  15-JUN-84 2302.22 ALL RD  NO        16           (SAILIB)
+WARP    SAI       2  15-JUN-84 2303.12 ALL RD  NO       369           (SAILIB)
+WARPT   SAI       2  15-JUN-84 2303.01 ALL RD  NO        92           (SAILIB)
+WARPLD  SAV       2  15-JUN-84 2302.29 ALL RD  NO        95           (SAILIB)
+WARPT   SAV       2  15-JUN-84 2302.51 ALL RD  NO        95           (SAILIB)
+WARPT   WRP       8  15-JUN-84 2302.33 ALL RD  NO      3584           (SAILIB)
+
+!dir (MAIL)/aft 15-jun
+ONTYME  DAT       2  15-JUN-84 1305.54 ALL RD  NO        98           (CARL)
+MAIL    LOG     119  18-JUN-84  700.39 ALL RD  NO     60154           (WRS)
+  #>_:  MAI       2  16-JUN-84  207.20 ALL RD  NO       217           (CARL)
+ONTMTP  SAV      23  17-JUN-84  334.00 ALL RD  NO     11018 SY AC WF  (WRS)
+SMTP    SAV      14  16-JUN-84 1844.55 ALL RD  NO      6632 WC SY JL AC WF (WRS)
+MAIN03  VUE       3  15-JUN-84 1305.54 ALL RD  NO       729           (CARL)
+
+!dir (KEN)/aft 15-jun
+007TEL  COM       2  15-JUN-84 1457.35 ALL RD  NO        13           (KEN)
+MSC     DAT       2  15-JUN-84 1041.33 ALL RD  NO       222           (KEN)
+MUX     HLP       2  15-JUN-84 1457.00 ALL RD  NO       260           (KEN)
+007TEL  OUT       2  15-JUN-84 1457.38 ALL RD  NO        24           (KEN)
+MAIL             14  16-JUN-84 2323.16 ALL RD  NO      6344           (KEN)
+
+!dir (SYSTECH)/aft 15-jun
+DOC     BAK       2  15-JUN-84 1547.03 ALL RD  NO       193           (LOIS)
+DOC     CTL       2  15-JUN-84 1548.16 ALL RD  NO        46           (LOIS)
+MAGNUM  DIR       2  15-JUN-84 1809.38 CP  NO  NO       512           (LOIS)
+A8896Z  MA0       7  15-JUN-84 1809.00 ALL CP  NO      3072           (LOIS)
+A8896Z  MD0       6  15-JUN-84 1635.00 ALL RD  NO      2560           (LOIS)
+
+!dir (KDEV2)/aft 15-jun
+NAMES   BAK       3  15-JUN-84  857.46 ALL RD  NO       797           (KEN)
+003TEL  COM       2  15-JUN-84  733.08 ALL RD  NO        15           (KEN)
+NAMES   CTL       3  18-JUN-84  658.45 ALL RD  NO       797           (KEN)
+DUSAGE  DAT       3  18-JUN-84  653.38 ALL RD  NO       892           (KEN)
+NAMES   LOG       1  15-JUN-84  858.00 ALL RD  NO      3072           (KEN)
+003TEL  OUT       2  15-JUN-84  733.11 ALL RD  NO        26           (KEN)
+DUSAGE  RPT      13  18-JUN-84  653.38 ALL RD  NO      5907           (KEN)
+LTR               2  17-JUN-84 1714.09 ALL RD  NO       190           (KEN)
+DUSAGE  930      13  15-JUN-84  725.12 ALL RD  NO      5907           (KEN)
+
+!dir (XEXEC)/aft 15-jun
+LPR     SAV       7  15-JUN-84 1624.12 ALL RD  NO      2842           (XEXEC)
+
+!dir (SPPOPER)/aft 15-jun
+MA169   BAK       4  15-JUN-84 1631.07 ALL RD  NO      1375           (LOIS)
+MA169   MEM       4  15-JUN-84 1709.36 ALL RD  NO      1380           (LOIS)
+
+!dir (LOIS)/aft 15-jun
+MAGNUM  DIR       2  15-JUN-84 1530.41 CP  NO  NO       512           (LOIS)
+ONTYME  INS       5  15-JUN-84 1504.06 ALL RD  NO      1971           (LOIS)
+J       J         3  15-JUN-84 1814.34 ALL RD  NO       561           (LOIS)
+P034    MKR       2  15-JUN-84 1807.32 ALL RD  NO         2           (LOIS)
+CHANIO  VMP       2  15-JUN-84 1804.25 ALL RD  NO       201           (LOIS)
+COOP              5  15-JUN-84  951.10 ALL RD  NO      2031           (LOIS)
+MAIL             16  15-JUN-84 1758.12 ALL RD  NO      7527           (LOIS)
+
+!dir (MPL)/aft 15-jun
+ZEN     BAK      13  16-JUN-84 2036.00 ALL RD  RD      5984           (MATOKA)
+ZEN     FAI      13  16-JUN-84 2037.38 ALL RD  RD      5985           (MATOKA)
+DOC     MEM       3  15-JUN-84 1616.24 ALL RD  RD       793           (LOIS)
+MODEM   MEM       2  15-JUN-84 1614.07 ALL RD  NO        60           (LOIS)
+ZEN     REL      21  16-JUN-84 2037.54 ALL RD  NO      9986           (MATOKA)
+ZEN     SHR      13  16-JUN-84 2038.13 ALL RUN RUN     5964           (MATOKA)
+
+!dir (MATOKA)/aft 15-jun
+P034    MKR       2  16-JUN-84 2033.07 ALL RD  NO         2           (MATOKA)
+
+!dir (WILKES)/aft 15-jun
+MAIL             16  15-JUN-84 1730.38 ALL RD  NO      7582           (WILKES)
+
+!dir (TSUCOOP)/aft 15-jun
+SU0603  ALL     488  15-JUN-84 1016.23 ALL RD  NO    248755           (LOIS)
+MYFILE  BAK       2  15-JUN-84 1507.37 ALL RD  NO       244           (TSUCOOP)
+MAGNUM  DIR       2  15-JUN-84 1804.13 CP  NO  NO       512           (LOIS)
+TSU     FIL       2  15-JUN-84 1039.41 ALL RD  NO       244           (LOIS)
+FR0615  INC       6  15-JUN-84  845.26 ALL RD  NO      2401           (TSUCOOP)
+LOIS    LET       2  17-JUN-84 2314.04 ALL RD  NO       154           (TSUCOOP)
+BC7WZZ  MD0       3  15-JUN-84 1529.00 ALL RD  NO      1024           (LOIS)
+KF8JAE  ME0       5  15-JUN-84 1527.35 ALL RD  NO      1572           (LOIS)
+L80J8S  ME0       3  15-JUN-84 1527.38 ALL RD  NO       539           (LOIS)
+YRL2OY  ME0       2  15-JUN-84 1527.37 ALL RD  NO       124           (LOIS)
+BCK     MEM      35  17-JUN-84 2207.08 ALL RD  NO     17094           (TSUCOOP)
+KF8JAE  MP0      15  15-JUN-84 1527.46 ALL ALL NO      7168 XC        (LOIS)
+L80J8S  MP0       6  15-JUN-84 1527.52 ALL ALL NO      2560 XC        (LOIS)
+YO5SX4  MR0      12  15-JUN-84 1527.23 ALL RD  NO      5632           (LOIS)
+BC7WZZ  MS0       3  15-JUN-84 1527.14 ALL RD  NO       780           (LOIS)
+TURNUP  MSG       2  17-JUN-84 2212.34 ALL RD  NO        47           (TSUCOOP)
+BC7WZZ  MX0       3  15-JUN-84 1529.00 ALL RD  NO      1024           (LOIS)
+MYFILE            2  15-JUN-84 1509.47 ALL RD  NO       244           (TSUCOOP)
+
+!dir (WRS)/aft 15-jun
+P034    MKR       2  15-JUN-84 1731.18 ALL RD  NO         2           (WRS)
+
+!dir (M33)/aft 15-jun
+HOTLIN  LOG       3  15-JUN-84  845.49 ALL RD  NO       730           (LOIS)
+CLOCK1  MAC      20  15-JUN-84 1632.12 ALL RD  NO      9373           (CARL)
+COMCON  MAC      43  15-JUN-84 1633.17 ALL RD  NO     21308           (CARL)
+COMMON  MAC      52  15-JUN-84 1629.14 ALL RD  NO     25699           (CARL)
+UUOCON  MAC      41  15-JUN-84 1635.04 ALL RD  NO     20310           (CARL)
+P034    MEM      64  15-JUN-84 1648.00 ALL RD  NO     32236           (CARL)
+MAIN03  VUE      63  15-JUN-84 1647.54 ALL RD  NO     31461           (CARL)
+NOTICE  107       2  18-JUN-84  345.44 ALL RD  NO       192           (M33)
+NOTICE  22        2  17-JUN-84 2358.25 ALL RD  NO       281           (M33)
+NOTICE  23        2  15-JUN-84   32.51 ALL RD  NO        89           (M33)
+NOTICE  25        2  17-JUN-84 2140.44 ALL RD  NO       105           (M33)
+NOTICE  26        1  16-JUN-84  342.44 ALL RD  NO         0           (M33)
+NOTICE  28        2  18-JUN-84   58.01 ALL RD  NO        47           (M33)
+NOTICE  29        2  15-JUN-84  359.30 ALL RD  NO       118           (M33)
+NOTICE  30        2  18-JUN-84   57.03 ALL RD  NO       159           (M33)
+NOTICE  32        2  18-JUN-84  507.05 ALL RD  NO       114           (M33)
+NOTICE  33        2  17-JUN-84 2150.43 ALL RD  NO       360           (M33)
+NOTICE  34        2  17-JUN-84  639.21 ALL RD  NO        14           (M33)
+NOTICE  35        2  17-JUN-84  347.48 ALL RD  NO       220           (M33)
+NOTICE  36        2  18-JUN-84  147.34 ALL RD  NO       140           (M33)
+NOTICE  38        2  18-JUN-84  143.23 ALL RD  NO       102           (M33)
+NOTICE  39        2  18-JUN-84  458.27 ALL RD  NO       147           (M33)
+NOTICE  55        2  16-JUN-84 2110.40 ALL RD  NO        38           (M33)
+NOTICE  56        2  15-JUN-84  747.22 ALL RD  NO        26           (M33)
+NOTICE  57        2  16-JUN-84  637.20 ALL RD  NO        28           (M33)
+NOTICE  70        2  18-JUN-84  400.15 ALL RD  NO       375           (M33)
+NOTICE  72        2  17-JUN-84  151.41 ALL RD  NO       495           (M33)
+NOTICE  74        2  18-JUN-84  531.42 ALL ALL ALL       17           (M33)
+NOTICE  897       2  17-JUN-84 1356.10 ALL RD  NO        24           (M33)
+NOTICE  90        2  15-JUN-84 1307.38 ALL RD  NO       113           (M33)
+
+!dir (CB.MAGNUM)/aft 15-jun
+MAGNUM  DIR       2  17-JUN-84 1803.38 ALL RD  NO       512           (CARL)
+
+!dir (CARL)/aft 15-jun
+PHONES  DAT       8  15-JUN-84   10.50 ALL RD  NO      3138           (CARL)
+P034    MKR       2  15-JUN-84 1644.32 ALL RD  NO         2           (CARL)
+MAIN01  VUE       8  15-JUN-84   10.49 ALL RD  NO      3248           (CARL)
+MAIL             31  17-JUN-84 1802.10 ALL RD  NO     15110           (CARL)
+    kn¬
