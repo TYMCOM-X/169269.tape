@@ -1,0 +1,38 @@
+.Memo;
+.Device TTY;
+.Single Space;
+.indent 0;
+.UnderlineBetween (~~,~);
+.blankline;
+.turn off "%";
+.NoJust;
+.ByHand;
+		MM   MM   EEEEEEE   MM   MM    OOOOO
+		M MMM M   E	    M MMM M   O     O
+---------------	M  M  M   EEEEEEE   M  M  M   O     O-------------------
+|		M     M   E	    M     M   O     O                  |
+|		M     M   EEEEEEE   M     M    OOOOO                   |
+|								       |
+|								       |
+|	DATE:  December 27, 1982				       |
+|								       |
+|	  TO:  Adele Newman		COPIES:  Personnel     	       |
+|								       |
+|	FROM:  Ken Dawson					       |
+|								       |
+|    SUBJECT:  Vacation carry-over into 1983                           |
+|								       |
+|								       |
+------------------------------------------------------------------------
+
+
+.EndHand;
+
+I am requesting the carry-over of 5 days of vacation from 1982 into
+1983.
+.byhand;
+.skip 15;
+Approved:  _______________________________
+		   Adele M. Newman
+.endhand;
+
