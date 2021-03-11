@@ -1,0 +1,121 @@
+
+
+
+                              TOPS-20 Work                               
+
+
+
+The following are needed for TOPS-20 as a development or internal
+machine.  Requirements are greater for full center service.
+
+Network File Transfer.  It is needed now.  
+
+    Status.  Darren Price is working on a prototype to test the FTP    
+    specification and in response to the needs of the SofTyme project.
+
+    Software development work.  Implement a prototype on TOPS-20 and      
+    TYMCOM-X which is as close as reasonable to the FTP protocol
+    developed by the task force.  Interface a user-level front end.
+
+Tape File Transfer.  MAGNUM needs a way to move large files (those which  
+will occupy more than one tape) from TYMCOM-X to TOPS-20.  MIS may have
+other needs of similar scope later.
+
+    Software development work.  For MAGNUM's short term needs, Carl is      
+    writing a TOPS-20 program to read TITO format tapes onto TOPS-20.
+    The most recent BACKUP could be converted to TYMCOM-X at a later
+    date.
+
+Listing Service.  It's a given. 
+
+    Suggestions.  The existing printing facilities may be adequate as is    
+    for internal needs.  A network printer should be considered.
+
+    Procedures needed.  Operator notification and delivery procedures.     
+
+    Research.  Investigate the engine work station by contacting someone    
+    (Jill Neidrauer?) on that project.  If MIS is a possible user, find
+    out about their forms and other needs.
+
+Validations.  Commit a routine to paper; it can be informal.
+
+    Procedures needed.  For requesting a validation, approving it, and     
+    carrying it out.
+
+    Possible development work.  A data base which relates people and      
+    groups within the company to user accounts.  This data base could
+    generate the DLUSER ASCII file which could then be loaded on the
+    target system.
+
+Accounting.  Need problem tracking tools and charge-back capability.
+
+    Recommendations.  To handle charge-backs, either (1) use class    
+    scheduling and existing TOPS-20 tools; or (2) implement a very
+    stripped-down accounting mechanism using information already
+    collected by TOPS-20.
+
+
+
+
+20 March 1983                 Adele Newman                             1
+
+
+
+    Software development work.  Stream scanning tool.  Possible      
+    accounting programs.
+
+Tape Handling.  I do not recommend using archiving and migration 
+features of TOPS-20 at the time; if we can solve the problems inherent
+in using these features, they could be introduced later.  Operations
+plans to use the existing tape library software for tracking and
+bookkeepping purposes.
+
+    Procedures needed.  Written procedures and schedules for daily     
+    backups with DUMPER; written instructions for rebuilding a system
+    from scratch.
+
+    Software development work.  Provide a means to load DUMPER      
+    directories into a MAGNUM data base, so that recent backups can be
+    easily referenced for file retrievals, etc.  (Vivian is working on
+    this now.)
+
+Operator requests. 
+
+    Procedures needed.  Notification procedures for requests to     
+    operators for such things as saving files to tape, etc.
+
+    Software development work.  An audit trail for "batch" requests and      
+    a way to read that log.
+
+Software distribution.  We need an interim plan and coordination with 
+software distribution to assure that long-range problems are handled.
+
+SPR's.
+
+    Procedures needed.  An organized way to submit SPR's to DEC; a means     
+    to insure that source updates or patches from DEC (or the section)
+    get installed and logged; crash analysis and logging procedures.
+
+    Possible development work.  Extend ITSR data base to SPR's.  Means      
+    to track updates and patches.
+
+Common Editor.  Ken is working on providing PEAK for TOPS-20. 
+
+Product List.  Decide which products we will commit to making available. 
+Should we include products the division doesn't support?
+
+Mail system.  This is more of a future -- a mail system for the division 
+for 20's and VAX's.
+
+    Research.  Look at AUGMENT's XMAILER system.  What would it take to    
+    port it?
+
+Tools.  Play by ear.  What are the greatest needs?  What can we import?
+
+
+
+
+
+
+20 March 1983                 Adele Newman                             2
+
