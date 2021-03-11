@@ -1,0 +1,292 @@
+	TITLE	TRUNCZ - Truncate trailing zero file pages
+	SUBTTL	Definitions
+
+	SEARCH	UUOSYM
+
+;Register equates
+
+	S=0
+	T1=1
+	T2=2
+	T3=3
+	T4=4
+	F=5
+
+	P=17
+
+; I/O channel equates
+
+	CH1=:1
+	SUBTTL	Get file name and init channel
+
+	TWOSEG
+	RELOC	400000
+
+ST:	JFCL
+	RESET
+	MOVE	P,[-PDLSIZ,,PDL-1]
+	OUTSTR	[ASCIZ /
+This program will delete trailing blank pages and holes from a file.
+/]
+F1INI:	CLRBFI
+	MOVEI	F,LKPBLK		;Point to lookup block
+	OUTSTR	[ASCIZ/
+File name: /]
+	PUSHJ	P,GETFNM	;Get file name from TTY, store in lookup block
+	  JRST	F1INI		;Illegal file name or some such, try again
+	MOVE	T1,[.CHOPN,,CH1]
+	CHANIO	T1,OPNARG	;Open a channel for this file
+	  JRST	OPNERR		;Die
+	MOVEI	T2,.RBALC	;Size of extended look-up block we need
+	HRRZM	T2,(F)		;Set into first word of lookup block
+	HRLI	T1,.CHLK	;Set up args
+	CHANIO	T1,LKPBLK	;Look up the file
+	  JRST	LKPERR		;Die
+	MOVE	T1,.RBALC(F)	;File size in blocks
+	ADDI	T1,3		;Round up to nearest page
+	LSH	T1,-2		;Divide by blocks per page
+	MOVEM	T1,EOFPAG	;Remember last page number
+	ADDI	T1,1		;Page number gets decremented before MAP
+	MOVEM	T1,FILPAG	;Init highest page number
+	MOVSI	T1,-1000	;Init left half of checksum AOBJN word
+	HLLZM	T1,CKSARG
+	MOVE	T1,.JBREL	;Highest word in low seg
+	ADDI	T1,777		;Round up
+	TRZ	T1,777		; to next even page boundary
+	HRRM	T1,CKSARG	;Right half of checksum AOBJN word
+	LSH	T1,-^D9		;Convert to page number
+	HRLI	T1,(1B7+1B17)	;Rest of .CHMFP arg (read-only, 1 page)
+	MOVEM	T1,MAPARG	;Store into first word of arg block
+
+	SUBTTL	Main Program Loop
+
+LOOP:
+	SOSG	FILPAG		;Back up one page
+	  JRST	LOOPZ		;Entire file is zero
+	PUSHJ	P,MAPCKS	;Map, checksum, & type-out page
+	  JRST	MAPERR
+	SKIPN	T2		;Found a non-zero page?
+	  JRST	LOOP		;No, keep looking
+	MOVE	T1,FILPAG	;Highest non-zero page
+	CAML	T1,EOFPAG	;Any trailing zero pages at all?
+	  JRST	LOOPN		;Apparently not
+	LSH	T1,2		;Convert page count to block count
+	MOVEM	T1,.RBALC(F)	;Copy new file size (blocks) to look-up block
+	HRRZS	(F)		;Insure word 0, bit 19 is clear, so that
+				; .RBALC will be interpreted as blocks.
+	MOVE	T1,[.CHREN,,CH1] ;Use RENAME to truncate file
+	CHANIO	T1,LKPBLK
+	  JRST	RENERR		;RENAME error
+	OUTSTR	[ASCIZ /
+File truncated after page /]
+	MOVE	T1,FILPAG
+	PUSHJ	P,TYPDCU	;Type out new highest page # in decimal
+	JRST	XIT
+LOOPN:
+	OUTSTR	[ASCIZ /File has no trailing blank pages,/]
+	SKIPA
+LOOPZ:	OUTSTR	[ASCIZ /File is all zeroes,/]
+	OUTSTR	[ASCIZ / no action taken.
+/]
+XIT:
+	MOVE	T1,[.CHREL,,CH1]
+	CHANIO	T1,		;RELEASE first file I/O channel
+	  JFCL
+	EXIT
+
+	SUBTTL	GETFNM - Get File Name from terminal
+
+GETFNM:
+	SETZM	.RBPPN(F)	;Clear out PPN in lookup block
+	SETZM	USRNAM(F)	;And user name string
+	SETZM	USRNAM+1(F)
+	HRROI	T1,.AXIWL	;INCHWL AUXCAL
+	AUXCAL	T1,T2		;Get char to T2
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Yes, give error return
+	CAIN	T2," "		;Leading blank?
+	  JRST	.-3		;Yes, skip over leading blanks
+	CAIE	T2,"("		;Start of user name?
+	  JRST	FNAME		;No, scan file name
+	MOVE	T3,[POINT 6,USRNAM(F)] ;Byte pointer to user name string
+	MOVSI	T4,-^D12	;Maximum chars allowed in user name
+GETUNM:
+	AUXCAL	T1,T2		;Keep INCHWL-ing
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Illegal here - give error return
+	CAIN	T2,")"		;End of user name?
+	  JRST	GETUN1		;Branch if yes
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - error return
+	IDPB	T2,T3		;Store into user name string
+	AOBJN	T4,GETUNM
+	AUXCAL	T1,T2		;This should be the close paren
+	  POPJ	P,		;Give error return
+	CAIE	T2,")"		;Is it?
+	  POPJ	P,		;Error return - user name too long
+GETUN1:
+	MOVEI	T3,USRNAM(F)	;Address of SIXBIT user name string
+	MOVEM	T3,.RBPPN(F)	;Store into lookup block
+; Parse file name
+
+FNAME:
+	SETZM	.RBNAM(F)	;Clear file name from lookup block
+	SETZM	.RBEXT(F)	;Also file extension
+	MOVE	T3,[POINT 6,.RBNAM(F)] ;Byte pointer to SIXBIT file name
+	MOVSI	T4,-6		;Max length of file name
+	SKIPN	.RBPPN(F)	;Was there a user-name specified?
+	  JRST	FNAME2		;If not, T2 has first char of file name
+FNAME1:
+	AUXCAL	T1,T2		;T1 still has INCHWL args
+	  POPJ	P,		;Give bad return
+FNAME2:
+	CAIN	T2,15		;End of line?
+	  JRST	FNEXIT		;Yes, escape from this routine
+	CAIN	T2,"."		;End of file name?
+	  JRST	FEXT		;Yes, scan for extension
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Store next char of file name
+	AOBJN	T4,FNAME1	;Loop up to 6
+
+; Have scanned 6 chars of file-name, now look for "." or c-r,
+; ignoring intermediate blanks.
+
+	AUXCAL	T1,T2
+	  POPJ	P,
+	CAIN	T2," "
+	  JRST	.-3		;Ignore blanks
+	CAIN	T2,15		;Carriage return?
+	  JRST	FNEXIT		;Escape if so
+	CAIE	T2,"."		;Seperator?
+	  POPJ	P,		;No, give error return
+
+; Here to scan file extension
+FEXT:
+	MOVE	T3,[POINT 6,.RBEXT(F)]
+	MOVSI	T4,-3		;Max length
+FEXT1:
+	AUXCAL	T1,T2
+	  POPJ	P,		;Give error return
+	CAIN	T2,15		;End-of-line?
+	  JRST	FNEXIT		;Escape if so
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Add to file extension string
+	AOBJN	T4,FEXT1	;Loop up to 3 times
+FNEXIT:
+	SKIPE	.RBNAM(F)	;Did we actually get some sort of file-name?
+CPOPJ1:	AOS	(P)		;General purpose success return
+	POPJ	P,		;Error return
+
+; Routine to fold lower-case ASCII to upper case and convert to SIXBIT
+; Entered with char in T2, no other AC's used.
+
+CVT726:
+	CAIL	T2,40		;Check for legal range for SIXBIT conversion
+	CAILE	T2,"z"
+	  POPJ	P,		;Give error return
+	CAIL	T2,"a"		;Within range of lower-case
+	ADDI	T2,"A"-"a"	;Fold to upper case
+	SUBI	T2,40		;Adjust to SIXBIT character codes
+	ANDI	T2,77		;And leave only six bits
+	JRST	CPOPJ1		;Give good return
+	SUBTTL	MAPCKS - Map a page and checksum it
+
+; Entered with F=index of file to look at, MAPARG set up to 
+; appropriate VM page and file page.
+
+MAPCKS:
+	MOVEI	T2,0		;This will be non-zero only if page is, too.
+	MOVE	T1,[.CHMFP,,CH1] ;Arg for Map File Page CHANIO call
+	CHANIO	T1,MAPARG	;Map file page to VM page
+	  JRST	MFPERR
+	MOVE	T1,CKSARG	;AOBJN word for looping through page
+MAPCK1:	SKIPE	(T1)
+	  TLOA	T2,-1		;Indicate non-zero and exit loop
+	AOBJN	T1,MAPCK1
+	MOVE	T1,MAPARG	;Same format for VREMOV as for Map File Page
+	VREMOV	T1,
+	  POPJ	P,
+	JRST	CPOPJ1
+
+; Handle whatever Map File Page errors we can
+MFPERR:
+	TLZ	T1,-1		;Clear all but error code
+	CAIE	T1,FLHOL%	;Is this page a hole?
+	  POPJ	P,		;No, give bad return for other errors
+	JRST	CPOPJ1		;Give good return
+	SUBTTL	Error message routines
+
+OPNERR:	OUTSTR	[ASCIZ /
+Error on OPEN for channel
+/]
+	JRST	XIT
+
+LKPERR:	OUTSTR	[ASCIZ /
+LOOKUP error for file
+/]
+	JRST	XIT
+
+MAPERR:	OUTSTR	[ASCIZ /
+Error on MAP or VREMOV
+/]
+	JRST	XIT
+
+RENERR:	OUTSTR	[ASCIZ /
+RENAME error /]
+	HRRZ	T1,.RBEXT(F)	;Get file selection error code from extended
+	PUSHJ	P,TYPOCU	; look-up block, type out in unformatted octal
+	OUTSTR	[ASCIZ / while truncating file, aborting.
+/]
+	JRST	XIT
+	SUBTTL	Misc. type-out routines
+
+; Routine to type number out in unformatted decimal
+; Arg passed in T1, T2-T4 also clobbered.
+
+TYPDCU:
+	MOVEI	T4,^D10		;Number base to divide by
+	SKIPA			;Rest of routine same as decimal
+
+TYPOCU:	MOVEI	T4,^D8		;Number base to divide by
+	MOVEI	T3,1		;Width of type-out field (always >0)
+TYPU1:	IDIVI	T1,(T4)		;Divide out next-higher-order digit
+	PUSH	P,T2		;Remember it	
+	SKIPE	T1		;Anything left?
+	AOJA	T3,TYPU1	;Yes, get next digit
+TYPU2:	POP	P,T2		;Get next saved lower-order digit
+	ADDI	T2,"0"		;Convert to ASCII numeral
+	OUTCHR	T2		;Type it out
+	SOJG	T3,TYPU2	;Loop for dynamic field width
+	POPJ	P,
+	SUBTTL	Pure storage
+
+OPNARG:	0
+	SIXBIT	/DSK/
+	0
+
+	LIT
+	SUBTTL	Impure storage
+
+	RELOC	0
+
+LKPBLK:	PHASE	0
+	BLOCK	.RBALC
+USRNAM:	BLOCK	2
+	DEPHASE
+
+MAPARG:	0		;First word of Map File Page arg block, also
+			; used for VREMOV call
+FILPAG:	0		;Second word of Map File Page arg block
+
+CKSARG:	0		;AOBJN word for looping through file page
+
+EOFPAG:	0		;Last page of file, before truncate
+
+	PDLSIZ=40
+PDL:	BLOCK	PDLSIZ
+	END	ST
+ 
