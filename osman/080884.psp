@@ -1,0 +1,375 @@
+;
+
+tymshare  0715  08-aug-1984
+[LONSTD  8-Aug-84  7:15:08 Frame: 18 on TTY107 Network: 552-7]
+[LONSTS 11% 1000ms. C33-P034/L21-1 KL-10 6144 pages]
+
+.PSPALL
+
+VERSION 4.0
+08 AUG 84    07:15:23
+
+SYSTEM 22()
+        V22-P034/K-14 UP 79:16  1237/1536 PAGES
+        DSKB 134409
+        DR=B    BPA6(220006) SDAT 7
+        DR=B    BPA11(220005) SDAT 16
+        DR=E    BPA12(220009) SDAT 16
+        NO CRASHES
+SYSTEM 23()
+        D23-P034/K-8 UP 85:48   1742/2048 PAGES
+        DSKB 395475
+        NO CRASHES
+SYSTEM 24
+***SYSTEM UNAVAILABLE
+SYSTEM 25()
+        D25-P034/K-17 UP 104:09 1729/2048 PAGES
+        DSKB 45935
+        DR=A    BPA0(250500) SDAT 28 HDEV 1
+        DR=H    BPA1(250501) HDEV 1
+        DR=D    BPA3(250503) SDAT 1 HDAT 1
+        DR=E    BPA4(250504) SDAT 1 HDAT 1
+        DR=G    BPA6(250506) SDAT 6 HDAT 1
+        DR=H    BPA10(250507) SDAT 16 HDEV 1
+        DR=B    BPA11(250508) SDEV 1 SDAT 5
+        DR=C    BPA12(250509) SDAT 8 HDAT 1
+        DR=D    BPA14(250511) SDAT 6
+        CRA001  21-JUNE-84      1550
+        CRA008  22-JUNE-84      1547
+        CRA010  17-JULY-84      1107
+        CRA003  19-MAR-84       1714
+        CRA004  22-JUNE-84      952
+        CRA005  22-MAY-84       1912
+        CRA002  13-MAR-84       1715
+        CRA009  17-JULY-84      949
+        CRA006  23-MAY-84       2127
+        CRA007  29-MAY-84       1745
+SYSTEM 26(XX)
+        C26-P034/N04 UP  3:10   3595/4096 PAGES
+        DSKB 10377
+        CRA003  23-JULY-84      1439
+        CRA004  31-JULY-84      950
+        CRA005  6-AUG-84        835
+        CRA002  30-JUNE-84      239
+        CRA001  27-JUNE-84      823
+SYSTEM 27()
+        D27-P034/K-14 UP 107:11 1744/2048 PAGES
+        DSKB 134599
+        DR=A    BPA0(270200) HDAT 1
+        DR=B    BPA1(270201) SDAT 3 HDEV 1
+        DR=E    BPA4(270204) SDAT 4 HDAT 1
+        DR=F    BPA5(270205) SDAT 5
+        CRA001  11-MAR-84       316
+        CRA003  6-JUNE-84       2255
+        CRA004  30-MAR-84       2303
+        CRA002  4-JUNE-84       1219
+SYSTEM 28(3B)
+        F28-P034/K-12 UP  2:10  2746/3072 PAGES
+        DSKB 20719
+        CRA008  5-MAR-84        832
+        CRA001  19-APR-84       1719
+        CRA003  5-JULY-84       1128
+        CRA002  31-MAY-84       2327
+SYSTEM 29(ZZ)
+        C29-P034/L21-2 UP 28:32 3594/4096 PAGES
+        DSKB 28680
+        DR=D    BPA3(290003) SDAT 7
+        DR=F    BPA5(290005) SDAT 13
+        CRA001  17-APR-84       907
+        CRA010  23-JULY-84      1146
+        CRA009  3-JULY-84       531
+        CRA003  2-MAY-84        617
+        CRA012  1-AUG-84        1418
+        CRA004  17-MAY-84       1100
+        CRA005  17-MAY-84       2055
+        CRA006  28-MAY-84       1439
+        CRA007  29-MAY-84       521
+        CRA002  1-MAY-84        1531
+        CRA011  24-JULY-84      2350
+        CRA008  11-JUNE-84      1246
+SYSTEM 30(3C)
+        F30-P034/K-14 UP 80:50  2726/3072 PAGES
+        DSKB 48682
+        DR=A    BPA0(300200) SDAT 7
+        DR=B    BPA1(300201) SDAT 18
+        DR=A    BPA10(300207) SDAT 5
+        DR=C    BPA12(300209) SDAT 10
+        DR=E    BPA14(300211) SDAT 17
+        DR=F    BPA15(300212) SDAT 45
+        DR=H    BPA16(300216) SDAT 5
+        DR=A    BPB0(300214) SDAT 7
+        DR=C    BPB1(300215) SDAT 5
+        DR=E    BPB3(300218) SDAT 11
+        DR=G    BPB4(300219) SDAT 5
+        DR=F    BPB5(300213) SDAT 2295
+        CRA001  4-MAR-84        659
+        CRA003  7-MAY-84        1653
+        CRA006  13-JULY-84      57
+        CRA002  3-MAY-84        1039
+        CRA004  1-JAN-64        1601
+        CRA005  13-JUNE-84      137
+SYSTEM 32()
+        D32-P034/K-13 UP 102:39 1749/1984 PAGES
+        DSKB 82104
+        DR=A    BPA0(320100) SDEV 3 SDAT 7
+        DR=C    BPA1(320101) SDAT 8 HDAT 1
+        DR=D    BPA2(320102) SDAT 39
+        DR=E    BPA3(320103) SDAT 5 HDAT 1
+        DR=F    BPA4(320104) SDAT 5 HDAT 1
+        DR=H    BPA6(320106) HDAT 1
+        CRA006  3-APR-84        117
+        CRA007  18-JUNE-84      1038
+        CRA001  8-MAY-84        421
+        CRA008  1-AUG-84        457
+        CRA002  28-MAR-84       856
+        CRA003  7-JUNE-84       1031
+        CRA004  16-JUNE-84      1314
+        CRA005  18-JUNE-84      506
+SYSTEM 33(VV)
+        C33-P034/L21-1 UP 27:27 5642/6144 PAGES
+        DSKB 28340
+        DR=E    BPA2(330102) SDEV 5 SDAT 21
+        DR=F    BPA3(330103) SDEV 1 SDAT 6
+        DR=D    BPA13(330109) SDAT 25
+        DR=E    BPA14(330104) SDAT 7
+        DR=F    BPA15(330110) SDEV 9
+        CRA007  10-JUNE-84      1614
+        CRA026  26-MAR-84       1355
+        CRA028  2-APR-84        1524
+        CRA030  3-AUG-84        1412
+        CRA031  6-AUG-84        1251
+        CRA002  14-APR-84       824
+        CRA009  13-MAY-84       2237
+        CRA011  24-MAY-84       2341
+        CRA018  6-JULY-84       1351
+        CRA020  23-JULY-84      1228
+        CRA027  2-AUG-84        827
+        CRA003  23-APR-84       1633
+        CRA012  28-JUNE-84      711
+        CRA019  11-JULY-84      818
+        CRA021  27-JULY-84      1518
+        CRA022  8-MAR-84        1817
+        CRA029  4-APR-84        1419
+        CRA004  24-APR-84       1017
+        CRA013  30-MAY-84       1645
+        CRA023  9-MAR-84        10
+        CRA005  1-MAY-84        725
+        CRA014  31-MAY-84       828
+        CRA024  12-MAR-84       1420
+        CRA006  4-MAY-84        1109
+        CRA015  1-JUNE-84       1156
+        CRA025  13-MAR-84       1458
+        CRA016  3-JUNE-84       515
+        CRA001  13-APR-84       1224
+        CRA008  13-MAY-84       1828
+        CRA010  24-MAY-84       1703
+        CRA017  4-JUNE-84       558
+SYSTEM 34(AA)
+        C34-P034/K-15 UP 73:52  3835/4096 PAGES
+        DSKB 106065
+        DR=E    BPA2(340305) SDAT 5
+        DR=C    BPA4(340302) SDAT 8
+        DR=C    BPA11(340307) SDEV 1 SDAT 12 HDEV 1
+        CRA001  23-MAR-84       2154
+SYSTEM 35(QQ)
+        C35-P034/K43-6 UP 77:08 7782/8192 PAGES
+        DSKB 19112
+        DR=D    BPA2(350103) SDEV 33 SDAT 25
+        DR=E    BPA3(350101) SDEV 15 SDAT 39
+        DR=A    BPA10(350106) SDAT 12
+        DR=B    BPA11(350108) SDEV 1 SDAT 4
+        DR=C    BPA12(350107) SDEV 2 SDAT 67
+        CRA007  1-MAY-84        1050
+        CRA016  29-JUNE-84      17
+        CRA010  11-MAR-84       1312
+        CRA008  1-MAY-84        1724
+        CRA009  6-MAR-84        2250
+        CRA003  19-APR-84       1410
+        CRA012  19-JUNE-84      2343
+        CRA019  31-JULY-84      1129
+        CRA004  23-APR-84       1351
+        CRA013  21-JUNE-84      2323
+        CRA005  26-APR-84       1819
+        CRA014  26-JUNE-84      239
+        CRA006  1-MAY-84        619
+        CRA015  26-JUNE-84      1600
+        CRA002  19-APR-84       613
+        CRA011  17-MAY-84       1626
+        CRA018  23-JULY-84      1106
+        CRA001  10-APR-84       902
+        CRA017  23-JULY-84      819
+SYSTEM 36(YY)
+        C36-P034/L21-3 UP 43:59 3594/4096 PAGES
+        DSKB 18565
+        DR=E    BPA0(360100) SDAT 6
+        DR=A    BPA1(360101) SDEV 2 SDAT 5
+        DR=G    BPA2(360102) SDAT 24
+        DR=H    BPA5(360105) SDEV 2 SDAT 8
+        CRA001  16-JULY-84      738
+        CRA002  24-JULY-84      1830
+SYSTEM 37()
+        D37-P034/K-15 UP 55:49  1709/2048 PAGES
+        DSKB 88658
+        DR=C    BPA2(370202) SDAT 6
+        DR=D    BPA3(370203) SDEV 1 SDAT 5
+        DR=E    BPA4(370204) SDAT 16
+        DR=F    BPA5(370205) SDAT 8
+        DR=G    BPA6(370206) SDAT 18
+        DR=B    BPA11(370207) SDAT 7
+        DR=C    BPA12(370208) SDAT 14
+        DR=D    BPA13(370209) SDAT 34
+        NO CRASHES
+SYSTEM 38(3A)
+        F38-P034/K-12 UP 271:24 2758/3072 PAGES
+        DSKB 81144
+        DR=A    BPA0(380100) SDEV 1 SDAT 76
+        DR=B    BPA1(380101) SDEV 7 SDAT 17
+        DR=C    BPA2(380102) SDEV 3 SDAT 111
+        DR=D    BPA3(380103) SDAT 117
+        DR=E    BPA4(380004) SDAT 5
+        DR=F    BPA5(380105) SDAT 6
+        DR=G    BPA6(380106) SDAT 63
+        DR=A    BPA10(380107) SDAT 56
+        DR=B    BPA11(380108) SDAT 5
+        DR=E    BPA14(380111) SDAT 63
+        DR=F    BPA15(380112) SDAT 10
+        DR=G    BPA16(380113) SDAT 32
+        DR=A    BPB0(380114) SDAT 11
+        DR=B    BPB1(380115) SDEV 1 SDAT 8
+        DR=C    BPB2(380116) SDAT 8
+        DR=E    BPB4(380118) SDAT 22
+        DR=G    BPB6(380120) SDAT 71
+        DR=A    BPB10(380121) SDAT 75
+        DR=B    BPB11(380122) SDEV 1 SDAT 17
+        DR=C    BPB12(380123) SDAT 31
+        NO CRASHES
+SYSTEM 39(RR)
+        C39-P034/L25-1 UP 49:13 7690/8192 PAGES
+        DSKB 52223
+        DR=B    BPA1(390101) SDEV 23 SDAT 8
+        DR=C    BPA2(390102) SDAT 8
+        DR=A    BPA10(390107) SDAT 1 HDEV 1
+        DR=B    BPA11(390108) SDAT 22
+        DR=D    BPA12(390109) SDEV 1 SDAT 22
+        DR=H    BPA15(390112) SDEV 1 SDAT 4
+        CRA001  25-JULY-84      1516
+        CRA002  1-AUG-84        1339
+SYSTEM 54()
+        D54-P034/K-13 UP 87:30  2743/3072 PAGES
+        DSKB 137157
+        DR=A    BPA0(540300) SDAT 8
+        DR=B    BPA1(540301) SDAT        DR=D    BPA3(540303) SDAT 110
+        DR=E    BPA4(540304) SDAT 160
+        DR=F    BPA5(540305) SDAT 121
+        DR=G    BPA6(540306) SDAT 9
+        DR=H    BPA7(540307) SDAT 5
+        DR=B    BPA11(540309) SDEV 5 SDAT 4
+        DR=C    BPA13(540310) SDEV 6 SDAT 2
+        CRA003  6-MAY-84        624
+        CRA002  5-MAY-84        1244
+        CRA004  27-MAY-84       923
+        CRA001  27-APR-84       754
+SYSTEM 55(FF)
+        C55-P034/K-13 UP 45:55  7815/8192 PAGES
+        DSKB 74172
+        DR=B    BPA3(550103) SDEV 1 SDAT 4
+        DR=C    BPA4(550106) SDAT 21
+        DR=E    BPA5(550104) SDEV 10 SDAT 4
+        DR=C    BPA10(550100) SDAT 6
+        DR=D    BPA17(550105) SDEV 1 SDAT 41
+        CRA003  25-JUNE-84      824
+        CRA004  1-JAN-64        1618
+        CRA002  10-MAY-84       1528
+        CRA001  23-APR-84       1148
+        CRA005  6-AUG-84        924
+SYSTEM 56()
+        D56-P034/K-16 UP  5:00  5755/6144 PAGES
+        DSKB 35087
+        DR=C    BPA12(560209) SDAT 7
+        CRA001  15-JUNE-84      746
+        CRA003  14-JULY-84      2329
+        CRA004  25-JULY-84      1227
+        CRA002  6-JULY-84       755
+        CRA005  6-AUG-84        300
+SYSTEM 57(EW)
+        C57-P034/K-13 UP 97:13  5787/6144 PAGES
+        DSKB 19919
+        DR=A    BPA0(570107) SDAT 7
+        DR=G    BPA1(570105) SDAT 113
+        DR=D    BPA2(570103) SDAT 26
+        DR=C    BPA3(570102) SDEV 1 SDAT 13
+        DR=E    BPA5(570106) SDAT 22
+        DR=F    BPA6(570100) SDAT 51
+        DR=F    BPA10(570110) SDEV 1 SDAT 8
+        DR=B    BPA12(570108) SDEV 23 SDAT 33
+        DR=D    BPA14(570101) SDAT 18
+        CRA001  23-MAY-84       2035
+        CRA003  1-JULY-84       231
+        CRA002  6-JUNE-84       23
+        CRA004  5-JULY-84       851
+SYSTEM 65()
+        D65-P034/K-15 UP 107:03 2743/3072 PAGES
+        DSKB 49624
+        DR=H    BPA0(650200) SDAT 2 HDEV 1
+        DR=B    BPA1(650201) SDEV 1 SDAT 3 HDEV 1
+        DR=D    BPA3(650203) SDAT 35 HDEV 1
+        DR=H    BPA5(650205) SDEV 1 SDAT 6
+        DR=G    BPA6(650206) HDAT 1
+        DR=E    BPA7(650207) HDEV 1
+        NO CRASHES
+SYSTEM 70()
+        V70-P034/K-12 UP 52:08  1740/2048 PAGES
+        DSKB 46976
+        DR=A    BPA10(700108) SDEV 8 SDAT 2
+        DR=C    BPA15(700107) SDAT 8
+        NO CRASHES
+SYSTEM 72()
+        V72-P034/K-13 UP 76:37  1801/2048 PAGES
+        DSKB 147819
+        DR=A    BPA0(720000) SDAT 8
+        DR=C    BPA2(720002) SDAT 8
+        DR=A    BPA10(720007) SDAT 5
+        NO CRASHES
+SYSTEM 74(3D)
+        F74-P034/K-12 UP 50:19  2766/3072 PAGES
+        DSKB 71935
+        DR=A    BPA0(740007) SDAT 6
+        DR=B    BPA1(740006) SDEV 2 SDAT 5
+        DR=G    BPA6(740001) SDEV 1 SDAT 14
+        DR=C    BPA12(740009) SDAT 15
+        DR=F    BPA15(740012) SDAT 6
+        DR=G    BPA16(740013) SDAT 65
+        DR=E    BPB4(740018) SDAT 6
+        NO CRASHES
+SYSTEM 79()
+        D79-P034/K-14 UP 83:10  1811/2048 PAGES
+        DSKB 91423
+        DR=A    BPA0(790000) SDAT 7 HDEV 1
+        DR=B    BPA1(790001) SDAT 14 HDAT 1
+        DR=D    BPA3(790003) SDAT 4 HDAT 1
+        DR=E    BPA4(790004) SDAT 23 HDAT 1
+        DR=F    BPA5(790005) SDAT 7
+        DR=G    BPA6(790006) SDAT 2 HDEV 1
+        DR=E    BPA10(790007) SDAT 7 HDAT 1
+        DR=G    BPA12(790009) SDAT 9
+        CRA002  1-JUNE-84       603
+SYSTEM 897( ")
+        C897-P034/L23 UP 209:11 675/1024 PAGES
+        DSKB 40452
+        DR=F    APA2(CA0102) SDAT 1 HDAT 2
+        CRA001  31-MAY-84       1930
+SYSTEM 930( ")
+        C930-P034/N04 UP 114:38 675/1024 PAGES
+        DSKB 6682
+        DR=F    APA2(FOO002) SDAT 6 HDAT 1
+        NO CRASHES
+EXIT
+
+.K
+
+
+Just a fly in the soup of life
+
+48.06 tru
+terminal time: 0:02:54
+*?77‹
