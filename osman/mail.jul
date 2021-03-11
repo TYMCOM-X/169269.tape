@@ -1,0 +1,1307 @@
+
+From: <CARL@930.Tymnet>
+Date: Wed, 13 Jun 84 20:51:26 PST
+To: lois,osman
+Subject: System 24's tape drive is out again
+
+Well, it may be awhile before we get to write the monitor tapes
+for Mallinkrondt.  I have both monitors, plus the new /L25 monitor
+for system 24 over on 24, ready to test.
+
+However, the tape drive "JUST" died.  I talked to Debbie & she said
+they had to call whoever was on stand-by to come and look at it, so
+it will be awhile.
+
+More later... Debbie is supposed to call me at home so I can come in
+and write the tapes & test the monitors, (all of 15 minutes work)
+when the tape drive is fixed and they are finished restoring files
+from Mallinkrondt's all-files tapes.  Sigh!
+-Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 14 Jun 84 15:01:11 PST
+To: tcms.sramail@ontyme
+Cc: carl,lois,osman
+Subject: Change GAN for username OSMAN
+
+
+To: Jan Krivanec, TCMS.SRAMAIL@EMSAA
+From:  Carl Baltrunas, TXS.C/BALTRUNAS@EMSAA
+
+Re: Change GAN for username OSMAN
+
+Jan,
+  As per our phone conversation, I'd like to have the GAN changed
+for username OSMAN from 11346 to GAN 3.  His current AUN is:
+  11346,124422  and with the gan change it should be 3,124422.
+
+Please send me an ONTYME reply, or call me at x7257 after you've
+finished making the changes.  No rush.  Thanks again.
+
+/Carl
+From: <LOIS@930.Tymnet>
+Date: Wed, 20 Jun 84 11:22:34 PST
+To: carl,osman,wrs@39
+Subject: 56 problems
+
+To Carl, Osman, Bill:
+56 started today having numerous jobs in FC state (all but 4 in MAGNUM).
+They are running a K monitor, and I know there is a real question whether
+jobs ever come out of FC wait in K.  
+
+Anyway, the system was recycled and at first there were numerous "lack of
+DDB" problems with cannot init device, cannot open file, fatal MAGNUM errors,
+etc.  Only 40 some jobs at the time.  While I was looking at it, the problem
+seemed to improve some, and this was not the deteriorating problem that we
+used to see with L as repeated tries would result in success.  At the moment
+the system seems to be working, but it all leaves me with an uneasy feeling
+(at best) as it does Fred Canning.
+
+Ideas?  Comments?  Help?
+-Lois
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 20:34:45 PST
+To: osman
+Subject: OPER Password...
+
+I've transferred you from MOSSERJ (under DROYAL, under SWARBRICK)
+to TXS and upgraded your license accordingly.  You have everyting
+except for WA (Write-Absolute) and VL (Validations).  You may need
+to give yourself WA for certain things, and I will give you a cook-
+book method for patching the running monitor to give it to yourself
+in those cases when you need it in an emergency.  -Carl
+
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 21:31:26 PST
+To: osman
+Subject: Ah... there are two oper names
+
+On 33 there were two OPER names, OSMAN (the one I set up) and the old
+one GUVEN (the one DROYAL) had control of.  I'll bet that DROYAL went
+and noticed that GUVEN was gone and re-instated it.  Anyway, IF OSMAN
+is still not setup on 24, it's because it's a 2020, and possibly didn't
+get copied over from 33.  Let me know in a day or so, and I'll fix it.
+/Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 21:32:38 PST
+To: osman
+Subject: By the way...
+
+I wiped out GUVEN on 33, so unless DROYAL puts it back, no one will
+care.  And if he does, it won't matter either way.  Just continue to
+use OSMAN.  /Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 21:38:48 PST
+To: osman
+Subject: New ONTYME ID for you.
+
+I've "just" added your name to the list of users on EMSTXS
+as TXS.O/GUVEN so that you will be able to get/send mail via
+ONTYME.  Your password is INITIAL and if you do not change it
+then you will automatically get your ontyme mail picked up by
+the new mail system TUMS.  Ask Lois, or I will tell you about
+it all tomorrow.
+/Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 21:50:26 PST
+To: osman
+Subject: TV show
+
+It was pretty good.  It's an on-going "serial", like a science-fiction
+soap-opera, and I only get to see some of the episodes.  They actually
+run two different serials simultaneously.  One on weekdays from 7:30 to
+8:00 which they show one episode at a time.  With my schedule, I'm not
+home usually except on Monday and Friday nights, so I only get to see
+parts of it.  The other set of serials is run on Saturday nights only
+from 11:15 until sometime between 12:00 or 1:00 am where they show all
+of the episodes for a particular story. (Usually they show 4-6 episodes).
+Last Saturday, they started a new serial and showed 7 episodes.  I try
+to see the one on Saturday night pretty regularly, and have only missed
+it once or twice recently.
+
+I realize you just asked how was it tonight, but I got carried away....
+/Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 21:58:35 PST
+To: osman,lois
+Subject: Username OSMAN on 23,etc
+
+I've already taken care of it.  I'll also
+make sure he is valid on the various 2020's
+that he may need access to.  Of course, I
+will use discretion on those hosts where
+they do not want us on their machine.  /Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 20 Jun 84 22:01:17 PST
+To: osman
+Subject: CHannel 54
+
+The name of the show is "Doctor Who".... and oh yes, Channel 54, KTEH is
+a local station, in San Jose.  It's one of the PBS (Public Broadcast)
+stations.
+/Carl
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Thu, 21 Jun 84 22:04:43 UT
+From: TXS.SUP@Ontyme.Tymnet
+Date: 21 JUN 84 14:46:46  
+To: TXS.O/GUVEN@Ontyme.Tymnet
+
+Testing 1 4 7 9
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Thu, 21 Jun 84 16:05:19 UT
+From: TXS.O/GUVEN@Ontyme.Tymnet
+Date: 21 JUN 84 08:20:34  
+To: TXS.O/GUVEN@Ontyme.Tymnet
+
+hello goof...
+i just wanted to check my new iontym user name
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 22 Jun 84 15:09:39 UT
+From: THS.GUVEN@Ontyme.Tymnet
+Date: 22 JUN 84 07:20:52  
+To: THS.GUVEN@Ontyme.Tymnet
+
+testin from emsee...ths.guven
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 22 Jun 84 19:00:46 UT
+From: THS.RICHB@Ontyme.Tymnet
+Date: 22 JUN 84 11:50:09  
+To: THS.GUVEN@Ontyme.Tymnet
+
+THIS IS A HARDWARE TEST.
+From: <CARL@930.Tymnet>
+Date: Fri, 22 Jun 84 15:30:36 PST
+To: lois,osman
+Subject: /M transmittal
+
+Lois,
+  I think that it would be a good idea for OSMAN to look at the config
+files in OSP and in M33 and look through your systems list to verify
+that all the configurations are correct.  This will both aid in getting
+the transmittal through, and in making our files "consistant".  I don't
+expect this to be very difficult, or need anything much except maybe to
+show Osman how to get started doing it.  It will also give him a feel
+for what is in the files and what kinds of things are different for each
+system.
+
+  Let me know if you both think that this is a reasonable thing to do.
+
+/Carl
+Received: from 39.Tymnet by 930.Tymnet; Sun, 24 Jun 84 20:01:51 PDT
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Sun, 24 Jun 84 14:23:06 PST
+To: Osman@930
+Subject: Host Out of Ports
+
+This is a network originated message issued by the base.  The 10 will
+sometimes issue a similar message "port capacity exceded".  I have been
+about 50% successful at clearing this condition by issuing a "RETAKE" of
+the base via PROBE.  You can either do this yourself, or have NETCON do
+it.  Looking at the uptime, it appears that they recycled it, which is
+about all you can do if RETAKE doesn't work.  I see from (SYS)TAKEIT.LOG
+that they used TAKEIT to go down gracefully, which is good, no need to
+deposit in 30.
+
+-Bill
+
+(this is probably due to some Tymnet-I / Varian base code bug and will
+probaby never be fixed, but hopefully, we won't have to live with it
+much longer if Tymnet-II Engine base plans go as hoped)
+From: <OSMAN@930.Tymnet>
+Date: Sun, 24 Jun 84 22:15:41 PST
+To: osman
+Subject: test..
+
+
+
+testing...
+From: <CARL@930.Tymnet>
+Date: Mon, 25 Jun 84 1:50:08 PST
+To: osman
+Cc: lois
+Subject: Wrong date....
+
+No problem... we don't do any "real" accounting on 930.
+/Carl
+From: <LOIS@930.Tymnet>
+Date: Mon, 25 Jun 84 8:43:58 PST
+To: carl,osman
+Subject: 930 & TITO
+
+To Carl and Osman:
+Sunday, every time the directory command was given to TITO, 930 would
+crash (gave Bill good practice in reloading 930, anyway).  Tried with
+different tapes, different monitors, same result.  There is a note on
+the tape drive so Bobby won't do an incremental.
+
+Carl, the crash would occur (like a timeout delay) even before the
+"TAPE POSITION" prompt.  What is TITO looking for there?  Also, Carl,
+when you tried to load L28 you got the READ ERROR OR EOF error.  Really
+hard to reload when no one is here to take care of such problems.
+
+Thoughts on the TITO problem?
+-Lois
+From: <CARL@930.Tymnet>
+Date: Mon, 25 Jun 84 12:42:06 PST
+To: osman,lois
+Subject: My schedule...
+
+I should be by the office in a little while.  Cherie was supposed to see
+the doctors at Santa Clara today but we went to the E.R. last night and
+she was admitted so that they could take care of her pain.  So, my hours
+are all turned around again.  The order to try and find me until I give
+further notice is: [Home] 41-1082, [Office] 408-446-7257, and when
+not at either of these -- [Beeper] 408-977-7960.  See you in awhile.
+-Carl
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Mon, 25 Jun 84 17:03:40 UT
+From: THS.ROD@Ontyme.Tymnet
+Date: 26 JUN 84 09:47:33  
+To: THS.GUVEN@Ontyme.Tymnet
+
+HI OSMAN
+
+I AM AT AGOURA-VAVTION.DO YOU KNOW DICK FIDDLERS PHONE
+
+NUMBER????  SEND A MEESSAAGGEE.
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Tue, 26 Jun 84 22:36:35 UT
+From: THS.ROD@Ontyme.Tymnet
+Date: 26 JUN 84 14:16:26  
+To: THS.GUVEN@Ontyme.Tymnet
+
+NO TURKEY I AM NOT IN KICK BACK MODE!!!
+
+THIS PLACE HAS NO SPARES FOR 3675 S
+
+SO YOU MUST P-1 EVERYTHING.
+From: <CARL@930.Tymnet>
+Date: Thu, 28 Jun 84 1:42:51 PST
+To: lois,osman
+Subject: Reload 930.
+
+Please reload 930 when you come in, and test the tape read problem
+using (M33)F3XL29.  It contains a fix (I believe) and I'd like to
+have it checked out before a bunch of people get on the system.  If
+it passes the test, then please leave it up so that I can test sme
+otehr things when I come in.  Thanks again all.  I didn't reload it
+'cause I was at home and didn't want it left DOWN in the event it
+couldn't read the file from disk.   /Carl
+From: <LOIS@930.Tymnet>
+Date: Thu, 28 Jun 84 9:35:47 PST
+To: carl,osman
+Subject: L28
+
+To Carl and Osman:
+Well, that is an improvement.  Now doing a DIR ALL does not crash the
+system, but it also does not work.  TITO just reads merrily to the logical
+EOT finding nothing.  I think you have FTASER very confused.
+
+We are now back at a L24 (and yes, I am glad we didn't schedule this
+for 23).
+-Lois
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 29 Jun 84 0:01:12 UT
+From: THS.DORI@Ontyme.Tymnet
+Date: 28 JUN 84 17:04:15  
+To: THS.GUVEN@Ontyme.Tymnet
+Subject: ACQUISITION "PRODUCTION CONTROL SERVICES, INC."
+
+---------------------------------- M  E  M  O ----------------------------------
+
+                                      TCSS
+
+
+
+
+DATE>      28 JUN 84  17:03
+
+TO>        CSS PERSONNEL
+
+COPIES>    
+
+FROM>      JOHN F. SWARBRICK
+
+
+SUBJECT>   ACQUISITION "PRODUCTION CONTROL SERVICES, INC."
+
+
+-----------------------------------------------------------------------
+
+
+CSS HAS SIGNIFICANTLY IMPROVED ITS POSITION IN THE DEPOT REPAIR SERVICE
+MARKET PLACE.  I AM PLEASED TO ANNOUNCE THAT WALT JAMES, PRESIDENT OF
+PRODUCTION CONTROL SERVICES, WILL BE JOINING US AS DIRECTOR OF DEPOT 
+REPAIR CSS AGOURA.  DICK SKLARK WILL CONTINUE AS GENERAL MANAGER OF
+THE CSS AGOURA FACILITY.
+
+NOT ONLY DOES THE CSS AGOURA FACILITY BENEFIT FROM WALT'S MANY YEARS IN
+THE DEPOT SUPPORT BUSINESS, BUT, TYMSHARE HAS PURCHASED THE ASSETS OF 
+HIS COMPANY, PRODUCTION CONTROL SERVICES, INC. (PCSI).  THESE ASSETS  
+INCLUDE A SIGNIFICANT SPARE PARTS INVENTORY FOR AMPEX DISC AND TAPE, 
+CAL COMP DISCS AND TOSHIBA DISC DRIVES THAT WILL COMPLEMENT OUR
+IN-HOUSE AND INDEPENDENT SERVICE ORGANIZATIONS.  ADDITIONALLY, THE REVENUE
+GENERATED FROM THE SALES AND REPAIR OF DISC AND TAPE PRODUCTS WILL BE
+ENHANCED GREATLY.
+
+I BELIEVE THAT THE COMBINED FORCES OF PCSI AND CSS WILL BE JUST DYNAMITE 
+AGAINST OUR COMPETITION!!!
+
+PLEASE JOIN ME IN WELCOMING WALT AND HIS CREW TO CSS.
+From: <LOIS@930.Tymnet>
+Date: Fri, 29 Jun 84 8:46:48 PST
+To: carl,osman
+Subject: 23
+
+To Carl and Osman:
+L25 monitor for 23 is in (LOIS:23).  Tom Marconi says the system will be
+back sometime late next week.
+
+Incidentally he says 37 and some other system will be replaced by KL's
+and they may need new monitors.  Someone should check with him regarding 
+this.
+-Lois
+From: <FLETCHERC@930.Tymnet>
+Date: Thu, 5 Jul 84 15:11:17 PDT
+To: osman
+Subject: system 33 failure of July 3rd
+
+Please fill me in on what has happened with system 33 and file
+lossage problem.
+		Craig
+From: <CARL@930.Tymnet>
+Date: Thu, 5 Jul 84 18:20:21 PDT
+To: osman
+Subject: See you tomorrow.
+
+It looked like it wasn't going to be worthwhile for me to do anything BUT
+work from home today.  By the time I got back from Walnut Creek, it was
+already pretty late.  I presume there were no major crises since you didn't
+try to call me in Walnut Creek.  I'll be working tonight at home, so feel
+free to send mail with questions, etc...
+-Carl
+From: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 1:32:45 PDT
+To: osman,wilkes
+Subject: F3/F4 Tape drives
+
+Osman, John,
+  do either of you know much about the tape drives on an f3 or f4 as
+far as how you talk to it's controller, read data, write data, etc.??
+Apparently, certain functions are expected to be finished at interrupt
+level on the F3 and KS.  On the KI/KL these are handled differently???
+
+  I need a hardware lesson.   /Carl
+From: <CARL@930.Tymnet>
+Date: Fri, 6 Jul 84 20:29:51 PDT
+To: OSMAN
+Subject: ACTSER change for .FOCFM record
+
+Apparently it works fine.  It does exactly what is needed.
+(It may be confusing, and we may wish to set some bit saying that
+ this is a .FOCFM LOGIN instead of a LOGINN LOGIN, but other than
+ that, it appears we are home free.  It works!  Congratulations!!)
+
+-Carl
+From: <CARL@930.Tymnet>
+Date: Sun, 8 Jul 84 22:11:16 PDT
+To: osman
+Subject: System reload
+
+I'm going to test my new monitor, just after I finish eating.
+(Yes, I am here.)  Call me if you need to, else just send mail.
+I'll be back in about 20 minutes to read it.
+/Carl
+From: <CARL@930.Tymnet>
+Date: Sun, 8 Jul 84 23:04:14 PDT
+To: osman
+Subject: Dentist!
+
+I'm sorry to hear that you're in pain.  I hope that it can be taken
+care of easily.  Please, GO and see your dentist tomorrow.
+
+We do not have anything URGENT that requires you to be in the office
+happenning tomorrow, so please go and have your gums taken care of.
+
+I will see you when you can come in, after you've taken care of your
+pain.  I'm mostly working on getting the /N monitor release ready, now
+that I've solved the tape-drive problem.  Take care of yourself.
+
+PS. If you don't feel well, or if your schedule with the dentist means
+    that you won't make it to the office tomorrow, don't worry about it.
+    It's more important that you take care of the pain, and come in when
+    you're feeling better.
+
+/Carl
+
+From: <CARL@930.Tymnet>
+Date: Sun, 8 Jul 84 23:47:01 PDT
+To: osman
+Subject: F3TSER fix
+
+The problem was caused by a mis-calculation in a byte-pointer used to
+setup the page-map slots in the EPT.
+
+	POINT 18, EPT+<%ONC/1000/2>, -1+18*<<%ONC/1000>&1>
+
+The formula is correct, but the POINT pseudo-op allows the user to
+specify the byte-size and the bit-position in decimal, so instead of
+reading
+
+	-1+18*<<%ONC/1000>&1>
+    as
+	-1 + ^D 18 * < <%ONC / ^O 1000> & 1 >
+ it was read as
+	-1 + ^D 18 * < <%ONC / ^D 1000> & 1 >
+
+so, the calculation has been WRONG for a long time, and nobody noticed,
+because it just happenned to work with the old values, before I changed
+it.
+
+I fixed it, and now it will work, no matter what value %ONC has.  I will
+show you what was happenning when I see you.
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Mon, 9 Jul 84 21:01:32 PDT
+To: osman
+Subject: today...
+
+Today was ok.  I'm glad that your teeth are OK too.  Hope the pain hass
+gone away, or is at least better.
+
+I made the fixes to the sources for everything we talked about, and I
+started to generate monitors for general release.  You may notice that
+we are running P034/N on 930 right now.  I am assuming that all the
+files are up to date on OSP (or wherever they need to be) for .CMD and
+the CNFNxx and CONFxx files.  In any case the generated monitors can be
+used for testing on each processor type.  The next step is to finish
+getting the documentation and command files ready for software distribution
+to repeat the compilations and do their part in testing and distributing
+the monitor.
+
+See you tomorrow, and I'll show you what fixes I made and why.
+
+-Carl
+From: <FLETCHERC@930.Tymnet>
+Date: Tue, 10 Jul 84 9:51:47 PDT
+To: osman
+Subject: crash analysis
+
+Could you mail me a summary of any crash analysis you and Carl have done.
+Most common crash and what the scenario was, and one or two others.
+If you see this in time, could you get it to me by 1:30.
+
+	Craig
+P.s. Did you and John Wilkes test DSKCLN?
+Received: from 39.Tymnet by 930.Tymnet; Tue, 10 Jul 84 11:47:34 PDT
+Return-path: <WRS@39.Tymnet>
+From: <WRS@39.Tymnet>
+Date: Tue, 10 Jul 84 11:47:15 PDT
+To: carl@930,osman@930
+Subject: C39-P034/L25-1
+
+P034/L25 patched to become P034/L25-1
+in running monitor and SYS:SYSTEM.SAV.
+perforance experiment /WRS
+From: <OSMAN@930.Tymnet>
+Date: Tue, 10 Jul 84 13:51:30 PDT
+To: fletcherc,carl,osman
+Subject: Crash Analysis
+
+The most recent crash analysis done was to trace the problem on system
+930 with the tape drive crashing the system every time TITO tried to do
+a tape directory.
+
+Symptom:  RUN TITO and do a DIRECTORY ALL command
+	  System crashes at EXCMPE+3, exec page failure
+
+Tracing:  (reverse order)
+	  EXCMPE: determine if exec & crash if a hard page failure
+	  PGFAIL: come here when hardware detects a page fault
+		  (trap locations stored in EPT+500-504)
+	  OD.RF+11 was where the trap occurred, at interrupt level
+		  in module F3TSER.
+	  OLDRW1+?? was where the EPT map pages were setup for the
+		  tape read transfer, at UUO level in module F3TSER
+
+Problem:  Exec page fault was caused by "not enough" pages setup for
+	  the transfer of tape data into the users buffer, or so it
+	  seemed.
+
+	  Actual cause was that the EPT map slot entries for the user's
+	  data buffer were shifted, so that when the data was BLT'ed
+	  from monitor space into user space through the EPT mapping
+	  the pages were off by 1.  This was done at interrupt level.
+
+	  At uuo level, when the EPT pointers were setup, a byte ptr
+	  was used,  POINT 18,EPT+<%ONC/1000/2>,-1+18*<<%ONC/1000>&1>
+	  which (for all intents and purposes) looks correct.  The
+	  problem was that the third operand of the POINT pseudo-op
+	  is taken as decimal, thus:  -1+^D18*<<%ONC/^D1000>&1> was the
+	  calculation used instead of -1+^D18*<<%ONC/^O1000>&1>.
+
+Solution: Change the formula to -1+18*<<%ONC/^O1000>&1> and re-assemble
+	  the monitor.
+
+Time frame:  All of this took about a week digging through various
+	     modules and comparing F3TSER with MAGSER and FTASER as
+	     well as following the code through ONCE startup and using
+	     executive DDT to look at the EPT map slots and user buffers.
+
+/Carl
+
+PS:  I, (Carl) did most of the digging, showing Osman, step by step
+     as much as I could.  This just happenned to be a very OBSCURE
+     bug, and it's lucky that nothing else was affected.
+From: <TSUCOOP@930.Tymnet>
+Date: Wed, 11 Jul 84 11:33:41 PDT
+To: Carl,Osman
+Subject: tsucoop work schedule
+
+Dear Carl and Osman,
+
+     For your information here is the work schedule to which I am trying
+
+to adhere:
+
+                         Sun: 10 - 6
+                         Tue: 9:30 - 5:30
+                         Wed: 9:30 - 2:30
+                         Thu: 9:30 - 6:30
+                         Fri: 9:30 - 6:30
+
+     Note: Hours worked during the week depend on how long it takes to
+
+do the Sunday allfiles.
+
+                                  Regards,
+                                  Bill Mortensen
+From: Postmaster
+Date: Wed, 11 Jul 84 21:03:12 PDT
+To: <OSMAN@930.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+Invalid address(s):
+<~r>
+
+
+----------
+RCPT To: <~r>
+From: <OSMAN@930.Tymnet>
+Date: Wed, 11 Jul 84 21:03:11 PDT
+To: ~r
+
+
+From: <OSMAN@930.Tymnet>
+Date: Wed, 11 Jul 84 21:05:24 PDT
+To: osman
+Subject: testing
+
+Testing..
+
+From: <CARL@930.Tymnet>
+Date: Wed, 11 Jul 84 23:16:59 PDT
+To: osman
+Subject: meetings
+
+I certainly hope they are not as long or as disorganized as the one we
+attended today.  If I am running the meeting, as I expect to run the
+ones we will have here in Cupertino, they shall not be nearly as long
+or go off on as many tangents.
+-Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 11 Jul 84 23:36:02 PDT
+To: osman
+Subject: meeting
+
+You don't know the half of it as far as meeting go with Craig vs
+meetings with some other people, so I will fill you in on it all
+tomorrow.  /Carl
+From: <VUE@930.Tymnet>
+Date: Thu, 12 Jul 84 12:09:05 PDT
+To: osman
+Subject: Carl
+
+I just wanted to let you know that I doubt that Carl is going to be in the 
+office today; he felt rather ill when he came home from the meeting last night,
+and he doesn't seem to feel much better today. But, I'm sure he'll be in touch
+with you as soon as he feels he can sit at the terminal; in the meantime, feel
+free to call him at home if you have any problems or questions, Okay? Have a
+nice day!...Cherie
+From: <WILKES@930.Tymnet>
+Date: Thu, 12 Jul 84 12:43:45 PDT
+To: osman
+Subject: dskcln testing
+
+3:00 am friday the 13th...???!!!  clearly you are not supersticious.
+probably the best thing is for me to meet you at bubb bldg c a little
+before 3:00 (ugh!).  oh well, i guess that will make friday end that
+much earlier!
+thanks for doing the tape...  
+/john
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Thu, 12 Jul 84 22:02:40 UT
+From: THS.SUP@Ontyme.Tymnet
+Date: 12 JUL 84 14:36:08  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E04845@EMSEE.Ontyme.Tymnet
+Subject: PRESS RELEASE - TYMSHARE ACQUIRES PRODUCTION CONTROL SERVICES, INC.
+
+          C O R P O R A T E    C O M M U N I C A T I O N S
+
+                         M E M O R A N D U M
+
+DATE>      11 JUL 84  10:52
+
+TO>        ALL TYMSHARE EMPLOYEES
+
+COPIES>    
+
+FROM>      STAN TERRA
+            NEWS BUREAU
+
+
+SUBJECT>   PRESS RELEASE - TYMSHARE ACQUIRES PRODUCTION CONTROL SERVICES, INC.
+
+
+-----------------------------------------------------------------------
+
+
+THE FOLLOWING WAS RELEASED TO THE PRESS. PLEASE POST AND DISTRIBUTE.
+
+TYMSHARE ACQUIRES PRODUCTION CONTROL SERVICES, INC.
+
+
+     CUPERTINO, Calif., July 9, 1984 -- Tymshare, Inc. announced
+that it has acquired the major assets of Production Control
+Services, Inc. of Chatsworth, Calif.  Terms of the acquisition
+were not revealed.
+
+     Production Control Services, with sales of $1.5 million
+in 1983, provides repair and support services to the computer
+industry.  The company repairs and sells spare parts for a wide
+range of disk, tape and memory products made by Ampex, Cal Comp
+and other original equipment manufacturers.  At the time of acquisition,
+Production Control Services had an inventory of $20 million.
+
+     By merging Production Control Services into Tymshare's
+Computer Systems and Support (CSS) division, it is expected that the
+combined operation will post sales of about $18 million in 1984,
+according to John Swarbrick, vice president of CSS.
+
+     Tymshare's CSS division provides professional field maintenance,
+equipment staging and field engineer training for computer equipment
+                                                                Page  2
+
+and related peripherals from such companies as Digital Equipment
+Corp., Honeywell and IBM.  These services are used by Tymshare
+internally and also are available under third party maintenance
+agreements for customers throughout the country.
+
+     A new leader in the certification of removable media disk
+heads Production Control Services has under development a
+portable disk head certification unit for use in the field.
+The device will result in significant cost savings to users 
+by substantially reducing down time from incorrect diagnosis, 
+and by the device's ability to quickly certify the head.
+Swarbrick said the new portable unit will be available in the
+fourth quarter of this year.
+
+     Tymshare, Inc. offers a broad range of computer services,
+and is part of the newly formed Information Systems group of
+McDonnell Douglas Corp., St. Louis.
+
+                             # # #
+
+
+
+
+
+
+
+
+
+
+
+From: <CARL@930.Tymnet>
+Date: Thu, 12 Jul 84 17:01:35 PDT
+To: osman
+Subject: Monitor testing, et all
+
+Hi,
+  I'm feeling a little better.  Stomach is still feeling a little
+funny, but no more ache at the moment.
+
+  What do you have scheduled for the machines and for DSKCLN.  We
+never really got to talk about that.  Is it set for tonight-friday AM
+or is it set for tomorrow-saturday AM?  And what have you scheduled?
+
+  I just finally got out of bed, so I'll probably be awake all night
+anyway.  So, if it's tonight, I ought to come by later.  What do you
+think?  (Of course, If Istart to feel worse again, I'll let you both
+know about it via MAIL.)
+
+PS:  Tell John Wilkes that I still have his 44 in the back of my car.
+     Somehow, I think that he'd like some kind of terminal for awhile.
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 12 Jul 84 17:48:24 PDT
+To: osman
+Subject: cupc
+
+	It seems like a good idea, for me to come over at 3.am.  Since
+I've not been feeling well, I will leave it open.  If you see me before
+3am, then I'll be there and we can go through everything together.  If
+no, then just assume that I'm not feeling well again.  I want to get this
+monitor distributed, so I will try to work on the documentation and stuff
+so it can be sent to software distribution.
+
+   See you tonight, probably.    PS:  If you're at the office, go home!
+					you hav to get some sleep, you know!
+/Carl
+From: <CARL@930.Tymnet>
+Date: Mon, 16 Jul 84 15:23:38 PDT
+To: fletcherc,osman,wilkes,carl
+Subject: Meeting tomorrow
+
+There will be a TYMCOM-X monitor group meeting tomorrow at 1:00 PM
+in conference room J in VG-2.
+
+Adgenda:
+
+ o  Pending release of P034/N
+ o  Crash analysis status
+ o  TRU interrupt status
+ o  DSKCLN status
+
+I expect that no more than an hour, unless there are other things
+to discuss.
+
+Conference room J is the room by the VG-2B message center opposite
+the coffee machines.
+From: <KEN@930.Tymnet>
+Date: Wed, 18 Jul 84 10:28:34 PDT
+To: carl,tsucoop,osman
+Cc: ken
+Subject: New Peak
+
+    Yes, it's true!  The latest version of Peak, though lacking the
+    incredible WARPLD fast-start feature, does have timer-generated
+    checkpointing, and therefore spends the bulk of its time in TI
+    (rather than SL) state.  This should result in a greater rapport
+    with the Tymcom-X scheduler, making the Peak experience a bit
+    friskier in loaded situations.
+
+    Let me know if you notice any problems arising from this giant
+    leap in Technology.  Use SENDMA.
+
+    /ken
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Thu, 19 Jul 84 9:00:56 UT
+From: THS.ROD@Ontyme.Tymnet
+Date: 19 JUL 84 01:31:20  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E09920@EMSEE.Ontyme.Tymnet
+
+PLEASE CONTACT ME IF YOU HAVE DHKBF& DHKBG.A11 ON DECTAPE FLOPPY,ETC.
+
+
+THANK YOU
+
+
+
+
+
+
+
+
+
+From: <CARL@930.Tymnet>
+Date: Thu, 19 Jul 84 13:32:15 PDT
+To: ken,osman,wilkes,sppoper
+Subject: My schedule.
+
+Except for a brief trip to the office, I plan on working from home on
+the COEES TRU interrupt code.  If you need me for anything, call me
+at 415-961-1082.  I am working at home in order to decrease the number
+of interruptions so that I can finish the TRU stuff by tomorrow, and
+make sure it is properly tested.  /Carl
+From: Postmaster
+Date: Thu, 19 Jul 84 14:07:19 PDT
+To: <OSMAN@930.Tymnet>
+Subject: Returned MAIL
+
+The following message was not delivered because:
+Invalid address(s):
+<Carl..>
+
+
+----------
+RCPT To: <Carl..>
+From: <OSMAN@930.Tymnet>
+Date: Thu, 19 Jul 84 14:07:07 PDT
+To: Carl..
+Subject: Phone #..
+
+
+Hello there again..(Hello to you too Cheryl)
+Here is the phone#...Jim O'Conell (201)645-6800
+
+
+Osman..
+From: <CARL@930.Tymnet>
+Date: Thu, 19 Jul 84 20:09:41 PDT
+To: fletcherc,osman,ken
+Subject: STOCK PLAN TERMINIATION INFO
+
+Received: From EMSTXS.Ontyme.Tymnet by 930.Tymnet; Fri, 20 Jul 84 0:04:22 UT
+From: FIN.SUP@Ontyme.Tymnet
+Date: 20 JUL 84 00:31:55  
+To: TXS.SUP@Ontyme.Tymnet
+Message-id: A94214@EMSTXS.Ontyme.Tymnet
+Subject: CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+DATE>      19 JUL 84  15:25
+
+TO>        ALL EMPLOYEE STOCK PURCHASE PLAN PARTICIPANTS
+
+COPIES>    
+
+FROM>      SUSAN WOO
+           PAYROLL DEPARTMENT
+
+
+SUBJECT>   CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+
+-----------------------------------------------------------------------
+
+
+THE DISTRIBUTION OF CHECKS TO PARTICIPANTS OF THE EMPLOYEE STOCK PURCHASE
+PLAN IS SCHEDULED TO OCCUR NEXT WEEK.  THEY WILL BE DISBURSED IN THE
+SAME MANNER AS PAYROLL CHECKS AND SHOULD ARRIVE ON FRIDAY JULY 27, 1984.
+THERE ARE A FEW ITEMS OF INTEREST I WOULD LIKE TO MAKE YOU AWARE OF:
+
+1. IF YOU WERE AN EMPLOYEE OF BOTH TYMSHARE AND TYMNET DURING THE PLAN
+   YEAR, YOU WILL RECEIVE TWO CHECKS EACH CALCULATED ON THE YEAR TO DATE
+   DEDUCTIONS FOR EACH COMPANY.
+
+2. THE ORDINARY INCOME PORTION OF YOUR STOCK CHECK WILL BE TAXED FOR
+   FEDERAL AND STATE INCOME TAX PURPOSES.  THE INCOME PORTION AND TAXES
+   WILL BE REFLECTED ON YOUR 1984 W2.
+
+3. THE AUTOMATIC DEPOSIT FUNCTION WILL NOT BE IN EFFECT DUE TO THE
+   SPECIAL HANDLING OF THE STOCK RUN.  THIS WILL NOT INTERFERE WITH
+   THE AUTOMATIC DEPOSIT OF YOUR REGULAR PAYROLL CHECK.
+
+IF THERE ARE ANY QUESTIONS IN THE MEANTIME, PLEASE GIVE ME A CALL.
+I CAN BE REACHED AT (408)446-6740  OR ONTYME    FIN.PAYROLL
+
+
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Fri, 20 Jul 84 15:01:38 UT
+From: THS.SUP@Ontyme.Tymnet
+Date: 20 JUL 84 07:56:59  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E11264@EMSEE.Ontyme.Tymnet
+Subject: CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+DATE>      19 JUL 84  15:25
+
+TO>        ALL EMPLOYEE STOCK PURCHASE PLAN PARTICIPANTS
+
+COPIES>    
+
+FROM>      SUSAN WOO
+           PAYROLL DEPARTMENT
+
+
+SUBJECT>   CLOSING OF EMPLOYEE STOCK PLAN 1983-1984
+
+
+-----------------------------------------------------------------------
+
+
+THE DISTRIBUTION OF CHECKS TO PARTICIPANTS OF THE EMPLOYEE STOCK PURCHASE
+PLAN IS SCHEDULED TO OCCUR NEXT WEEK.  THEY WILL BE DISBURSED IN THE
+SAME MANNER AS PAYROLL CHECKS AND SHOULD ARRIVE ON FRIDAY JULY 27, 1984.
+THERE ARE A FEW ITEMS OF INTEREST I WOULD LIKE TO MAKE YOU AWARE OF:
+
+1. IF YOU WERE AN EMPLOYEE OF BOTH TYMSHARE AND TYMNET DURING THE PLAN
+   YEAR, YOU WILL RECEIVE TWO CHECKS EACH CALCULATED ON THE YEAR TO DATE
+   DEDUCTIONS FOR EACH COMPANY.
+
+2. THE ORDINARY INCOME PORTION OF YOUR STOCK CHECK WILL BE TAXED FOR
+   FEDERAL AND STATE INCOME TAX PURPOSES.  THE INCOME PORTION AND TAXES
+   WILL BE REFLECTED ON YOUR 1984 W2.
+
+3. THE AUTOMATIC DEPOSIT FUNCTION WILL NOT BE IN EFFECT DUE TO THE
+   SPECIAL HANDLING OF THE STOCK RUN.  THIS WILL NOT INTERFERE WITH
+   THE AUTOMATIC DEPOSIT OF YOUR REGULAR PAYROLL CHECK.
+
+IF THERE ARE ANY QUESTIONS IN THE MEANTIME, PLEASE GIVE ME A CALL.
+I CAN BE REACHED AT (408)446-6740  OR ONTYME    FIN.PAYROLL
+
+
+
+
+
+
+
+
+
+
+
+From: <CARL@930.Tymnet>
+Date: Sun, 22 Jul 84 21:40:03 PDT
+To: osman
+Subject: TRU interrupt code
+
+It's all written, and tested to my satisfaction.  It can be set by
+the console command "SET LIMIT n" or by the SETLIM UUO (CALLI -150).
+The interrupt fires properly, and the user can continue to process
+normally until a RESET or EXIT occurs.  When the interrupt fires, the
+programmable limit gets set to 0, while the frame limit stays the same.
+
+I'm pretty sure that it is checked every tick, which may be a performance
+problem.  If it turns out to slow down the system, then I will have to
+move the code to the once-a-second or once-a-minute routines.  I cannot
+tell until it gets tested by COEES.  If the code must be moved, it will
+take all of 1-half hour to change it and re-telecopy a newer version to
+system 26.
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Sun, 22 Jul 84 22:04:23 PDT
+To: osman
+Subject: Yes, lots of work...
+
+I was working all day yesterday, from 2PM to11PM, and from 1AM to 6:30AM
+and again this afternoon and tonight trying to make sure everything was
+working.  I had most of it working, 'cept for a couple of snags as of
+last night.  I dug through things and fixed the snags tonight, and the
+new monitor for 26 just finished being telecopied over to 26.  Now, I
+must call operations and make sure it gets reloaded tonight.  (I talked
+to debbie last night to schedule the reload, so shouldn't be a problem
+since no-one is on 26 right now.)  **WHEW** now I can relax a couple of
+minutes...
+
+I'm probably going to take off from work on tuesday,wednesday or thursday
+for most of 2 days to get my weekend... I'm just letting you know ahead of
+time... talk to you more tomorrow afternoon.  /Carl
+From: <FLETCHERC@930.Tymnet>
+Date: Mon, 23 Jul 84 14:16:53 PDT
+To: osman
+Subject: hotline support
+
+
+the text of the letter to ARtson Answering Service is to be found
+in (fletcherc)hotlin.mem.  We will begin operation in that mode
+on 1 August.
+
+		Craig
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Tue, 24 Jul 84 21:03:32 UT
+From: THS.SUP@Ontyme.Tymnet
+Date: 24 JUL 84 13:40:39  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E14176@EMSEE.Ontyme.Tymnet
+Subject: DISTRIBUTION OF STOCK CHECKS ('83-'84 PLAN YEAR)
+
+DATE>      24 JUL 84  10:52
+
+TO>        ALL EMPLOYEE STOCK PURCHASE PLAN PARTICIPANTS
+
+COPIES>    
+
+FROM>      SUSAN WOO
+           PAYROLL DEPARTMENT
+
+
+SUBJECT>   DISTRIBUTION OF STOCK CHECKS ('83-'84 PLAN YEAR)
+
+
+-----------------------------------------------------------------------
+
+
+MY PREVIOUS ON-TYME DATED JULY 19,1984 STATED THAT STOCK CHECKS WOULD
+BE RECEIVED BY FRIDAY, JULY 27TH.  I HAVE BEEN NOTIFIED BY BANK OF
+AMERICA THAT CHECKS HAVE BEEN PROCESSED AND SHOULD BE RECEIVED
+ON WEDNESDAY, JULY 25TH.  YOU SHOULD RECEIVE THEM IN THE SAME MANNER
+AS PAYROLL CHECKS (FEDERAL EXPRESS, EXPRESS MAIL, BANK OF AMERICA INTERBRANCH)
+
+BANK OF AMERICA HAS ADVISED ME THAT SOME CHECKS WHICH WOULD NORMALLY
+GO TO A FIELD OFFICE MAY COME HERE TO CORPORATE.  IF I GET ANY OF THESE
+CHECKS I WILL TURN AROUND AND AIRBORNE THEM TO THE APPROPRIATE FIELD
+LOCATION AND YOU WILL RECEIVE THEM ON THURSDAY, JULY 26TH.  IF YOU ARE
+MISSING CHECKS PLEASE CALL AND I WILL CONFIRM IF I HAVE THEM.
+ONCE AGAIN MY NUMBER IS (408)446-6740 
+
+
+
+
+
+
+
+
+
+
+
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Tue, 24 Jul 84 21:04:48 UT
+From: THS.BACH@Ontyme.Tymnet
+Date: 24 JUL 84 13:51:26  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E14204@EMSEE.Ontyme.Tymnet
+
+TY 2
+SEND * *.*
+SENT: 23 JUL 84 16:32:22  
+
+
+     
+     
+                                  -****-
+                             *                *   
+                        *                       **
+                      *  *                     *    *  
+     ===============      *                   *        ===============
+                  *        *                 *          *   
+                *           O***************O            *  
+               *          *   *           *               * 
+              *              *  *       *                  *
+             *         *         *NSSU*                      *   
+     ========                 *       *                       ========
+            *       *                  *                O*****   
+            ******O            *        *            *  *   
+                                         *         *    *   
+           *         *          *         *      *      *      * 
+           *                               *   *        *      * 
+     =======            *        *          O****O      *      =======
+           *                               *    *       O      * 
+           *               *      *       *    *      *    *   * 
+                                         *    *     *        *   
+            *                 *    *    *    *    *           *  
+                                       *    *   * 
+     ========                    *  * *    *  *               ========
+             *                     * *    * *               *    
+              *                     O****O                 *
+               *                  *       *               * 
+                *               *          *             *  
+                 *            *             *           *   
+     ===============        *                *         ===============
+                     *    *                   *     *  
+                       *                       *  *    
+                             *                *   
+                                   -****-    
+     
+     
+  TTTTTTTTTT  YY        YY  MM         MM  NN        NN  EEEEEEEE  TTTTTTTTTT   
+  TTTTTTTTTT   YY      YY   MMM       MMM  NNN       NN  EEEEEEEE  TTTTTTTTTT   
+      TT        YY    YY    MMMM     MMMM  NNNN      NN  EE            TT  
+      TT         YY  YY     MM MM   MM MM  NN NN     NN  EE            TT  
+      TT          YYYY      MM  MM MM  MM  NN  NN    NN  EEEEEE        TT  
+      TT           YY       MM   MMM   MM  NN   NN   NN  EEEEEE        TT  
+      TT           YY       MM    M    MM  NN    NN  NN  EE            TT  
+      TT           YY       MM         MM  NN     NN NN  EE            TT  
+      TT           YY       MM         MM  NN      NNNN  EE            TT  
+      TT           YY       MM         MM  NN       NNN  EEEEEEEE      TT  
+N        NN  EEEEEEEE      TT  
+     
+     
+                                               Y   Y   OO    U   U    
+          H E A D Q U A R T E R S   WANTS       Y Y   O  O   U   U 
+                                                 Y    O  O   U   U 
+                                                 Y     OO     U U  
+     
+     
+     
+        The TYMNET headquarters function of Network Systems Staging
+at Cupertino, California has two excellent career opportunities for   
+individuals ready to take on the challenges of a Senior Network  
+Consultant. These positions offer exposure across many department
+lines for the person proud of their performance track record. If you  
+have a minimum of two years experience with TYMNET's software technology;  
+you may be a candidate. Comparable real-time assembly language or data
+communications network experience will be considered.  
+     
+     
+        POSITION ANNOUNCEMENT   
+                                                                page 2 
+     
+     
+     
+     
+     
+        The Network Systems Staging Unit (NSSU) is being challenged with:    
+increasing numbers of networks, larger custom networks, and networks  
+with more custom development. The growth in NSSU's responsibilities   
+could translate to your professional growth. 
+     
+     
+        The Senior Network Consultant will provide technical leadership,
+and coordination with Field and Headquarters organizations in the
+system integration and performance certification of custom networks. You   
+will be involved with the configuration and generation of new networks.    
+You will be one of the first persons to apply new TYMNET technology   
+to products purchased by our customers. 
+     
+     
+        These are exciting positions which require a solid academic and 
+applied experience in TYMNET operating systems and applications. You  
+need to be a self starter and able to follow through on difficult tasks.   
+Previous management experience will be beneficial.
+     
+     
+        This position announcement is distributed for your information. 
+You are reminded to confer with your immediate supervisor regarding   
+your interest in contacting me for consideration. Your immediate 
+supervisor will assist you in assessing your career path within your  
+current organization.    
+     
+     
+        RFP # TYN 368 
+        RFP # TYN 369 
+     
+     
+     
+        My ONTYME name is (EMSTYM) TYM.D/ZISA. My phone number is  
+(408) 942-5363. I am looking forward to hearing from you.   
+     
+     
+DOUG  ZISA
+MANAGER, NETWORK SYSTEMS STAGING UNIT   
+     
+     
+                                  -****-
+                             *                *   
+                        *                       **
+                      *  *                     *    *  
+     ===============      *                   *        ===============
+                  *        *                 *          *   
+                *           O***************O            *  
+               *          *   *           *               * 
+              *              *  *       *                  *
+             *         *         *NSSU*                      *   
+     ========                 *       *                       ========
+            *       *                  *                O*****   
+            ******O            *        *            *  *   
+                                         *         *    *   
+           *         *          *         *      *      *      * 
+           *                               *   *        *      * 
+     =======            *        *          O****O      *      =======
+           *                               *    *       O      * 
+           *               *      *       *    *      *    *   * 
+                             *    *     *        *   
+            *                 *    *    *    *    *           *  
+                                       *    *   * 
+     ========                    *  * *    *  *               ========
+             *                     * *    * *               *    
+              *                     O****O                 *
+               *                  *       *               * 
+                *               *          *             *  
+                 *            *             *           *   
+     ===============        *                *         ===============
+                     *    *                   *     *  
+                       *                       *  *    
+                             *                *   
+                                   -****-    
+     
+     
+  TTTTTTTTTT  YY        YY  MM         MM  NN        NN  EEEEEEEE  TTTTTTTTTT   
+  TTTTTTTTTT   YY      YY   MMM       MMM  NNN       NN  EEEEEEEE  TTTTTTTTTT   
+      TT        YY    YY    MMMM     MMMM  NNNN      NN  EE            TT  
+      TT         YY  YY     MM MM   MM MM  NN NN     NN  EE            TT  
+      TT          YYYY      MM  MM MM  MM  NN  NN    NN  EEEEEE        TT  
+      TT           YY       MM   MMM   MM  NN   NN   NN  EEEEEE        TT  
+      TT           YY       MM    M    MM  NN    NN  NN  EE            TT  
+      TT           YY       MM         MM  NN     NN NN  EE            TT  
+      TT           YY       MM         MM  NN      NNNN  EE            TT  
+      TT           YY       MM         MM  NN       NNN  EEEEEEEE      TT  
+      TT           YY       MM         MM  NN        NN  EEEEEEEE      TT  
+     
+     
+                                               Y   Y   OO    U   U    
+          H E A D Q U A R T E R S   WANTS       Y Y   O  O   U   U 
+                                                 Y    O  O   U   U 
+                                                 Y     OO     U U  
+     
+     
+     
+        The TYMNET headquarters function of Network Systems Staging
+at Cupertino, California has two excellent career opportunities for   
+individuals ready to take on the challenges of a Senior Network  
+Consultant. These positions offer exposure across many department
+lines for the person proud of their performance track record. If you  
+have a minimum of two years experience with TYMNET's software technology;  
+you may be a candidate. Comparable real-time assembly language or data
+communications network experience will be considered.  
+     
+     
+        POSITION ANNOUNCEMENT   
+                                                                page 2 
+     
+     
+     
+     
+     
+        The Network Systems Staging Unit (NSSU) is being challenged with:    
+increasing numbers of networks, larger custom networks, and networks  
+with more custom development. The growth in NSSU's responsibilities   
+could translate to your professional growth. 
+     
+     
+        The Senior Network Consultant will provide technical leadership,
+and coordination with Field and Headquarters organizations in the
+system integration and performance certification of custom networks. You   
+will be involved with the configuration and generation of new networks.    
+You will be one of the first persons to apply new TYMNET technology   
+to products purchased by our customers. 
+     
+     
+        These are exciting positions which require a solid academic and 
+applied experience in TYMNET operating systems and applications. You  
+need to be a self starter and able to follow through on difficult tasks.   
+Previous management experience will be beneficial.
+     
+     
+        This position announcement is distributed for your information. 
+You are reminded to confer with your immediate supervisor regarding   
+your interest in contacting me for consider
+ation. Your immediate 
+supervisor will assist you in assessing your career path within your  
+current organization.    
+     
+     
+        RFP # TYN 368 
+        RFP # TYN 369 
+     
+     
+     
+        My ONTYME name is (EMSTYM) TYM.D/ZISA. My phone number is  
+(408) 942-5363. I am looking forward to hearing from you.   
+     
+     
+DOUG  ZISA
+MANAGER, NETWORK SYSTEMS STAGING UNIT   
+VIA IEMS
+NNNN
+:QUIT
+
+
+
+
+
+
+
+
+Received: From EMSEE.Ontyme.Tymnet by 930.Tymnet; Tue, 24 Jul 84 22:03:58 UT
+From: THS.GUVEN@Ontyme.Tymnet
+Date: 24 JUL 84 14:13:17  
+To: THS.GUVEN@Ontyme.Tymnet
+Message-id: E14251@EMSEE.Ontyme.Tymnet
+
+LOIS, STANBY HOURS FOR THE WEEKS BEGINING 7-9 AND 7-16 ARE:
+	CARL BALTRUNAS  9%
+	OSMAN GUVEN     7%
+
+
+
+
+
+
+
+
+
+h k
