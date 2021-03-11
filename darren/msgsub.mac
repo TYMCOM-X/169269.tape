@@ -1,0 +1,139 @@
+	title	msgsub
+
+; register equates
+
+	a=1
+	b=2
+	c=3
+	d=4
+
+	ch=6
+	m=7
+	n=10
+
+	r=16
+	p=17
+
+; routine msgini
+; function: initialize msg buffer & params
+; returns: msgbuf zeroed
+;	msg/ b.p. to start of buffer
+;	msgct/ chars left to end of buffer
+; destroy: all ac's preserved
+
+internal msgini
+msgini:	push p,a
+	move a,[point 7,msgbuf]
+	movem a,msg
+	movei a,msgsiz*5
+	movem a,msgct	;set up msg params for msgapp,msgdec
+	setzm msgbuf
+	move a,[xwd msgbuf,msgbuf+1]
+	blt a,msgbuf+msgsiz-1
+	pop p,a
+	popj p,
+
+; routine msgapp
+; function: append string to msg
+; expects: a/addr of asciz string to append
+;	msg/ b.p. to current spot in msgbuf for idpb
+;	msgct/ chars left to go in msgbuf
+; destroy: a
+
+internal msgapp
+msgapp: hrli a,(point 7,0)
+	push p,a
+app2:	ildb a,(p)
+	jumpe a,appx
+	sosg msgct
+	  jrst appx
+	idpb a,msg
+	jrst app2
+
+appx:	pop p,a
+	popj p,
+
+; routine msginl
+; function: append asciz string which follows the pushj to the msg buffer.
+; all registers preserved.
+
+internal msginl
+msginl:	exch	a,(p)	;a gets addr of asciz string
+	pushj	p,msgapp
+	exch	a,(p)	;(p) gets addr of last byte in string
+	aos	(p)
+	popj	p,	;return is at that addr + 1
+
+; routine msgsix
+; function: append sixbit string in m to message buffer
+; expects: m/sixbit string	msg/byte ptr into msgbuf,etc.
+; destroys: ch
+
+msgsix:	push	p,m
+	move	m,[point 6,(p)]	;m=byte pointer
+msgsi1:	ildb	ch,m
+	jumpe	ch,mpopj	;quit at first null byte
+	addi	ch,40
+	sosle	msgct
+	  idpb	ch,msg
+	tlne	m,770000	;or end of word
+	  jrst	msgsi1
+mpopj:	pop	p,m
+	popj	p,
+
+; routine msgdec
+; function: append decimal number in (a) onto string in msgbuf
+; expects: a/number	msg/ b.p. into msgbuf for idpb
+;	msgct/ space left in msgbuf
+; destroy: n,n+1 (=n1), ch
+
+msgdec:	movei	r,^d10
+	push	p,ch
+	pushj	p,msgrdx
+chpopj:	pop	p,ch
+	popj	p,
+
+msgrdx:	idivi	n,(r)
+	hrlm	n+1,(p)
+	skipe	n
+	pushj	p,msgrdx
+	hlrz	ch,(p)
+	addi	ch,"0"
+	sosle	msgct
+	idpb	ch,msg
+	popj	p,
+
+internal msgoct
+msgoct:	push	p,ch
+	push	p,r
+	movei	r,^d8
+	pushj	p,msgrdx
+	pop	p,r
+	jrst	chpopj
+
+msg2dg:	push	p,ch
+	cail	n,^d10
+	  jrst	msg2d1
+	movei	ch,"0"
+	sosle	msgct
+	  idpb	ch,msg
+msg2d1:	movei	r,^d10
+	pushj	p,msgrdx
+	jrst	chpopj
+
+internal msgeol
+msgeol:	pushj	p,msginl
+	asciz	/
+/
+	popj	p,
+
+internal msgout
+msgout:	outstr	msgbuf
+	pushj	p,msgini
+	popj	p,
+
+integer msg,msgct
+msgsiz==^d40
+array msgbuf[msgsiz]
+
+	end
