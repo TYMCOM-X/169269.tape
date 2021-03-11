@@ -1,0 +1,41 @@
+begin "INIT" require "(wrs)settrm.sai" source!file;
+
+lc;					! lower case input allowed;
+backspace;				! backspace on erase character;
+erase;					! erase with bs-sp-bs;
+form;					! don't simulate form feeds;
+stall;					! respond to ^S/^Q from term;
+width(80);				! length of line=80;
+case out!baud of begin
+    [baud!300] Tym!325;			! assume diablo if at 300 baud;
+    [baud!1200] Tym!444;		! assume HP2621 if at 1200 baud;
+else end;
+addproc("DIRIT","(WRS)EDIRIT");		! alternate DIRIT;
+addproc("SAIL","(SYS)FTSAIL");		! whatever SAIL to use?;
+setdo("MPL","M33","SAILIB");		! do list;
+RPGini;					! set this all up;
+if tic then begin "terminal"
+    list DJL;				! for detached job list;
+    def;				! stay in deffered echo mode;
+    SetAlp("(MPL)ZEN");			! ZEN on logout;
+    if STATES land '700000 then print(7&
+	"~ ", STATE!NAME, " ~"&nl);	! shut, restricted, etc;
+    print(
+	"Load ", LOAD!AVERAGE,"%, "&
+	"response ", RESPONSE!TIME," ms"&
+	nl, SOFTWARE,
+	" [", HARDWARE, "] ",
+	cvos(NODE), "-",
+	cvos(PORT), nl );		! statistics;
+    DJL _ DetachedJobList;		! detached jobs if any;
+    if length(DJL) then begin "detached jobs"
+	string  J;
+	print(7&7, user, " has detached jobs: ", DJL, nl);
+	do begin
+	    print("attach # or <cr>: ");
+	    Attach(cvd(J_inchwl));
+	end until length(J)=0;
+    end "detached jobs";
+end "terminal";
+
+exit; end $
