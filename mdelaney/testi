@@ -1,0 +1,23 @@
+#!  This test data is used login three accounts
+#!  For the purpose of debugging TPSIM
+#!
+#P.
+ru(mpl)icp
+open d
+job stat rep 60
+#5C
+ccont
+#LSEAMAN
+#Z
+#P-
+da
+SYST
+#A60
+#QK
+K
+#LGODFREYP:37
+#P.
+sys
+dir
+#a60
+#8
