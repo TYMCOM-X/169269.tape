@@ -1,0 +1,42 @@
+Here is the proposed specification for the TRU scaling function.
+Questions and comments are cheerfully solicited.
+
+	.XCSCA: scale TRU's (XCHARG fn 7)
+
+	MOVE	ac,[-count,addr]
+	XCHARG	ac,
+	  error return	;ac/ unchanged, addr+2/ unchanged
+	normal return	;ac/ unchanged, old TRU scale word stored
+				in addr+2
+
+addr:	.XCSCA		;function code 7
+addr+1:	new TRU scaling word
+addr+2:	old TRU scaling word
+
+The left half of the TRU scaling word scales non-kilocore charges, the
+right half scales kilocore charges.  The format of the TRU scaling word
+is:
+	bits 00-08	(SC1) numerator (0-511) - non-kilocore
+	bits 09-17	(SC2) denominator (0-511) - non-kilocore
+	bits 18-26	(SC3) numerator (0-511) kilocore
+	bits 27-35	(SC4) denominator (0-511) kilocore
+
+If the process does not have XC license, take the error return (code 0).
+If SC1 is non-zero and SC2 is zero, take the error return (code 3).
+Otherwise set TRU scale to the argument specified in <addr+1>,
+store the previous value of the scale in <addr+2> and take the succes return.
+The value of <count> is presently ignored by the system, but is included for
+consistency with other XCHARG functions.
+
+TRU scaling factors are cleared by a RESET (also, therefore, by a RUN UUO).
+
+Note: If SC4 is zero, the kilocore portion of the argument will not be
+treated as a fraction.  Instead, the value of SC3 will be substituted for
+the current charging size in K-words for accounting purposes.
+
+Example: if a program wanted to scale kilocore charges in order to be
+charged as though the program was 32K in size, and the non-kilocore
+charges at 40% of the normal billing rate, the format of the TRU
+scaling word would be:
+
+	BYTE (9) ^D40,^D100,^D32,0
