@@ -1,0 +1,235 @@
+string	RPstring;
+define	RPmanual=bit(1),
+	RPdefault=bit(2),
+	RPnone=bit(3),
+	RPfast=bit(4),
+	RPslow=bit(5),
+	RPdisk=bit(6),
+	RPnodisk=bit(7),
+	RPhang=bit(8),
+	RPcrash=bit(9),
+	RPerror=bit(10);
+
+simple integer procedure RParse (
+	string ARG );
+begin	"RParse"
+    string T;
+    integer B;
+    B _ 0;
+    RPstring _ null;
+    while length(ARG) do begin
+	simple boolean procedure Match(string S!);
+	    return(equ(S,S![1 to length(S)]));
+	simple procedure Setb(integer A1,A2);
+	begin
+	    if B land A2 then B_B lor RPerror;
+	    B_B lor A1;
+	end;
+	define Grp1 = RPauto+RPmanual+RPnone+RPfast+RPslow+RPdefault;
+	define Grp2 = RPdisk+RPnodisk;
+	define Grp3 = RPhang+RPcrash;
+	S _ scan(ARG,blanks,brk);
+	if length(S)=0 then continue;
+	if match("MANUAL") then Setb(RPmanual,Grp1)
+	else if match("DEFAULT") then Setb(RPdefault,Grp1)
+	else if match("UNDEFINED") then Setb(RPdefault,Grp1)
+	else if match("AUTOMATIC") then Setb(RPauto,Grp1)
+	else if match("FAST") then Setb(RPfast,Grp1)
+	else if match("QUICK") then Setb(RPfast,Grp1)
+	else if match("SLOW") then Setb(RPslow,Grp1)
+	else if match("FULL") then Setb(RPslow,Grp1)
+	else if match("NONE") then Setb(RPnone,Grp1)
+	else if match("DISK") then Setb(RPdisk,Grp2)
+	else if match("NODISK") then Setb(RPnodisk,Grp2)
+	else if match("HANG") then Setb(RPhang,Grp3)
+	else if match("CRASH") then Setb(RPcrash,Grp3)
+	else RPstring _ S;
+    end;
+    return (B);
+end	"RPARSE";
+
+string procedure BootsString (
+	string NewS(esc) );
+! call with ARG = new boots string;
+! returns old string;
+! to only return old string without changing, omit argument;
+begin	"BOOTSSTRING"
+    integer I;			! scratch pad;
+    integer SS;			! string size;
+    SS _ (calli(hl(!BTSTR)+hr(0),SETUUO!uuo) +4) %5;
+    if not !SKIP! then return("???");
+    begin
+	integer CW;		! control word;
+	string OldS;		! old string;
+	safe integer array SA[1:SS];
+	CW _ location(SA[1]);	! get the old value;
+	calli(hl(!BTSTR)+location(CW),SETUUO!uuo);
+	if not !SKIP! then return("???");
+	OldS _ null;
+	for I _ 1 upto SS do begin ! exchange new and old;
+	    OldS _ OldS & cvastr(SA[i]);
+	    SA[i] _ cvasc(NewS[i*5-4 for 5]);
+	end;
+	if NewS=esc then return(OldS);
+	CW _ bit(0) lor location(SA[1]); ! set the new value;
+	calli(hl(!BTSTR)+location(CW),SETUUO!uuo);
+	if not !SKIP! then return("???");
+    end;
+    return(OldS);
+end	"BOOTSSTRING";
+
+string procedure BootsAction (
+	string NewA(null) );
+begin	"BOOTSACTION"
+    simple string procedure cvBAS(integer RB);
+    if RB land bit(0) = 0 
+	then return("default")
+	else if RB land bit(3) = 1 
+	    then return("manual")
+	    else return(BootsString);
+    integer RB,B;		! scratch;
+    string OldA;		! old action storred here as string;
+    integer RestBits;		! restart bits;
+    if NewA="?" then begin print("format is
+  BOOTS [{<string>|MANUAL|DEFAULT} [{HANG|CRASH}] [{DISK|NODISK}] ]
+where
+  <string>	- specify file name to load from
+  MANUAL	- ask for filename at BOOTS time
+  DEFAULT	- do whatever is usual
+  HANG		- do this on a HANG (default)
+  CRASH		- do this on a CRASH
+  DISK		- write action to disk (default)
+  NODISK	- don't write action to disk
+");
+	return(null);
+    end;
+    RestBits _ calli(hl(!REST),SETUUO!uuo);
+    if not !SKIP! then RestBits _ 0;
+    OldA _ cvBAS(RestBits lsh (27-8)) & "[hang], "
+	& cvBAS(RestBits lsh (35-8)) & "[crash]";
+    if length(NewA)=0 then return(OldA);
+    B _ RParse(NewA);
+    RB _ 0; 
+    if RPstring then B_B lor RPauto;
+    if (B land (RPerror+RPfast+RPslow+RPnone))
+      or ((B land RPauto) and (B land (RPmanual+RPdefault)))
+	then return("?illegal combination, type BOOTS ? for help");
+    if RPstring then BootsString(RPstring);
+    if B land RPauto then RB _ bit(0);
+    if B land RPmanual then RB _ bit(0)+bit(3);
+    if B land RPdisk then dpb(0,point(1,RestBits,19));
+    if B land RPnodisk then dpb(1,point(1,RestBits,19));
+    if B land RPhang then RestBits _
+	(RestBits land (lnot ('220*bit(35)))) lor (RB lsh 35-35);
+    if B land RPcrash then RestBits _
+	(RestBits land (lnot ('220*bit(27)))) lor (RB lsh 35-27);
+    NewA _ cvBAS(RestBits lsh (27-8)) & "[hang], "
+	& cvBAS(RestBits lsh (35-8)) & "[crash]";
+    calli(hl(!REST)+hr(RestBits+bit(18)),SETUUO!uuo);
+    if not !SKIP! then return("?cant set "&NewA);
+    Log("BOOTS: "&NewA);
+    return("set to "&NewA&" from "&OldA);
+end	"BOOTSACTION";
+string procedure OnceAction (
+	string NewA(null) );
+begin	"ONCEACTION"
+    simple string procedure cvOAS(integer RB);
+    if RB land bit(1) = 0 
+	then return("default")
+	else if RB land bit(4) = 1 
+	    then return("manual")
+	    else return("auto");
+    integer RB,B;		! scratch;
+    string OldA;		! old action storred here as string;
+    integer RestBits;		! restart bits;
+    if NewA="?" then begin print("format is
+  ONCE [{AUTO|MANUAL|DEFAULT} [{HANG|CRASH}] [{DISK|NODISK}] ]
+where
+  AUTO		- bypass once command level
+  MANUAL	- stop at once command level
+  DEFAULT	- do whatever is usual
+  HANG		- do this on a HANG (default)
+  CRASH		- do this on a CRASH
+  DISK		- write action to disk (default)
+  NODISK	- don't write action to disk
+");
+	return(null);
+    end;
+    RestBits _ calli(hl(!REST),SETUUO!uuo);
+    if not !SKIP! then RestBits _ 0;
+    OldA _ cvOAS(RestBits lsh (27-8)) & "[hang], "
+	& cvOAS(RestBits lsh (35-8)) & "[crash]";
+    if length(NewA)=0 then return(OldA);
+    B _ RParse(NewA);
+    RB _ 0; 
+    if (B land (RPerror+RPfast+RPslow+RPnone)) or length(RPstring)
+	then return("?illegal combination, type ONCE ? for help");
+    if B land RPauto then RB _ bit(1);
+    if B land RPmanual then RB _ bit(1)+bit(4);
+    if B land RPdisk then dpb(0,point(1,RestBits,19));
+    if B land RPnodisk then dpb(1,point(1,RestBits,19));
+    if B land RPhang then RestBits _
+	(RestBits land (lnot ('110*bit(35)))) lor (RB lsh 8-35);
+    if B land RPcrash then RestBits _
+	(RestBits land (lnot ('110*bit(27)))) lor (RB lsh 35-27);
+    NewA _ cvOAS(RestBits lsh (27-8)) & "[hang], "
+	& cvOAS(RestBits lsh (35-8)) & "[crash]";
+    calli(hl(!REST)+hr(RestBits),SETUUO!uuo);
+    if not !SKIP! then return("?cant set "&NewA);
+    Log("ONCE: "&NewA);
+    return("set to "&NewA&" from "&OldA);
+end	"ONCEACTION";
+string procedure DskClnAction (
+	string NewA(null) );
+begin	"DskClnACTION"
+    simple string procedure cvDAS(integer RB);
+    if RB land bit(2) = 0 
+	then return("default")
+	else case RB land 7 of begin
+	    [0] return ("none");
+	    [1] return ("fast");
+	    [7] return ("slow");
+	    else return("<"&cvos(RB land 7)&">") end;
+    integer RB,B;		! scratch;
+    string OldA;		! old action storred here as string;
+    integer RestBits;		! restart bits;
+    if NewA="?" then begin print("format is
+  DSKCLN [{NONE|FAST|SLOW|DEFAULT} [{HANG|CRASH}] [{DISK|NODISK}] ]
+where
+  NONE		- do not run DSKCLN
+  FAST		- run DSKCLN in fast mode
+  SLOW		- run DSKCLN in full mode
+  DEFAULT	- do whatever is usual
+  HANG		- do this on a HANG (default)
+  CRASH		- do this on a CRASH
+  DISK		- write action to disk (default)
+  NODISK	- don't write action to disk
+");
+	return(null);
+    end;
+    RestBits _ calli(hl(!REST),SETUUO!uuo);
+    if not !SKIP! then RestBits _ 0;
+    OldA _ cvDAS(RestBits lsh (27-8)) & "[hang], "
+	& cvDAS(RestBits lsh (35-8)) & "[crash]";
+    if length(NewA)=0 then return(OldA);
+    B _ RParse(NewA);
+    RB _ 0; 
+    if (B land (RPerror+RPmanual+RPauto)) or length(RPstring)
+	then return("?illegal combination, type DSKCLN ? for help");
+    if B land RPnone then RB _ bit(2)+0*bit(7);
+    if B land RPfast then RB _ bit(2)+1*bit(7);
+    if B land RPslow then RB _ bit(2)+7*bit(7);
+    if B land RPdisk then dpb(0,point(1,RestBits,19));
+    if B land RPnodisk then dpb(1,point(1,RestBits,19));
+    if B land RPhang then RestBits _
+	(RestBits land (lnot ('047*bit(35)))) lor (RB lsh 35-35);
+    if B land RPcrash then RestBits _
+	(RestBits land (lnot ('047*bit(27)))) lor (RB lsh 35-27);
+    NewA _ cvDAS(RestBits lsh (27-8)) & "[hang], "
+	& cvDAS(RestBits lsh (35-8)) & "[crash]";
+    calli(hl(!REST)+hr(RestBits+bit(18)),SETUUO!uuo);
+    if not !SKIP! then return("?cant set "&NewA);
+    Log("DSKCLN: "&NewA);
+    return("set to "&NewA&" from "&OldA);
+end	"DskClnACTION";
+  
