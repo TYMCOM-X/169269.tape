@@ -1,0 +1,13 @@
+TST will fail when the following input sequence is given to it:
+
+.exe tst
+4,
+[4,]
+[3.]
+[3,]
+[7,]
+[7]
+[,7
+[,7]
+
+BLAM!
