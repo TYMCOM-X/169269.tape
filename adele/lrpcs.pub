@@ -1,0 +1,58 @@
+.Page frame 60 high 77 wide;
+.Area text lines 6 to 57 chars 6 to 77;
+.Title area heading lines 1 to 5;
+.Title area footing line 60;
+.Place text;
+.StandardSpacing_ 1;
+.MarginHeadings_ true;
+.Device TTY;
+.Preface 1;
+.Memo;
+.UnderlineBetween (~~,~);
+.every heading(,|MEMBERS OF THE LONG RANGE PLANNING COMMITTEE|,);
+.every footing({date},,|Page {page}|);
+.ByHand;
+.group;
+Brand, Fred N.
+1246 Ridgeline Ct.			(408)743-0846 (work)
+San Jose, CA 95127			(408)923-3614 (home)
+.apart;
+.skip 2;
+.group;
+Delvey, Fred
+2569 Lancaster Ct.			(408)727-6444 (work)
+Santa Clara, CA 95051			(408)248-5663 (home)
+.apart;
+.skip 2;
+.group;
+Fowler, Mary
+NASA Ames
+Mail Stop 233-3				(415)965-6515 (work)
+Moffett Field, CA 94035			(415)532-6268 (home)
+.apart;
+.skip 2;
+.group;
+Newman, Adele
+258 Pamela Dr. #55			 (408)446-6232 (work)
+Mountain View, CA 94040			(415)969-4438 (home)
+.apart;
+.skip 2;
+.group;
+Matser, Jan
+359 Tyrella Ave.			(408)988-3472 X6145 (work)
+Mountain View, CA 94043			
+.apart;
+.skip 2;
+.group;
+Miller, Dorris
+3736 Cass Way				(415)859-3660 (work)
+Palo Alto, CA 94306			(415)493-0388 (home)
+.apart;
+.skip 2;
+.group;
+Van Tuyl, Bob
+2572 Ohlone Dr.	  			(415)966-4024 (work)
+San Jose, CA 95129			
+.apart;
+.EndHand;
+
