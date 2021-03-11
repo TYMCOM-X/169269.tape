@@ -1,0 +1,520 @@
+!! title Rtn GetParseRecord
+        CSEG
+        PUBLIC  GetParseRecord_
+        PUBLIC  calloc_
+
+GetParseRecord_:
+        PUSH    BP
+        MOV     BP, SP
+        MOV     AX, 30
+        PUSH    AX
+        MOV     AX, 1
+        PUSH    AX
+        CALL    calloc_
+        MOV     SP, BP
+        POP     BP
+        RET
+        POP     BP
+        RET
+!! title Rtn FreeParseRecord
+        PUBLIC  FreeParseRecord_
+        PUBLIC  free_
+
+FreeParseRecord_:
+        PUSH    BP
+        MOV     BP, SP
+        PUSH    WORD [BP+4]
+        CALL    free_
+        MOV     SP, BP
+        POP     BP
+        RET
+        POP     BP
+        RET
+!! title Rtn SpanCopy
+        PUBLIC  SpanCopy_
+        PUBLIC  error_
+        DSEG
+__7     DB      'Null P pointer to SpanCopy', 0
+__8     DB      'Null Src pointer to SpanCopy', 0
+__9     DB      'Null Dst pointer to SpanCopy', 0
+__10    DB      'Zero DstLen to SpanCopy', 0
+__11    DB      'Null Brk pointer to SpanCopy', 0
+        CSEG
+        PUBLIC  _setmem_
+        PUBLIC  strlen_
+        PUBLIC  _move_
+
+SpanCopy_:
+        PUSH    BP
+        MOV     BP, SP
+        SUB     SP, 6
+        CMP     WORD [BP+4], 0
+        JNZ     _L1
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __7
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L1:
+        CMP     WORD [BP+6], 0
+        JNZ     _L2
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+10], 0
+        JNZ     _L3
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __8
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L3:
+        JMP     _L4
+_L2:
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP+6]
+        MOV     WORD [SI+10], AX
+        MOV     SI, WORD [BP+4]
+        MOV     WORD [SI+8], AX
+_L4:
+        CMP     WORD [BP+8], 0
+        JNZ     _L5
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+12], 0
+        JNZ     _L6
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __9
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L6:
+        JMP     _L7
+_L5:
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP+8]
+        MOV     WORD [SI+12], AX
+_L7:
+        CMP     WORD [BP+12], 0
+        JNZ     _L8
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+2], 0
+        JNZ     _L9
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __10
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L9:
+        JMP     _L10
+_L8:
+        CMP     WORD [BP+12], -1
+        JNZ     _L11
+        MOV     AX, 32767
+        JMP     _L12
+_L11:
+        MOV     AX, WORD [BP+12]
+_L12:
+        MOV     SI, WORD [BP+4]
+        MOV     WORD [SI+2], AX
+_L10:
+        CMP     WORD [BP+10], 0
+        JNZ     _L13
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+5], 0
+        JNZ     _L14
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __11
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L14:
+        JMP     _L15
+_L13:
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP+10]
+        MOV     WORD [SI+5], AX
+        MOV     AX, 0
+        PUSH    AX
+        MOV     AX, 16
+        PUSH    AX
+        MOV     AX, WORD [BP+4]
+        ADD     AX, 14
+        PUSH    AX
+        CALL    _setmem_
+        ADD     SP, 6
+        MOV     SI, WORD [BP+4]
+        MOV     SI, WORD [SI+5]
+        MOV     WORD [BP-5], SI
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+7], 0
+_L16:
+        MOV     SI, WORD [BP-5]
+        MOV     AL, BYTE [SI]
+        MOV     BYTE [BP-3], AL
+        CMP     AL, 0
+        JZ      _L17
+        CMP     BYTE [BP-3], 126
+        JNZ     _L19
+        MOV     SI, WORD [BP-5]
+        CMP     BYTE [SI+1], 126
+        JNZ     _L20
+        INC     WORD [BP-5]
+        JMP     _L21
+_L20:
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+7], 1
+        JMP     _L18
+_L21:
+_L19:
+        MOV     AL, BYTE [BP-3]
+        MOV     AH, 0
+        MOV     CL, 16
+        DIV     CL
+        MOV     AL, AH
+        MOV     CL, AL
+        MOV     AX, 1
+        SHL     AX, CL
+        MOV     CX, WORD [BP+4]
+        ADD     CX, 14
+        MOV     DI, AX
+        MOV     AL, BYTE [BP-3]
+        MOV     AH, 0
+        MOV     DL, 16
+        DIV     DL
+        SHL     AL, 1
+        MOV     SI, AX
+        AND     SI, 255
+        ADD     SI, CX
+        OR      WORD [SI], DI
+_L18:
+        INC     WORD [BP-5]
+        JMP     _L16
+_L17:
+_L15:
+        MOV     SI, WORD [BP+4]
+        MOV     WORD [SI], 0
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 0
+        MOV     SI, WORD [BP+4]
+        MOV     SI, WORD [SI+10]
+        MOV     WORD [BP-5], SI
+        MOV     WORD [BP-2], 0
+_L22:
+        MOV     SI, WORD [BP-5]
+        MOV     AL, BYTE [SI]
+        MOV     BYTE [BP-3], AL
+        CMP     AL, 0
+        JZ      _L23
+        MOV     SI, WORD [BP+4]
+        MOV     SI, WORD [SI+2]
+        CMP     SI, WORD [BP-2]
+        JLE     _L23
+        MOV     AL, BYTE [BP-3]
+        MOV     AH, 0
+        MOV     CL, 16
+        DIV     CL
+        MOV     AL, AH
+        MOV     CL, AL
+        MOV     AX, 1
+        SHL     AX, CL
+        MOV     CX, WORD [BP+4]
+        ADD     CX, 14
+        MOV     DI, AX
+        MOV     AL, BYTE [BP-3]
+        MOV     AH, 0
+        MOV     DL, 16
+        DIV     DL
+        SHL     AL, 1
+        MOV     SI, AX
+        AND     SI, 255
+        ADD     SI, CX
+        AND     DI, WORD [SI]
+        CMP     DI, 0
+        JZ      _L25
+        CMP     BYTE [BP+14], 0
+        JZ      _L26
+        MOV     SI, WORD [BP+4]
+        MOV     AL, BYTE [BP-3]
+        MOV     BYTE [SI+4], AL
+        JMP     _L23
+_L26:
+        JMP     _L27
+_L25:
+        CMP     BYTE [BP+14], 0
+        JNZ     _L28
+        MOV     SI, WORD [BP+4]
+        MOV     AL, BYTE [BP-3]
+        MOV     BYTE [SI+4], AL
+        JMP     _L23
+_L28:
+_L27:
+_L24:
+        INC     WORD [BP-5]
+        MOV     AX, WORD [BP-2]
+        INC     WORD [BP-2]
+        JMP     _L22
+_L23:
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+4], 0
+        JNZ     _L29
+        MOV     SI, WORD [BP+4]
+        PUSH    WORD [SI+10]
+        CALL    strlen_
+        ADD     SP, 2
+        CMP     AX, WORD [BP-2]
+        JNZ     _L29
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+7], 0
+        JZ      _L29
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 126
+_L29:
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+4], 0
+        JZ      _L30
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP-2]
+        MOV     WORD [SI], AX
+        MOV     SI, WORD [BP+4]
+        PUSH    WORD [SI+12]
+        MOV     SI, WORD [BP+4]
+        PUSH    WORD [SI+10]
+        PUSH    WORD [BP-2]
+        CALL    _move_
+        ADD     SP, 6
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+4], 126
+        JNZ     _L31
+        MOV     AX, WORD [BP-2]
+        JMP     _L32
+_L31:
+        MOV     AX, WORD [BP-2]
+        ADD     AX, 1
+_L32:
+        MOV     SI, WORD [BP+4]
+        ADD     WORD [SI+10], AX
+        JMP     _L33
+_L30:
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 255
+_L33:
+        MOV     SI, 4
+        AND     SI, 255
+        ADD     SI, WORD [BP+4]
+        MOV     AL, BYTE [SI]
+        MOV     AH, 0
+        MOV     SP, BP
+        POP     BP
+        RET
+        MOV     SP, BP
+        POP     BP
+        RET
+!! title Rtn Span
+        PUBLIC  Span_
+        DSEG
+__16    DB      'Null P pointer to Span', 0
+__17    DB      'Null Src pointer to Span', 0
+__18    DB      'Null Brk pointer to Span', 0
+        CSEG
+
+Span_:
+        PUSH    BP
+        MOV     BP, SP
+        SUB     SP, 4
+        CMP     WORD [BP+4], 0
+        JNZ     _L34
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __16
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L34:
+        CMP     WORD [BP+6], 0
+        JNZ     _L35
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+10], 0
+        JNZ     _L36
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __17
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L36:
+        JMP     _L37
+_L35:
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP+6]
+        MOV     WORD [SI+10], AX
+        MOV     SI, WORD [BP+4]
+        MOV     WORD [SI+8], AX
+_L37:
+        CMP     WORD [BP+8], 0
+        JNZ     _L38
+        MOV     SI, WORD [BP+4]
+        CMP     WORD [SI+5], 0
+        JNZ     _L39
+        MOV     AX, 1
+        PUSH    AX
+        MOV     AX, OFFSET __18
+        PUSH    AX
+        CALL    error_
+        ADD     SP, 4
+_L39:
+        JMP     _L40
+_L38:
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP+8]
+        MOV     WORD [SI+5], AX
+        MOV     AX, 0
+        PUSH    AX
+        MOV     AX, 16
+        PUSH    AX
+        MOV     AX, WORD [BP+4]
+        ADD     AX, 14
+        PUSH           CALL    _setmem_
+        ADD     SP, 6
+        MOV     SI, WORD [BP+4]
+        MOV     SI, WORD [SI+5]
+        MOV     WORD [BP-3], SI
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+7], 0
+_L41:
+        MOV     SI, WORD [BP-3]
+        MOV     AL, BYTE [SI]
+        MOV     BYTE [BP-1], AL
+        CMP     AL, 0
+        JZ      _L42
+        CMP     BYTE [BP-1], 126
+        JNZ     _L44
+        MOV     SI, WORD [BP-3]
+        CMP     BYTE [SI+1], 126
+        JNZ     _L45
+        INC     WORD [BP-3]
+        JMP     _L46
+_L45:
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+7], 1
+        JMP     _L43
+_L46:
+_L44:
+        MOV     AL, BYTE [BP-1]
+        MOV     AH, 0
+        MOV     CL, 16
+        DIV     CL
+        MOV     AL, AH
+        MOV     CL, AL
+        MOV     AX, 1
+        SHL     AX, CL
+        MOV     CX, WORD [BP+4]
+        ADD     CX, 14
+        MOV     DI, AX
+        MOV     AL, BYTE [BP-1]
+        MOV     AH, 0
+        MOV     DL, 16
+        DIV     DL
+        SHL     AL, 1
+        MOV     SI, AX
+        AND     SI, 255
+        ADD     SI, CX
+        OR      WORD [SI], DI
+_L43:
+        INC     WORD [BP-3]
+        JMP     _L41
+_L42:
+_L40:
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 0
+        MOV     SI, WORD [BP+4]
+        MOV     SI, WORD [SI+10]
+        MOV     WORD [BP-3], SI
+_L47:
+        MOV     SI, WORD [BP-3]
+        MOV     AL, BYTE [SI]
+        MOV     BYTE [BP-1], AL
+        CMP     AL, 0
+        JZ      _L48
+        MOV     AL, BYTE [BP-1]
+        MOV     AH, 0
+        MOV     CL, 16
+        DIV     CL
+        MOV     AL, AH
+        MOV     CL, AL
+        MOV     AX, 1
+        SHL     AX, CL
+        MOV     CX, WORD [BP+4]
+        ADD     CX, 14
+        MOV     DI, AX
+        MOV     AL, BYTE [BP-1]
+        MOV     AH, 0
+        MOV     DL, 16
+        DIV     DL
+        SHL     AL, 1
+        MOV     SI, AX
+        AND     SI, 255
+        ADD     SI, CX
+        AND     DI, WORD [SI]
+        CMP     DI, 0
+        JZ      _L50
+        CMP     BYTE [BP+10], 0
+        JZ      _L51
+        MOV     SI, WORD [BP+4]
+        MOV     AL, BYTE [BP-1]
+        MOV     BYTE [SI+4], AL
+        JMP     _L48
+_L51:
+        JMP     _L52
+_L50:
+        CMP     BYTE [BP+10], 0
+        JNZ     _L53
+        MOV     SI, WORD [BP+4]
+        MOV     AL, BYTE [BP-1]
+        MOV     BYTE [SI+4], AL
+        JMP     _L48
+_L53:
+_L52:
+_L49:
+        INC     WORD [BP-3]
+        JMP     _L47
+_L48:
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+4], 0
+        JNZ     _L54
+        MOV     SI, WORD [BP+4]
+        CMP     BYTE [SI+7], 0
+        JZ      _L55
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 126
+        MOV     SI, WORD [BP+4]
+        MOV     AX, WORD [BP-3]
+        MOV     WORD [SI+10], AX
+        JMP     _L56
+_L55:
+        MOV     SI, WORD [BP+4]
+        MOV     BYTE [SI+4], 255
+_L56:
+        JMP     _L57
+_L54:
+        MOV     AX, WORD [BP-3]
+        ADD     AX, 1
+        MOV     SI, WORD [BP+4]
+        MOV     WORD [SI+10], AX
+_L57:
+        MOV     SI, 4
+        AND     SI, 255
+        ADD     SI, WORD [BP+4]
+        MOV     AL, BYTE [SI]
+        MOV     AH, 0
+        MOV     SP, BP
+        POP     BP
+        RET
+        MOV     SP, BP
+        POP     BP
+        RET
+        END
+ 
+
