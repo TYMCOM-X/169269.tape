@@ -1,0 +1,259 @@
+
+ID,	TYMXTS81ADM2
+TITL,	2q81 Administrative
+ID,	TYMXTS81CON2
+TITL,	2q81 Consulting
+ID,	TYMXTS81DEV2
+TITL,	2q81 Approved Development
+ID,	TYMXTS81LIB2
+TITL,	2q81 Section Libraries
+ID,	TYMXTS81SER2
+TITL,	2q81 Non-Dev. Services
+
+ID,	TYMXTS81ADM2MANAGE__
+TITL,	TS Unit Management/Plan
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	All of the Planning and Management tasks that PC/70 already has
+	task numbers for.
+REM,	What fun!
+TASK,	8000,GREL,60,04/04/81,07/03/81,Misc. Management
+TASK,	8010,GREL,60,04/04/81,07/03/81,Planning: 1 Hour per Day
+TASK,	8030,GREL,39,04/04/81,07/03/81,PC/70 Administration
+TASK,	8030,CARB,13,04/04/81,07/03/81,PC/70 Reporting
+TASK,	8030,LOIL,13,04/04/81,07/03/81,PC/70 Reporting
+TASK,	8040,GREL,26,04/04/81,07/03/81,~13 Mgr's meetings in Q2
+TASK,	9030,GREL,40,05/18/81,05/22/81,IBM Proj. Manag. Class
+COMP,	If we all make it to 05/03/81 without Nervous Breakdown, or
+	Mutiny, and I learn something about how things SHOULD be done
+	this Project will have been succesfully completed.
+--------
+ID,	TYMXTS81ADM2ADMIN___
+TITL,	Admin/Misc. Overhead____
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	All of the Administrative tasks that PC/70 already has
+	task numbers for.
+REM,	Misc. Overhead includes: Reading Memos, getting supplies,
+	Filling out personnel forms, Etc. 1 Hour/Day Max.
+TASK,	9020,GREL,16,04/04/81,07/03/81,Sick leave
+TASK,	9020,CARB,16,04/04/81,07/03/81,Sick leave
+TASK,	9020,LOIL,16,04/04/81,07/03/81,Sick leave
+TASK,	9050,GREL,65,04/04/81,07/03/81,Misc. Overhead.
+TASK,	9050,CARB,65,04/04/81,07/03/81,Misc. Overhead.
+TASK,	9050,LOIL,65,04/04/81,07/03/81,Misc. Overhead.
+TASK,	9060,LOIL,02,04/14/81,04/14/81,Tymshare Orientation____
+COMP,	None.
+ID,	TYMXTS81ADM2MEETINGS
+TITL,	Unit & Proj. meetings___
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	Regular	Meetings.
+REM,	None.
+TASK,	1010,LOIL,60,04/04/81,07/03/81,OS/LA/UT/TS meetings____
+TASK,	1010,CARB,60,04/04/81,07/03/81,OS/LA/UT/TS meetings____
+TASK,	1010,GREL,60,04/04/81,07/03/81,OS/LA/UT/TS meetings____
+TASK,	1010,GREL,02,05/09/81,05/09/81,DSTTF Meeting___________
+TASK,	1010,GREL,04,05/12/81,05/12/81,Tymcare Meeting_________
+TASK,	1010,GREL,04,06/09/81,06/09/81,Tymcare Meeting_________
+COMP,	None.
+--------
+ID,	TYMXTS81ADM2RECRUIT_
+TITL,	Recrutiting_____________
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	Review Resumes, Set up and conduct interviews, etc. etc.
+REM,	Fill that RFP!
+TASK,	8000,GREL,65,04/04/81,07/03/81,Recuiting activities
+COMP,	Filled RFP, New person aboard.
+--------
+ID,	TYMXTS81ADM2HOTLINE_
+TITL,	Announce Hotline/Mail___
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	Get Phone Hwd straight, Setup "HOTMAIL" system, Find solution
+	to 24 hour problem (Answering service/Operations/beepers?),
+	Hold Design Review, Write Announcement, Send it, Review after
+	First month of operation.
+REM,	This is draging out too long.  We've got to settle on an
+	initial Spec. and see how it works.
+TASK,	8000,GREL,65,04/04/81,06/01/81,Misc. Overhead.
+COMP,	One month of HOTLINE/MAIL Operation Reviewed.
+HIST,	Found need for more data on answering services, centrex, etc.
+	/GL 4-13-81
+ID,	TYMXTS81ADM2EOQRPT__
+TITL,	End of Quarter Reports__
+MGR,	GREL
+LDR,	GREL
+DATE,	04/04/81
+DESC,	Write and submit end of quarter report to your manager.
+REM,	Lucky Me, Lucky Mike.
+TASK,	9000,CARB,3,04/04/81,07/13/81,EOQ report to Greg
+TASK,	9000,LOIL,0,04/04/81,07/13/81,EOQ report to Greg
+TASK,	9000,GREL,3,04/14/81,07/20/81,EOQ report to Mike
+COMP,	Mike has acceptable End of Quarter Reports From Tech. Support
+	Unit.
+--------
+ID,	TYMXTS81ADM2INITPC70
+TITL,	Get TS Unit on PC/70____
+MGR,	GREL
+LDR,	GREL
+DATE,	03/16/81
+DESC,	Learn PC/70 and Plan TS Unit's 2q81 project catagories, and get
+	the at least some of the projects entered into Bill's Milestone
+	Data base to generate PC70 input.
+REM,	Big New Job!
+TASK,	8010,GREL,40,04/04/81,04/09/81,intense Planning
+TASK,	8030,GREL,40,04/04/81,04/09/81,Entry / Planning
+COMP,	We get initial PC/70 project data to Janis. (And get PC/70
+	Reports (i.e. time sheets) for TS Unit back the next week).
+HIST,	Didn't make the deadline last thursday.  /Greg 4-13-81
+--------
+ID,	TYMXTS81ADM2REVIEWS_
+TITL,	Unit Reviews/Minireviews
+MGR,	GREL
+LDR,	GREL
+DATE,	03/16/81
+DESC,	Mini review for Carl.  Micro review (1st Month) for Lois.
+	Almost forgot that I get one too (a real one!).
+REM,	None of the reviews count this quarter except mine.
+TASK,	8010,GREL,04,04/04/81,05/04/81,Planning
+TASK,	8040,GREL,08,04/04/81,05/04/81,Review meetings
+TASK,	8040,CARB,02,04/04/81,05/04/81,Review meeting
+TASK,	8040,LOIL,02,04/04/81,05/04/81,Review meeting
+COMP,	Mini reviews on file.  My review in the mill.
+--------
+ID,	TYMXTS81ADM2FOOHDW__
+TITL,	Get hdw straight________
+MGR,	GREL
+LDR,	GREL
+DATE,	03/16/81
+DESC,	Just try to stay on top of the F3 hardware situation.
+	May involve going to Palo Alto to help with acceptance
+	by bringing up our best Diagnostic program (i.e. TYMCOM-X)
+REM,	Involves lots of coordinating with other depts.
+TASK,	8000,GREL,40,04/04/81,07/03/81,Misc.
+COMP,	:934 Up and running in VG-2B lab.
+--------
+ID,	TYMXTS81ADM2CHARTER_
+TITL,	Write TS Unit Charter___
+MGR,	GREL
+LDR,	GREL
+DATE,	03/16/81
+DESC,	Write a charter for this new unit.
+REM,	none.
+TASK,	8000,GREL,04,04/04/81,07/03/81,Misc.
+COMP,	:934 Up and running in VG-2B lab.
+--------
+ID,	TYMXTS81ADM2TRAINING
+TITL,	TS Unit Training________
+MGR,	GREL
+LDR,	GREL
+DATE,	03/16/81
+DESC,	Set up and carry out at least an informal training program.
+REM,	Training may be the most important function in the TS Unit
+	even in terms of free others to do development.  Training
+	should include: ONCE, OPER procedures, SAIL, MAGNUM, Some
+	Discretionary Reading & Hacking time, MDDT, Use of all products
+	that we support, ICP, 36bit Hdw, etc..
+TASK,	9040,GREL,80,04/04/81,07/03/81,Teaching
+TASK,	9030,GREL,80,04/04/81,07/03/81,Learning
+TASK,	9030,CARB,80,04/04/81,07/03/81,Learning
+TASK,	9030,LOIL,80,04/04/81,07/03/81,Learning
+COMP,	none.
+--------
+
+ID,	TYMXTS81CON2INTERNAL
+TITL,	Intra-Dept Consulting
+DESC,	Consulting to Ron Saltgaver's Section.
+TASK,	7030,GREL,00,04/04/81,07/03/81,Office Visit
+TASK,	7030,CARB,00,04/04/81,07/03/81,Office Visit
+TASK,	7030,LOIL,00,04/04/81,07/03/81,Office Visit
+--------
+ID,	TYMXTS81CON2WALKIN__
+TITL,	Face to face Consulting
+TASK,	7030,GREL,00,04/04/81,07/03/81,Office Visit
+TASK,	7030,CARB,00,04/04/81,07/03/81,Office Visit
+TASK,	7030,LOIL,00,04/04/81,07/03/81,Office Visit
+--------
+ID,	TYMXTS81CON2HOTLINE_
+TITL,	Hotline Consulting
+TASK,	7030,GREL,00,04/04/81,07/03/81,HOTLINE 
+TASK,	7030,CARB,00,04/04/81,07/03/81,HOTLINE 
+TASK,	7030,LOIL,00,04/04/81,07/03/81,HOTLINE 
+--------
+ID,	TYMXTS81CON2HOTMAIL_
+TITL,	XMAIL Consulting
+TASK,	7030,GREL,00,04/04/81,07/03/81,HOTMAIL 
+TASK,	7030,CARB,00,04/04/81,07/03/81,HOTMAIL 
+TASK,	7030,LOIL,00,04/04/81,07/03/81,HOTMAIL 
+--------
+ID,	TYMXTS81CON2TECHNEWS
+TITL,	Consulting Newsletter
+TASK,	7040,GREL,04,04/04/81,07/03/81,HOTMAIL Review
+TASK,	7040,CARB,04,04/04/81,07/03/81,HOTMAIL Review
+TASK,	7040,LOIL,04,04/04/81,07/03/81,HOTMAIL Review
+TASK,	7000,LOIL,20,04/04/81,07/03/81,Write it.
+--------
+ID,	TYMXTS81CON2PROJEVAL
+TITL,	Evaluate Proj. Reqs.
+TASK,	7030,GREL,00,04/04/81,07/03/81,Proj. Eval
+TASK,	7030,CARB,00,04/04/81,07/03/81,Proj. Eval
+TASK,	7030,LOIL,00,04/04/81,07/03/81,Proj. Eval
+--------
+
+ID,	TYMXTS81SER2GENDIST_
+TITL,	Generate/Distribute
+TASK,	7030,GREL,00,04/04/81,07/03/81,Crash Analysis
+DESC,	Special Software Generation/Distribution requests that can't
+	(yet) be handled by Software Distribution.
+TASK,	7000,GREL,00,04/04/81,07/03/81,Gen/Distribute
+TASK,	7000,CARB,00,04/04/81,07/03/81,Gen/Distribute
+TASK,	7000,LOIL,00,04/04/81,07/03/81,Gen/Distribute
+--------
+ID,	TYMXTS81SER2CRANALYS
+TITL,	Crash/SickSys analysis
+TASK,	7000,GREL,00,04/04/81,07/03/81,Crash Analysis
+TASK,	7000,CARB,00,04/04/81,07/03/81,Crash Analysis
+
+ID,	TYMXTS81SER2DIABLO__
+TITL,	Section Diablo service
+ID,	TYMXTS81SER2DATAENTR
+TITL,	Section Data Entry
+ID,	TYMXTS81SER2TRANSMIT
+TITL,	Coordinate Transmittals
+REM,	This includes Document archiving, and General ARCHIVING.
+ID,	TYMXTS81SER2PREMAINT
+TITL,	PM on PERP and SPOOL etc.
+ID,	TYMXTS81SER2FICHEING
+TITL,	fiche generation
+ID,	TYMXTS81SER200INVENT
+TITL,	Inventory Section DOCs
+ID,	TYMXTS81SER2INFO____
+TITL,	Maintain INFO 33/930
+ID,	TYMXTS81SER2SOFTEVAL
+TITL,	Evaluate TOPS-10 SftWar
+ID,	TYMXTS81SER2DOCREVIE
+TITL,	Documentation Review
+
+ID,	TYMXTS81DEV2LPTSPL
+TITL,	
+ID,	TYMXTS81DEV2NODLOD
+TITL,	
+ID,	TYMXTS81DEV2SITECK
+TITL,	
+ID,	TYMXTS81DEV2EXEFILE
+TITL,	
+ID,	TYMXTS81DEV2LIBDAT
+TITL,	Section Lib MAGNUM DB
+ID,	TYMXTS81DEV20000INFO
+TITL,	Improvements to INFO 
+ID,	TYMXTS81DEV2MINLUD
+TITL,	Spec. Minimum LUD/DUL
+
+
