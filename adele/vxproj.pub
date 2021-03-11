@@ -1,0 +1,16 @@
+.Memo;
+.Device TTY;
+.Single Space;
+.indent 0;
+.UnderlineBetween (~~,~);
+.blankline;
+.turn off "%";
+.NoJust;
+.begin center;
+VAX Projects
+.end;
+.skip 3;
+Translate XSEARCH or FIND.  (There is an XSEARCH on TOPS-20.)
+
+Stan will be getting a VAX DECUS tape.  Look at what is on it.
+
