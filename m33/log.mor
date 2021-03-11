@@ -1,0 +1,473 @@
+comment ! routine CHSEMI
+function:  see if previous input terminator was ";",
+	set proper flag if so, and exit. Check for CR LF and
+	suck them in & echo them .
+call:  pushj p,chsemi
+	tlx f,flag	;this gets xct'd if ch/semi
+	always return here
+expects:  ch/ term chr last input
+!
+
+chsemi:	cain ch,";"
+	xct  @(p)
+	outchr ch	;echo it (port is in no-echo mode)
+	cail ch,40	;ctrl char (prob CR) ?
+	jrst cpopj1	;no
+	pushj p,tyi	;get probable LF
+	outchr ch
+	jrst cpopj1
+
+
+
+comment ! routine RDNAM..reads username in login string
+expects:  ch/ 1st char of name
+returns:  ch/ terminating char, name/ username, (skip return)
+	or (error return) if too many characters for field (>12)
+destroys: wd,bp
+!
+;put 12-char string into "name", a pseudonym for
+;the project-code spot in login stream records. ascii
+rdnam:	movei wd,^d12	;read 12 character name
+	setzm name
+	setzm name+1
+	move bp,[point 6,name]
+rdlp:	caie ch,";"
+	 caige ch,40
+	  jrst cpopj1
+rdlpa:	subi ch,40
+	sojl wd,cpopj		;deposit up to ^d12 chars
+	idpb ch,bp
+	pushj p,tyi
+	jrst rdlp
+
+crlf:	outstr [asciz /
+/]
+	popj p,
+
+octprt:	movei	r,^d8
+	jrst	rdxprt
+
+decpr2:	caig	n,11
+	outchr ["0"]
+decprt:	movei	r,12
+rdxprt:	idivi	n,(r)
+	hrlm	n+1,0(p)
+	skipe	n
+	pushj	p,rdxprt
+	hlrz	ch,0(p)
+	addi	ch,"0"
+	outchr ch
+	popj p,
+
+
+rdnam1:	movei wd,^d12
+	setzm name
+	setzm name+1
+	setzm name+2
+	move bp,[point 7,name]
+rdlp1:	pushj p,tyi
+	caie ch,";"
+	cain ch,15
+	popj p,
+	sojl wd,rdlp1
+	idpb ch,bp
+	jrst rdlp1
+
+
+comment ! SETINT;  set up timer,zapper interrupts & set
+	initial timeout for (m) sec by falling into RSTTIM.  Both
+	timer and zapper are armed on channel 1 to cause
+	control to go to COMOUT where LOGINN cleans up
+	and goes away.
+expects: m/ sec
+!
+
+setint:	movei ch,comout
+	movem ch,inttab+1	;set up interupts
+	move ch,[4B17+2B17+inttab]	;IA.REE+IA.CLR+trap vector addr
+	intadr ch,
+	 jsp n,uuoerr
+	movei ch,0
+	settim ch,	;reset timer
+	 jsp n,uuoerr
+	move ch,[timcas,,1]	;timer on chl 1
+	intass ch,
+	 jsp n,uuoerr
+	.IAZAP==7	;zapper-seen cause
+	move ch,[<.IAZAP>B8+1B17+777777] ;assign also to channel 1
+	tinass ch,	;on command port
+	 jsp n,uuoerr
+	movsi ch,(1B0+1B1)
+	intenb ch,	;enable channel
+	 jsp n,uuoerr
+	;pjrst rsttim	;fall thru
+
+comment ! routine RSTTIM
+function: set up timer for new timeout
+expects:  m/ seconds
+!
+rsttim:	hrli m,1	;m/ 1,,seconds
+	settim m,
+	 jsp n,uuoerr
+	popj p,
+
+clrtim:	movei m,0	;routine to turn off timer completely
+	settim m,
+	 jsp n,uuoerr
+	popj p,
+
+
+comment	! Routines to do KS2020 special processing !
+
+	array pwcmd[2]
+	array pwbuf[200]
+	integer savwd
+
+;getpas - routine to get the password
+
+getpas:	tlne f,f.half		;see if half duplex
+	 pushj p,prtmsk	;yes,go print mask
+;fall through from above
+
+getpa2:	pushj p,tyi		;get next char
+	pushj p,get12		;get  12 char in a & b
+	movem a,lftpas
+	movem b,rtpas
+	pushj p,testch		;see if password done
+	 jrst getpa4		;yes, exit
+	pushj p,get12		;get next 12
+	rot a,2			;shift to preserve position
+	rot b,2
+	xorm a,lftpas		;xor to rest
+	xorm b,rtpas
+	pushj p,testch		;see if done
+	 jrst getpa4		;yes, exit
+	pushj p,get12		;get next 12
+	rot a,4
+	rot b,4
+	xorm a,lftpas
+	xorm b,rtpas
+	pushj p,testch		;see if done
+	 jrst getpa4
+getpa3:	pushj p,tyi		;ignore password after 36 char
+	pushj p,testch
+	 jrst getpa4		;exit
+	jrst getpa3		;loop until past password
+
+getpa4: move n,lftpas		;set up for hash routine
+	move n1,rtpas
+	pushj p,hashit		;go hash it
+	movem a,hpw		;save hashed password
+	movem n1,pblknum		;save block number in pass file
+	popj p,		;now exit
+
+;subroutine to see if ch = ";" or less than 40
+;  retrun if it is, skip return if not
+
+testch:	cain ch,";"
+	 popj p,
+	caige ch,40
+	 popj p,
+	jrst cpopj1		;no, skip return
+
+; subroutine to print 15 character mask for password
+
+prtmsk:	outstr [asciz/
+/]
+	outstr [asciz/###############/]
+	outchi 15
+	outstr [asciz/***************/]
+	outchi 15
+	outstr [asciz/OOOOOOOOOOOOOOO/]
+	outchi 15
+	popj p,
+
+; subroutine to check for half duplex line
+
+seehaf:	setz a,
+	getlch a		;get line characteristics
+	tlne a,10000	;see if half duplex
+	 tlo f,f.half	;yes, set half duplex flag
+	popj p,
+
+;subroutine to get up to 12 char and store them in a and b
+
+get12:	movei wd,^d12	;initialize char. count
+	setz a,
+	setz b,
+	move bp,[point 6,a]
+get12a:	caie ch,";"
+	 caige ch,40
+	popj p,		;found not valid letter
+
+	sosge wd		;skip if not done
+	 popj p,	;done 12, exit
+	subi ch,40
+	idpb ch,bp	;store character
+	pushj p,tyi	;get next char
+	jrst get12a	;loop back for next character
+
+;subroutine to find if password is in pas.sys file, and that it
+;  correct for the user name. Skip return if found, non-skip
+;  if not found or not correct for user name.
+;Destroys registers a,b,c, and d 
+
+fndpas:	movei	a,17
+	
+	hrli a,400000	;physical only
+	move b,[iowd 200,pwbuf]
+	movem b,pwcmd	;set up ioword for password file read
+	movsi b,'SYS'
+	movei c,0
+	
+	open pasio,a		;physical only, lodmp = 17 mode no buff ring hdr
+	 jsp n, syserr
+	movsi a,(sixbit/PAS/)
+	movsi b,(sixbit/SYS/)
+	movei c,0
+	move d,sysppn
+	lookup pasio,a		;lookup pas.sys in sysppn directory
+	 jrst nopas		;***** lookupfailed
+	move a,hpw		;hashed password
+	move c,hshnam		;hashed username
+	move b,hshblk		;hashed user name block number
+	addi b,1
+fndp1:	hrrzm b,pasblk#		;save for varifing forward search
+	useti pasio,(b)		;get block
+	input pasio,pwcmd
+fndp2:	movei wd,0
+fndp3:	came c,pwbuf+phun(wd)	;see if match on hashed name
+	 jrst fndp4		;no, go get next entry
+	camn a,pwbuf+ppw(wd)	;check match on hashed user password
+	 jrst skip		;found, skip return
+;on not found fall through
+
+fndp4:	addi wd,pentsz		;position to next entry
+	caige wd,^d128/pentsz*pentsz -pentsz ;are we at end?
+	 jrst fndp3		;no
+	hrrz b,pwbuf+phun(wd)	;get pointer to next block
+	skipg b			;got pointer if non zero
+	 jrst noskp		;exit, not found
+	camg b,usrblk		;must move forward in file
+	 jrst noskp		;exit, not found
+	jrst fndp1		;go read next block
+
+noskp:	releas pasio,		;release channel
+	popj p,			;non skip return, not found
+
+skip:	releas pasio		;release pas file channel
+	jrst cpopj1		;skip return, found mtch
+
+comment ! end of special KS2020 routines !
+;here if ufd already exists
+
+ufdex:	movem	m,srcbuf+exlqtf	;and fcfs
+	movem	ch,srcbuf+exlqto ;and logged out quota
+	tlze f,fl.fuf
+	jrst chktru	;tru need checking
+oktru:	movsi	a,riplog!ripbfa!ripcrh!riphre!riphwe!ripbdr!ripbda	;logged in bit and error bits
+	tdnn	a,srcbuf+exlsts	;skip if bit on in ufd
+	jrst	ufdex2		;no, can proceed
+	move b,[xwd segptr,cnftbl]
+	gettab b,		;get number of jobs
+	 jsp n,uuoerr
+	movni b,-1(b)
+	hrlzs b
+	pjob e,			;e:=this job. aaa
+ufdex1:	move c,ufdfsn
+	movem c,chrbuf+gobnam
+	move c,inppn
+	movem c,chrbuf+gobppn
+	movei c,1(b)	;job
+	camn c,e		;dont look at this job
+	jrst .fdex2		;keep looking at others
+	movem c,chrbuf+gobjob
+	movei c,chrbuf
+	gobstr c,
+	 skipa		;not in this jobs search list or not same ppn
+	jrst ufdex5	;go
+.fdex2:	aobjn b,ufdex1
+	andcam a,srcbuf+exlsts	;reset
+	movsi a,riplog
+	iorm a,srcbuf+exlsts	;and set logged in
+
+;here to lookup all files and recompute ribusd
+
+	setzb	a,c
+	hrli a,400000
+	move	b,ufdfsn
+	open	us1,a		;open file structure
+	  jrst	ufdse2
+	setzm	srcbuf+exlusd	;clear used word
+	move a,[-4*^d102,,ufnbuf]
+	movem a,ufnarg
+	movsi a,(sixbit/*/)
+	movem a,ufnarg+1
+	movem a,ufnarg+2	;file *.*
+	setzm ufnarg+4
+	movsi a,220000
+	movem a,ufnarg+3
+allk0:	move a,[33,,usr]
+	chanio a,ufnarg
+	 jrst ufdrer
+	move c,ufnarg
+allk1:	sosge ufnarg+7
+	jrst allk0
+	move a,(c)
+	movem a,secbuf+exlnam
+	move a,1(c)
+	movem a,secbuf+exlext
+	move	a,inppn	;user's ppn
+	movem	a,secbuf+exlppn
+	movei	a,exlalp
+	movem	a,secbuf	;set number of args to get alp word
+	move a,2(c)
+	jumpl a,allku	;lookup required
+	movei b,ufperr
+	tdne b,3(c)	;check special status flag
+	jrst allku
+	ash a,-2 ;kludge convert blocks->pgs.aaa.dec 76
+	addm a,srcbuf+exlusd
+allk2:	addi c,4
+	jrst allk1
+
+allku:	lookup	us1,secbuf	;lookup file
+	jrst	[hrrz a,secbuf+exlext ;did this fail because
+		caie a,6	;of a rib error?
+		jrst allk2	;no.
+		movsi a,ripbdr ;yes, warn the
+		jrst allk4]	;user.
+	move	a,secbuf+exlalp ;get blocks allocated for this file
+	addm	a,srcbuf+exlusd ;count for all files
+	hrlz a,secbuf+exlsts
+	tlne a,ripcrh
+	pushj p,crhfil
+	tlne a,ripbfa
+	pushj p,bfafil
+	tlne a,ripbda
+	pushj p,bdafil
+allk4:	tlne	a,ripbdr
+	pushj	p,bdrfil
+	tlne a,riphwe
+	pushj p,hwefil
+	tlne a,riphre
+	pushj p,hrefil
+	and a,[xwd ripbfa!ripcrh!riphre!riphwe!ripbdr!ripbda,0]
+	iorm a,srcbuf+exlsts	;put bits back in dir
+	jrst allk2
+
+strfil:	move m,ufdfsn
+	pushj p,sixmsg
+	outchr [":"]
+	move m,secbuf+exlnam
+	pushj p,sixmsg
+	hllz m,secbuf+exlext
+	jumpe m,cpopj
+	outchr ["."]
+	pjrst sixmsg
+
+crhfil:	pushj p,strfil
+	outstr [asciz / partially written file closed after monitor stopped
+/]
+	popj p,
+
+bfafil:	pushj p,strfil
+	outstr [asciz / found bad by restore
+/]
+	popj p,
+
+bdafil:	pushj p,strfil
+	outstr [asciz / found bad by damage assessment program
+/]
+	popj p,
+
+bdrfil:	pushj p,strfil
+	outstr [asciz / rib error
+/]
+	popj p,
+
+hrefushj p,strfil
+	outstr [asciz / hardware data read error detected
+/]
+	popj p,
+
+hwefil:	pushj p,strfil
+	outstr [asciz / hardware data write error detected
+/]
+	popj p,
+
+chktru:	tlne f,fl.rst	;is system restrict bit on
+	skipge a,intru	;and really a limit there?
+	jrst oktru	;no to either, ok
+	caml a,srcbuf+exltru	;is it exceeded
+	jrst oktru
+	tlo f,fl.fuf
+	pushj p,stufcl	;clear interlock
+	 jrst cpopj1
+	jrst cpopj1
+
+;here if read error (may be eof)
+
+ufdrer:	close	us1,
+	getsts	usr,a		;a=error code
+	movei	m,[asciz . ufd read error, status = .]
+	trnn	a,20000		;skip if error, not eof
+	jrst	ufdse4		;tell user about error, no ufd
+	jrst	ufdex3		;all set
+
+
+ufdex2:	movsi a,riplog	;here fr oktru+2 when no err bits on in ufd ribsts
+	iorm	a,srcbuf+exlsts	;make sure logged in bit on
+ufdex5:	setom	srcbuf+exlusd	;use monitor's copy of ufbtal to compute ribusd
+ufdex3:	move a,innam
+	movem a,srcbuf+exlun1
+	move a,innam1
+	movem a,srcbuf+exlun2
+	setom srcbuf+exlmxa
+	pushj	p,setexl	;set up srcbuf for extended rename
+  ife deb,<
+	rename	usr,srcbuf
+	  skipa	a,srcbuf+exlext
+	 >;end ife deb. Leave UFD alone if debugging
+	jrst	ufdok
+
+	movei	m,[asciz . ufd rename failure .]
+	jrst	ufdse4
+
+ufdse3:	movei	m,[asciz . ufd lookup failure .]
+	tlz f,fl.fuf	;reset flag
+ufdse4:	exch	m,ufdfsn
+	pushj	p,sixmsg
+	exch	m,ufdfsn
+	outstr (m)
+	hrrz	n,a		;n=error code
+	pushj	p,octprt
+	pushj	p,crlf
+	jrst	ufdok
+
+ufdse1:	move	m,ufdfsn
+	pushj	p,sixmsg
+	outstr [asciz . ufd enter failure .]
+	hrrz	n,srcbuf+exlext
+	pushj	p,octprt
+	outstr [asciz .
+no ufd created
+.]
+
+ufdok:
+ufdok1:
+
+;here to clear ufd interlock
+
+	pushj	p,stufcl	;clear ufd interlock
+	  jrst	cpopj1		;what?
+	jrst	cpopj1		;all done
+
+ufdsmp:	outchi "?"
+	move m,ufdfsn
+	pushj p,sixmsg
+	outchi " "
+	outstr (n1)
+	pjrst crlf
+
++@%V
