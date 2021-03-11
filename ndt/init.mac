@@ -1,0 +1,63 @@
+START:
+
+	; TTY LC / TTY FORM
+	SETO	1,
+	GETLCH	1
+	TLO	1, (1B13+1B17)
+	SETLCH	1
+
+	; TTY BACKSPACE
+	HRROI	1, 57
+	MOVEI	2, 1
+	AUXCAL	1, 2
+
+	; TTY ERASE
+	HRROI	1, 62
+	MOVEI	2, 1
+	AUXCAL	1, 2
+
+	; REVERSE XON
+	HRROI	1, 55
+	MOVEI	2, 1
+	AUXCAL	1, 2
+
+	; SET LINE WIDTH TO 79 (80 CAUSES AUTO-CRLF TROUBLE)
+	HRROI	1, 27	; CURRENT TERMINAL, SET LINE WIDTH
+	MOVEI	2, ^D79	; (DECIMAL)
+	AUXCAL	1, 2	; DO IT (2 GETS OLD WIDTH)
+
+	; IDENTIFY SYSTEM
+	OUTSTR	[ASCIZ /System /]
+	hrlzi	2,11	;system name in table 11, words 0-4
+	setz	4,	;so that ac3 will be ASCIZ
+namlup:	movs	3,2	;pick up index,,table
+	gettab	3,	;read in table
+	 jrst	gtfal
+	outstr	3
+	addi	2,1
+	camg	2,[xwd 11,4]	;system name in words 0-4
+	 jrst	namlup
+	jrst	.+2
+gtfal:	outstr	[ASCIZ / GETTAB failure?!/]
+
+	seto	1,
+	aobjn	1,[halt .]
+	jumpn	1,[OUTSTR  [ASCIZ " [FOO K"]
+		   setz  1,
+		   jrst  .+2]
+	OUTSTR	[ASCIZ " [DEC K"]
+;now check for KI or KL (1 is already 0)
+	hrlzi	2,440700
+	ibp	1,2	;on a KL/KS this is adjust byte pointer
+	movei	2,"I"
+	skipe	1
+	 movei	2,"L"
+	outchr	2	;and output processor letter
+finit:	outstr	[ASCIZ "-10]"]
+	movei	[sixbit /ZEN/
+		 [sixbit /SAILIB/]]
+	setalp
+	 jfcl
+	EXIT	1,
+	EXIT
+END START
