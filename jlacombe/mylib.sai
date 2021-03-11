@@ -1,0 +1,196 @@
+require "(sailib)sail.def" source!file;
+
+!	Parse ("filespec",@Name,@Ext,@PPN)
+
+	Scans the filespec and breaks it into Name, Ext and PPN.
+	If a username is given, it is converted to a PPN.
+;
+
+procedure Parse (
+	string 	File;
+	reference integer 
+		Name,
+		Ext,
+		PPN );
+begin "Parse"
+    Name _ cvfil (File, Ext, PPN);
+    if PPN = 0 then PPN _ calli(0,'24);	! GETPPN;
+    begin "UserName"
+	integer array LKB[0:3];		! block for extended lookup;
+	integer Chan,Eof;
+	LKB[0] _ arrinfo(LKB,2);	! size of LKB;
+	LKB[1] _ calli('16,'41);	! MFD PPN;
+	LKB[2] _ PPN;			! addr of SIXBIT user name;
+	LKB[3] _ cvsix("UFD");		! extension;
+	open (Chan_getchan, "DSK", '17,0,0, 0,0,Eof);
+	if Eof then return;		! very, very ill;
+	chnior (Chan, LKB[0], 4);	! lookup UFD to get PPN;
+	release (Chan);			! don't need the channel;
+	PPN _ LKB[2];			! save real PPN for user;
+    end "UserName";
+end "Parse";
+
+
+!	ppn _ CVPPN("username")
+
+Convert a directory name to a PPN
+;
+
+integer procedure cvppn (string UNS);
+begin "cvppn"
+	integer array LKB[0:3];		! block for extended lookup;
+	integer array UN[0:3];		! block for user name;
+	integer Chan,Eof;
+	LKB[0] _ arrinfo(LKB,2);	! size of LKB;
+	LKB[1] _ calli('16,'41);	! MFD PPN;
+	LKB[2] _ location(UN[0]);	! addr of SIXBIT user name;
+	LKB[3] _ cvsix("UFD");		! extension;
+	UN[0] _ cvsix(UNS[1 for 6]);	! save user name in sixbit;
+	UN[1] _ cvsix(UNS[7 for 6]);
+	open (Chan_getchan, "DSK", '17,0,0, 0,0,Eof);
+	if Eof then return(0);		! very, very ill;
+	chnior (Chan, LKB[0], 4);	! lookup UFD to get PPN;
+	release (Chan);			! don't need the channel;
+	return (LKB[2]);		! return the PPN;
+end "cvppn";
+
+!	boolean _ EXISTS ("filename")
+
+Indicate that a file exists
+;
+
+boolean procedure EXISTS (string FILE);
+begin "exists"
+	integer C,E;
+	open (C_getchan, "DSK", 0,0,0, 0,0,E);
+	if E then return(false);	! very, very ill;
+	lookup (C,FILE,E);		! lookup file;
+	release (C);
+	return (E=0);
+end "exists";
+
+!	GetTab (Index,Table)
+
+	Does a gettab for index I into table T.
+;
+
+simple integer procedure GetTab (integer Index,Table);
+start!code
+	SETOM !SKIP!;
+	HRL 1,Index;
+	HRR 1,Table;
+	CALLI 1,'41;
+	SETZM !SKIP!;
+end;	
+
+!	"username" _ User
+
+	Returns the username the job is logged in to as a string
+	without the "()"
+;
+
+simple string procedure user;
+return(cv6str(gettab(-1,-'22))&cv6str(gettab(-1,-'21)));
+
+!	StrPPN
+
+	is the string [gan,uun] for the AUN 
+;
+
+string procedure StrPPN;
+begin
+    own integer PPN;
+    PPN _ gettab(-1,-'23);
+    return("["&cvos(PPN lsh (-18))&","&cvos(PPN land '777777)&"]");
+end;
+
+!	miscellaneous
+;
+
+define 	EXIT 		= {call(0,"EXIT")};
+
+procedure time;
+begin "time"
+
+integer array stats[1:3];
+integer hours,minutes,seconds,work;
+
+stats[1] _ calli('1,'22);
+stats[2] _ calli('1,'27);
+stats[3] _ calli('1,'24);
+hours _ stats[1] div (60^3);
+work _ stats[1] mod (60^3);
+minutes _ work div (60^2);
+work _ work mod (60^2);
+seconds _ work div 60;
+
+print("The current time is (in jiffies)  ",stats[1],"
+");
+print(hours,":",minutes,":",seconds," since midnight
+");
+print("Runtime of this program is (in ms) ",stats[2],"
+");
+print("Your PPN is  ",stats[3],"
+");
+end "time";
+
+
+procedure readtable;
+begin "readtable"
+
+integer i,table,temp;
+
+
+print("Enter the table number you wish to read  ");
+table _ cvo(inchwl);
+setformat(-9,3);
+ for i _ '0 step '1 until '36 do	
+ begin "loop";
+	temp _ gettab(i,table);
+	outstr("Table entry "&cvos(i)&" is  "&cvos(temp)&'15&'12);
+	end "loop";
+end;
+
+
+!	Run (program,[start])
+
+	Run another program (overlay).  Program name may contain
+	user name and program name, no device.
+;
+
+procedure Run (
+	string 	File; 
+	integer Start(0) );
+begin "run"
+    integer array RNB[0:5];
+    Parse (File, RNB[1], RNB[2], RNB[4]);
+    RNB[0] _ cvsix("DSK");
+    RNB[3] _ RNB[5] _ 0;
+    calli ((Start lsh 18) + location(RNB[0]), '35);
+end "run";
+! Rescan the command line.  Return the line, or NULL if none is
+! available.
+;
+
+simple string procedure RescanCommandLine;
+begin "rescan"
+  integer Flag;
+
+  start!code
+    setob	1,Flag;
+    ttcall	'6,1;		! getlch 1 ;
+    tlnn	1,'100000;	! lc.ecs - command lines exists ;
+      setzm	Flag;
+  end;
+
+  if (not Flag) then
+    return(NULL);
+
+  start!code
+    ttcall	'10,;		! rescan ;
+  end;
+
+  return(inchwl);
+  return( NULL );
+
+end "rescan";
