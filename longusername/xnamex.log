@@ -1,0 +1,59 @@
+.dir *.ctl
+
+123456  CTL       2   3-MAR-83
+
+.systat . lic
+ 3*  TP AS HF +$
+
+.who
+ 1  CARL (LONGUSERNAME) +
+ 2  OPER
+ 3* CARL (LONGUSERNAME) +
+ 4  OPER
+ 7  CARL (LONGUSERNAME) +
+
+.logout
+4.41 tru
+terminal time: 0:00:31
+.SEND CARL
+TYPE LETTER:
+; PCOM v1.60 command processed: (LONGUSERNAME)XNAMEX.LOG = (LONGUSERNAME)123456.CTL
+; Options: DETACH  LOG NOAPPEND SUPERSEDE LICENSE 
+; Job limits: TIME:60 TRULIMIT:0 
+; Job status: abended - lost circuit to slave at line 4.
+; Output recorded in file (LONGUSERNAME)XNAMEX.LOG.
+
+mail waiting
+.LOGOUT
+2.91 tru
+terminal time: 0:00:04
+!dir *.ctl
+
+123456  CTL       2   3-MAR-83
+
+!systat . lic
+ 5*  TP AS HF (BH) RA WA RC OP SY GD TD ST JL AC XC (JB) WC +
+
+!who
+ 1  KEN +
+ 2  OPER +
+ 3  CARL (LONGUSERNAME) +
+ 4  OPER +
+ 5* CARL (LONGUSERNAME) +
+ 7  CARL (LONGUSERNAME) +
+
+!logout
+4.78 tru
+terminal time: 0:00:34
+!SEND CARL
+TYPE LETTER:
+; PCOM v1.60 - processed: (LONGUSERNAME)XNAMEX.LOG = (LONGUSERNAME)123456.CTL
+; Options: DETACH  LOG APPEND SUPERSEDE LICENSE 
+; Limits: TIME:60 TRULIMIT:0 
+; Status: abended - lost circuit to slave at line 4.
+; Output recorded in file (LONGUSERNAME)XNAMEX.LOG.
+
+mail waiting
+!LOGOUT
+2.50 tru
+terminal time: 0:00:04
