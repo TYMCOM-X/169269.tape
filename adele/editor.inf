@@ -1,0 +1,33 @@
+
+
+From: ADELE
+Date: MAY 7,1982 14:35
+To:  Samuel
+From:  Adele Newman (Gadol)
+	Question about EDITOR . . .  What is the limit on the size of a
+file which can be edited using EDITOR?
+
+--Thanks, Adele
+
+
+
+From: EDITOR
+Date: MAY 7,1982 17:52
+Adele:  The number of lines is fixed for each version of Editor,
+at least as far as I understand the code.  For 36.0, the magic number
+seems to be 128,592 lines.  It shouldn't matter what size each line is,
+except that Editor keeps a temp file containing the text of the workspace,
+and if you don't have enough room for that file in your directory you lose.
+The temp file also grows with each modification to the file, so in extreme
+cases the user might do better to save the file and restart the edit.
+The error messages you get are different depending on whether you have
+too many lines or not enough disk space:  in the former case, Editor will
+print "Out of core" and in the latter case it will print "Not enough room
+on disk", or something like that.
+
+Hope this answers your question.  /Samuel
+
+From: ADELE
+Date: MAY 10,1982 9:43
+To:  Samuel
+	Thanks very much.  --Adele
