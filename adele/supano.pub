@@ -1,0 +1,146 @@
+.Page frame 60 high 77 wide;
+.Area text lines 4 to 57 chars 6 to 77;
+.Title area heading lines 1 to 3;
+.Title area footing line 60;
+.Place text;
+.library |MEMO.LIB|;
+.to |Ken Be Dell           International|;
+.to |John Luongo|;
+.to |Ron Bates		   INSD Product Support|;
+.to |Kathryn Daugherty|;
+.to |Glenn Hammer|;
+.to |Ken Holcomb|;
+.to |Gary Mauldin|;
+.to |Ben Russell|;
+.to |Ron Stevens|;
+.to |Eileen Riordan|;
+.to |Holly Hobart	   MIS|;
+.to |Dick Kovach|;
+.to |Cindy Morel|;
+.to |Leonard Rickan|;
+.to |Homer Jamison	   Network Product Support (DND)|;
+.to |Ken Carta		   Operations - Fremont|;
+.to |Brett Fairchild			Valley Forge|;
+.to |Mike Muratore			Dallas|;
+.to |Gary Perez				Cupertino|;
+.to |Jim Zone				Houston|;
+.to |John Swarbrick	   Computer Maintenance|;
+.to |Margaret Delaney      Lockheed Support|;
+.to |Jerry Messina	   SRA|;
+.to |Dave Coggins|;
+.to |Sal Barbagallo	   TMS|;
+.to |Dennis Allen|;
+.to |Jo Davidson	   Tymcare|;
+.to |Ed Gauci		   Validations|;
+.to |Dru Damico		   COEES support|;
+.to |Bill Mozet|;
+.to |Nathan Gregory	   TRW support (TYMNET)|;
+.to |Natalie Shuttleworth|;
+.cc |Stan Derry		   MAGNUM|;
+.cc |Dick Ouellette|;
+.cc |Bert Novak|;
+.cc |Bob Schwartz|;
+.cc |The TYMCOM-X Section|;
+.cc |Sherman Gavette|;
+.cc |Ken Jones|;
+.re |The Tymshare TYMCOM-X Support Line|;
+.break;
+.body
+In order to provide better systems software support, a new telephone
+line and procedures for its use will go into effect on January 11.  The
+TYMCOM-X Support Line (408-446-6709) is intended to address the following
+needs:
+.list "1."
+.skip 1;
+--The support line will provide a central place to contact the section for software
+help where time is important but minutes are not of the essence (as they
+are when a customer system has crashed).  Most utilities problems fall
+into this category.
+.skip 1;
+--It will serve as an initial contact point and information resource for
+people who need assistance initiating a request for help with "routine"
+problems.  However, the support line is not intended to replace other
+ways of requesting help with non-urgent problems.
+.skip 1;
+--It will enable us to provide better technical support and make sure
+that each caller receives a response.
+.endlist
+
+We would appreciate your feedback on the operation of the support
+line.  Please let us know if you have any suggestions.
+
+If you have any serious problems using the support line, please send
+a memo to Adele Gadol, 20705 Valley Green Drive (VG2-B03), Cupertino,
+CA 95014 with a copy to Mike Hinckley.
+
+In order to accomplish our goals, we are asking your help in following
+a simple set of procedures for the use of the support line.
+.list "1.";
+.skip 1;
+--Please use the support line for reporting a systems software problem
+or requesting assistance
+instead of contacting an individual TYMCOM-X section member.  The line
+will be available between the hours of 9AM and 5PM on normal business
+days.  There will be one person who has the primary responsibility
+for answering it during each four-hour shift.  In general,
+this will be a member of the Technical Support Unit; at times, other
+TYMCOM-X section members will handle it as well.  The person in charge
+will delegate responsibility
+for solving the problem if it is necessary.
+.skip 1;
+--The support line phone number is for the use of yourself and anyone on
+your staff that you delegate (eg. for Operations, shift supervisors are
+a logical choice).  Please do NOT allow the number to go elsewhere.  As
+in the past, we must restrict our communication to "2nd level" support
+organizations except for unusual cases or by special arrangement.  We
+will make referrals to the appropriate support organizations when
+necessary.
+.Skip 1;
+--Before calling the support line, please consider carefully whether
+the problem at hand is really a systems software problem.  With the use
+of the support line, the section does not intend to widen its scope but
+rather to provide a more organized way to report and handle our
+existing support responsibility and reduce its impact upon high-priority
+projects.  We must continue to expect good preliminary screening and
+investigation of trouble reports before they are related to us.
+.skip 1;
+--If the support line is answered by a message center, please indicate
+clearly that you were trying to reach the support line and leave your
+name and phone number.  The message center will locate a Tech. Support
+person who will return the call and get your information.  Initially,
+the support line may not have message center backup.  Until that time,
+be persistent when calling during normal business hours.
+.skip 1;
+--The first time a problem is reported, a number (which includes the
+initials of the person who took the call) will be assigned.  When making
+repeat calls for information or follow-up of a previously reported
+problem, please refer to the original number.  The people handling the
+support line will ask for it.  Following this procedure will help us
+keep our information straight and will prevent duplicated efforts.
+.skip 1;
+--In addition to the support line, inquiries will be accepted through the
+"normal" mail system.  In fact, this would be preferred for routine or
+non-urgent problems.  Please send mail to XCONSULT on any of the
+following systems:  33, 38, 118, 930.  Tell us how you would like to be
+notified.
+.skip 1;
+--Please direct user-level questions and requests for consulting
+assistance to the appropriate support organization whenever possible.  For
+example, a question about FORTRAN or COBOL
+should be directed to INSD Product Support.  Many utilities questions
+also fall into this category, particularly those relating to printing
+(SPOOL and LISTER), file transfers and other network access, and the
+PERP/DEFER programs.  We will be building our knowledge of the support
+structures so that we can make good referrals.
+.skip 1;
+.continue;
+Requests to us for consulting assistance will be referred to an appropriate
+person.  If that is not easy to do, we will try to handle those
+requests ourselves which we feel we can treat adequately.  As always,
+a question which will require more than 10-15 minutes of consulting time
+will be reviewed by a manager first.
+.endlist;
+
+Thanks for your cooperation in helping make the support line a success.
+.Endbody;
+
