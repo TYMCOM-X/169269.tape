@@ -1,0 +1,46 @@
+begin
+  require "(sailib)sail.def" source!file;
+  string Line, FileName, OutFile;
+  integer i,j,word,map,bit, eof, WordCount, vert, horizon;
+  string array UnpackedMap[ 1 : 60 ];
+
+  ! save us from that icky fortran i/o ;
+
+  integer procedure GetMeAWord;
+    begin
+      if ( WordCount mod 128 = 0 ) then
+        begin
+	  WordCount := WordCount + 1;  wordin( map );
+	end;
+      WordCount := WordCount + 1;
+      return( wordin( map ) );
+    end;
+
+  if ( call( -'25, "GETTAB" ) neq '3330611 ) then
+    usererr( 0,0,"not enough core for map file" );
+! pick apart the map ;
+
+  open( map := getchan, "dsk", '14, 2,0,0,0, eof );
+  print( "[Packed] Map: " );  FileName := inchwl;
+  lookup( map, FileName, i );
+  print( "Listing:      " );  OutFile := inchwl;
+  setprint( OutFile, "F" );
+
+  arrclr( UnpackedMap, NULL );
+  WordCount := 0;
+  Line := NULL;
+  for vert := 1 upto 60 do
+    begin "a line"
+      for horizon := 1 upto 5 do
+	begin
+	  word := GetMeAWord;
+	  for j := 1 upto 20 do
+	    begin
+	      bit := word mod 3;  word := word div 3;
+	      UnpackedMap[ vert ] := UnpackedMap[ vert ] &
+		(case bit of (" ","+","O"));
+	    end;
+	end;
+      print( UnpackedMap[ vert ], crlf );
+    end "a line" ;
+end;
