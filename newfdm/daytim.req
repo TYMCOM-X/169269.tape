@@ -1,0 +1,12 @@
+
+require "  General Date and Time subroutine library" message;
+
+External Simple String  Procedure CvSDat( Integer Date );
+External Simple String  Procedure CvSTim( Integer Time );
+External Simple String  Procedure TymDay( Integer TimeOfDay );
+
+External Simple Integer Procedure CvDate( String  Date );
+External Simple Integer Procedure CvTime( String  Time );
+
+require "DAYTIM" library;
+
