@@ -1,0 +1,286 @@
+Entry;
+
+begin "NBS Mail User Interface Routines"
+
+  require "(sailib)sail.def" source!file;
+  require "nbsmsg.def" source!file;
+
+  define DEBUG = {false};
+
+
+!          N   N  BBBB    SSS    SSS   U   U  BBBB
+!          NN  N  B   B  S      S      U   U  B   B
+!          N N N  BBBB    SSS    SSS   U   U  BBBB
+!          N  NN  B   B      S      S  U   U  B   B
+!          N   N  BBBB    SSS    SSS    UUU   BBBB
+!
+!
+!  Some user interface routines for the NBS mail system.
+!
+!  Dave W. Smith,  June, 82. ;
+
+  require "nbsnam.req" source!file;
+! Some storeage and such ;
+
+preload!with
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December";
+string array Month[ 1 : 12 ];
+
+! Return a string representation of the date in a form acceptable to NBS ;
+
+internal string procedure NBSDate;
+  begin "date/time string"
+    integer T,D,M,Y, HH,MM;
+    string S;
+
+    do begin
+      T := call( 0, "DATE" );
+      MM := call( 0, "MSTIME" ) div 60000;
+    end until T = call( 0, "DATE" );
+
+      ! We resort to the loop above in order to insure that we don't get
+	caught by the transition between PM and AM;
+
+    D := ( T mod 31 ) + 1;
+    T := T div 31;
+    M := ( T mod 12 ) + 1;
+    T := T div 12;
+    Y := 1964 + T;
+
+    HH := MM div 60;
+    MM := MM mod 60;
+
+    S := cvs(Y) & cvs(100+M)[2 for 2] & cvs(100+D)[2 for 2] &
+	 "-" & cvs(100+HH)[2 for 2] & cvs(100+MM)[2 for 2];
+
+    return( S );
+
+  end "date/time string";
+! Routine to convert an NBS format date to something printable.
+! The NBSDate should be either:
+!	YYYYMMDD or YYYYMMDD-HHMMZZZ or YYYYMMDD-HHMMSSZZZ ;
+
+string procedure CVNDate( string NBSDate );
+  begin "convert date"
+    string S, Y,M,D, HH,MM,SS,ZZZ;
+    integer L;
+
+    ! check the length of the string against what we expect ;
+
+    L := Length( NBSDate );
+    if ( not (( L = 8 ) or ( L = 13 ) or ( L = 15 ))) then
+      return( NBSDate );
+
+    Y := NBSDate[1 for 4];
+    M := NBSDate[5 for 2];
+    D := cvs(cvd(NBSDate[7 for 2]));
+    
+    ! watch this space for more code ;
+
+    L := cvd( M );
+    if (( L < 1 ) or ( L > 12 )) then return( NBSDate );
+
+    if ( length( NBSDate ) >= 13 ) then
+      begin
+	HH := NBSDate[ 10 for 2 ];
+	MM := NBSDate[ 12 for 2 ];
+	return( Month[L] & " " & D & ", " & Y & " " & HH & ":" & MM );
+      end;
+
+    return( Month[L] & " " & D & ", " & Y );
+
+  end "convert date";
+! Convert an NBS date to a short-form date (dd-mmm-yy) ;
+
+internal string procedure CVSDate( string S );
+  begin
+    string T;
+
+    T := cvs( cvd( S[ 7 for 2 ] )) & "-" &
+	 Month[ cvd( S[ 5 for 2 ] ) ][ 1 for 3 ] & "-" &
+	 S[ 3 for 2 ];
+
+    return( T );
+
+  end;
+! Convert a null seperated list to a comma seperated one. ;
+
+internal string procedure CVList( string L );
+  begin "convert list"
+    string S; integer C;
+
+    S := NULL;
+
+    while ( length( L )) do
+      begin
+	C := lop( L );
+	if ( C = '0 ) then
+	  S := S & ", "
+	else
+	  S := S & C;
+      end;
+
+    return( S );
+
+  end "convert list";
+! Given an NBS!Rec, fill it out and return a list of recipients ;
+
+internal Name!pointer procedure FillIn( record!pointer ( NBS!Rec ) N );
+  begin "fill in"
+    Name!pointer NP, Recipients;
+    string T;
+
+    NBS!Rec:From[N] := cv6str( call( -'22, "GETTAB" )) &
+			cv6str( call( -'21, "GETTAB" )) &
+			":" & cvs( call( '33000011, "GETTAB" ));
+
+    while ( not length( NBS!Rec:To[N] )) do
+      begin
+	print( "To: " );
+	T := inchwl;
+	NP := CVNList( T );
+	NBS!Rec:To[N] := CV0List( NP );
+	Recipients := NP;
+      end;
+
+    print( "Subject: " );
+    NBS!Rec:Subject[N] := inchwl;
+
+    print( "Type Message.  ^Z when done.", crlf, crlf );
+
+    while ( true ) do
+      begin
+	NBS!Rec:Text[N] := NBS!Rec:Text[N] & inchwl;
+	if (( !skip! = '4 ) or ( !skip! = '32 )) then done;
+	NBS!Rec:Text[N] := NBS!Rec:Text[N] & crlf;
+      end;
+
+    return( recipients );
+
+  end "fill in";
+! A routine used to direct output to either the terminal or a file. ;
+
+procedure qprint( integer Chan; string S );
+  begin
+    if ( Chan < 0 ) then    
+      print( S )
+    else
+      cprint( Chan, S );
+  end;
+! return a summary of the message ;
+
+internal string procedure Summary( NBS!pointer N );
+  begin "summarize"
+    string T1, T2, T3;
+    integer L;
+
+    T1 := cvsdate( NBS!Rec:PostedDate[N] ) & " " &
+	  cvlist( NBS!Rec:From[N] );
+    if ( length( NBS!Rec:Subject[N] )) then
+      T2 := "  Re: " & NBS!Rec:Subject[N]
+    else
+      T2 := NULL;
+    T3 := "  (" & cvs( length( NBS!Rec:Text[N] )) & ")";
+
+    L := length( T1 ) + length( T3 );
+
+    if (( L + length( T2 ) < 72 )) then
+      return( T1 & T2 & T3 )
+    else
+      begin
+	L := 70 - L;
+	return( T1 & T2[1 for L] & ".." & T3 );
+      end;
+
+  end "summarize";
+! Pretty-print an NBS!Rec ;
+
+internal procedure NBSPrint( NBS!pointer N; integer Chan(-1) );
+  begin "print"
+
+    qprint( Chan, "Posted: " );
+    qprint( Chan, CVNDate( NBS!Rec:PostedDate[N] ));
+    qprint( Chan, crlf );
+
+    if ( NBS!Rec:Date[N] ) then
+      begin
+	qprint( Chan, "Date: " );
+	qprint( Chan, CVNDate( NBS!Rec:Date[N] ));
+	qprint( Chan, crlf );
+      end;
+
+    qprint( Chan, "To:   " );
+    qprint( Chan, CVList( NBS!Rec:To[N] ));
+    qprint( Chan, crlf );
+
+    qprint( Chan, "From: " );
+    qprint( Chan, CVList( NBS!Rec:From[N] ));
+    qprint( Chan, crlf );
+
+    if ( NBS!Rec:Sender[N] ) then
+      begin
+	qprint( Chan, "Sender: " );
+	qprint( Chan, NBS!Rec:Sender[N] );
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:ReplyTo[N] ) then
+      begin
+	qprint( Chan, "Reply-To: " );
+	qprint( Chan, CVList( NBS!Rec:ReplyTo[N] ));
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Cc[N] ) then
+      begin
+	qprint( Chan, "Cc:   " );
+	qprint( Chan, CVList( NBS!Rec:Cc[N] ));
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Bcc[N] ) then
+      begin
+	qprint( Chan, "Bcc:  " );
+	qprint( Chan, CVList( NBS!Rec:Bcc[N] ));
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Subject[N] ) then
+      begin
+	qprint( Chan, "Re:   " );
+	qprint( Chan, NBS!Rec:Subject[N] );
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:InReplyTo[N] ) then
+      begin
+	qprint( Chan, "In-Reply-To: " );
+	qprint( Chan, NBS!Rec:InReplyTo[N] );
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Keywords[N] ) then
+      begin
+	qprint( Chan, "Keywords: " );
+	qprint( Chan, CVList( NBS!Rec:Keywords[N] ));
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Text[N] ) then
+      begin
+	qprint( Chan, crlf );
+	qprint( Chan, NBS!Rec:Text[N] );
+	qprint( Chan, crlf );
+      end;
+
+    if ( NBS!Rec:Comments[N] ) then
+      begin
+	qprint( Chan, "Comments:" & crlf );
+	qprint( Chan, NBS!Rec:Comments[N] );
+	qprint( Chan, crlf );
+      end;
+
+  end "print";
+
+end "NBS Mail User Interface Routines";
