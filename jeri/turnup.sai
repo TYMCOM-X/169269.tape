@@ -1,0 +1,168 @@
+
+begin "Turnup"
+
+  require "(SaiLib)Sail.Def" source!file;
+  require '3 version;
+
+  ! yet another hack by DWS with additional hacking by LOIS and Jeri
+    See TURNUP.DOC in (spl) or (tsucoop) for more documentation ;
+
+! Globals & such
+;
+
+Define DefDays = {10};
+
+integer Chan, Pchan, BC, BT, Flag, EOF, Equal;	! stuff for reading the file ;
+integer DaysAhead;
+string Line;				! a line of text ;
+boolean IsToday,IsFirst,P,ReadingPermFile;
+! date decoding stuff ;
+
+integer UDT, MM, DD, DaysIntoYear;
+
+preload!with
+ "jan","feb","mar","apr","may","jun",
+ "jul","aug","sep","oct","nov","dec";
+string array Month[ 1 : 12 ];
+
+preload!with
+   0,  31,  59,  90, 120, 151,
+ 181, 212, 243, 273, 304, 334;
+integer array DaysIntoMonth[ 1 : 12 ];
+! Parse command line and follow instruction
+;
+forward boolean procedure ParseDate;
+procedure SetVariable;
+  begin
+  string Key, CommandLine, Command;
+  CommandLine := Line;
+  lop (CommandLine);
+  while ( CommandLine = " " ) do lop ( CommandLine );
+  Command := scan (CommandLine, Equal, BC);
+  Key := lop(Command);
+  if kequ( Key, "D") then
+    begin "DaysCommand"
+    DaysAhead := intscan (CommandLine, BC );
+    if DaysAhead < 0 then
+      begin
+      Print(#bel,"negative number of days ahead ** ",DaysAhead," **",crlf);
+      DaysAhead := DefDays;
+      end;
+    end "DaysCommand"
+  else if kequ(Key, "P") then     ! Command to read permanent file ;
+      begin
+      if ReadingPermFile then begin     ! person typed :p in PERM.MSG;
+         print(#bel,">>> ILLEGAL COMMAND IN PERM.MSG <<<",crlf);
+         calli(0,'12);
+      end;
+      open(Pchan := GetChan,"DSK",0,1,0,512,BC,EOF);
+      while true do
+	 begin
+	 lookup(Pchan,"PERM.MSG",Flag);
+         if Flag then calli(0,'12)
+            else done;
+         end;
+      ReadingPermFile := true;
+      IsFirst := true;
+      Line := input(Pchan,BT);
+      end
+  else print( "?Unrecognized Command?",crlf);
+  end;
+
+! Parse the front of the message and return true if the date
+! is good and is within a week of today.
+! Set IsToday true if true
+;
+
+
+boolean procedure ParseDate;
+  begin "parse"
+    integer D, M, I, T;
+    string S, LineCopy;
+    if Line[1 for 1] = ":" then
+      begin "Command"
+      SetVariable;
+      Return( false )
+      end "Command"
+    else LineCopy := Line;
+
+    D := intscan( LineCopy, BC );
+    if ( D < 1 or D > 31 ) then return( false );
+
+    while ( LineCopy = " " ) do lop( LineCopy );
+    S := LineCopy[ 1 for 3 ];
+
+    for M := 1 upto 12 do
+      if ( kequ( S, Month[ M ] )) then done;
+    if ( not kequ( S, Month[ M ] )) then return( false );
+
+    T := DaysIntoMonth[ M ] + D;
+    if ( T < DaysIntoYear ) then begin
+       T := T + 365;
+    end;
+    if ( T = DaysIntoYear ) then IsToday := true;
+    if ( T >= DaysIntoYear and ( T - DaysIntoYear < DaysAhead ))
+       then return( true );
+    return( false );
+    
+  end "parse";
+! more or less top level stuff
+;
+
+  UDT := call( 0, "DATE" );
+  DD := UDT mod 31 + 1;
+  MM := (( UDT div 31 ) mod 12 ) + 1;
+  DaysIntoYear := DaysIntoMonth[ MM ] + DD;
+
+  setbreak( BT := getbreak, '12&0, '15&0, "INS" );
+  setbreak( Equal := getbreak,"=_",NULL,"INS" );
+
+  open( Chan := GetChan, "DSK", 0, 1,0, 512, BC, EOF );
+
+  while TRUE do
+    BEGIN
+    lookup( Chan, "TURNUP.MSG", Flag );
+    if Flag then calli(0,'12)                  ! Exit;
+     else done;
+    END;
+
+  IsFirst := true;
+
+  Line := input( Chan, BT );
+
+  DaysAhead := DefDays;
+
+  while ( not EOF ) do
+    begin "each line"
+      P := ParseDate;
+      if (ReadingPermFile and IsFirst) then
+          P := ParseDate;
+
+      while ( true ) do
+	begin
+	  if ( P ) then 
+            begin
+            if (IsFirst) then print(crlf,crlf);
+            IsFirst := false;
+            if ( IsToday ) then print ("*** ",#bel);
+            print( Line,crlf );
+            end;
+	  if ( EOF ) then begin
+            print("EOF encountered",crlf);
+            done;
+          end;
+          if ReadingPermFile then 
+             Line := input( Pchan, BT )
+	  else Line := input( Chan, BT );
+          IsToday := false;
+	  if (( Line neq " " ) and ( Line neq '11 )) then done;
+	end;
+
+    end "each line";
+
+  release( Chan );
+  if not IsFirst then print( crlf );
+
+  call( 0, "EXIT" );
+
+end "Turnup";
