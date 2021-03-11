@@ -1,0 +1,102 @@
+
+entry;
+begin	"WINDOW"
+
+require "(SAILIB)SAIL.DEF" source!file;
+require "(SAILIB)UUOSYM.DEF" source!file;
+require "(DARREN)FRMSUB.SAI" source!file;
+
+require 1 version;
+
+define NW = 2 ;			! Number of screen windows;
+define WindowSize = 11 ;	! lines per window;
+
+external procedure T!Init ;
+external procedure T!Buf( integer C ) ;
+external procedure T!Flush ;
+external procedure T!CPos( integer Row, Column ) ;
+
+integer array W!Row[1:NW], W!Col[1:NW];		! Cursor position memory;
+integer array W!Top[1:NW], W!Bottom[1:NW];	! Window boundaries;
+string WindowClearString ;	! string to send to clear a window;
+integer W!Current;		! window where the cursor is now;
+
+procedure W!Clear(integer W);
+  begin
+  T!CPos( W!Bottom[W] + 1, 1 ) ;
+  T!Flush ;
+  outstr( WindowClearString ) ;
+  W!Row[W] := W!Top[W] ;
+  W!Current := W
+  end;
+
+procedure W!Curse(integer W);	! Window W current cursor position ;
+  if ( W!Current neq W ) then
+    begin
+      W!Current := W;
+      T!CPos( W!Row[W], W!Col[W] ) ;
+      T!Flush ;
+    end;
+
+internal procedure Screen!Out(string S; integer W);
+begin "Update screen"
+while (length(S) neq 0) do
+  begin "output string"
+    integer C;
+    C := lop(S);
+    if ( (C > '37) and (C < '177) )
+      then W!Col[W] := W!Col[W] + 1
+      else case C of
+        begin "special character"
+          [#cr] W!Col[W] := 1 ;
+          [#lf] W!Row[W] := W!Row[W] + 1 ;
+          [#ht] W!Col[W] := W!Col[W] - (W!Col[W] mod 8) + 8 ;
+          [#bs] W!Col[W] := ( 1 min ( W!Col[W] - 1) ) ;
+         else
+        end "special character" ;
+    
+    if W!Col[W] > 80 then
+      begin W!Col[W] := 1; W!Row[W] := W!Row[W] + 1; end;
+
+    if W!Row[W] > W!Bottom[W]
+      then W!Clear(W)
+      else W!Curse(W);
+
+    T!Buf( C ) ;
+
+  end "output string" ;
+
+T!Flush		! Dump the terminal output buffer ;
+
+end "Update screen" ;
+
+internal procedure Init!Screen;
+  begin "Init!Screen"
+  integer W, i ;
+
+  T!Init ;
+
+  WindowClearString := "" ;
+  for i := 1 upto WindowSize do 
+    WindowClearString := WindowClearString & "AK" ;
+
+  for W := 1 upto NW do
+    begin
+    W!Top[W] := ( (W-1) * (WindowSize+1) ) + 1 ; ! First line of window ;
+    W!Bottom[W] := W!Top[W] + WindowSize - 1 ;	! Last line of window ;
+    if W > 1 then begin "window seperator"
+      T!CPos( W!Top[W] - 1 , 1 ) ;
+      T!Flush ;
+      outstr("+-------+-------+-------+-------+-------");
+      outstr("+-------+-------+-------+-------+-------");
+      end "window seperator" ;
+    W!Clear(W);
+    end;
+
+  W!Curse(NW)	! gets to top of last window ;
+
+  end "Init!Screen" ;
+
+
+end "WINDOW" $
+
