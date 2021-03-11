@@ -1,0 +1,6 @@
+1. add TYM and BIL job specs for TYMSHARE and BILLABLE.
+2. add ability for groups to be immune.
+3. add the CLEAN command, like RELOAD but forces full DSKCLN.
+4. have systat show what sense switches are set and if there is
+   a breakpoint at CRASHX
+5. have command to clear breakpoint at CRASHX
