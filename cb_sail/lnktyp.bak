@@ -1,0 +1,218 @@
+Begin "Lnktyp"
+Require 1 Version;
+Require "(Sailib)Sail.def" Source!file;
+
+External boolean procedure Ask(String prompt);
+Require "(Sailib)Ask" Library;
+
+External String Procedure Radix50(Value Integer Symbol);
+Require "Radx50.rel" load!module;
+
+External integer procedure Lynk(Value     Integer Chan;
+				Reference Integer Eof, Typ, Len;
+				Reference Integer Array Block);
+Require "Lynk.rel" library;
+
+Preset!with "Unknown",          "Code",      "Symbols",     "High Seg",
+	    "Entry",            "End",       "Name",        "Start Adr",
+	    "Internal Request", "Polish",    "Link",        "LVAR",
+	    "Index",            "Algol OWN", "Request Load","Request Lib",
+	    "Common",           "Sparce Data",
+	    "Cobol Local Symbol",    ".Assign Block",
+	    "Fortran 400",      "Fortran 401",
+	    "Radix 50 Block", "Radix 50 Block", "Radix 50 Block",
+	    "Macro Universal File";
+String Array Link!names[0:25];
+Preset!with  '0, '1, '2, '3,   '4, '5, '6, '7,   '10,'11,'12,'13,
+    '14,'15,'16,'17,  '20,'21, '37,'100, '400,'401, '774,'775,'776,'777;
+Integer Array Link!types[0:25];
+Integer Array Link!type[0:50], Type!Counts[0:50];
+Integer Array Link!block[-1:2048];
+Integer Word!count, Block!length, Type, Data, Extra, Aux, Dsk, Owt, Index;
+String Filename, Dummy;
+Boolean Found, Flag, Eof, Oeuf, Symbols, Local!Symbols;
+Boolean We!want!numbers, We!want!polish;
+
+Procedure Display!Data;
+Begin "Display Data"
+
+  If We!want!numbers then
+    Cprint(Owt,"{'",Cvos(Type),"|'",Cvos(Block!length),"} ");
+  Case Type of Begin "Read all block types"
+    [2] begin "reading symbols"
+      If Symbols then begin "typing symbols"
+	Cprint(Owt,"Symbol Block",CRLF);
+	For Word!count _ 1 step 2 until Block!length do begin
+	  Integer stype, symval, symadr;
+	  Symval _ Link!block[Word!count];
+	  Symadr _ Link!block[Word!count+1];
+	  Stype _ Symval lsh -32;
+	  CPrint(Owt,"  ",Radix50(Symval),
+	    (If (stype land '10 and not stype land '4) then "!" else " "),
+	    (If stype = '14 then "External" else (Case Stype land '3 of
+	    ("Illegal","Global","Local","Block Name"))),"  ==  ",
+	    cvos(!lh(symadr)),",,",cvos(!rh(symadr)),
+	    (If stype = '14 then " ["&Radix50(symadr)&"]" else ""),Crlf);
+	End;
+      End "typing symbols";
+    End "reading symbols";
+
+    [3] begin "hiseg twoseg"
+      Integer Symval; String Val;
+      Val _ (If !lh(Link!block[1]) neq 0 then "Twoseg  " else "Highseg");
+      Cprint(Owt,Val," Block",CRLF);
+      For Word!count _ 1 step 1 until Block!length - 1 do
+	  Cprint(Owt,Val,cvos(!lh(Link!block[Word!count])),",,",
+			 cvos(!rh(Link!block[Word!count])),Crlf);
+    End "hiseg twoseg";
+
+    [4] For Word!count _ 1 step 1 until Block!length do "Entry points"
+	CPrint(Owt,"Entry ",Radix50(Link!block[Word!count]),Crlf);
+    [5] For Word!count _ 1 step 1 until Block!length do "End block"
+	Cprint(Owt,"End: ",Cvos(Link!block[Word!count]),Crlf);
+    [6] begin "name blocks"
+	Cprint(Owt,"Program: ",Radix50(Link!block[1]),"  ");
+	If Block!length > 1 then Begin
+	  Cprint(Owt,"(",Case !lh(Link!block[2]) land '7777 of (
+	    [0]   "Unknown",	[1]   "F40",
+	    [2]   "Cobol",	[3]   "Algol-60",
+	    [4]   "Neliac",	[5]   "PL/1",
+	    [6]   "Bliss-10",	[7]   "Sail",
+	    ['10] "Fortran-10",	['11] "Macro",
+	    ['12] "Fail",
+	    [Else] Cvos(!lh(Link!block[2]))),  ")",
+	    If !rh(Link!block[2]) then
+	       "  Blank Common Size = "&Cvos(!rh(Link!block[2])) else "");
+	End;
+	Cprint(Owt,CRLF);
+	If Block!length > 2 then
+	  Cprint(Owt,"Name block too large ",Block!length, Crlf);
+    End "name blocks";
+
+    [7] For Word!count _ 1 step 1 until Block!length do "start address"
+	Cprint(Owt,"Start address: ",Cvos(Link!block[Word!count]),Crlf);
+
+    ['10] For Word!count _ 1 step 1 until Block!length do "internal request"
+	Cprint(Owt,"Fixup: ",Cvos(!rh(Link!block[Word!count])),
+		   " => ",Cvos(!lh(Link!block[Word!count])),Crlf);
+
+    ['11] Begin "polish blocks"
+	Integer W,Fh,Steps,Cntr;
+	Procedure Next!Polish(Integer Nextp);
+	Begin "Next polish"
+	Cntr _ Cntr + 1;
+!	Cprint(Owt,"[",Cntr,"] ");
+	Case Steps of begin
+	  [0] Case Nextp of begin
+		[0] Steps _ 1;
+		[1] Steps _ 2;
+		[2] Steps _ 4;
+		[3] Cprint(Owt," + ");
+		[4] Cprint(Owt," - ");
+		[5] Cprint(Owt," * ");
+		[6] Cprint(Owt," / ");
+		[7] Cprint(Owt," & ");
+		['10] Cprint(Owt," ! ");
+		['11] Cprint(Owt," LShift ");
+		['12] Cprint(Owt," Xor ");
+		['13] Cprint(Owt," Not ");
+		['14] Cprint(Owt," Neg ");
+		[Else] Case -('777777000000 lor Nextp) of begin
+		    [1] Begin Cprint(Owt," SRH "); Steps _ 6; End;
+		    [2] Begin Cprint(Owt," SLH "); Steps _ 6; End;
+		    [3] Begin Cprint(Owt," SAL "); Steps _ 6; End;
+		    [4] Begin Cprint(Owt," SRS "); Steps _ 7; End;
+		    [5] Begin Cprint(Owt," SLS "); Steps _ 7; End;
+		    [6] Begin Cprint(Owt," SAS "); Steps _ 7; End;
+		    [7] Begin Cprint(Owt," SFW "); Steps _ 6; End;
+		    [Else] Cprint(Owt,CRLF,"Polish ERROR: ",Cvos(Nextp),CRLF) END END;
+	    [1] Begin Steps _ 0; Cprint(Owt," OPH ",Cvos(Nextp)); End;
+	    [2] Begin Steps _ 3; Fh _ Nextp lsh 18; End;
+	    [3] Begin Steps _ 0; Cprint(Owt," OPW ",Cvos(Fh lor Nextp)); End;
+	    [4] Begin Steps _ 5; Fh _ Nextp Lsh 18; End;
+	    [5] Begin Steps _ 0; Cprint(Owt," OPG ",Radix50(Fh lor Nextp)); End;
+	    [6] Begin Steps _-1; Cprint(Owt,Cvos(Nextp)); End;
+	    [7] Begin Steps _ 8; Fh _ Nextp lsh 18; End;
+	    [8] Begin Steps _ 9; Cprint(Owt,Radix50(Fh lor Nextp)); End;
+	    [9] Begin Steps _10; Fh _ Nextp Lsh 18; End;
+	    [10] Begin Steps_-1; Cprint(Owt,":",Radix50(Fh lor Nextp)); End;
+	    [Else] Cprint(Owt,CRLF,"Polish ERROR: ",Cvos(Steps),CRLF) END;
+	End "Next polish";
+
+	If We!want!polish then begin "printing polish"
+	  Integer C;
+	  Cprint(Owt,Crlf);
+	  Steps _ C _ 0;
+	  Cntr _ 0;
+	  For Word!count _ 1 Step 1 until Block!length Do Begin "Read blocks"
+	    C _ C + 1;
+	    If C > 18 and C mod 18 = 0 then C _ C + 1;
+	    W _ Link!block[C];
+	    If Steps Neq -1 then Next!Polish(!lh(W))
+			    else Cprint(Owt," LH:",Cvos(!lh(W)));
+	    If Steps Neq -1 then Next!Polish(!rh(W))
+			    else Cprint(Owt," RH:",Cvos(!rh(W)));
+	  End "Read blocks";
+	  Cprint(Owt,CRLF);
+	  End "printing polish";
+    End "polish blocks";
+  [Else] End "Read all block types";
+
+End "Display Data";
+
+Outstr("[ LNKTYP version "&Cvos(Memory['137])&" ]"&Crlf);
+Open(Dsk_Getchan, "DSK", '10, 4,0, 0,0, Eof);
+DO Begin "Find a file"
+    Outstr("Input file:  ");
+    Filename_Inchwl;
+    Lookup(Dsk, Filename, Flag);
+end "Find a file" until not flag or not length(Filename);
+If Length(Filename) then Begin "We have work to do"
+    Outstr("Output file: ");
+    Filename_Inchwl;
+    If Length(Filename) then begin "Use disk"
+	Open(Owt_Getchan, "DSK", '0, 0,4, 0,0, oeuf);
+	Enter(Owt, Filename, flag);
+    End "Use disk"
+    Else Open(Owt_Getchan, "TTY", '0, 0,4, 0,0, oeuf);
+    Symbols         _ Ask("Type Symbols? ");
+    We!want!numbers _ Ask("All Blocks? ");
+    We!want!polish  _ Ask("Polish Expansions? ");
+
+    Arrclr(Link!type);    Arrclr(Type!counts);
+    While not eof Do Begin "Reading file"
+	Lynk(Dsk,Eof,Type,Block!length,Link!block);
+	If eof then done;
+	Found _ False;
+	If Link!type[0] neq 0 then
+	  For Index _ 1 step 1 until Link!type[0] Do begin "find type"
+	    If Type = Link!type[Index] then begin "increment type"
+		Type!counts[Index] _ Type!counts[Index]+1;
+		Found _ True;   Done;
+	    End "increment type";
+	  End "find type";
+	If not Found then begin "Set new type"
+	    Link!type[0] _ Link!type[0] + 1;
+	    Link!type[Link!type[0]] _ Type;
+	    Type!counts[Link!type[0]] _ 1;
+	End "Set new type";
+	Display!Data;
+    End "Reading file";
+    If Link!type[0] neq 0 then begin "List totals"
+	For Word!count _ 1 step 1 until Link!type[0] DO begin
+	    Found _ False;
+	    For Index _ 0 step 1 until 24 Do
+	      If Link!types[Index] = Link!type[Word!count] then begin
+		Found _ True;
+		Done;
+	      End;
+	    CPrint(Owt,If Found then Link!names[Index] else "Link Type: "&
+	    	Cvos(Link!Type[Word!Count]), " occurs ",
+		Type!counts[Word!count], " Times",Crlf);
+	End;
+    End "List totals";
+    Close(Dsk); Release(Dsk);
+    Close(Owt); Release(Owt);
+End "We have work to do";
+
+End "Lnktyp";   
