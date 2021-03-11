@@ -1,0 +1,723 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This program attempts to detect jobs waiting on the	;;
+;;	spare LDB chain (yes, Virginia, there is a spare LDB)	;;
+;;	and kill them.  The name EUTHAN is an abbreviation	;;
+;;	for 'euthanasia' which seems a sensible enough name	;;
+;;	for a program which kills things that want to die.	;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	TITLE	EUTHAN - Kill jobs that want to die
+	ENTRY	EUTHAN
+	SEARCH	UUOSYM
+	TWOSEG
+	RELOC	400000
+
+; Register equates
+
+	S=0	;Status register
+
+	J=2	;Job/frame number
+
+	T1=6	;Temps
+	T2=T1+1
+	T3=T2+1
+	T4=T3+1
+
+	P=17	;PDL pointer
+;;
+;; Initialize the program
+;;
+
+EUTHAN:
+	JFCL			;For CCL entry
+	RESET
+	MOVE	P,[-PDLSIZ,,PDL] ;Set up push-down list
+	MOVE	T1,[JOBTBL,,JOBTBL+1] ;For BLT
+	SETZM	JOBTBL
+	BLT	T1,JOBTBE	;Zero out status table
+	MOVE	T1,[SIXBIT /EUTHAN/] ;Our program name
+	SETNAM	T1,		;Wear it with pride
+	HRROI	T1,.GTPRV	;Get our privilege bits
+	GETTAB	T1,
+	  HALT			;Should never happen
+	MOVEM	T1,LOGPRV	;Store into LOGIN arg block
+	SETZ	T1,		;Clear JL.LOG + his friends
+	SETJAL	T1,
+	  HALT			;What, no JL license?? shameful...
+	MOVE	T1,[-LOGNUM,,LOGARG] ;Arg block for LOGIN UUO
+	LOGIN	T1,		;Masquerade as someone else
+	PUSHJ	P,LOGINI##	;Initialize the log file
+	PUSHJ	P,STRTMG	;Put start-up message into log file
+	HRROI	T1,.GTLIC	;Find out what license we have
+	GETTAB	T1,
+	 PUSHJ	P,DIE		;This call should never fail
+	TLNE	T1,(LC.SY)	;Skip if no Systat license
+	TLNN	T1,(LC.WC)	;Skip if we also have Write Core
+				; (Also wants OPER, but not essential)
+	PUSHJ	P,BITCH		;Not enough license, bitch about it
+	PUSHJ	P,NTQINI##	;Setup notice-to-quit interrupt handler
+	  JFCL			;Ignore error return
+	MOVE	T1,[.CNNJB,,.GTCNF] ;Args for max frame number +1
+	GETTAB	T1,		;Find out
+	  PUSHJ	P,DIE		;Fatal error
+	SOS	T1		;Highest job number
+	MOVEM	T1,JOBN		;Remember it
+	MOVEI	T1,5		;Make first pass a quickie
+	MOVEM	T1,SLPTIM	;Normally take long naps
+;;
+;; Start of main program loop
+;;
+;; Take either a long or short nap (depending on whether
+;; or not work is pending).
+;;
+SNORE:	MOVE	T1,SLPTIM
+	SLEEP	T1,
+	MOVEI	T1,^D300	;Set nap time initially large
+	MOVEM	T1,SLPTIM
+;;
+;; Loop over all possible jobs
+;;
+	MOVEI	J,1		;Lowest possible job number
+LOOP:	MOVE	S,JOBTBL(J)	;Status word for this job
+	HRLZ	T1,J		;Set up
+	HRRI	T1,.GTTTY	;  to find TTYTAB(J)
+	GETTAB	T1,		;Find it
+	  PUSHJ	P,DIE		;Errors are fatal
+	TLNN	T1,-1		;Anything in LH(TTYTAB(J)) ?
+	JRST	JBDONE		;No, this job not waiting for SLDB
+	MOVEI	T1,5		;We found work, so take a short nap
+	MOVEM	T1,SLPTIM	; before the next pass
+;;
+;; This job is on the spare LDB queue - try to halt it.
+;;
+	PUSHJ	P,HLTFRM
+	  PUSHJ	P,HLTERR	;Non-skip means error halting job
+	  JRST	NXTJOB		;call+1 means halt attempted
+				;call+2 means job is halted - 
+				; drop into clear-frame code
+;;
+;; The job is halted, so try to clear the frame.
+;;
+	PUSHJ	P,CLRFRM
+	  JRST	.+3		;Non-skip means success - branch around
+	PUSHJ	P,CLRERR	;Skip return means error
+	JRST	NXTJOB		;So don't try to log out
+;;
+;; The YAMM indicates that a job is not actually cleared
+;; until it halts.  Since the job was already halted before the
+;; clear, it is assumed to be cleared already.  Therefore, try
+;; to log the job out.
+;;
+	PUSHJ	P,LOGOJB
+	  PUSHJ	P,LGOERR	;Non-skip means logout error
+	JRST	NXTJOB
+;;
+;; Control flows to here if the job is not on the spare LDB
+;; queue (whether or not it was before).
+;;
+JBDONE:	TDZE	S,S		;Was this on the queue before ?
+	PUSHJ	P,TYPKIL	;If so, say we killed it
+;;
+;; Here when done processing this job, do next job.
+;;
+NXTJOB:	MOVEM	S,JOBTBL(J)	;Store back status word
+	AOS	J
+	CAMG	J,JOBN		;Was this the last job ?
+	JRST	LOOP		;If not, repeat loop for next job
+	PUSHJ	P,LOGVAL##	;Write out any log messages produced
+	SKIPN	NTQFLG##	;Received "notice-to-quit"?
+	JRST	SNORE		;If not, go back to sleep
+	PUSHJ	P,ENDMSG	;Write out shut-down message
+	PUSHJ	P,LOGCLS##	;Close log file
+	SETZ	T1,		;Clear all bits
+	SETJAL	T1,		;JL in particular
+	  JFCL			;Ignore errors
+	LOGOUT			;Go away and don't come back
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This subroutine is called to initiate the halting	;;
+;;	of a job/frame.  The calling sequence is:		;;
+;;		MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,HLTFRM					;;
+;;		  <error return>				;;
+;;		<halt initiated>				;;
+;;		<job is halted>					;;
+;;								;;
+;;	J is preserved, S is maintained, T registers are	;;
+;;	cheerfully clobbered.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HLTFRM:	HRLZI	T1,J		;Set up args
+	HRRI	T1,.GTSTS	; for GETTAB
+	GETTAB	T1,		;Find out this job's status
+	  PUSHJ	P,DIE		;Fatal error
+	TLNE	T1,(JB.JAC)	;JACCT set ?
+	JRST	CPOPJ1		;If so, don't halt (but say we tried)
+	TLNN	T1,(JB.RUN)	;Is job RUNnable?
+	JRST	CPOPJ2		;If not, already halted
+	LDB	T2,[POINT 5,T1,14] ;Wait state code from status word
+	MOVN	T3,T2		;Set up shift count
+	MOVSI	T1,400000	;Zero bit
+	LSH	T1,T3		;T1 now holds bit whose position
+				;  matches the job state code
+	HLRZ	T3,S		;Get previous job state
+	HRL	S,T2		;Save new job state
+	CAMN	T1,[WS.ST]	;Already halted ?
+	JRST	CPOPJ2		;Give best exit if so
+	TDNN	T1,[STATES]	;Is job in an acceptable state ?
+	JRST	CHKSTA		;No, see if this is chronic
+;;
+;; The job is in a reasonable state to try to halt it. Do so.
+;;
+	HRLZI	T1,.FOHLT	;Set up args
+	HRRI	T1,J		;  for FRMOP
+	TRNN	S,%TRHLT	;Have we already tried halting?
+	FRMOP	T1,		;If not, try it now
+	  POPJ	P,		;Bad return or second try
+	TROA	S,%TRHLT	;Say we tried to halt it
+CPOPJ2:	AOS	(P)		;Skip once
+CPOPJ1:	AOS	(P)		;Skip once
+	POPJ	P,		;And give good return
+;;
+;; Control flows to here (not unlike maple syrup) if the job is
+;; in a state which makes a halt attempt unsafe.
+;;
+CHKSTA:	CAIN	T3,(T2)		;Same bad state as last time?
+	POPJ	P,		;Same bad state - frown
+	JRST	CPOPJ1		;No, let it settle ere complaint
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called to clear a frame after it	;;
+;;	has been halted.  calling sequence is:			;;
+;;		MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,CLRFRM				;;
+;;		  <success return>				;;
+;;		<error return>					;;
+;;								;;
+;;	J is preserved, S is maintained, T registers are	;;
+;;	clobbered at will.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CLRFRM:	HRLZI	T1,.FOCLR	;Set up args
+	HRR	T1,J		;  for FRMOP
+	TRON	S,%TRCLR	;If we tried before, don't try again
+	FRMOP	T1,		;If not, try now
+	  AOS	(P)		;Skip return is error return
+	POPJ	P,		;Painless
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called to log a job out after it	;;
+;;	has been halted and cleared.  The calling sequence	;;
+;;	is:	MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,LOGOJB				;;
+;;		  <error return>				;;
+;;		<success return>				;;
+;;								;;
+;;	J is preserved, S is maintained, T registers		;;
+;;	are clobbered at will.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOGOJB:	HRLZI	T1,.FORUN	;Set up args
+	HRR	T1,J		;  for FRMOP
+	TRON	S,%TRLGO	;Don't try if we tried before
+	FRMOP	T1,LGOARG	;Try to run LOGOUT on his frame
+	  POPJ	P,		;Error return
+	JRST	CPOPJ1		;Success return
+;;
+;; Argument block for running LOGOUT
+;;
+LGOARG:	XWD	0,LGOCNT	;Size of arg block
+	SIXBIT	/SYS:/		;Source device
+	XWD	0,[SIXBIT /SYS/] ;Directory name
+	SIXBIT	/LOGOUT/	;File name
+	Z			;Blank extension
+LGOCNT=.-LGOARG-1		;Size of arg block
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called when a job has been killed	;;
+;;	to type out a message and inform the world.  It		;;
+;;	is entered with J=job number, S=JOBTBL(J). T1-T4	;;
+;;	are cheerfully clobbered.				;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+TYPKIL:
+	PUSHJ	P,MSGINI	;Init the message buffer
+	MOVE	T1,[POINT 7,KILMSG-1,35] ;Byte pointer to message
+	PUSHJ	P,COPSTR	;Copy ASCII message text
+	PUSHJ	P,JOBUSR	;Add job number and user name
+	  POPJ	P,		;Don't flush buffer if error found
+	PUSHJ	P,FLUSH		;And vomit the message
+	POPJ	P,
+
+KILMSG:	ASCIZ	/Killed Job /
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called when a job cannot be		;;
+;;	halted and an error message should be issued		;;
+;;	to the operator.  A message will be issued		;;
+;;	only once for a job, any subsequent requests		;;
+;;	will be ignored.  The calling sequence is:		;;
+;;		MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,HLTERR				;;
+;;		<only return>					;;
+;;								;;
+;;	J is preserved, S is maintained, T registers are	;;
+;;	clobbered at will.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HLTERR:	MOVE	T1,[POINT 7,HL1,35] ;First byte-1 (for ILDB) of
+				; ASCIZ message
+	TRON	S,%MGHLT	;Don't issue halt message twice
+	PUSHJ	P,ERRMSG	;Send it out
+	POPJ	P,
+
+HLTMSG:	ASCIZ	/Can't Halt Job /
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called when a halted job cannot		;;
+;;	be cleared and a message should be issued to the	;;
+;;	operator.  A message will be issued only once for	;;
+;;	a given job and subsequent requests will be		;;
+;;	ignored.  The calling sequence is:			;;
+;;		MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,CLRERR				;;
+;;		<only return>					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CLRERR:	MOVE	T1,[POINT 7,CLRMSG-1,35] ;Byte pointer to ASCIZ message
+	TRON	S,%MGCLR	;Make sure message wasn't issued before
+				;Flag it so it's not issued again
+	PUSHJ	P,ERRMSG	;Spit it out
+	POPJ	P,
+
+CLRMSG:	ASCIZ	/Can't Clear Job /
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called when a job has been halted	;;
+;;	and cleared, but cannot be logged out and a message	;;
+;;	should be issued to the operator.  A message will	;;
+;;	be issued only once for a job and subsequent		;;
+;;	requests will be ignored.  The calling sequence		;;
+;;	is:	MOVE	J,[job number]				;;
+;;		MOVE	S,JOBTBL(J)				;;
+;;		PUSHJ	P,LGOERR				;;
+;;		<only return>					;;
+;;								;;
+;;	J is preserved, S is maintained, T registers		;;
+;;	are clobbered at will.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LGOERR:	MOVE	T1,[POINT 7,LGOMSG-1,35] ;Byte pointer to ASCIZ message
+	TRON	S,%MGLGO	;Make sure message not issued twice
+	PUSHJ	P,ERRMSG	;Spit it out
+	POPJ	P,
+
+LGOMSG:	ASCIZ	/Can't Kill Job /
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called for issuing general-purpose	;;
+;;	error messages of the form:				;;
+;;	<ASCIZ message text> <job #> (<username>) <jobstate>	;;
+;;		JBTSTS=<job status word>			;;
+;;								;;
+;;	Routine is called with J=job number, S=JOBTBL(J),	;;
+;;	T1=byte pointer to ASCIZ message preface. Clobbers	;;
+;;	T1-T4, preserves all else.				;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ERRMSG:
+	PUSH	P,T1		;Save error msg byte pointer
+	PUSHJ	P,MSGINI	;Init msg buffer, set up T2 byte ptr
+	POP	P,T1		;Restore error msg byte pointer
+	PUSHJ	P,COPSTR	;Copy string from @T1 to @T2
+	PUSHJ	P,JOBUSR	;Append job number and user name
+	  POPJ	P,		;Quit now if error
+	HRLZ	T1,J		;Set up index for yet another GETTAB
+	HRRI	T1,.GTNAM	;Program name this time
+	GETTAB	T1,
+	  POPJ	P,
+	MOVEM	T1,PGMNAM	;Save
+	MOVE	T1,[POINT 6,PGMNAM-1,35] ;byte pointer for copy
+	PUSHJ	P,COP627	;Copy SIXBIT to 7-bit ASCII
+	PUSHJ	P,SPACE		;Append a seperator
+	HLRZ	T3,S		;Get job state from status word
+	IDIVI	T3,3		;T3 has index into WSCODE
+	MOVE	T3,WSCODE(T3)	;Select WSCODE entry (3 6-bit codes)
+	JUMPE	T4,.+3		;Skip shift if none required
+	LSH	T3,^D12		;Shift next code into position
+	SOJG	T4,.-1		;Loop over shift count
+	HLLZ	T4,T3		;Copy two SIXBIT chars
+	TLZ	T4,^O77		;And only two
+	MOVE	T1,[POINT 6,T4-1,35] ;Byte pointer to SIXBIT string
+	PUSHJ	P,COP627	;Copy SIXBIT to ASCII
+	PUSHJ	P,SPACE		;Append a seperator
+	PUSHJ	P,COP627	;Copy SIXBIT to ASCII
+	MOVE	T1,[POINT 7,JBTSTR-1,35] ;Byte pointer to ASCII string
+	PUSHJ	P,COPSTR	;Copy ASCII string
+	HRLZ	T3,J		;Set up job number
+	HRRI	T3,.GTSTS	;GETTAB type
+	GETTAB	T3,		;Find this job's status
+	  POPJ	P,		;Error exit
+	PUSHJ	P,COPOCT	;Copy octal number in T3 to ASCII
+	PUSHJ	P,FLUSH		;Regurgitate completed message
+	POPJ	P,
+
+JBTSTR:	ASCIZ	/JBTSTS=/
+;;
+;; Utility routines for message type-out
+;;
+
+;;
+;; Routine to clear message buffer and set up T2 as message
+;; buffer byte pointer.
+;;
+MSGINI:
+	MOVE	T2,[MSGBUF,,MSGBUF+1] ;Set up for BLT
+	SETZM	MSGBUF		; to clear
+	BLT	T2,MSGEND	; message buffer
+	MOVE	T2,[POINT 7,MSGBUF-1,35] ;Set up byte pointer
+				; to target message string buffer
+	MOVE	T1,[POINT 7,BELLS-1,35] ;Byte pointer to annoyance
+	PUSHJ	P,COPSTR	;Set into start of message buffer
+	PUSHJ	P,CRLF		;Make message noticeable
+	MOVE	T1,[POINT 7,OURNAM-1,35] ;Byte pointer to our pgm name
+	PUSHJ	P,COPSTR	;Insert into message text
+	POPJ	P,
+
+BELLS:	BYTE(7)7,7,7,7,7,7,7,7,7,0 ;ASCIZ string of bells
+
+OURNAM:	ASCIZ	/EUTHAN: /	;ASCIZ name of this program
+
+;;
+;; Routine to append job number and user name to message buffer.
+;; Returns at Call+1 if GETTAB failure, else at Call+2. Clobbers
+;; T1, T3, and T4.
+;;
+JOBUSR:
+	MOVE	T3,J		;Set up job number for call
+	PUSHJ	P,COPDEC	;Put decimal number in msg buffer
+	PUSHJ	P,SPACE		;Intuitively obvious
+	MOVEI	T3,"("		;Identify user name
+	IDPB	T3,T2		; by bracketting with parenthesis
+	HRLZ	T1,J		;Job number for GETTAB index
+	HRRI	T1,.GTUNM	;Code for user name (chars 1-6)
+	GETTAB	T1,		;Do it
+	  POPJ	P,		;Give up on errors
+	SKIPN	T1		;Does the job have a user name ?
+	MOVE	T1,[SIXBIT /???/] ;If not, give it special non-name
+	MOVEM	T1,USRNAM	;Save first six chars
+	HRLZ	T1,J		;Go back
+	HRRI	T1,.GTUN1	;  for the next six
+	GETTAB	T1,		;Go for it
+	  POPJ	P,		;Don't stop giving up now
+	MOVEM	T1,USRNAM+1	;Store next six chars
+	MOVE	T1,[POINT 6,USRNAM-1,35] ;byte pointer to user name
+	PUSHJ	P,COP627	;Copy SIXBIT to 7-bit ASCII
+	MOVEI	T3,")"		;Close paren
+	IDPB	T3,T2
+	PUSHJ	P,SPACE		;Append a seperator
+	JRST	CPOPJ1		;Give good return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	These routines are utilities for the error message	;;
+;;	routines. In general, they are called with T1=byte	;;
+;;	pointer to source string (where appropriate), T2=byte	;;
+;;	pointer to destination string (always), T3=number	;;
+;;	to be decoded (where appropriate). T1, T3, and T4	;;
+;;	are consistently clobbered, T2 is always preserved.	;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;
+;; Takes decimal integer in T3, copies into ASCIZ string pointed
+;; at by byte pointer in T2. Clobbers T3, T4, preserves all else.
+;; Routine courtesy of HAKMEM.
+;;
+COPDEC:
+	IDIVI	T3,^D10		;Low-order digit to T4
+	HRLM	T4,(P)		;Save in convenient hiding place
+	SKIPE	T3		;Skip if last digit was high-order
+	PUSHJ	P,COPDEC	;Else do clever recursive call
+	HLRZ	T3,(P)		;Get back digit
+	TRO	T3,"0"		;Convert to ASCII
+	IDPB	T3,T2		;Store into string
+	POPJ	P,
+;;
+;; Routine takes octal integer in T3, converts to ASCII,
+;; (in the form <LH,,RH>) and
+;; places in string pointed to by byte pointer in T2.
+;; Clobbers T3 and T4, preserves all else.
+;;
+COPOCT:
+	HLLZ	T4,T3		;LH into position for print
+	PUSHJ	P,OCT6		;Copy six octal digits from LH(T4)
+	MOVEI	T4,","		;Delimiter
+	IDPB	T4,T2		;Copy into message text
+	MOVEI	T4,","		;And another
+	IDPB	T4,T2		;Copy into message text
+	HRLZ	T4,T3		;RH(T3) into position for print
+	PUSHJ	P,OCT6		;Copy six octal digits from LH(T4)
+	POPJ	P,
+
+OCT6:	MOVEI	T1,6		;Loop counter
+	HRRI	T4,"0"_-3	;Shift right three bits prior
+	ROT	T4,3		;Next highest-order digit
+	IDPB	T4,T2		;Store into message text
+	SOJG	T1,.-3		;Loop
+	POPJ	P,		;Don't loop
+;;
+;; Routine to copy ASCIZ strings. Entered with T1=byte pointer
+;; to source string, T2=byte pointer to destination string,
+;; clobbers T3. Does NOT insert trailing space after message text.
+;;
+COPSTR:	ILDB	T3,T1		;Get next byte from source string
+	JUMPE	T3,[POPJ P,]	;Exit if null
+	IDPB	T3,T2		;Store into message text
+	JRST	COPSTR		;Back for more
+;;
+;; Routine to copy SIXBIT strings to ASCII. Entered with
+;; T1=byte pointer to SIXBIT string, T2=byte pointer to
+;; ASCII string, clobbers T3, inserts trailing space after
+;; message text. Treats NULL (SIXBIT 00=ASCII "space") as delimiter,
+;; so effectively copies first space faithfully and ignores
+;; subsequent text.
+;;
+COP627:
+	ILDB	T3,T1		;Get next byte from SIXBIT string
+	JUMPE	T3,[POPJ P,]	;Exit if null
+	ADDI	T3,40		;Convert to ASCII
+	IDPB	T3,T2		;Store into message text
+	JRST	COP627		;Go back for rest of string
+;;
+;; Routine to insert trailing space in message text.
+;;
+SPACE:
+	MOVEI	T3,40
+	IDPB	T3,T2
+	POPJ	P,
+;;
+;; Routine to insert Carriage return-Linefeed into message text
+;; Clobbers T3.
+;;
+CRLF:
+	MOVEI	T3,15		;Carriage-return
+	IDPB	T3,T2		;Store it
+	MOVEI	T3,12		;Line-feed
+	IDPB	T3,T2		;Store it
+	POPJ	P,
+;;
+;; Routine to flush message buffer after message has been assembled.
+;; Clobbers T1, T3.
+;;
+FLUSH:
+	PUSHJ	P,CRLF		;Append EOL onto message
+;	PUSHJ	P,CRLF		;For good measure
+	HRROI	T1,.AXOST	;Output string without I/O wait
+	AUXCAL	T1,MSGBUF
+;	MOVE	T1,[.STTYO,,MSGBUF] ;Also inform operator
+;	SETUUO	T1,
+;	  JFCL			;Shouldn't happen, but we don't care
+	MOVEI	T1,MSGBUF	;Set up message buffer address
+	PUSHJ	P,LOGMSG##	;Write message to log file
+	POPJ	P,
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Routines to write start-up and shut-down messages	;;
+;;	to the log file.  Called via PUSHJ, clobbers T1 (at	;;
+;;	least), one return.					;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;
+;; Routine to write start-up message to log file
+;;
+STRTMG:
+	PUSH	P,[POINT 7,SMSG-1,35] ;Stack message byte pointer
+	SKIPA			;And drop into common code
+;;
+;; Routine to write shut-down message to log file
+;;
+ENDMSG:	PUSH	P,[POINT 7,EMSG-1,35] ;Stack message byte pointer
+				;And drop into common code
+	PUSHJ	P,MSGINI	;Init the message buffer
+	POP	P,T1		;Get back message byte pointer
+	PUSHJ	P,COPSTR	;Copy ASCIZ string into buffer
+	PUSHJ	P,FLUSH		;Flush the message buffer
+	PUSHJ	P,LOGVAL##	;Validate important messages
+	POPJ	P,		;And return
+
+SMSG:	ASCIZ	/Starting up.../
+
+EMSG:	ASCIZ	/Received Notice-to-Quit.../
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This routine is called when the program detects		;;
+;;	a GETTAB error return.					;;
+;;	The routine terminates the program without		;;
+;;	ceremony.  The calling sequence is:			;;
+;;		PUSHJ	P,DIE					;;
+;;		<does not return>				;;
+;;								;;
+;;	No elaboration is necessary.				;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DIE:
+	PUSHJ	P,MSGINI	;Init the message buffer
+	MOVE	T1,[POINT 7,GTBMSG-1,35] ;Byte pointer to GETTAB
+				; failure message
+	PUSHJ	P,COPSTR	;Insert into message buffer
+	HRRZ	T3,(P)		;Caller's return address
+	SUBI	T3,EUTHAN+2	;Adjust to address of GETTAB call
+				; displaced from start address
+	HRLZ	T4,T3		;In position for octal print
+	PUSHJ	P,OCT6		;Six octal digits to message buffer
+DIE001:	MOVE	T1,[POINT 7,DIEMSG-1,35] ;Byte pointer to suicide note
+	PUSHJ	P,COPSTR	;Copy into message buffer
+	PUSHJ	P,FLUSH		;Issue suicide message
+	PUSHJ	P,LOGVAL##	;Validate message log file
+	HALT			;Self-explanatory
+	JRST	EUTHAN		;On CONTinue, restart from beginning
+
+GTBMSG:	ASCIZ	/GETTAB failure at EUTHAN+/
+
+DIEMSG:	ASCIZ	/, "Good-bye, cruel world..."/
+
+;;
+;; This is the analagous error message routine for lack
+;; of sufficient license.
+;;
+BITCH:
+	PUSHJ	P,MSGINI	;Init the message buffer
+	MOVE	T1,[POINT 7,LICMSG-1,35] ;Byte pointer to our bitch
+	PUSHJ	P,COPSTR	;Copy into message buffer
+	JRST	DIE001		;Do the rest
+
+LICMSG:	ASCIZ	/Not Enough License/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Pure data area for EUTHAN program			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;
+;; Job states from job status word
+;;
+	WS.RN=1B0	;Running
+	WS.WS=1B1	;I/O wait satisfied
+	WS.TS=1B2	;Terminal I/O wait satisfied
+	WS.SS=1B3	;Swap wait satisfied
+	WS.SI=1B4	;SAT I/O wait
+	WS.RI=1B5	;RIB I/O wait
+	WS.PS=1B6	;SAT primary PCB wait
+	WS.PR=1B7	;RIB primary PCB wait
+	WS.M2=1B8	;Two PCB wait
+	WS.DA=1B9	;Disk allocation wait
+	WS.CB=1B10	;File system Core Block resource wait
+	WS.FC=1B11	;Freecore wait
+	WS.MT=1B12	;Magtape control wait
+	WS.AX=1B13	;Aux circuit resource wait
+	WS.AC=1B14	;Accounting resource wait
+	WS.BP=1B15	;Block I/O port resource wait
+	WS.IO=1B16	;I/O wait
+	WS.CW=1B17	;Monitor buffer wait
+	WS.TI=1B18	;Terminal I/O wait
+	WS.SW=1B19	;Swap wait
+	WS.ML=1B20	;PCB lock queue wait
+	WS.IL=1B21	;Club interlock wait
+	WS.FL=1B22	;File wait (atomic lock queue)
+	WS.SL=1B23	;Sleep
+	WS.NU=1B24	;Null (no process here)
+	WS.ST=1B25	;Stop (^C)
+
+STATES=<WS.RN+WS.IO+WS.TI+WS.IL+WS.SL+WS.NU+WS.ST>
+			;These are the acceptable states for
+			; a job to be in before trying to
+			; halt it.
+
+;;
+;; Table of wait state codes in SIXBIT for error message type-out.
+;;
+
+WSCODE:
+	SIXBIT	/RNWSTS/
+	SIXBIT	/SSSIRI/
+	SIXBIT	/PSPRM2/
+	SIXBIT	/DACBFC/
+	SIXBIT	/MTAXAC/
+	SIXBIT	/BPIOMB/
+	SIXBIT	/TISWML/
+	SIXBIT	/ILFLSL/
+	SIXBIT	/NU^C/
+
+	LIT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Impure data area for EUTHAN program.			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	RELOC	0
+
+	PDLSIZ=100
+PDL:	BLOCK	PDLSIZ
+
+;;
+;;  This table contains one entry per job.  LH is used for job
+;;  state at last call to HALT, RH holds status bits.
+;;
+;;  Status bits:
+;;
+	%TRHLT=400000		;A halt has been attempted
+	%TRCLR=200000		;A clear has been attempted
+	%TRLGO=100000		;A log-out has been attempted
+	%MGHLT=040000		;A halt failure message was issued
+	%MGCLR=020000		;A clear failure message was issued
+	%MGLGO=010000		;A logout failure message was issued
+
+JOBTBL:	BLOCK	^D128		;As many jobs as there can be
+	JOBTBE=.-1		;Last entry in table
+
+JOBN:	Z			;Actual max job number on this system
+
+SLPTIM:	Z			;How long to sleep between passes -
+				; initially set to five minutes,
+				; reduced to five seconds when work
+				; is found.
+;;
+;; Argument block for LOGIN UUO
+;;
+LOGARG:
+	3,,42754		;PPN for M33
+LOGPRV:	0			;Frame privilege word - set by program
+	3,,42754		;AUN for M33
+	SIXBIT	/M33/		;First half of user name
+	0			;Second half of user name
+	LOGNUM=.-LOGARG	;Length of argument block
+;;
+;; More error message storage areas
+;;
+
+MSGBUF:	BLOCK	30		;150 chars should be more than enough
+MSGEND=.-1
+
+USRNAM:	BLOCK	3		;Temp for user name string
+
+PGMNAM:	BLOCK	2		;Temp for program name string
+	END	EUTHAN
+    2@&ø
