@@ -1,0 +1,424 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	This module will write an ASCII log file for any	;;
+;;	program. The log file will be named ######.LOG		;;
+;;	where "######" is the name of the user program		;;
+;;	(as retrieved via GETTAB).  The module contains		;;
+;;	the following entry points:				;;
+;;		LOGINI - initialize the log file		;;
+;;		LOGMSG - write message into log file		;;
+;;		LOGVAL - validate the log file (copy all	;;
+;;			 pages to disk)				;;
+;;		LOGCLS - Close log file and release channel	;;
+;;								;;
+;;	Messages are date- and time-stamped, and must be	;;
+;;	in ASCIZ format.					;;
+;;	All routines preserve all registers.			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	TITLE	LOGGER - Routines for logging messages to a file
+	SEARCH	UUOSYM
+	TWOSEG
+	RELOC	400000
+
+;; Register equates
+
+	T1=6	;Temps
+	T2=T1+1
+	T3=T2+1
+	T4=T3+1
+
+	P=17	;PDL pointer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Routine LOGINI - initialize the log file		;;
+;;								;;
+;;	Calling format:						;;
+;;		PUSHJ	P,LOGINI				;;
+;;		<only return>					;;
+;;								;;
+;;	No arguments, all registers preserved.			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOGINI::
+	PUSHJ	P,SAV4T		;Save T1-T4 and set up auto-restore
+	SETOM	STAMPF		;Date/time stamp flag
+	HRLOI	T1,.CHOPN	;Find a free channel
+	CHANIO	T1,LOGOPN	; and open it
+	  PUSHJ	P,LOGERR	;None available?? - quit now
+	HRRZM	T1,LOGCHN	;Remember the log file channel
+;;
+;; From this point on, the right half of T1 is presumed to have
+;; the channel number intact.
+;;
+	HRROI	T2,.GTNAM	;Find out the calling program's name
+	GETTAB	T2,
+	  PUSHJ	P,LOGERR	;Shouldn't happen...
+	MOVEM	T2,LOGARG	;Make it the file name in arg list
+	HRLI	T1,.CHLK	;RH still has channel number
+	CHANIO	T1,LOGARG	;Is there already a log file ?
+	  SKIPA			;Skip if not
+	JRST	FILOK		;Found one, use it
+	HRRZ	T2,LOGARG+1	;Fetch LOOKUP error code
+	JUMPN	T2,LOGERR	;Error out if not "File not found"
+	HRLI	T1,.CHENT	;Enter new log file
+	CHANIO	T1,LOGARG	;Same arg list as for LOOKUP
+	  PUSHJ	P,LOGERR	;No errors tolerated
+	HRLI	T1,.CHCFP	;Create file page
+	CHANIO	T1,[1]		;Needs the first page
+	  PUSHJ	P,LOGERR	;<insert raspberry>
+	HRLI	T1,.CHCLS	;Close newly-created file
+	CHANIO	T1,
+	HRLI	T1,.CHLK	;Look it up again just in case
+	CHANIO	T1,LOGARG	;Channel number still in RH(T1)
+	  PUSHJ	P,LOGERR	;We have a bad feeling about this...
+;;
+;; File exists, set up for output and find out relative page 
+;; number of the last page in the file.
+;;
+FILOK:	HRLI	T1,.CHENT	;Three guesses what's in the right half
+	CHANIO	T1,LOGARG	;Set I/O direction to output
+	  PUSHJ	P,LOGERR	;Barf
+	HLRE	T2,LOGARG+3	;-File size in words from LOOKUP
+	MOVN	T2,T2		;Make positive
+	ADDI	T2,777		;Round up
+	LSH	T2,^D-9		;Last page base zero
+	HRRZM	T2,FILPAG	;Save last file page number
+;;
+;; Find an available low segment page onto which to map the
+;; file page.
+;;
+	MOVEI	T2,377		;Start high and count down
+	MOVEM	T2,VIRPAG	;
+CHKPAG:	PAGSTS	T2,		;Get page status for this page
+	  SKIPA			;Error also means page exists
+	JUMPE	T2,PAGOK	;No error+no status=no page
+	SOSLE	T2,VIRPAG	;Try next lower page
+	JRST	CHKPAG
+	PUSHJ	P,LOGERR	;Don't try page 0
+;;
+;; VIRPAG now has page number of page into which the log file
+;; page can be mapped.
+;;
+PAGOK:	MOVEI	T2,(<.PRRW>+1B17) ;# pages to map + read/write prot.
+	HRLM	T2,VIRPAG	;Set into argument list
+	HRLI	T1,.CHMFP	;Believe it or not...
+	CHANIO	T1,LOGMFP	;Map 1 file page
+	  PUSHJ	P,LOGERR	;Shit
+;;
+;; Find the first zero word in the page.  There should always
+;; be one since the "next" file page is created when the "previous"
+;; page is filled rather than when the first byte is written
+;; to it.
+;;
+	MOVEI	T1,^D512	;Clobber channel # with words/page
+	HRRZ	T2,VIRPAG	;Get back virtual page number
+	LSH	T2,^D9		;Turn page number into virtual address
+	SKIPN	(T2)		;Skip if location used already
+	JRST	.+3		;Found an empty one
+	AOS	T2		;Point to next location
+	SOJG	T1,.-3		;Count down words left in page
+;;
+;; T2 points to first zero word in page, T1=number of zero words
+;; left in page.
+;;
+	JUMPE	T1,NEWPAG	;Need fresh page plus pointers
+	IMULI	T1,5		;Convert to bytes left
+	MOVEM	T1,BYTCNT	;Remember it
+	SOS	T2		;Back up for IDPB pointer
+	HLL	T2,LPOINT	;Set up IDPB byte pointer
+	MOVEM	T2,VIRPTR	;Remember this, too
+	POPJ	P,		;Restore registers and exit
+;;
+;; Error exit - undo as much as possible
+;;
+LOGERR:
+	POP	P,ERRPC		;Hide caller's return address
+	MOVEM	T1,ERRT1	;Save for future inspection
+	MOVEM	T2,ERRT2
+	HRRZ	T1,VIRPAG	;Retrieve virtual page number
+	HRLI	T1,(1B17)	;How many pages to VCLEAR
+	TRNE	T1,-1		;Skip clear if no page number assigned
+	VCLEAR	T1,		;If it existed, get rid of it
+	  JFCL			;Ignore errors at this point
+	HRRZ	T1,LOGCHN	;Channel assigned ?
+	JUMPE	T1,.+3		;Just exit if not
+	HRLI	T1,.CHREL	;Release it if so
+	CHANIO	T1,
+	SETZM	LOGCHN		;Clear out all the impure
+	SETZM	FILPAG
+	SETZM	VIRPAG
+	SETZM	VIRPTR
+	SETZM	BYTCNT
+CPOPJ:	POPJ	P,		;Restore registers and return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Routine LOGMSG - Write ASCIZ message to log file.	;;
+;;	Calling sequence:					;;
+;;		MOVEI	T1,<msg addr>				;;
+;;		PUSHJ	P,LOGMSG				;;
+;;		<only return>					;;
+;;								;;
+;;	All registers preserved.				;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOGMSG::
+	PUSHJ	P,SAV4T		;Save T1-T4 and set up auto-restore
+	SOS	T1		;Convert message address
+	HLL	T1,LPOINT	; into ILDB byte pointer
+	SETZ	T3,		;no "current" character yet
+;;
+;; This is the main copy loop
+;;
+NXTBYT:	HRRZ	T2,T3		;Copy "current" char into "previous"
+	ILDB	T3,T1		;Pick up new "current"
+	JUMPE	T3,CPOPJ	;End of message, exit
+	SKIPE	STAMPF		;Date/time stamp before next real char?
+	PUSHJ	P,STAMP		;If so, stamp away
+;;
+;; Check for carriage-return/line-feed sequence, since each
+;; line is preceded by date/time stamp.
+;;
+	CAIE	T3,12		;Is "current" char a line-feed?
+	JRST	.+3		;Just copy if not
+	CAIN	T2,15		;Yes, was previous a carriage-return?
+	SETOM	STAMPF		;CR-LF, insert stamp before next char
+	PUSHJ	P,PUTBYT	;Copy this char into file page
+	JRST	NXTBYT		;And do rest of message
+;;
+;; Routine to insert date/time stamp into log file
+;;
+STAMP:	POPJ	P,
+	PUSHJ	P,SAV4T		;Preserve T-regs from our meddling
+	DATE	T1,		;DEC-format date
+	IDIVI	T1,^D31		;Day of month into T2
+	AOS	T2		;Call gives day-1, adjust
+	PUSHJ	P,TWODEC	;Copy 2-digit decimal from T2 into file
+	IDIVI	T1,^D12		;Month of year into T2
+	MOVE	T4,MONTH(T2)	;ASCII "-MMM-" into T4
+	LSHC	T3,7		;Shift ASCII char from T4
+	PUSHJ	P,PUTBYT	;Store into file page
+	JUMPN	T4,.-2		;Go until none left
+	HRRZ	T2,T1		;Copy year
+	ADDI	T2,^D64		;Make absolute
+	PUSHJ	P,TWODEC	;Copy 2-digit decimal from T2 into file
+	MOVEI	T3," "		;Space
+	PUSHJ	P,PUTBYT	;After date string
+	TIMER	T1,		;Jiffies since midnight
+	IDIVI	T1,^D<60*60*60>	;Leave hours in T1
+	EXCH	T1,T2		;Hours to T2
+	PUSHJ	P,TWODEC	;Copy hour in 2-digit decimal
+	MOVEI	T3,":"		;Seperate hours and minutes
+	PUSHJ	P,PUTBYT
+	IDIVI	T1,^D<60*60>	;Leave minutes in T1
+	EXCH	T1,T2		;Minutes to T2
+	PUSHJ	P,TWODEC	;Copy minute in 2-digit decimal
+	MOVEI	T3,"."		;Seperate minutes and seconds
+	PUSHJ	P,PUTBYT
+	IDIVI	T1,^D60		;Leave seconds in T1, jiffies in T2
+	EXCH	T1,T2		;Seconds to T2
+	PUSHJ	P,TWODEC	;Copy seconds in 2-digit decimal
+	MOVEI	T3," "		;Seperate seconds from rest of msg
+	PUSHJ	P,PUTBYT
+	SETZM	STAMPF		;Next stamp after next end-of-line
+	POPJ	P,		;Restore registers and return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Support routines for LOGMSG and STAMP routines		;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;
+;; Routine to copy T2 into log file page as two-digit decimal
+;; number.
+;; Clobbers T2 & T3.
+;;
+TWODEC:
+	IDIVI	T2,^D10		;T2 has high digit, T3 has low
+	PUSHJ	P,.+1		;Execute remaining code twice
+	EXCH	T2,T3		;Swap digits
+	ADDI	T3,"0"		;Convert to ASCII
+	PUSHJ	P,PUTBYT	;Copy the digit into log file page
+	POPJ	P,		;Return to caller (may be TWODEC+1)
+
+;;
+;; Routine to copy one data character into the log file page.
+;; This is the only routine which writes the log file page.
+;; Called with data character in T3, all registers preserved.
+;;
+PUTBYT:
+	SKIPN	VIRPTR		;Virtual page byte pointer set up?
+	POPJ	P,		;No, don't use bad pointer
+	IDPB	T3,VIRPTR	;Deposit into file page, update pointer
+	SOSG	BYTCNT		;Adjust bytes left in page
+	PUSHJ	P,NEWPAG	;None left, set up fresh page
+	POPJ	P,
+;;
+;; Routine to move to next file page when current page is full.
+;; Saves, clobbers, & restores T1. All others preserved.
+;;
+NEWPAG:
+	PUSH	P,T1		;Save scratch reg
+	HRRZ	T1,VIRPAG	;Virtual page number
+	HRLI	T1,(1B17)	;How many pages to VREMOV
+	VREMOV	T1,		;Remove address page, write to disk
+	  PUSHJ	P,NPGERR	;Errors not tolerated
+	AOS	FILPAG		;Bump to next page in file
+	HRRZ	T1,LOGCHN	;Set up fil/O channel
+	HRLI	T1,.CHCFP	;"Create file page"
+	CHANIO	T1,FILPAG	;Make new last page
+	  PUSHJ	P,NPGERR	;Error
+	HRLI	T1,.CHMFP	;Map file page
+	CHANIO	T1,LOGMFP	;Into newly-freed virtual page
+	  PUSHJ	P,NPGERR	;Error
+	HRRZ	T1,VIRPAG	;Get back virtual page number
+	LSH	T1,^D9		;Convert to memory address
+	SOS	T1		;Convert memory address
+	HLL	T1,LPOINT	; into IDPB byte pointer
+	MOVEM	T1,VIRPTR	;Remember it
+	MOVEI	T1,^D512*5	;Number of bytes in a page
+	MOVEM	T1,BYTCNT	;Remember this also
+NPGXIT:	POP	P,T1		;Restore scratch reg
+	POPJ	P,
+
+NPGERR:	POP	P,NPGPC		;Hide PC of error
+	MOVEM	T1,NPGT1	;Save error code for later study
+	SETZM	VIRPTR		;Make sure "PUTBYT" doesn't
+	SETZM	VIRPAG		;Make sure "LOGVAL" doesn't, either
+	JRST	NPGXIT		;Leave
+
+;;
+;; Routine to save registers T1-T4 on the PDL and restore on
+;; the next POPJ in the calling routine.
+;; Preserves all but P (obviously).
+;;
+SAV4T:	EXCH	T1,0(P)		;Save T1, get caller's return address
+	PUSH	P,T2
+	PUSH	P,T3
+	PUSH	P,T4
+	MOVEM	T1,1(P)		;Put caller's return address
+	MOVE	T1,-3(P)	;Get back T1 from point of call
+	PUSHJ	P,@1(P)		;Return to caller, but leave our
+				; return address on top of stack
+	  SKIPA			;Non-skip return
+	AOS	-4(P)		;Skip return, bump real return address
+	POP	P,T4
+	POP	P,T3
+	POP	P,T2
+	POP	P,T1
+	POPJ	P,		;Return one level up
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Routine LOGVAL - validate the log file (write all	;;
+;;	virtual file pages to disk).				;;
+;;	Calling sequence:					;;
+;;		PUSHJ	P,LOGVAL				;;
+;;		<only return>					;;
+;;								;;
+;;	No arguments, all registers preserved.			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOGVAL::
+	PUSH	P,T1		;Scratch register
+	HRRZ	T1,VIRPAG	;Log file virtual page number
+	JUMPE	T1,LGVXIT	;Exit if none set up
+	HRLI	T1,(1B17)	;How many pages to validate
+	VALPAG	T1,		;Write page to disk, don't wait
+	  MOVEM	T1,VPGERR	;Save VALPAG error return code
+LGVXIT:	POP	P,T1		;Restore scratch register
+	POPJ	P,		;And leave
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Routine to close the log file and release the		;;
+;;	channel.  Call via PUSHJ, one return, clobbers		;;
+;;	T1 only.						;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LOGCLS::
+	HRRZ	T1,LOGCHN		;Log file channel
+	HRLI	T1,.CHCLS		;Close
+	CHANIO	T1,			;Close channel
+	HRLI	T1,.CHREL		;Release
+	CHANIO	T1,
+	POPJ	P,			;Easy as pie (easier...)
+;;
+;; Pure data area
+;;
+
+LPOINT:	POINT	7,0,35		;Left half of ASCII ILDB/IDPB pointer 
+
+MONTH:
+	ASCII	/-Jan-/
+	ASCII	/-Feb-/
+	ASCII	/-Mar-/
+	ASCII	/-Apr-/
+	ASCII	/-May-/
+	ASCII	/-Jun-/
+	ASCII	/-Jul-/
+	ASCII	/-Aug-/
+	ASCII	/-Sep-/
+	ASCII	/-Oct-/
+	ASCII	/-Nov-/
+	ASCII	/-Dec-/
+
+	LIT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;								;;
+;;	Impure storage area for LOGGER module			;;
+;;								;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	RELOC	0
+;;
+;; Arguments for opening channel
+;;
+LOGOPN:	0,,0		;not physical-only search, no file status
+	SIXBIT	/DSK/	;device name
+	0,,0		;no buffered I/O, no buffers
+
+LOGCHN:	0		;Log file I/O channel
+;;
+;; Argument list for LOOKUP/ENTER (short)
+;;
+LOGARG:	0		;File name - filled in by program
+	SIXBIT	/LOG/	;File extension(LH), RH has error bits
+	0		;Protection, data mode, creation date/time
+	0		;LOOKUP puts -file size in words in LH
+
+;;
+;; Arguments for Map File Page
+;;
+LOGMFP:
+VIRPAG:	0		;LH - page count, RH - virtual page number
+FILPAG:	0		;Relative file page
+;;
+;; Random garbage
+;;
+VIRPTR:	0		;Byte pointer to log file's virtual page
+BYTCNT:	0		;How many free bytes left on page
+
+STAMPF:	0		;=-1 if date/time stamp needed before
+			; next real data character.
+
+;;
+;; Storage for initialization routine error exit
+;;
+ERRPC:	0		;Return address of error exit call
+ERRT1:	0		;T1 at point of failure
+ERRT2:	0		;T2 at point of failure
+;;
+;; Storage for "NEWPAG" error exit
+;;
+NPGPC:	0		;Return address of error exit call
+NPGT1:	0		;T1 at point of failure
+;;
+;; Storage area for "LOGVAL" routine
+;;
+VPGERR:	0		;Error return code from VALPAG call
+	END
+   5@0
