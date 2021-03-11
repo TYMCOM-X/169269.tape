@@ -1,0 +1,277 @@
+- 1 -
+Posted: March 7, 1983 17:40
+To:   Carl, Adele, Lois
+From: MCH:930
+Cc:   MCH
+Re:   LOC and NODE Help Messages in SPOOL
+
+Possibilities might be something like:
+
+LOCATION - USED TO OVERRIDE THE DEFAULT PRINTER LOCATION
+NODE     - USED TO OVERRIDE THE DEFAULT NODE FOR SELECTION OF PRINTER LOCATION
+
+					/Mike
+- 2 -
+Posted: March 14, 1983 14:16
+Date: March 14, 1983 14:12
+To:   TXS.A/NEWMAN (ADELE:930)
+From: TXS.WRS:930
+Re:   EMSAA.server fixed!
+Keywords: A91702 
+
+Well, it would appear that EMSAA.SERVER is once again doing its thing, thanks
+to a few small hacks.  Please report any problems to me.  Also, if you do
+not get this message, please let me know.  Remember that you must have exactly
+one address in the TO field when sending a message to be forwarded.  Also
+remember that EMSAA addresses appearing in the CC field are not noticed (and
+thus ignored).  And lastly, don't forget to keep (EMSAA.SERVER)EMSAA.CTL up
+to date with your current name/password.
+
+-Bill
+
+
+- 3 -
+Posted: March 14, 1983 18:07
+Date: March 14, 1983 17:29
+To:   TXS.A/NEWMAN (ADELE:930)
+From: INSD.HSSMAIL:EMSAA
+Re:   LISTED ABOVE WERE THE RESPONSIBILITY
+Keywords: A92083 
+
+                  INFORMATION NETWORK SERVICES DIVISION
+
+                            M E M O R A N D U M
+
+DATE>      14 MAR 83  17:24                           []  TYMSHARE
+
+TO>        RON SALTGAVER
+           JIM BENNETT
+           ADELE NEWMAN
+           LYNNE EDWARDS
+
+COPIES>    
+
+FROM>      EDIE ADAMS (INSD.HSSMAIL)
+
+-----------------------------------------------------------------------
+
+WE HAVE SCHEDULED A SOFTWARE DISTRIBUTION MEETING FOR 
+WEDNESDAY, MARCH 16, AT 10:00. IT WILL BE HELD IN THE 
+BUILDING "B" CONFERENCE ROOM ON BUBB RD. WE WILL BE 
+
+      * CREATION OF SOFTWARE DISTRIBUTION TAPES FOR
+        DEC 20/20 CUSTOMERS (PROCEDURE, FREQUENCY,
+        FINAL TESTING, ETC.)
+
+      * HOW NEW SOFTWARE RELEASES ARE DISTRIBUTED
+        AND IMPLEMENTED
+
+      * A PROPOSED METHOD TO IMPROVE THE CONTROL AND
+        20/20 SOFTWARE RELEASES
+
+      * WHAT TYPE OF FOLLOW-UP SHOULD BE PROVIDED
+        AT THE BRANCH LEVEL AND AT THE CUSTOMER
+        SITES FOLLOWING THE INSTALLATION OF THE
+        NEW SOFTWARE
+
+OF GARY WOLF AND BEN RUSSELL PRIOR TO THEIR LEAVING. WE HAVE
+BEEN "VOLUNTEERED" TO TAKE OVER THIS OPERATION FOR OUR 20/20
+CUSTOMERS. 
+
+PLEASE ATTEND THIS MEETING; WE WOULD GREATLY APPRECIATE YOUR
+IDEAS AND SUGGESTIONS ON THIS.
+
+THANK YOU,
+
+EDIE ADAMS/HARDWARE SYSTEMS  SUPPORT
+EXT. 8139
+
+
+- 4 -
+Posted: March 15, 1983 11:39
+To:   carl
+From: LOIS:930
+Cc:   adele, mch
+Re:   SPOOL 6.3
+
+Chicago had a lot of post office requests that needed printing ASAP, and
+their usual printer was down.  They couldn't print them on their backup
+printer as it came in over another node.  I provided them with a copy of
+SPOOL 6.3, and it worked beautifully.  They are happy, customer is not
+unhappy--and SPOOL was a success.
+-Lois
+
+- 5 -
+Posted: March 15, 1983 16:08
+To:   Lois
+From: CARL:930
+Cc:   Adele, Mike
+Re:   SPOOL 6.3
+
+I'm glad that my changes to SPOOL actually "HELPED" someone to
+please a customer.  It's a perfect example of how a "new" addition
+to an old product can make it much more effective as a tool, even
+if the idea was "unsolicited" (as it was in this case).
+/Carl.
+
+- 6 -
+Posted: March 16, 1983 00:13
+To:   Mike
+From: WRS:930
+Cc:   Adele, Todd
+Re:   (COEES2506:26)INIT2X.SAI and associated monitor changes
+
+Well, my stomach just wouldn't let me hack the access rights for .ARCON,
+even though it would have only taken about 30 seconds to do.  After
+thinking about it, I decided that it really belonged as a special
+case access right.  So that it now is.  The only time you can
+continue a frame that you don't have write access to is when you
+are attaching a port to it.  It is still not allowed in other cases.
+
+The change to INIT2.SAI becomes a trivial removal of code to force the
+CONT command and the addition of an argument to the ATTACH uuo.  These
+changes have been made and exist in (COEES2506:26)INIT2X.SAI.  When the
+new monitor is moved to 26, they will want to rename INIT2X.SAI as INIT2
+and compile and test it before making it public.
+
+For further details on the monitor changes, see P034.MEM.
+
+-Bill
+
+- 7 -
+Posted: March 16, 1983 01:20
+To:   Todd
+From: WRS:930
+Cc:   Mike, Adele
+Re:   /L01 ??
+
+Well, /L01 stuff for ATTACH, RETACH for COEES works okay on 930.  What's
+the plan about version numbers?  Will we keep on with /L## until /L is
+fully operational and then release it as /M?  -Bill
+
+- 8 -
+Posted: March 21, 1983 18:48
+To:   Adele, Vivian
+From: MCH:930
+Re:   DUSAGE
+
+Whee!  COEES is finally beginning to use it.  Angela said today that they
+like it.  /Mike
+- 9 -
+Posted: March 23, 1983 20:06
+Date: March 23, 1983 19:09
+To:   TXS.A/NEWMAN (ADELE:930)
+From: TXS.M/HINCKLEY:EMSAA
+Keywords: A04962 
+
+Adele,
+
+I sent the following ONTYME to Doren Perruccio re SYSTAT or Otis:
+
+Doren,
+
+As per your request for a summary of today's phone call:
+
+1.  My section will provide Otis with a program that will allow an authorized
+    user to set SYSTAT licence on their job.
+
+2.  The program will include the following checks:
+    a.  Otis GAN
+    b.  Account Supervisor status
+    c.  Otis' system number and
+    d.  it will also ask for a password.
+
+3.  We will deliver within 2-3 weeks (sooner if possible).  
+
+                                               /M. Hinckley, Manager
+                                                Systems Development Section
+
+
+- 10 -
+Posted: March 24, 1983 12:24
+To:   Adele
+From: MCH:930
+Re:   Assignment of "SY for Otis" to Lois
+
+Good.  She seems like the best choice.  /Mike
+- 11 -
+Posted: March 25, 1983 11:32
+To:   Adele
+From: WRS:930
+Re:   TVEDIT
+
+I notice you have been using TVEDIT quite a bit lately.  Scott and
+I have decided its long past time to dispose of it.  Do you have any
+problem with this?  -Bill
+
+- 12 -
+Posted: March 25, 1983 13:23
+To:   Adele
+From: WRS:930
+Re:   TVEDIT to disappear May 1 1983
+
+How's that?
+-Bill
+
+- 13 -
+Posted: March 26, 1983 12:00
+To:   Tym.DEU:emsaa
+From: WRS:930
+Cc:   Mike, Adele, Lois
+Re:   P034/L on C39 with 190 net ports 128 jobs
+
+P034/L is now running on 39.  Operations has been asked to move it
+to SYSTEM.SAV.  It is configured for 128 jobs and 190 network ports.
+It seems to run fine, but the real test will come with a full load on
+Monday.  For fear of running out of freecore, I patched it to the value
+I found on the old 39 monitor less the calculated space taken by the
+new LDB's and DDB's.  This makes it aabout 64 pages which may give us
+some problems if people start opening many files.
+-Bill
+
+- 14 -
+Posted: March 27, 1983 17:52
+To:   txs
+From: CARL:930
+Re:   (SPL)FINDIT.SAV
+
+There is a "new" version of FNDFIL called FINDIT.  In addition to the
+stuff FNDFIL used to print, FINDIT also prints file size and protection.
+
+It accepts file specs separated by commas, single wildchar of ? and #,
+wild remainder of field using *, usernames "or" PPNs, wildcard ? in PPNs
+and maybe one day switches.
+
+It is "as fast" as FNDFIL when searching the entire disk, and much
+faster when specific directories or ppn wildcards are used.
+
+If no username or ppn is specified, the default is the entire disk!
+/Carl.
+
+- 15 -
+Posted: March 28, 1983 14:32
+To:   TSU
+From: ADELE:930
+Cc:   Mike
+Re:   new MTS project
+
+I have decided to put in a new MTS project for general technical work which
+is done primarily at the request of groups outside the division.  Right now
+its name is TSU External Technical -- any suggestions will be appreciated
+for a better name.  It has a start date of 4/2/83 and will appear on time
+sheets for next week.
+
+--Adele
+
+- 16 -
+Posted: March 30, 1983 00:32
+To:   txs
+From: CARL:930
+Re:   PCOM 1.60 Field Test
+
+PCOM version 1.60 is back up on (SYS:930) for testing.  This version
+fixes the truncated log files, and stranded jobs running LOGOUT.  New
+features include usernames printed with file specs, /LICENSE (since
+version 1.54) and /WATCH.  Please report any problems, complaints or
+bugs to CARL.
+
