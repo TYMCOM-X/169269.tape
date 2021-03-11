@@ -1,0 +1,37 @@
+	integer	Chan,		! Channel for reading crash files;
+		Eof,		! EOF flag for crash files;
+		WordCnt,	! -Data words left until next IOWD;
+		WordAdr,	! Current address in file (expanded);
+		Word,		! A word from the file;
+		ConfigAdr;	! Holds address of Config table;
+	define	JobVer = '137;	! Pointer to CONFIG;
+	define	SysName1 = 0;	! start of system name in ascii;
+	define	SysName2 = 4;	! end of system name in ascii;
+	integer array Config [SysName1:SysName2];
+
+	ConfigAdr _ 0;
+	WordCnt _ WordAdr _ -1;
+	arrclr (Config);
+	while not Eof do begin "NextBlock"
+	    Word _ wordin (Chan);
+	    WordAdr _ WordAdr + 1;
+	    WordCnt _ WordCnt + 1;
+	    if WordCnt
+	      then begin "DataWord"
+		if WordAdr = JobVer then ConfigAdr _ rh(Word);
+		if  (WordAdr-ConfigAdr geq arrinfo(Config,1)) and
+		    (WordAdr-ConfigAdr leq arrinfo(Config,2))
+		    then Config[WordAdr-ConfigAdr] _ Word;
+	      end "DataWord"
+	      else begin "IOWord"
+		WordAdr _ rh(Word);
+		WordCnt _ (Word ash -18)-1;
+		if (WordAdr>JobVer and ConfigAdr=0) then Eof_true;
+	      end "IOWord";
+	    if (WordAdr > ConfigAdr+arrinfo(Config,2)) then done;
+	end "NextBlock";
+	close (Chan);
+	MonitorVer _ null;
+	for I _ SysName1 upto SysName2 do
+	    MonitorVer _ MonitorVer & cvastr(Config[i]);
+
