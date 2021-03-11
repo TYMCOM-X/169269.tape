@@ -1,0 +1,295 @@
+	TITLE	STRCNT - Count occurrences of strings in a file
+	SUBTTL	Definitions
+
+	SEARCH	UUOSYM
+
+;Register equates
+
+	S=0
+	T1=1
+	T2=2
+	T3=3
+	T4=4
+	F=5
+	A=6
+
+	P=17
+
+; I/O channel equates
+
+	CH1=:1
+	SUBTTL	Get file names and init channels
+
+	TWOSEG
+	RELOC	400000
+
+ST:	JFCL
+	RESET
+	SKIPA	P,[-PDLSIZ,,PDL-1]
+				;Don't clear input buffer first time around
+F1INI:	  CLRBFI
+	MOVEI	F,F1LKB		;Point to lookup block
+	OUTSTR	[ASCIZ/
+Input file name: /]
+	PUSHJ	P,GETFNM	;Get file name from TTY, store in lookup block
+	  JRST	F1INI		;Illegal file name or some such, try again
+	MOVE	T1,[.CHOPN,,CH1]
+	CHANIO	T1,OPNARG	;Open a channel for this file
+	  JRST	OPNERR		;Die
+	HRLI	T1,.CHLK	;Set up args
+	CHANIO	T1,F1LKB	;Look up the file
+	  JRST	LKPERR		;Die
+
+	MOVE	T1,.JBREL	;Highest word in low seg
+	ADDI	T1,777		;Round up
+	TRZ	T1,777		; to next even page boundary
+	MOVE	T2,T1
+	HRLI	T2,(POINT 7,)	;Byte pointer to start of file page
+	MOVEM	T2,FILPTR
+	SETZM	FILPAG
+	LSH	T1,-^D9		;Convert to page number
+	HRLI	T1,(1B7+1B17)	;Rest of .CHMFP arg (read-only, 1 page)
+	MOVEM	T1,MAPARG	;Store into first word of arg block
+	PUSHJ	P,MSGINI	; Init the message buffer
+	PUSHJ	P,NXTPAG	;Set-up byte count & ptr (T3,T4)
+
+FNDEOL:	ILDB	T2,T4
+	IDPB	T2,MSGPTR
+	CAIN	T2,15		;End-of-line (CR) ?
+	  PUSHJ	P,MSGOUT	; Flush the message buffer if so
+	SOSG	T3
+	  PUSHJ	P,NXTPAG
+	JRST	FNDEOL
+; Routine to map next file page
+
+NXTPAG:	SKIPN	FILPAG		;Anything mapped yet?
+	  JRST	NEXT1		;No, don't try VREMOV
+	MOVE	T4,MAPARG	;Before mapping new file page,
+	VREMOV	T4,		; dispose of old one
+	  JRST	RMVERR		;Should never happen
+NEXT1:	AOS	FILPAG
+	MOVE	T4,[.CHMFP,,CH1]
+	CHANIO	T4,MAPARG
+	  JRST	MFPERR
+	MOVE	T4,FILPTR	;Byte ptr to start of page buffer
+	MOVEI	T3,^D<512*5>	;Bytes yet to be processed in page
+	POPJ	P,
+
+MFPERR:	TLZ	T4,-1		;Clear out all but error code
+	CAIE	T4,FLPHP%	;Reached end-of -file?
+	  JRST	MAPERR		;No, something wrong
+
+; End-of-file reached on input file, write output file
+	PUSHJ	P,MSGOUT	;Flush message buffer if any
+XIT:	MOVE	T1,[.CHREL,,CH1]
+	CHANIO	T1,		;RELEASE first file I/O channel
+	  JFCL
+	EXIT	1,
+	SUBTTL	GETFNM - Get File Name from terminal
+
+GETFNM:
+	SETZM	.RBCNT(F)	;Initially, say nothing in lookup block
+	SETZM	.RBPPN(F)	;Clear out PPN in lookup block
+	SETZM	USRNAM(F)	;And user name string
+	SETZM	USRNAM+1(F)
+	HRROI	T1,.AXIWL	;INCHWL AUXCAL
+	AUXCAL	T1,T2		;Get char to T2
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Yes, give error return
+	CAIN	T2," "		;Leading blank?
+	  JRST	.-3		;Yes, skip over leading blanks
+	CAIE	T2,"("		;Start of user name?
+	  JRST	FNAME		;No, scan file name
+	MOVE	T3,[POINT 6,USRNAM(F)] ;Byte pointer to user name string
+	MOVSI	T4,-^D12	;Maximum chars allowed in user name
+GETUNM:
+	AUXCAL	T1,T2		;Keep INCHWL-ing
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Illegal here - give error return
+	CAIN	T2,")"		;End of user name?
+	  JRST	GETUN1		;Branch if yes
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - error return
+	IDPB	T2,T3		;Store into user name string
+	AOBJN	T4,GETUNM
+	AUXCAL	T1,T2		;This should be the close paren
+	  POPJ	P,		;Give error return
+	CAIE	T2,")"		;Is it?
+	  POPJ	P,		;Error return - user name too long
+GETUN1:
+	MOVEI	T3,USRNAM(F)	;Address of SIXBIT user name string
+	MOVEM	T3,.RBPPN(F)	;Store into lookup block
+; Parse file name
+
+FNAME:
+	SETZM	.RBNAM(F)	;Clear file name from lookup block
+	SETZM	.RBEXT(F)	;Also file extension
+	MOVE	T3,[POINT 6,.RBNAM(F)] ;Byte pointer to SIXBIT file name
+	MOVSI	T4,-6		;Max length of file name
+	SKIPN	.RBPPN(F)	;Was there a user-name specified?
+	  JRST	FNAME2		;If not, T2 has first char of file name
+FNAME1:
+	AUXCAL	T1,T2		;T1 still has INCHWL args
+	  POPJ	P,		;Give bad return
+FNAME2:
+	CAIN	T2,15		;End of line?
+	  JRST	FNEXIT		;Yes, escape from this routine
+	CAIN	T2,"."		;End of file name?
+	  JRST	FEXT		;Yes, scan for extension
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Store next char of file name
+	AOBJN	T4,FNAME1	;Loop up to 6
+
+; Have scanned 6 chars of file-name, now look for "." or c-r,
+; ignoring intermediate blanks.
+
+	AUXCAL	T1,T2
+	  POPJ	P,
+	CAIN	T2," "
+	  JRST	.-3		;Ignore blanks
+	CAIN	T2,15		;Carriage return?
+	  JRST	FNEXIT		;Escape if so
+	CAIE	T2,"."		;Seperator?
+	  POPJ	P,		;No, give error return
+
+; Here to scan file extension
+FEXT:
+	MOVE	T3,[POINT 6,.RBEXT(F)]
+	MOVSI	T4,-3		;Max length
+FEXT1:
+	AUXCAL	T1,T2
+	  POPJ	P,		;Give error return
+	CAIN	T2,15		;End-of-line?
+	  JRST	FNEXIT		;Escape if so
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Add to file extension string
+	AOBJN	T4,FEXT1	;Loop up to 3 times
+FNEXIT:	AUXCAL	T1,T2		;Eat input
+	  POPJ	P,
+	CAIE	T2,12		;Line-feed yet?
+	  JRST	FNEXIT
+	SKIPN	.RBNAM(F)	;Did we actually get some sort of file-name?
+	  POPJ	P,		;No, give error return
+	MOVEI	T1,LKBLEN	;Yes, store lookup block length
+	MOVEM	T1,.RBCNT(F)
+CPOPJ1:	AOS	(P)		;General purpose success return
+	POPJ	P,		;Error return
+
+; Routine to fold lower-case ASCII to upper case and convert to SIXBIT
+; Entered with char in T2, no other AC's used.
+
+CVT726:
+	CAIL	T2,40		;Check for legal range for SIXBIT conversion
+	CAILE	T2,"z"
+	  POPJ	P,		;Give error return
+	CAIL	T2,"a"		;Within range of lower-case
+	ADDI	T2,"A"-"a"	;Fold to upper case
+	SUBI	T2,40		;Adjust to SIXBIT character codes
+	ANDI	T2,77		;And leave only six bits
+	JRST	CPOPJ1		;Give good return
+; routine msgini
+; function: initialize msg buffer & params
+; returns: msgbuf zeroed
+;	msgptr/ b.p. to start of buffer
+;	msgct/ chars left to end of buffer
+; destroy: all ac's preserved
+
+msgini:	push p,a
+	move a,[point 7,msgbuf]
+	movem a,msgptr
+	setzm msgbuf
+	move a,[xwd msgbuf,msgbuf+1]
+	blt a,msgbuf+msgsiz-1
+	pop p,a
+	popj p,
+
+msgout:	outstr	msgbuf
+	  jfcl
+	pushj	p,msgini
+	popj	p,
+
+
+	SUBTTL	Error message routines
+
+OPNERR:	OUTSTR	[ASCIZ /
+Error on OPEN for channel
+/]
+	JRST	XIT
+
+LKPERR:	OUTSTR	[ASCIZ /
+LOOKUP error for file
+/]
+	JRST	XIT
+
+ENTERR:	OUTSTR	[ASCIZ /
+ENTER error for file
+/]
+	JRST	XIT
+
+CREERR:	OUTSTR	[ASCIZ /
+Error on VCREAT
+/]
+	JRST	XIT
+
+MAPERR:	OUTSTR	[ASCIZ /
+Error on MAP
+/]
+	JRST	XIT
+
+RMVERR:	OUTSTR	[ASCIZ /
+Error on VREMOV
+/]
+	JRST	XIT
+
+VMVERR:	OUTSTR	[ASCIZ /
+VMOVPG error
+/]
+	JRST	XIT
+	SUBTTL	Pure storage
+
+OPNARG:	0
+	SIXBIT	/DSK/
+	0
+
+	LIT
+	SUBTTL	Impure storage
+
+	RELOC	0
+
+F1LKB:	PHASE	0	;Extended lookup block (just a small one)
+.RBCNT:	BLOCK	1
+.RBPPN:	BLOCK	1
+.RBNAM:	BLOCK	1
+.RBEXT:	BLOCK	1
+.RBPRV:	BLOCK	1
+.RBSIZ:	BLOCK	1
+.RBVER:	BLOCK	1
+.RBFUT:	BLOCK	1
+.RBEST:	BLOCK	1
+.RBALC:	BLOCK	1
+USRNAM:	BLOCK	2
+	DEPHASE
+	LKBLEN==.-F1LKB-2
+
+MAPARG:	BLOCK	1	;First word of Map File Page arg block, also
+			; used for VREMOV call
+FILPAG:	BLOCK	1	;Second word of Map File Page arg block
+
+FILPTR:	BLOCK	1	;Byte pointer to file page buffer
+
+LOGBAS:	BLOCK	1	;Address of log base
+
+NAMSTR:	BLOCK	2	;SIXBIT user name string
+
+	PDLSIZ=40
+PDL:	BLOCK	PDLSIZ
+
+MSGPTR:	BLOCK	1
+	MSGSIZ=40
+MSGBUF:	BLOCK	MSGSIZ
+
+	END	ST
