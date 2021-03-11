@@ -1,0 +1,361 @@
+
+Title: LUD; Format of LUD                                                 page 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            Published:   JULY 27,1983
+            System:      930
+            Directory:   [3,123054]
+            Data base:   INFO
+            Path:        ROOT/FORMAT/LUD
+            Node:        LUD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       1
+Contents: LUD; Format of LUD                                              page 1
+
+LUD: Format of LUD    3     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       2
+Text: LUD; Format of LUD                                                  page 1
+
+		PDP-10 LUD FORMAT
+
+The LUD file [(SYS)LUD.SYS] consists of 887  normal
+blocks, numbered 1 to 887 and any number of overflow blocks.
+The format description starts at the begining of the block
+specified by a hash locater generated from the user name.
+This format is reapeated as necessary.
+
+When an entry is deleted, the space is not necessarily reclaimed
+immediately. An empty entry will be indicated by a hashed
+user name (word 4) or 0.
+
+WORD 0: Project-Programmer number. Same as Global Account Number
+	in left half, Universal User Number in right half.
+	If the word is 0, it is the end of the block and there
+	are no more overflow blocks for this hash locater.
+	If the word is negative, the right half contains the
+	block number of the next overflow block for this hash
+	locater.
+
+WORD 1:	Bits 28-35 (377) District number
+
+WORD 2:	BIT 0 User may NOT login under this name
+	BIT 1 User should NOT recieve the 'TYMSHARE' message
+	BIT 2 Resticted bit
+	BIT 3 Anyone in this GAN can GFD here
+	BIT 4 TRU budget word present
+	BIT 5 Do NOT allow ATTACH during login
+	BIT 6 Force ATTACH at login (If any DET jobs)
+	BIT 7 Do NOT allow multiple jobs this UUN
+	BIT 8 Do NOT require PROJECT CODE
+	BITS 9-20 Unused
+	BITS 21-26 Indicate broadcast LETTER not yet recieved
+	 by this user. Bit 26 indicates broadcast letter 1.
+	BIT 27 (400) Indicates there is a program to be run
+	 automatically for this user when he logs in.
+	BIT 28 Unused
+	BITS 29-35 (177) Size of this entry in words.
+
+WORD 3:	Privilege bits
+	BITS 0-1 (600000) Language bits.
+	BIT 2 (100000) This user should be switched to
+	 daylight savings time at appropriate time.
+	BITS 3-7 (76000) Number of hours displacement from
+	 GMT which should be applied for this user.
+	  A zero value in this field is interpreted as PACIFIC zone.
+	  All other values are inerpreted as a four bit displacement
+	  from GMT.  If bit 3 (40000) is ON, the displacement is
+	  positive, if bit 3 is OFF, the displacement is negative.
+	BITS 8-10 Unused
+	BITS 11-17 Settable amount of core this user can access.
+	 This should be set to same number as bits 29-35.
+	BIT 18 Reserved for use by MONITOR, ignored in this field.
+	BIT 19-20 One of
+		0 - LOGOUT ON DISCONNECT
+
+
+                                       3
+Text: LUD; Format of LUD                                                  page 2
+
+		1 - DETACH ON DISCONNECT
+		2 - CONTINUE ON DISCONNECT
+		3 - DETACH ON DISCONNECT - TIMEOUT
+	BIT 21 (40000) Tymshare proprietary
+	BIT 22 (20000) Account supervisor
+	BIT 23 Used by MONITOR (for Mail waiting)
+	BIT 24 Used by MONITOR. Ignored in this field.
+	BIT 25 (2000) Set by LOGIN from bit 4 of word 2 TRU control
+	BIT 26 Unused
+	BITS 27-28 Mode user is running in
+	   0 PDP-10 MODE
+	   1 TYMEX (940) MODE
+	   2 GE MODE
+	   3 SUDS MODE
+	BITS 29-35 Amount of memory user is allowed to have.
+	 This number has 1 added to it and is then multiplied by
+	 2 to determine number of K of memory allowed. This
+	 number is subject to a MINIMUM in the MONITOR and a
+	 maximum imposed by PHYSICAL memory size.
+
+WORD 4:	Hashed user name
+
+WORD 5:	TRU budget (possibly not present)
+
+WORD 6A:Name of program to run (this word and the 2 following it
+	 are present only if word 2 indicates that there is
+	 such a program.
+
+WORD 7A:First half of user name of program to run.
+WORD 10A:Second half of user name (in sixbit).
+
+WORD 6:	(OR 11) BITS 0-23 Name of file structure.
+	BITS 24-35 Flag bits for file structure.
+	  BIT 24 Structure READ ONLY for this user.
+	  BIT 25 Do NOT create new files in this structure.
+	  BITS 26-35 Undefined
+
+WORD 7:	Logged in QUOTA (in BLOCKS)
+
+WORD 10:Logged out QUOTA (in BLOCKS)
+
+These three words are repeated for each structure the user can
+access. The number of repeats may be determined from the size
+field in word 2.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       4
+Text: LUD; Format of LUD                                                  page 3
+
+		Hash Subroutine
+
+Routine takes a 12 character user name (SIXBIT) in T1 and T2.
+It uses accumulators T3,T4,A,B,C,D, and E. T1 and T2 must be
+consecutive. T3 and T4 must be consecutive. C,D, and E must
+be consecutive. The routine returns the hashed user name in T1
+and the block number (hash locater) in T2.
+
+HASH:	0
+	MOVEI	B,0
+	MOVE	C,[555555555555]
+	MOVE	D,[361275431652]
+	MOVE	E,[612754316523]
+	JSR	RND
+	JSR	RND
+	JSR	RND
+	JSR	RND
+	XOR	E,D
+	MOVE	T1,E
+	TLZ	T1,400000
+	IDIVI	T1,^D887
+	ADDI	T2,1
+	XOR	C,E
+	MOVE	T1,C
+	JRST	@HASH
+
+RND:	0
+	ADD	D,T1
+	ROTC	T1,-22
+	MOVEI	A,5
+RND1:	MOVE	T3,D(B)
+	MUL	T3,[5*5*5*5*5*5*5*5*5*5*5*5*5*5*5]	;5^15
+	ADDM	T4,E(B)
+	AOJE	B,RND2
+	MOVNI	B,1
+	TRNE	D,1
+	SKIPL	E
+	MOVEI	B,0
+	EXCH	C,E
+RND2:	SOJG	A,RND1
+	JRST	@RND
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       5
+Index: LUD; Format of LUD                                                 page 1
+
+
+
+LUD  3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       6
