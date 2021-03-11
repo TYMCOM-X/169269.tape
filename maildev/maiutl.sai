@@ -1,0 +1,271 @@
+begin "mail utility"
+
+  require "(sailib)sail.def" source!file;
+  require "nbsmsg.def" source!file;
+  require 1 version;
+
+  define DEBUG = {true};
+
+
+!	M   M   AAA   III  U   U  TTTTT  L
+!	MM MM  A   A   I   U   U    T    L
+!	M M M  AAAAA   I   U   U    T    L
+!	M   M  A   A   I   U   U    T    L
+!	M   M  A   A  III   UUU     T    LLLLL
+!
+!
+!  Dave W. Smith  July, '82. ;
+! globals ;
+
+  string CmdLine, Cmd;
+
+
+! stuff for the .chufd chanio ;
+
+  define !chufd = {'33};
+
+  integer UFDChan, UFDEOF;
+  integer array UFDBlk1[ 0 : 7 ];
+  integer array UFDBlk2[ 0 : 611 ];
+  integer UFDBlk2Idx;
+  integer NameFromUFD, ExtFromUFD;
+
+procedure InitUFDStuff;
+  begin
+    open( UFDChan := getchan, "DSK", '17,0,0,512,0,UFDEOF );
+    lookup( UFDChan, "(UFD)'3167357.UFD", UFDEOF );
+    if ( UFDEOF ) then
+      usererr(0,0,"?Can't lookup (MAIL).UFD "&cvos(UFDEOF),"x" );
+  end;
+
+require InitUFDStuff initialization;
+! Stuff for looking at the DUL (the file which maps PPNs to usernames).
+!
+! This code was lifted from the stream scanning stuff.  The Cache isn't
+! really necessary for this application, but isn't going to hurt us much.
+;
+
+  define CACHESIZE = 250;
+  own integer Cache!Sequence;				! cache serial # ;
+  own safe integer array Cache!Seq[ 1 : CACHESIZE ];
+  own safe integer array Cache!PPN[ 1 : CACHESIZE ];
+  own safe string array Cache!User[ 1 : CACHESIZE ];
+
+  own integer DUL, DUL!EOF, DUL!Block!Number;
+  own integer array DUL!Block[ 0 : 127 ];
+
+procedure InitDULStuff;
+  begin
+    open( DUL := getchan, "DSK", '16,0,0,DUL!EOF,DUL!EOF,DUL!EOF );
+    lookup( DUL, "DUL.SYS[1,4]", DUL!EOF );
+    if ( DUL!EOF ) then usererr( 0,0,"Can't access (SYS)DUL.SYS" );
+    DUL!Block!Number := -1;
+  end;
+
+require InitDULStuff initialization;
+! Convert a PPN to a username.  Check first in the cache.  If not found
+!  go to the DUL and cache the result. ;
+
+simple string procedure CVUser( integer PPN );
+  begin "convert ppn to username"
+
+    own integer i, hash, lowitem, lowvalue;
+    own string username;
+
+    Cache!Sequence := Cache!Sequence + 1;
+
+    for i := 1 upto CACHESIZE do
+      if ( Cache!PPN[ i ] = PPN ) then
+	begin
+	  Cache!Seq[ i ] := Cache!Sequence;	! record the hit ;
+	  return( Cache!User[ i ] );
+	end;
+
+! continued ... ;
+! continued ... ;
+
+    ! Didn't find the PPN in the cache.  Go to the DUL for it. ;
+
+    if ( DEBUG ) then
+      print( crlf,"[",cvos(!lh(PPN)),",",cvos(!rh(PPN)),"] -> " );
+
+
+    hash := PPN mod 101 + 1;
+    useti( DUL, hash );
+    if ( DUL!EOF ) then
+      begin
+	username := "[" & cvos(!lh(PPN)) & "," & cvos(!rh(PPN)) & "]";
+      end
+    else
+      begin
+	while true do
+	  begin "search DUL"
+	    if ( hash neq DUL!Block!Number ) then
+	      arryin( DUL, DUL!Block[ 0 ], 128 );
+	    DUL!Block!Number := hash;
+	    for i := 0 step 3 until 127 do
+	      begin "search block"
+		if ( DUL!Block[ i ] = PPN ) then done "search DUL"
+		else if ( DUL!Block[ i ] = 0 ) then done "search DUL"
+		else if ( DUL!Block[ i ] < 0 ) then done "search block";
+	      end "search block";
+	    hash := DUL!Block[ i ] land '777777 + 1;
+	    useti( DUL, hash );
+	  end "search DUL";
+      end;
+
+    if ( DUL!Block[ i ] ) then
+      begin
+	username := cvxstr( DUL!Block[ i+1 ] ) & cvxstr( DUL!Block[ i+2 ] );
+	while ( username[ inf for 1 ] = " " ) do
+	  username := username[ 1 for inf-1 ];
+      end
+    else
+      username := "[" & cvos(PPN lsh -18) & "," & cvos(PPN land '777777) & "]";
+
+    if ( DEBUG ) then
+      print( username, crlf );
+
+! continued ... ;
+! continued ... ;
+
+    ! Save this PPN and username in the cache, discarding the oldest entry. ;
+
+    lowitem := 1;  lowvalue := Cache!Seq[ 1 ];
+    for i := 1 upto CACHESIZE do
+      begin
+	if ( Cache!Seq[ i ] < lowvalue ) then
+	  begin
+	    lowitem := i;
+	    lowvalue := Cache!Seq[ i ];
+	  end;
+      end;
+    Cache!PPN[ lowitem ] := PPN;
+    Cache!User[ lowitem ] := username;
+    Cache!Seq[ lowitem ] := Cache!Sequence;
+
+    return( username );
+
+  end "convert ppn to username";
+! Routine to set up for UFD Scanning ;
+
+procedure SetupUFDScan;
+  begin
+
+    arrclr( UFDBlk2 );
+
+    UFDBlk1[ 0 ] := !xwd( -612, location( UFDBlk2[0] ));
+    UFDBlk1[ 1 ] := cvsix( "######" );
+    UFDBlk1[ 2 ] := cvsix( "MAI" );
+    UFDBlk1[ 3 ] := '370000000000;
+    UFDBlk1[ 4 ] := 0;
+    UFDBlk1[ 5 ] := 0;
+    UFDBlk1[ 6 ] := 0;
+    UFDBlk1[ 7 ] := 0;
+
+    chnior( UFDChan, UFDBlk1[ 0 ], !chufd );
+    if ( not !skip! ) then UFDBlk1[ 7 ] := 0;
+
+    UFDBlk1[ 5 ] := UFDBlk2[ 0 ];
+    UFDBlk1[ 6 ] := UFDBlk2[ 1 ];
+
+    UFDBlk2Idx := 0;
+
+    if ( DEBUG ) then
+      begin
+	print( "UFDBlk1[ 7 ] =  ", UFDBlk1[ 7 ], crlf );
+	print( "UFDBlk2[ 0 ] = '", cvos( UFDBlk2[ 0 ] ), crlf );
+	print( "UFDBlk2[ 6 ] = '", cvos( UFDBlk2[ 6 ] ), crlf );
+      end;
+
+  end;
+! Scan the next ufd entry ;
+
+boolean procedure ScanUFD;
+  begin
+
+    if ( UfdBlk2Idx = 102 ) then
+      begin
+	chnior( UFDChan, UFDBlk1[ 0 ], !chufd );
+	UFDBlk1[ 5 ] := UFDBlk2[ 0 ];
+	UFDBlk1[ 6 ] := UFDBlk2[ 1 ];
+	UfdBlk2Idx := 0;
+      end;
+
+    if ( UfdBlk2Idx = UfdBlk1[ 7 ] ) then return( false );
+
+    if ( DEBUG ) then
+      begin
+	print( ".CHUFD -> '", cvos( UFDBlk2[ UFDBlk2Idx * 6 + 0 ] ), crlf );
+      end;
+
+    NameFromUFD := UFDBlk2[ UFDBlk2Idx * 6 + 0 ];
+    ExtFromUfd := UFDBlk2[ UFDBlk2Idx * 6 + 1 ];
+
+    UFDBlk2Idx := UFDBlk2Idx + 1;
+
+    return( true );
+
+  end;
+! Procedure to list who has mail ;
+
+procedure ListWhoHasMail;
+  begin
+    string U; integer Hits;
+
+    SetupUFDScan;  Hits := 0;
+
+    while ( ScanUFD ) do    
+      begin
+	if ( not Hits ) then print( "Mail Pending for:", crlf );
+	Hits := Hits + 1;
+	U := CVUser( NameFromUFD );
+	print( "  ", U, crlf );
+      end;
+
+    if ( not Hits ) then print( "No Pending Mail", crlf );
+
+  end;
+! Routine to print a help message ;
+
+procedure GiveHelp;
+  begin "give help"
+
+    print( "
+Commands are:
+
+HELP     - this message
+QUIT     - go away
+WHO      - list who has mail
+
+" );
+
+  end "give help";
+! Top level logic.  ;
+
+  print( "Mail Utility v" & cvos(memory['137]) & "." & crlf & crlf );
+
+  while ( true ) do
+    begin "command loop"
+
+      print( "*" );
+      CmdLine := inchwl;
+      if ( not CmdLine ) then continue;
+
+      Cmd := CmdLine;	! ** hack ** scan this later ;
+      if ( kequ( Cmd, "?" )) then
+	GiveHelp
+      else if ( kequ( Cmd, "Help" )) then
+	GiveHelp
+      else if ( kequ( Cmd, "Who" )) then
+	ListWhoHasMail
+      else if ( kequ( Cmd, "Quit"[1 to length(Cmd)])) then
+	done
+      else
+	print( "Eh?  Type ? for help", crlf );
+
+    end "command loop";
+
+  call( 0, "EXIT" );
+
+end "mail utility";
