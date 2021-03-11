@@ -1,0 +1,771 @@
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 1-1
+     Prt: 07-Aug-84  13:11                             COMM4 - File I/O Commands
+
+     
+     ! *************************************************************************
+     *                                                                         *
+     *                                  COMM4                                  *
+     *                            File I/O Commands                            *
+     *                                                                         *
+     ***************************************************************************
+     
+     
+                This file is required as a source!file in COMAND.SAI.
+     
+     
+     **************************************************************************;
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 2-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!NewBuffer
+
+     
+     ! Routine to build a work buffer ;
+     
+     simple procedure C!NewBuffer;
+     begin |1|
+       ifcr Tops20 thenc
+         define
+           CloseFile = true;
+       endc
+     
+       C!ArgV _ 0;
+     
+       if (not B!FreeP) then
+       begin |2|
+         W!Msg("No Free Buffers!");
+         return;
+       end; |2|
+     
+       ifcr TymComX thenc
+         B!CheckPoint;
+         B!Make(NULL, "(Scratch)");
+       endc
+     
+       ifcr Tops20 thenc
+         B!CheckPoint(CloseFile);
+           ! Close the Checkpoint File and free up B!Chan.
+           ;
+     
+         B!CreateChkPntFile(null, "(Scratch)");
+       endc
+     
+       W!NewS;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 3-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!KillBuffer
+
+     
+     ! Routine to kill a buffer ;
+     
+     simple procedure C!KillBuffer;
+     begin |1|
+       C!ArgV _ 0;
+     
+       if (W!Buf0 = W!Buf1) then
+         W!Msg("You cannot kill a buffer while it is in two windows.")
+       else if (B!Cnt) then
+         ifcr TymComX thenc
+           B!Kill
+         endc
+     
+         ifcr Tops20 thenc
+           B!DelCurrentBuffer
+         endc
+       else
+         W!Msg("You cannot kill your only buffer.");
+     
+       W!NewS;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 4-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!ReadFile
+
+     
+     ! Prompt for a file spec and read a file. ;
+     
+     simple procedure C!ReadFile;
+     begin "C!ReadFile" |1|
+       string
+         Prompt,
+         Str,
+         Switches;
+       integer
+         Error;
+       define
+         CloseFile      = true,
+         F.OK           = 0,
+         F.BAD.SWITCH   = 1,
+         F.BAD.FILESPEC = 2;
+     
+     
+       C!ArgV _ 0;
+       Prompt _ "Read File: ";
+     
+       if (not B!FreeP) then
+       begin |2|
+         W!Msg("No Free Buffers!");
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (not C!ReadString(Prompt, CR, ESC)) then
+         C!String _ null;
+     
+       if (C!String = null) then
+       begin |2|
+         W!Msg(Prompt & "[Aborted]");
+         return;
+       end; |2|
+     
+       if ((Error _ F!Scan(C!String)) neq F.OK) then
+       begin |2|
+         case (Error) of
+         begin |3|
+           [F.BAD.FILESPEC]
+             W!Msg(Prompt & C!String & " [Bad FileSpec]");
+     
+           [F.BAD.SWITCH]
+             W!Msg(Prompt & C!String & " [Bad Switch]")
+         end; |3|
+     
+         T!Bell;
+         return;
+       end; |2|
+     
+       begin |2|
+         string
+           Dummy;            ! Dummy to fake out the oracle.
+                             ;
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 4-2
+     Prt: 07-Aug-84  13:11                                        Rtn C!ReadFile
+
+     
+         ifcr TymcomX thenc
+           F!Decompose(C!String, Dummy, Dummy, Dummy, Dummy, Dummy, Switches);
+         endc
+     
+         ifcr Tops20 thenc
+           F!Decompose(C!String, Dummy, Dummy, Dummy, Dummy, Dummy, Dummy,
+               Switches);
+         endc
+       end; |2|
+     
+       Str _ F!Parse(C!String);
+       appnd(Prompt, Str & Switches);
+     
+       W!Msg(Prompt & " [Working]");
+       W!MsgF _ true;
+       W!Disp(true);
+     
+       ifcr TymComX thenc
+         B!CheckPoint;
+         B!Make(Str, null);
+     
+         if (F!Load(Str, -1, -1, -1)) then
+           W!Msg(Prompt & "  [Complete]")
+         else
+           W!Msg(Prompt & "  [Failed]");
+       endc
+     
+       ifcr Tops20 thenc
+         B!CheckPoint(CloseFile);
+     
+           ! Close the Checkpoint File and free up B!Chan.
+           ;
+     
+         if (B!CreateChkPntFile(Str)) then
+           ! Successfully created the Checkpoint file.
+           ;
+     
+           W!Msg(Prompt & "  [Complete]")
+         else
+           W!Msg(Prompt & "  [Failed]");
+       endc
+     
+       B!Prot _ 0;
+     
+         ! Establish the file protection default.
+         ;
+     
+       W!MsgF _ false;
+       W!NewS;
+       W!FixS;
+     end "C!ReadFile"; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 5-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!InsertFile
+
+     
+     ! Prompt file a file spec and insert a file at the point. ;
+     
+     simple procedure C!InsertFile;
+     begin |1|
+       string
+         Prompt,
+         Str;
+     
+       if (B!Lock) then
+         PuntCommand;
+     
+       C!ArgV _ 0;
+       Prompt _ "Insert File: ";
+     
+       if (not C!ReadString(Prompt, CR, ESC)) then
+         C!String _ null;
+     
+       if (C!String = null) then
+       begin |2|
+         W!Msg(Prompt & "[Aborted]");
+         return;
+       end; |2|
+     
+       Str _ F!Parse(C!String);
+     
+       if (not Str) then
+       begin |2|
+         W!Msg(Prompt & C!String & " [Bad FileSpec]");
+         T!Bell;
+         return;
+       end; |2|
+     
+       appnd(Prompt, Str);
+       W!Msg(Prompt & " [Working]");
+     
+       W!MsgF _ true;
+       W!Disp(true);
+     
+       ifcr TymcomX thenc
+         if (F!Read(Str)) then
+           W!Msg(Prompt & "  [Complete]")
+         else
+           W!Msg(Prompt & "  [Failed]");
+       endc
+     
+       ifcr Tops20 thenc
+         if (B!FileInsert(Str)) then
+           W!Msg(Prompt & "  [Complete]")
+         else
+           W!Msg(Prompt & "  [Failed]");
+       endc
+     
+       W!MsgF _ false;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 6-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!WriteFile
+
+     
+     ! Write out the buffer to a file. ;
+     
+     procedure C!WriteFile;
+     begin |1|
+       string
+         Prompt,
+         Str;
+     
+       C!ArgV _ 0;
+       Prompt _ "Write File [" & B!File & "]: ";
+     
+       if (not C!ReadString(Prompt, CR, ESC)) then
+       begin |2|
+         W!Msg(Prompt & "[Aborted]");
+         return;
+       end; |2|
+     
+       if (C!String) then
+       begin |2|
+         Str _ F!Parse(C!String);
+     
+         if (not Str) then
+         begin |3|
+           W!Msg(Prompt & C!String & " [Bad FileSpec]");
+           T!Bell;
+           return;
+         end; |3|
+     
+         appnd(Prompt, Str);
+         W!Msg(Prompt);
+         appnd(Prompt, " ");
+       end |2|
+       else
+         Str _ B!File;
+     
+       W!Msg(Prompt & "[Working]");
+       W!MsgF _ true;
+       W!Disp(true);
+     
+       if (F!Writ(Str)) then
+       begin |2|
+         W!Msg(Prompt & "[Complete]");
+         B!ModP _ false;
+       end |2|
+       else
+         W!Msg(Prompt & "[Failed]");
+     
+       W!MsgF _ false;
+       W!FixS;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 7-1
+     Prt: 07-Aug-84  13:11                                          Rtn C!Finish
+
+     
+     ! Finish by writing out the file and exiting ;
+     
+     simple procedure C!Finish;
+     begin "C!Finish" |1|
+       C!ArgV _ 0;
+       W!MsgF _ true;
+     
+       if (not B!AnyM) then
+       begin |2|
+         W!Msg("No Buffers Modified");
+         W!Disp(true);
+         B!Fini(false);
+       end |2|
+       else
+       begin |2|
+         string
+           Str;
+     
+         Str _ "Writing Modified Buffer";
+     
+         if (B!ModCnt > 1) then
+           appnd(Str, "s");
+     
+         W!Msg(Str & "...");
+     
+           ! <<  We should list the buffer here.
+           ;
+     
+         W!Disp(true);
+         W!MsgF _ false;
+         if (not B!Fini(true)) then
+           return;
+       end; |2|
+     
+       F!Exit;
+       C!Quit _ true;
+     end "C!Finish"; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 8-1
+     Prt: 07-Aug-84  13:11                                          RtunRPG
+
+     
+     ! Finish by writing out the file and calling RPG ;
+     
+     simple procedure C!RunRPG;
+     begin |1|
+       F!RPGFlag _ true;
+       C!Finish;
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                             Page 9-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!SafeExit
+
+     
+     ! Just exit.  (The safe way). ;
+     
+     simple procedure C!SafeExit;
+     begin |1|
+       string
+         Str;
+       boolean
+         ExitP;
+     
+     
+       C!ArgV _ 0;
+       ExitP  _ true;
+     
+       if (B!AnyM) then
+       begin |2|
+         Str _ "Buffer";
+     
+         if (B!ModCnt > 1) then
+           appnd(Str, "s");
+     
+         appnd(Str, " modified.  Exit? ");
+     
+         if (not (ExitP _ C!Ask(Str))) then
+           appnd(Str, "No")
+         else
+           appnd(Str, "Yes");
+     
+         ifcr Tops20 thenc
+           T!FlshIBuf;
+     
+             ! Flush the terminal input buffer of a possible CR response.
+             ;
+         endc
+       end; |2|
+     
+       W!Msg(Str);
+       W!MsgF _ true;
+       W!Disp(true);
+     
+       if (not ExitP) then
+       begin |2|
+         W!MsgF _ false;
+         return;
+       end; |2|
+     
+       B!Fini(false);
+       F!Exit;
+       C!Quit _ true;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 10-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!UnModify
+
+     
+     ! "Un"modify a buffer ;
+     
+     simple procedure C!UnModify;
+     begin |1|
+       define
+         DontClose = {false};                        ! Don't close the
+                                                     ! checkpoint file.
+                                                     ;
+     
+       B!ModP _ false;
+     
+       ifcr TymcomX thenc
+         B!CheckPoint;
+       endc
+     
+       ifcr Tops20 thenc
+         B!CheckPoint(DontClose);
+       endc
+     
+       W!FixS;
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 11-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!Checkpoint
+
+     
+     ! Checkpoint the buffer ;
+     
+     simple procedure C!Checkpoint;
+     begin |1|
+       string
+         Str;
+     
+       define
+         DontClose = {false};                        ! Don't close the
+                                                     ! checkpoint file.
+                                                     ;
+     
+     
+       Str _ "Checkpoint ";
+       W!Msg(Str);
+       C!ArgV _ 0;
+       W!MsgF _ true;
+       W!Disp(true);
+       W!MsgF _ false;
+     
+       ifcr TymcomX thenc
+         B!CheckPoint;
+       endc
+     
+       ifcr Tops20 thenc
+         B!CheckPoint(DontClose);
+       endc
+     
+       W!Msg(Str & " [Complete]");
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 12-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!UnCheckpoint
+
+     
+     ! Recover the last checkpoint ;
+     
+     simple procedure C!UnCheckpoint;
+     begin |1|
+       string
+         Str;
+     
+       Str _ "Checkpoint ";
+     
+       if (B!CkPtSer) then
+       begin |2|
+         ! There has been a checkpoint done.
+         ;
+     
+         C!ArgV _ 0;
+         W!Msg(Str);
+         W!MsgF _ true;
+         W!Disp(true);
+         W!MsgF _ false;
+     
+         ifcr Tops20 thenc
+           B!RestoreFromEDT;
+         endc
+     
+         ifcr TymcomX thenc
+           B!Restore;
+         endc
+     
+         W!Msg(Str & " [Restored]");
+       end |2|
+       else
+         W!Msg("No checkpoint has been done.");
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 13-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!NextBuffer
+
+     
+     ! step forward through the buffer chain ;
+     
+     simple procedure C!NextBuffer;
+     begin |1|
+       if (not C!ArgV) then
+         C!ArgV _ 1
+       else
+         C!ArgV _ (C!ArgV min hr(B!Cnt)) max 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         B!Step(FORWARDS);
+         decr(C!ArgV);
+       end; |2|
+     
+       W!NewS;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 14-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!LastBuffer
+
+     
+     ! step backwards ;
+     
+     simple procedure C!LastBuffer;
+     begin |1|
+       if (not C!ArgV) then
+         C!ArgV _ 1
+       else
+         C!ArgV _ (C!ArgV min lh(B!Cnt)) max 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         B!Step(BACKWARDS);
+         decr(C!ArgV);
+       end; |2|
+     
+       W!NewS;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 15-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!CmdFile
+
+     
+     ! Load commands from a file.
+     ;
+     
+     forward simple boolean procedure C!File(String F);
+     
+     procedure C!CmdFile;
+     begin "C!CmdFile" |1|
+       string
+         Str,
+         S;
+     
+       C!ArgV _ 0;
+       Str _ "Command File: ";
+     
+       if (not C!ReadString(Str, CR, ESC)) then
+         C!String _ null;
+     
+       if (C!String = null) then
+       begin |2|
+         W!Msg(Str & " [Aborted]");
+         return;
+       end; |2|
+     
+       appnd(Str, (S _ F!Parse(C!String)));
+     
+       if (not S) then
+       begin |2|
+         W!Msg(Str & C!String & " [Bad FileSpec]");
+         return;
+       end; |2|
+     
+     
+       set(W!MsgF);
+       W!Msg(Str & " [Working]");
+       W!Disp(true);
+       clear(W!MsgF);
+     
+       if (C!File(S)) then
+         W!Msg(Str & "  [Complete]")
+       else
+       begin |2|
+         T!Bell;
+         W!Msg(Str & "  [Failed]");
+       end; |2|
+     end "C!CmdFile"; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 16-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!PushFrame
+
+     
+     ! Push to another frame.  (POP back in /K14 and later monitors). ;
+     
+     procedure C!PushFrame;
+     begin |1|
+       integer
+         Err,
+         FD;
+     
+       C!ArgV _ 0;
+     
+       ifcr TymcomX thenc
+         W!Msg("Type POP to return to " & DED!Alias);
+         W!MsgF _ true;
+         W!Disp(true);
+         W!MsgF _ false;
+     
+         start!code |2|
+           label lx;
+             setzm   Err;
+             hrlzi   1, '1;          ! 1 -> create new frame ;
+             setz    2, ;
+             frmop   1, 2;
+               setom Err;
+             skipe   Err;
+               jrst  lx;
+             movem   1, FD;
+             hrro    1, FD;
+             hrloi   2, '200000;     ! command level ;
+             movei   3, 1;
+             calli   3, -'135;       ! retach 3, ;
+               setom Err;
+             skipe   Err;
+               jrst  lx;
+             ttcall  '16, '7;        ! outchi 7 ;
+           lx:
+         end; |2|
+       endc
+     
+       ifcr Tops20 thenc
+         W!Msg("Push not implemented yet");
+       endc
+     
+       C!Refresh;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 17-1
+     Prt: 07-Aug-84  13:11                           Rtn C!RecoverCheckpointFile
+
+     
+     ! Recover from a checkpoint file. ;
+     
+     procedure C!RecoverCheckpointFile;
+     begin "C!RecoverCheckpointFile" |1|
+       ifcr TymcomX thenc
+         string
+           Ext,
+           Dummy,
+           Name,
+           Str;
+     
+         C!ArgV _ 0;
+         Str    _ "Checkpoint File: ";
+     
+         if (not C!ReadString(Str, CR, ESC)) then
+         begin |2|
+           W!Msg(Str & "[Aborted]");
+           PuntCommand;
+         end; |2|
+     
+         if (not F!Decompose(C!String, Dummy, Name, Ext, Dummy, Dummy, Dummy))
+             then 
+         begin |2|
+           W!Msg(Str & C!String & " [Bad FileSpec]");
+           PuntCommand;
+         end; |2|
+     
+         B!CKFile(cvsix(Name), cvsix(Ext));
+         W!Msg(Str & "  [Complete]");
+         W!NewS;
+       endc
+     
+       ifcr Tops20 thenc
+         string
+           Str,
+           S;
+     
+     
+         C!ArgV _ 0;
+         Str    _ "Checkpoint File: ";
+     
+         if (not C!ReadString(Str, CR, ESC)) then
+         begin |2|
+           W!Msg(Str & "[Aborted]");
+           PuntCommand;
+         end; |2|
+     
+         if (not F!Scan(C!String)) then
+         begin |2|
+           W!Msg(Str & C!String & " [Bad FileSpec]");
+           PuntCommand;
+         end; |2|
+     
+         B!CKFile(C!String);
+         W!Msg(Str & "  [Complete]");
+
+
+
+     Cre: 07-Aug-84  12:55  (PEAK)COMM4.REQ                            Page 17-2
+     Prt: 07-Aug-84  13:11                           Rtn C!RecoverCheckpointFile
+
+         W!NewS;
+       endc
+     end "C!RecoverCheckpointFile"; |1|
+     
+     
+     ! *************************  End of COMM4.REQ  ***************************;
+   ' }Û
