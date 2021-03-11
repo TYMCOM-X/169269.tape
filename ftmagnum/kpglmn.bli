@@ -1,0 +1,370 @@
+MODULE KPGLMN(DOLLAR,DEBUG,ENTRIES=($KGPGL,$KRPGL,$KFPGL,$KALCL,$KDLCL,$KCPGL,$KVPGL,$KCPLF))=
+BEGIN
+
+% Last revision  12-Sept-79 ... RLS %
+
+REQUIRE (XMAGNDEV)K1DEFS.BLI;
+REQUIRE (XMAGNDEV)K2DEFS.BLI;
+REQUIRE (XMAGNDEV)K3DEFS.BLI;
+REQUIRE (XMAGNDEV)K7DEFS.BLI;
+REQUIRE (XMAGNDEV)K8DEFS.BLI;
+REQUIRE (XMAGNDEV)UDEFS.BLI;
+REQUIRE (XMAGNDEV)FDEFS.BLI;
+REQUIRE (XMAGNDEV)C1DEFS.BLI;
+REQUIRE (XMAGNDEV)C2DEFS.BLI;
+REQUIRE (XMAGNDEV)SBDEFS.BLI;
+EXTERNAL RLEVL$;
+EXTERNAL KISBP$, KISBJP$, KILBT$, KIFLG$;
+UNDECLARE $KGPGL,$KRPGL,$KFPGL,$KALCL,$KDLCL,$KCPGL,$KVPGL,$KCPLF;
+
+MACHOP CALLI = #047;
+
+BIND SETTIM = -#37;
+
+
+MAP KLMS$ KLOCK$;
+
+MACRO INC(NAME) = NAME := .NAME + 1 &;
+MACRO DEC(NAME) = NAME := .NAME - 1 &;
+
+
+ROUTINE ERROR(NUMBER)=
+   BEGIN
+   $KRMSL();
+   $UMESS(UV$ABORT,FTLMS$<36,7>);
+   $FATAL(FV$CONTINUE,.NUMBER);
+   END;
+
+GLOBAL ROUTINE $KALCL(FIDT,PN)=
+
+   BEGIN
+   MAP KFIDT$ FIDT;
+   LOCAL KLPT$ LPT;
+
+   LPT := $CGTZM(3);
+   LPT[K$LFN] := .FIDT[K$NAME];
+   LPT[K$LEXT] := .FIDT[K$EXT];
+   LPT[K$LUUN] := .FIDT[K$USER]<0,18>;
+   LPT[K$LP] := .PN;
+   LPT[K$LNXTPTR] := .KLCLC$;
+   KLCLC$ := .LPT
+   END;
+
+GLOBAL ROUTINE $KDLCL(FIDT,PN)=
+
+   BEGIN
+   MAP KFIDT$ FIDT;
+   LOCAL KLPT$ LPT:LAST;
+
+   LAST := 0;
+   LPT := .KLCLC$;
+   WHILE .LPT NEQ 0
+     DO
+        BEGIN
+        IF .LPT[K$LFN] EQL .FIDT[K$NAME] THEN IF
+           .LPT[K$LEXT] EQL .FIDT[K$EXT] THEN IF
+           .LPT[K$LUUN] EQL .FIDT[K$USER]<0,18> THEN IF
+           .LPT[K$LP] EQL .PN
+            THEN
+               BEGIN
+               IF .LAST NEQ 0
+                  THEN LAST[K$LNXTPTR] := .LPT[K$LNXTPTR]
+                  ELSE KLCLC$ := .LPT[K$LNXTPTR];
+               $CFREE(.LPT);
+               RETURN TRUE
+               END;
+         LAST := .LPT;
+         LPT := .LPT[K$LNXTPTR]
+         END;
+   RETURN FALSE
+   END;
+
+
+GLOBAL ROUTINE $KCPLF(FCB,PN)=
+   BEGIN
+
+   MAP KFCB$  FCB;
+   REGISTER KLPT$ LPT,
+         KLPQ$  LPQ,
+         KFIDT$ FIDT,
+         Q;
+   LOCAL COUNTER;
+
+   REGISTER AC;
+
+   FIDT := .FCB[K$FIDPTR];
+   LPQ := .KLOCK$+KV$LPQADR;
+
+   WHILE TRUE DO
+     BEGIN
+     COUNTER := 0;
+     WHILE (COUNTER := .COUNTER + 1) LEQ 10 DO
+      BEGIN
+      $KGMSL();  %GET MASTER LOCK%
+
+      IF (LPT:= $KFLPT(.FIDT,.PN)) EQL KV$NOENTRY
+         THEN ERROR(#612);
+
+      IF .LPT[K$LWRLOCK] THEN IF .LPT[K$LJOBNO] EQL .KSLOT$ 
+         THEN ($KRMSL(); RETURN);
+
+      IF NOT .LPT[K$LCVLOCK]
+         THEN ERROR(#612);
+
+      IF .LPT[K$LJOBNO] NEQ .KSLOT$
+         THEN ERROR(#612);
+
+      LPT[K$LCONVERT] := TRUE;  %SET CONVERTION IN PROCESS BIT%
+
+      IF .LPT[K$LRCOUNT] EQL 0 THEN IF NOT .LPT[K$LWRLOCK]
+      THEN BEGIN
+           LPT[K$LWRLOCK] := TRUE;
+           LPT[K$LCVLOCK] := FALSE;
+           LPT[K$LCONVERT] := FALSE;
+           $KRMSL();
+           RETURN
+           END;
+      IF (Q := .LPT[K$LPQP]) NEQ .KSLOT$
+      THEN BEGIN  %PUT JOB TO BE 1ST IN QUEUE%
+           LPT[K$LPQP] := .KSLOT$;
+           LPQ[K$LPTR,.KSLOT$] := .Q;
+           LPQ[K$LTYPE,.KSLOT$] := CV$LOCK;
+           END;
+      $KRMSL();
+      AC := #201000036; % SLEEP FOR 30 SECONDS OR WAKEUP %
+      IFSKIP CALLI(AC,#72) THEN .VREG
+      END;
+     $KCMEM()     % SOMETHING IS WRONG %
+     END
+   END;
+
+GLOBAL ROUTINE $KCPGL(FCB,PN)=
+   BEGIN
+
+   MAP KFCB$ FCB;
+
+   IF NOT .FCB[K$CONCURR] THEN RETURN;
+   $KCPLF(.FCB,.PN);
+
+   END;
+
+GLOBAL ROUTINE $KVPGL(FCB,PN,CVFLAG)=
+   BEGIN
+   MAP KFCB$ FCB;
+   REGISTER KLPT$ LPT,
+         KFIDT$ FIDT;
+   LOCAL KLPQ$ LPQ,
+         KLMT$ LMT,
+         Q,JOBLST[KV$LMTSIZE],IDX,QC,LOC[2];
+
+   REGISTER AC;
+
+   IF NOT .FCB[K$CONCURR] THEN RETURN;
+
+   FIDT := .FCB[K$FIDPTR];
+   LPQ := .KLOCK$+KV$LPQADR;
+   LMT := .KLOCK$+KV$LMSIZE;
+
+   $KGMSL();
+
+   IF (LPT := $KFLPT(.FIDT,.PN)) EQL KV$NOENTRY
+      THEN ERROR(#612);
+
+   IF .LPT[K$LWRLOCK] AND .LPT[K$LJOBNO] EQL .KSLOT$
+      THEN BEGIN
+           IF .CVFLAG EQL KV$CVLOCK THEN LPT[K$LCVLOCK] := TRUE
+                       ELSE BEGIN
+                            LPT[K$LRCOUNT] := 1;
+                            LPT[K$LRLCURJB] := TRUE;
+                            LPT[K$LJOBNO] := 0;
+                            END;
+           LPT[K$LWRLOCK] := FALSE;
+
+           IDX := 0;
+           IF (Q := .LPT[K$LPQP]) EQL 0 THEN ($KRMSL(); RETURN);
+           IF (IF .CVFLAG EQL KV$CVLOCK
+                  THEN .LPQ[K$LTYPE,.Q] EQL KV$RDLOCK
+                  ELSE .LPQ[K$LTYPE,.Q] NEQ KV$WRLOCK)
+              THEN BEGIN
+                   JOBLST[.IDX] := .LMT[K$LID,.Q];
+                   LPT[K$LPQP] := 0;
+                   IDX := .IDX+1;
+                   END;
+           QC := .Q;
+           UNTIL (Q := .LPQ[K$LPTR,.Q]) EQL 0 DO
+              IF (IF .CVFLAG EQL KV$CVLOCK
+                     THEN .LPQ[K$LTYPE,.Q] EQL KV$RDLOCK
+                     ELSE .LPQ[K$LTYPE,.Q] NEQ KV$WRLOCK)
+                 THEN BEGIN
+                      JOBLST[.IDX] := .LMT[K$LID,.Q];
+                      IDX := .IDX+1;
+                      END
+                 ELSE IF .LPT[K$LPQP] EQL 0
+                      THEN (LPT[K$LPQP] := QC := .Q)
+                      ELSE (LPQ[K$LPTR,.QC] := QC := .Q);
+           LPQ[K$LPTR,.QC] := 0;
+
+           INCR I FROM 0 TO .IDX-1 DO  % WAKE UP JOBS WAITING FOR RDLOCK %
+              BEGIN
+              LOC[1] := .JOBLST[.I];
+              LOC[0] := .KLUB$;
+              AC := LOC<0,0>;
+              IFSKIP CALLI(AC,KV$CLBWAK) THEN .VREG
+              END;
+
+           $KRMSL();
+           RETURN;
+           END
+      ELSE ERROR(#612);
+   END;
+
+GLOBAL ROUTINE $KGPGL(FCB,PN,LOCKTY)=
+   BEGIN
+   MAP KFCB$  FCB;
+   MAP KISB$ KISBP$:KISBJP$;
+   REGISTER KFIDT$ FIDT;
+   LOCAL KSOB$ SOB;
+   REGISTER KLPT$ LPT;
+   REGISTER KLPQ$ LPQ;
+   LOCAL KLBT$ LBT;
+   LOCAL KLPL$ LPL;
+   LOCAL Q,NXTENTRY,LAST,TIME,CURRENTYPE,ENT,P,I,STSTYPE;
+
+   REGISTER AC;
+
+   IF .KIFLG$ THEN
+      BEGIN
+         STSTYPE := SELECT .LOCKTY OF
+				NSET
+			KV$RDLOCK:	KV$RDR;
+			KV$WRLOCK:	KV$WRR;
+			KV$CVLOCK:	KV$CVR;
+				TESN;
+         IF (.KILBT$ EQL KVB$MS) AND  (.PN EQL 0)
+	    THEN KILBT$ := KVB$SB;
+         KISBP$[.STSTYPE,.KILBT$] := .KISBP$[.STSTYPE,.KILBT$] + 1;
+         KISBJP$[.STSTYPE,.KILBT$] := .KISBJP$[.STSTYPE,.KILBT$] + 1
+      END;
+
+   IF NOT .FCB[K$CONCURR]  % NO CONCURRENCY %
+      THEN (KILBT$ := KVB$MS; RETURN);
+
+   FIDT := .FCB[K$FIDPTR];
+
+   IF $KFLPL(.FCB,.PN) THEN         % IF PN FOUND IN FCB LP LIST %
+      BEGIN
+      IF .LOCKTY EQL KV$WRLOCK
+         THEN $KCPLF(.FCB,.PN);
+      KILBT$ := KVB$MS;
+      RETURN TRUE
+      END;
+
+   LBT := .KLOCK$ + KV$LBTADR;
+
+   $KGETLOCK;    % TRY TO GET LOCK %
+
+   IF .CURRENTYPE GTR 1
+    THEN IF .RLEVL$ GTR 0
+      THEN
+        BEGIN
+        IF NOT .LPT[K$LWRLOCK]
+          THEN IF .LOCKTY EQL KV$RDLOCK
+            THEN IF .LPT[K$LRLCURJB]
+               THEN ($KRMSL(); RETURN $KALCL(.FIDT,.PN));
+        $KRMSL();
+        $UAPSZ(UV$ABORT,$USPTR('Access conflict between calling and called PROCEDURE for '));
+        SOB := .FCB[K$SOBP];
+        $UAPSC(UV$ABORT,SOB[K$SNAM]<36,7>,.SOB[K$SNAMSIZ]);
+        $UMESS(UV$ABORT,$USPTR('.'));
+        $CFATAL();
+        (.SOB[K$SABORTR])(.SOB[K$SABPARM])
+        END
+      ELSE ERROR(#603);
+
+   IF .CURRENTYPE EQL 0
+      THEN              % SOMEONE ELSE HOLDS THE LOCK %
+         BEGIN
+         IF .KIFLG$ THEN
+           BEGIN
+             KISBP$[.STSTYPE+1,.KILBT$] := .KISBP$[.STSTYPE+1,.KILBT$] + 1;
+             KISBJP$[.STSTYPE+1,.KILBT$] := .KISBJP$[.STSTYPE+1,.KILBT$] + 1
+           END;
+         LPQ := .KLOCK$+KV$LPQADR;
+         $KTIMEROFF;   % TURN OFF TIMER INTERRUPTS %
+         WHILE TRUE
+           DO
+             BEGIN
+             I := 0;
+             WHILE (INC(I)) LEQ 10
+               DO
+                 BEGIN
+                 $KADD2Q;   % ADD JOB TO QUEUE WAITING FOR LOCK %
+                 $KRMLM;
+                 AC := #201000036;  % SLEEP FOR 30 SECONDS OR AN OUTSIDE %
+                 IFSKIP CALLI(AC,#72) THEN .VREG; % WAKEUP %
+                 $KGETLOCK;   %  TRY TO GET LOCK AGAIN %
+                 IF .CURRENTYPE NEQ 0
+                   THEN   % GOT LOCK %
+                     BEGIN
+                     $KRMOVFROMQ;  % REMOVE FROM WAITING QUEUE %
+                     $KRMLM;
+                     $KTIMERON; % RE-ENABLE TIMER INTERRUPTS %
+                     KILBT$ := KVB$MS;
+                     RETURN TRUE
+                     END
+                 END;
+             $KCMEM()   % 10 TRIES AT GETTING LOCK & NO SUCCESS %
+                        % => SOMETHING IS WRONG!!! %
+             END
+         END;
+
+   $KRMLM;
+   KILBT$ := KVB$MS;
+   RETURN TRUE
+
+   END;
+
+GLOBAL ROUTINE $KRPGL(FCB,PN)=
+   BEGIN
+   MAP KFCB$    FCB;
+   REGISTER KFIDT$ FIDT,
+            KLPT$ LPT;
+   LOCAL    KLPT$ LAST,
+            KLBT$ LBT,
+            KLPL$ LPL,
+            ENT,P;
+   LABEL LAB;
+
+   IF NOT .FCB[K$CONCURR]  % NO CONCURRENCY %
+      THEN RETURN FALSE;
+
+   IF $KFLPL(.FCB,.PN) THEN RETURN FALSE ; %IF PN FOUND IN FCB LP LIST %
+
+   FIDT := .FCB[K$FIDPTR];
+   IF .RLEVL$0
+      THEN IF $KDLCL(.FIDT,.PN)
+         THEN RETURN TRUE;
+   $KRELOCK(.KSLOT$,TRUE,TRUE);
+   RETURN TRUE;
+   END;
+GLOBAL ROUTINE $KFPGL(FCB,PN)=
+   BEGIN
+   MAP KFCB$   FCB;
+   REGISTER KFIDT$ FIDT,
+         KLPT$ LPT;
+
+   FIDT := .FCB[K$FIDPTR];
+
+   $KGMSL();
+
+   IF (LPT := $KFLPT(.FIDT,.PN)) EQL KV$NOENTRY
+      THEN ($KRMSL(); RETURN FALSE);
+   IF (.LPT[K$LJOBNO] EQL .KSLOT$ AND (.LPT[K$LWRLOCK] OR .LPT[K$LCVLOCK])) OR 
+      (.LPT[K$LRLCURJB] AND .LPT[K$LRCOUNT] GTR 0)
+      THEN ($KRMSL(); RETURN TRUE)
+      ELSE ($KRMSL();RETURN FALSE)
+   END;
+
+END ELUDOM
+
+  izeaT
