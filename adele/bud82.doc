@@ -1,0 +1,1678 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          T Y M C O M - X   T E C H N I C A L   S U P P O R T   U N I T
+
+
+
+
+
+
+
+
+
+
+                           Manpower Allocation Summary
+
+                          Summary of On-going Activities
+
+                         Project Requests for 1982 Budget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             DATE:  November 20, 1981        Prepared by:  Adele Gadol
+
+
+
+                           MANPOWER_ALLOCATION_SUMMARY                           
+
+                             Units of Person Quarters
+
+
+     ________________________________________________________________________
+       Activity or Project                | 1981 | 1982 | 1982 | 1982 | 1982
+     _____________________________________|__Q4__|__Q1__|__Q2__|__Q3__|__Q4__     
+                                          |      |      |      |      |
+       Activity                           |      |      |      |      |       
+                                          |      |      |      |      |
+       General SPOOL maintenance          |  .25 |  .15 |  .15 |  .20 |  .20
+       General PERP maintenance           |  .04 |  .08 |  .08 |  .10 |  .10
+       Misc. IX and X maintenance         |  .60 |  .90 |  .90 |  .90 |  .90
+       Misc. monitor maintenance          |  .20 |  .20 |  .20 |  .20 |  .20
+       Keep section hacks organized       | ---- |  .05 |  .05 |  .10 |  .10
+       Keep section docs. organized       | ---- |  .10 |  .10 |  .15 |  .15
+       General consulting                 |  .20 |  .20 |  .20 |  .20 |  .20
+       Learning                           |  .16 |  .16 |  .20 |  .20 |  .20
+       Unit management                    |  .50 |  .50 |  .40 |  .40 |  .40
+       Miscellaneous non-project time     |  .20 |  .20 |  .25 |  .25 |  .25
+       Time off                           |  .33 |  .33 |  .41 |  .41 |  .41
+                                          |      |      |      |      |
+     __Projects_Less_Than_Six_Months______|______|______|______|______|______     
+                                          |      |      |      |      |
+       Cost codes in accounting files(.50)|  .25 |  .25 |      |      |
+       Implement special handling chg(.50)|  .12 |  .38 |      |      |
+       Finish TITO time study (.04)       |      |  .04 |      |      |
+       Fix known EDITOR bugs              |  **  |      |      |      |
+       TITO large file problem (.25)      |  .25 |      |      |      |
+       TELECOPY - assorted fixes (1.00)   |      |  .10 |  .70 |  .30 |
+       Support 4-digit host numbers (.50) |      |      |  .50 |      |
+       Stream scanner shell (.25)         |      |      |  .25 |      |
+       Improve DSKCLN robustness (.28)    |  .28 |      |      |      |
+       Improve oper. interface - ONCE(.15)|  .15 |      |      |      |
+       MONGEN schema (.38)                |  .38 |      |      |      |
+       Improvements to MAIL (.35)         |      |      |      |  .30 |  .05
+       Investigate X/XX incompats. (.06)  |      |      |      |      |  .06
+       Fixes to NODLOD (.10)              |      |      |      |      |  .10
+       Organize section docs (.25)        |  .10 |  .15 |      |      |
+       Organize section hacks (.25)       |      |  .25 |      |      |
+       Automate system patch proc. (.25)  |      |      |      |      |  .25
+       Utilities usage review (.30)       |      |      |      |  .30 |
+       Improvements to INFO (.50)         |      |      |      |      |  .50
+       Release LPTSPL - LPQUE (.30)       |      |      |      |      |     +
+       Fast COPY program (.15)            |      |      |      |      |     +
+       VUE - long term possibilities (.75)|      |      |      |      |     +
+                                          |      |      |      |      |
+     _____________________________________|______|______|______|______|______
+
+
+
+     __Projects_More_Than_Six_Months______|______|______|______|______|______     
+                                          |      |      |      |      |
+       Reduce bug backlog (2.00)          |      |      |      | 1.00 | 1.00
+                                          |      |      |      |      |
+     _____________________________________|______|______|______|______|______     
+
+
+     ** Project funded through marketing
+      + more time to go
+
+
+     NOTE:  The following manpower assumptions were made:
+             (1) Calstate student added to TSU in January.
+             (2) Transfer of Dave Smith to Languages in January.
+             (3) Additional TSU person (5/1/82).
+
+
+
+                         TSU UNIT -- ON-GOING ACTIVITIES
+
+
+
+
+     General SPOOL maintenance:  This  is time spent in  regular preventative
+     maintenance as  well as problem  analysis and occasional  emergency data
+     base fixes.  It currently requires 10-20% of a person's time  to perform
+     these tasks.  The work is  necessary in order to keep SPOOL  running and
+     bringing in revenue.  Maintenance during early 4Q81 has  been abnormally
+     high;  thus I  have put  a large  estimate of  time for  for  4Q81.  The
+     allocation summary also shows an increase in maintenance toward  the end
+     of 1982.  This is  a reflection of the  result of an increasing  load on
+     SPOOL and an increase in the number of systems running SPOOL.
+
+     General PERP  maintenance:  This is  time spent in  regular preventative
+     maintenance as  well as problem  analysis and occasional  emergency data
+     base fixes.  Operations and  marketing support have assisted  where they
+     can with  some of  the PERP work.   Although Mike  Hinckley has  had the
+     ultimate responsibility for this to the present time, we expect to shift
+     the task to TSU as soon  as reasonably possible.  The amount of  work is
+     also expected to increase toward the end of 1982 until the completion of
+     a X-PERP system which can alleviate the overloading of the  current 940-
+     PERP.
+
+     Misc. IX and X maintenance:  Time spent in unscheduled support of any IX
+     and X  software for which  the group is  responsible.  Much of  the work
+     staffing the "support line" will be reported in this category.
+
+     Misc. monitor  maintenance:  This  will include  monitor configurations,
+     quick bug fixes, miscellaneous small projects not significant  enough to
+     report elsewhere.  Will  also take into  account the assistance,  by one
+     TSU  person, the  staffing of  the  "hot line".   This type  of  work is
+     justifiable for  training purposes and  for assisting the  monitor group
+     with a growing support  responsibility.  The time estimate  accounts for
+     two people at 4 hours per week each.
+
+     General consulting:  TSU is attempting to take as much of  the section's
+     consulting load as  it can.  TSU expect  to develop the  information and
+     expertise to make referrals as much as possible.  The aim is  to provide
+     selective, quality consulting.
+
+     Learning  &  teaching:   People  need  some  learning  time  to  develop
+     technically and  stay current with  new developments.  Teaching  time is
+     expected  to  be minimal,  but  is a  possibility.   (The  time estimate
+     increases by .04 for each additional person.)
+
+     Unit  management:  The  amount of  time expected  for 4Q81  and  1Q82 is
+     higher than for subsequent  quarters due to such activities  as budgets,
+     implementation  of  project  request  procedures,  installation  of  the
+     support and hot  lines, and the fact  that one manager is  covering both
+     the  TSU and  utilities areas.   This is  expected to  decrease somewhat
+     after a utilities unit manager is in place.
+
+
+
+     Miscellaneous non-project time:  administrative meetings, clerical, lost
+     time, equipment down, miscellaneous non-development.  (The time estimate
+     increases by about .05 for each additional person.)
+
+     Time  off:   Vacation (2  weeks  each,  Adele -  3  weeks),  9 holidays,
+     personal  and  medical (estimated  at  1 day  per  year).   Personal and
+     medical time is estimated very  low, since this is largely made  up with
+     flexible work time.  (This estimate increases by .08 for each additional
+     person in the unit.)
+
+                                 PROJECT REQUEST
+
+     requestor _____________Adele_Gadol________________   date Nov._20,_1981_                                                    
+     organization __________TYMCOM-X_Tech._Sup._Unit___    cost code __4011__                                               
+     internal mail address _VG2-B03____________________  phone (408) 446-6232                                                          
+     mail usernystem __ADELE:36___________________                            
+
+     current problem or market opportunity:
+       Work is needed on an on-going basis to keep individually contributed
+       systems tools documented and available for use.
+
+
+
+     current procedure:
+       At present, things are ad hoc.  In order to find and use the tools,
+       one must do some searching or ask around.  We have many useful
+       programs in the section's directories without documentation.
+
+
+     project objectives:
+       Performing this on-going task depend upon completion of a project to
+       organize the system hacks we already have.  After doing such a
+       project, we do not want to slip back into the old, ad hoc ways of
+       doing things.
+
+     quantifiable benefits (expected payoffs):
+       The easy availability of tools improves programmer productivity.
+
+     qualitative benefits:
+       Reduction of frustration level.
+
+
+
+
+     risk:
+
+
+
+     impact on other systems (include accounting):
+
+
+
+     proposed solution(s):
+       Assign a TSU person the on-going responsibility.
+
+
+
+
+     alternative solution(s):
+       Leave things as is.
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Keep section hacks organized
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Work is needed on an on-going basis to keep our section library up to
+       date.  The materials involved are manuals, documentation, and program
+       archives.  The tasks involved are short documentation projects,
+       filing, and possibly some data base design and entry.
+
+     current procedure:
+       A project is in progress to organize the materials we have to-date.
+
+     project objectives:
+       Make sure we don't lose the benefit of the current organization
+       project by allowing additions to our library to remain unaccounted
+       for.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       Reduction of frustration level.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Assign a TSU person the on-going responsibility.
+
+     alternative solution(s):
+       Leave things as is.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Keep section docs. organized
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The district/cost code conversion now underway causes serious problems
+       for BATCH, PERP, and SPOOL support for our European affiliates.  Most
+       of the programs involved check district numbers to identify European
+       customers and sometimes to divide them into separate groups.  E.g.,
+       BATCH requests submitted by CEGI and SLIGOS customers are routed into
+       special files for translation and resubmission, and there are
+       differences in billing for tape stores/restores among affiliates.
+       Proper time for DEFER rates is established by routine European PERP
+       jobs to the master on 14 which is connected to a Tymbase set to
+       European time.
+
+     current procedure:
+       Use district number to identify customers requiring special BATCH or
+       PERP handling.
+
+     project objectives:
+       Correct the programs which are affected by the accounting file
+       changes.  The best way to solve this problem is unclear.  The 940's
+       could be especially difficult.  (Please see (adele:930)invest.doc for
+       further discussion of this problem.) Most of the changes we previously
+       thought were necessary for the programs which use the BATCH accounting
+       files will not be needed, since the PPN's are provided and the
+       appropriate cost code can be looked up by the accounting programs.
+       However some changes will be necessary if the district is either
+       blanked or eliminated from the accounting files.  Potentially all the
+       programs that are part of BATCH/SPOOL would be affected:  BATCH,
+       SPOOL, BCHARG, RCHARG, 370CHG, (*1BATCH)RBCHG, LISTER, 1CLEAR, RECPPR,
+       SPFIX, and TAPCHG.
+
+     quantifiable benefits (expected payoffs):
+       Work will be needed to preserve existing pricing schemes, to provide
+       acceptable BATCH service to French-speaking customers working on
+       systems location in U.S. centers, and to allow CEGI and SLIGOS each to
+       translate requests for their own customers.
+
+     qualitative benefits:
+       None.
+
+     risk:
+       The risk is dependent upon the solution chosen.  In general, modifying
+       old software, some of it written in SIMPL, presents a challenge.  It
+       is risky to modify so many pieces of software, all with
+       interdependencies.  Any misunderstanding of the use of the batch
+       accounting files could cause a problem.  See also
+       (adele:930)invest.doc for a thorough discussion of risks.
+
+     impact on other systems (include accounting):
+       We are impacted by accounting an MIS.  We must cooperate with them on
+       a solution.
+
+     proposed solution(s):
+       Not clear at this time.
+
+     alternative solution(s):
+       Ask the affiliates to give up the special services currently provided
+       to them and their customers.  This minimizes the extent of the
+       changes.
+
+     desired date _1Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _BATCH/SPOOL and PERP systems_                                  
+     Title:  Cost codes in accounting files
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       There is currently no acceptable way to enter special handling charges
+       into the "batch" charging files for later processing by MIS.  Users
+       are billed a charge for shipping or receiving of items to/from our
+       data centers.  This charge needs to be separable from postage since it
+       could be discounted, whereas postage is a fixed item.
+
+     current procedure:
+       I believe that the special handling charges are being added to the
+       postage charges and entered using one of the programs, BCHARGE or
+       RCHARGE.  This does not allow the charges to be separated.  It is not
+       clear to me whether this method covers items resulting from work on
+       370 type systems.
+
+     project objectives:
+       A program or programs is needed which will allow accumulation of the
+       special handling charges as separate from postage charges on TYMCOM-X
+       and 370 systems.
+
+     quantifiable benefits (expected payoffs):
+       A revenue increase would be expected as it becomes easy for operators
+       to enter the charges; my impression is that the interim solution may
+       not now include all cases that it should.
+
+     qualitative benefits:
+
+     risk:
+       The major risk lies in dealing with current software and the "batch"
+       charge files.  Any misunderstandings about the use of any of the words
+       in the files could affect any of about ten utilities programs which
+       also access them.
+
+     impact on other systems (include accounting):
+       The impact depends in part upon the solution; that is which existing
+       programs are reworked.  There is is certain impact upon the programs:
+       BCHARG, RCHARG, and 370CHG.  In addition, this project must be
+       coordinated with MIS since their programs and procedures must be
+       enhanced to process the additional charge records which will be
+       generated.
+
+     proposed solution(s):
+       Add two new record types to the "batch" record files.  Extend 370CHG
+       program to handle special handling charges for 370 systems.  Rewrite
+       BCHARG and RCHARG, including the special handling charges in the
+       process.  Leave 940's alone; use "miscellaneous charge" feature in
+       1BCHARG to enter charges.
+
+     alternative solution(s):
+       Same as above with the exception that a new program will be created
+       instead of extensions (and probable rewrite) to BCHARG and RCHARG.
+       The new program will run on all TYMCOM-X's and will process entry of
+       special handling charges only.
+
+     desired date _1Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name __         
+     Title:  Implement special handling charges
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The EDITOR has many known bugs.  It is still the main editor used by
+       TYMCOM-X customers.
+
+     current procedure:
+
+     project objectives:
+       Fix the bugs in EDITOR.
+
+     quantifiable benefits (expected payoffs):
+       Since EDITOR is still the most often used editor by customers,
+       problems with it affect many users.  Failure to fix the problems can
+       cause unhappiness and negative impact on revenues.
+
+     qualitative benefits:
+       It will help keep COEES and others happy.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Hire Samuel Feldman as a consultant to fix the bugs.
+
+     alternative solution(s):
+       Do the bug-fixing project within TSU.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _1Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _EDITOR_                               
+     Title:  Fix known EDITOR bugs
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       MIS has been generating some very large MAGNUM data bases (files of
+       135,000+ pages) which TITO can't store to tape.  TITO apparently seems
+       to loop, storing tape after tape and never finishing.  Our dependence
+       upon the MIS accounting information is such that this problem in
+       backing up large files is a very dangerous one.
+
+     current procedure:
+       I believe that MIS is using the BACKUP program occasionally to get
+       copies of their large files.
+
+     project objectives:
+       A corrected TITO.  The large files should be backed up daily along
+       with the other changed files which are saved by operations.
+
+     quantifiable benefits (expected payoffs):
+       Will reduce the time MIS is spending to back up their own files.
+
+     qualitative benefits:
+       Will prevent a dangerous situation in case of a disk crash and
+       rebuild.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Assign a TSU person (or Adele) to find and fix the problem in TITO.  I
+       think that this is imperative.
+
+     alternative solution(s):
+       Leave as is.  Handle the problem in SNARL.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q81_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _TITO_                               
+     Title:  TITO large file problem
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       TELECOPY does not handle files with "holes".  It desperately needs
+       updating of its system map.  It was left in an imcomplete state when
+       Jean left the company, and its various versions must be untangled in
+       order to make such features as 4-digit system numbers available.
+
+     current procedure:
+       Presently, a field test version is used to cover cases where the
+       system map of the released version is inadequate.  This is confusing.
+
+     project objectives:
+       A functioning TELECOPY which handles files with "holes" and 4-digit
+       system numbers and whose system map is up to date.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       Many procedures, such as software installation, depend upon TELECOPY.
+       A consistent working one will improve reliability of those things
+       which require TELECOPY.
+
+     risk:
+       TELECOPY is an old program, and any work on it involves some risk in
+       terms of programming pitfalls.
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _3Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _TELECOPY_                               
+     Title:  TELECOPY - assorted fixes
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Some utilities do not support 4-digit host numbers.  These are SPOOL,
+       BATCH, any additional programs using the batch accounting files,
+       TELECOPY, and probably PERP.  SPOOL and BATCH and other related
+       programs pose a special problem because they share a request numbering
+       scheme which must be expanded, affecting all the batch accounting
+       files and SPOOL's data bases.
+
+     current procedure:
+       At present, SPOOL cannot be used on hosts which have a number larger
+       than two digits.  There is a field-test TELECOPY (with problems) which
+       has 4-digit systems in its map.  PERP/DEFER is probably also a
+       problem.  What we do now will not work in the future.
+
+     project objectives:
+       The object is to have enhanced copies of the customer utilities, all
+       available on hosts with 4-digit numbers.
+
+     quantifiable benefits (expected payoffs):
+       This is a situation in which our revenues will be limited if we cannot
+       expand our services due to the current program limitations.
+
+     qualitative benefits:
+       Since the TYMCOM-X section is using hosts with large numbers, we are
+       already inconvenienced by the software.  Our productivity could be
+       improved if this inconvenience could be removed.
+
+     risk:
+       The programs involved are old and any enhancement of them is a risk in
+       terms of programming pitfalls.  Risks are similar to those of the cost
+       code project.  See (adele:930)invest.doc for a thorough discussion.
+
+     impact on other systems (include accounting):
+       Cooperation with MIS is necessary if the batch files must change.
+
+     proposed solution(s):
+       Fix SPOOL, TELECOPY, PERP/DEFER, and any others which are affected.
+       It would be desirable to work on TELECOPY in conjunction with a
+       general clean-up on that program.  I think it would be advantageous to
+       schedule this project in conjunction with the cost code project, since
+       the same class of programs is involved.  Changing all these programs
+       and the associated files more than once should be avoided.
+
+     alternative solution(s):
+       Same as above, except fix only the system map problem in TELECOPY.
+
+     desired date _2Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name _Support 4-digit host numbers_                                  
+     Title:  Support 4-digit host numbers
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       There is no easy way to scan the stream accounting records.  With
+       increasing emphasis on transaction billing, there will be more reasons
+       to read the stream for tracking of problems and security violations.
+       If additional kinds of records, such as royalty accounting, are put in
+       the stream as planned, there would be a need for a debugging and
+       monitoring tool. If we had such a tool now, we could obtain the
+       available information on our current security break more easily and
+       more quickly.  Finding the answers to the system 38 performance
+       problem is another timely application for such a tool.  A stream
+       scanner is necessary in order to do a utilities usage review.
+
+     current procedure:
+       There is, as I understand it, a tool that can be used now with a fair
+       amount of hand work to supplement it.
+
+     project objectives:
+       The object is an interactive program built around a modular scanner.
+
+     quantifiable benefits (expected payoffs):
+       Savings in programmer time needed to scan the stream will result from
+       a well designed automatic scanner.  In addition, revenue increases
+       could result from timely work to detect billing problems or security
+       violations.
+
+     qualitative benefits:
+       This tool could be used by MIS as well.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Assign someone in TSU to write the stream scanner.
+
+     alternative solution(s):
+       Leave as is, or assign someone in another group to do the project.
+
+
+
+
+
+
+
+
+
+     desired date _2Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name __         
+     Title:  Stream scanner shell
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The monitor unit has recently experienced a number of disk structure
+       problems requiring 3-10 hours each to correct (usually at 4:00 AM)
+       which could be easily and rapidly corrected if better information was
+       available.
+
+     current procedure:
+
+     project objectives:
+       Improve DSKCLN reliability and enhance it to provide more details
+       about critical files.
+
+     quantifiable benefits (expected payoffs):
+       This project would significantly reduce the down time associated with
+       disk structure problems requiring programmer intervention.
+
+     qualitative benefits:
+       Would reduce the amount of tedious work involved in tracking and
+       repairing disk structure problems.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       (1) Require READONLY mode to run DSKCLN.  (2) Print message on CTY if
+       DSKCLN doesn't have enough license.  (3).  Print more details about
+       critical files.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q81_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _DSKCLN_                               
+     Title:  Improve DSKCLN robustness
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Several sever examples of near catastrophic operator error which would
+       have clearly been avoided by a reasonable user interface have occurred
+       recently:  (1) A 2020 system was rebuilt from tape when an operator
+       accidentally zeroed the disk by typing "R DSKCLN".  (2) Ten person
+       hours were spent patching up a 2020 after an operator accidentally
+       dissolved the structure by typing "DIS" (as in DISkclean).
+
+     current procedure:
+
+     project objectives:
+       Improve the friendliness and consistency of the operator interface to
+       the monitor and its support programs.
+
+     quantifiable benefits (expected payoffs):
+       Will reduce costly operator error and OS unit consulting time.
+
+     qualitative benefits:
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       (1) Restrict ONCDSK (FILES subsystem) commands so that the command
+       must be fully specified (allow no abbreviation), and require
+       confirmation.  (2) Implement the FULL command in ONCE.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q81_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _ONCDSK and ONCE_                                 
+     Title:  Improve operator interface - ONCE
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The means for accepting monitor configuration requests and producing
+       and distributing the configured monitor is ad hoc.
+
+     current procedure:
+       When a new machine comes up in a center, operations often runs it with
+       a copy of a monitor for another similarly configured machine.
+       Requests to change that usually are called in.
+
+     project objectives:
+       Formalize and organize the procedure for requesting monitor
+       configurations.
+
+     quantifiable benefits (expected payoffs):
+       Will reduce OS unit consulting time and time needed to make
+       configurations.
+
+     qualitative benefits:
+       Will reduce confusion and assure a better chance of bringing new or
+       altered machines up quickly.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Design and implement a MAGNUM data base to control monitor
+       configuration.  The data base will also contain distribution and
+       administration information for each host.  Write procedures to accept
+       change orders, obtain approval, and generate the necessary files to
+       assemble a monitor with the correct information.
+
+     alternative solution(s):
+       Leave things the way they are.
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q81_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name _MONGEN schema_                                
+     Title:  MONGEN schema
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       An on-line system whereby we can easily accept and collect mail
+       concerning non-emergency problems would be greatly helpful.
+
+     current procedure:
+       Most support questions arrive by telephone.  A special arrangement has
+       been made with COEES to send mail to user XCONSULT on selected
+       systems.  This must be collected and distributed by hand.
+
+     project objectives:
+       The object is to provide some backup for the support phone line which
+       we establishing and to encourage, in general, the reporting of
+       problems and requests for consulting to be written.  Reporting by mail
+       should be extended to those people and groups who will be using the
+       support line.  However, few benefits will be seen if it is difficult
+       to collect and track request which are report in this fashion.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       An improved mail system will benefit all of us.  Communication is
+       always a concern.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Make improvements to the mail system which would incorporate some
+       means of routing to a user's "home" system.  The user should be able
+       to specify where his/her "home" is.  Assign someone in TSU to design
+       and implement this project.
+
+     alternative solution(s):
+       At the very least, make improvements to the collection of XCONSULT
+       mail.  This could be a program which gets and consolidates on one
+       system the various messages from the selected systems where the
+       username resides.
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _MAIL_                               
+     Title:  Improvements to MAIL
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Incompatibities exist between the TYMCOM-X and TYMCOM-XX software.
+       For instance, when a new transmittal of COPYCR was done (during the
+       summer), it was found to be incompatible with INITIA on the TYMCOM-XX.
+
+     current procedure:
+       In the case of COPYCR, an old version must be run on XX systems.  For
+       other software, the same action must be taken.  This creates support
+       difficulties.
+
+     project objectives:
+       Investigate the differences between X and XX software, and plan the
+       implementation of the changes necessary to bring the two into line.
+
+     quantifiable benefits (expected payoffs):
+       Better support and availability of XX systems.
+
+     qualitative benefits:
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Not clear at this time.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Investigate X/XX incompatibilities
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       NODLOD needs work, particularly on its user interface.
+
+     current procedure:
+
+     project objectives:
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       Making NODLOD easier to use will make 20 sites in the field easier to
+       maintain and will help insure system availability.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Evaluate changes to NODLOD and make the fixes.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _NODLOD_                               
+     Title:  Fixes to NODLOD
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The section documentation needs organization and requires some regular
+       work to keep it so.  A computer index to the paper files is desirable.
+
+     current procedure:
+       Things have been ad hoc.  Lois Lindley has made a great deal of
+       headway organizing a library of section documentation and archives
+       (including a data base design), and this should be continued.
+
+     project objectives:
+       A usable library of section archives accumulated up to the present.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       The section has benefited by the organization that has been done so
+       far, and others outside the section have been helped by getting quick
+       access to documentation.  If others can be provided written work, our
+       time spent consulting is saved.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Continue to have a TSU person assigned to the task of organizing the
+       section library.  This should be followed up by an on-going task to
+       keep the section library organized.
+
+     alternative solution(s):
+       Drop the project and also the gains already made.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _1Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name __         
+     Title:  Organize section docs
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       We have many useful programs written by members of the TYMCOM-X
+       systems section and no index to them.  Some also require user
+       documentation.
+
+     current procedure:
+       The channels of information at present are very informal.  Lack of
+       information encourages duplication of efforts.
+
+     project objectives:
+       This is largely a matter of getting the information into the INFO data
+       base and writing documentation.
+
+     quantifiable benefits (expected payoffs):
+       Tools improve programmer productivity.  Documentation will help us not
+       to duplicate efforts either within or outside the section.
+
+     qualitative benefits:
+       Tools improve programmer productivity.  Documentation will help us not
+       to duplicate efforts either within or outside the section.  Easy
+       availability reduces frustration.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Assign someone in TSU to work on collecting the various section hacks
+       and getting documentation into INFO.  This should be followed up by an
+       on-going task to keep the section hacks organized.
+
+     alternative solution(s):
+       Leave the mess as is.
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _1Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name __         
+     Title:  Organize section hacks
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Monitor patches must be propagated by hand to all the involved X and
+       XX systems.
+
+     current procedure:
+
+     project objectives:
+       Automate the system patching procedure.
+
+     quantifiable benefits (expected payoffs):
+       Cost savings in terms of support time needed to install patches.
+
+     qualitative benefits:
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Not clear at this time.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Automate system patch procedure
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The list of IX and X utilities is very long (close to 300 total).
+       There are still some whose functions we don't know; we are not certain
+       that all are actually begin used.
+
+     current procedure:
+
+     project objectives:
+
+     quantifiable benefits (expected payoffs):
+       There should be some payoff in terms of saving disk space, but this
+       may be minimal.
+
+     qualitative benefits:
+       Having only the software that is necessary and in use should ease the
+       problem of supporting utilities.  I feel that the knowledge to be
+       gained is necessary to doing a good support job.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       The collection of TYMCOM-X utilities needs to be reviewed for obsolete
+       software whose functions are covered by other programs.  If these
+       exist (and we think they do), then take steps to remove them from the
+       systems.  The solution depends on having a stream scanner program
+       available.  The first step is to identify programs which are not being
+       used; it is very likely that some of these are truly obsolete.  An
+       additional functional evaluations should also be done to locate
+       programs which have some overlap.  Determine the set of programs whose
+       features could easily be included in other newer software, with
+       minimal enhancements.  In the process, update the product data with
+       the information obtained.
+
+     alternative solution(s):
+       Leave things as they are now.
+
+
+
+
+
+
+
+
+
+     desired date _3Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Utilities usage review
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Improvements to INFO would greatly help the problem of organizing our
+       systems documentation and allowing good access to it.  Tools are
+       needed to aid managers in general software control.  Providing the
+       ability to manage documentation on large projects is a good first
+       step.
+
+     current procedure:
+       Documentation, where it exists, is found in every conceivable location
+       at present.
+
+     project objectives:
+       At least a good index to software which would desribe where the
+       information is to be found.  Initially, this should be limited to
+       monitor and internal (to the section) tools and other commonly used
+       system programs.
+
+     quantifiable benefits (expected payoffs):
+       Cost savings are in terms of programmer time needed to find
+       information necessary or helpful to project work.
+
+     qualitative benefits:
+       Better documentation control makes it easier for all of us to find the
+       tools we need and much easier for new people to come on board.  It
+       enables project leaders to manage documentation on large projects.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Assign a programmer to make INFO enhancements.
+
+     alternative solution(s):
+       Leave things as is.
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _INFO_                               
+     Title:  Improvements to INFO
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       Provide a convenient tool for spooling on our lab computers which does
+       not require an operator and which contains some queuing and status
+       reporting ability.
+
+     current procedure:
+       We have a primitive unsupported spooler which we use now.
+
+     project objectives:
+       A program which runs automatically on the lab computers (with
+       printers) and picks up scheduled jobs and prints them.  Slave programs
+       on the other 10-class computers (in MPL) which accept requests and
+       copy them to the lab computer (we have a primitive one now).  Provide
+       capability of keeping track of status and allowing users to see the
+       status of a request.  Make possible provisions for queueing on the
+       basis of size or other criterion.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+       Very fast turn-around for systems people when they need listings.
+       Takes some load off the corporate print room.
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name __                
+     Title:  Release LPTSPL - LPQUE
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       The current software for copying files (PIP) is slow.
+
+     current procedure:
+
+     project objectives:
+       A new program for copying files which is faster than PIP.
+
+     quantifiable benefits (expected payoffs):
+
+     qualitative benefits:
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Implement a fast copy program which uses paging instead of standard
+       I/O.
+
+     alternative solution(s):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new_x_ old___ system name __         
+     Title:  Fast COPY program
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       We need a good screen-oriented editor which is generally available and
+       supported for development work.  (One that we could provide customers
+       would also be desirable.)
+
+     current procedure:
+       A very limited number of people use TVEDIT.  This can not be made
+       available due to contractual and support problems.  VUE, since it was
+       imported in somewhat different form, has found a great deal of
+       popularity within Tymshare.  (It cannot be provided outside of
+       Tymshare.)
+
+     project objectives:
+       Improve VUE for in-house users.
+
+     quantifiable benefits (expected payoffs):
+       Editing is a substantial part of the work that we do daily.  Speeding
+       that operation increases efficiency.
+
+     qualitative benefits:
+
+     risk:
+
+     impact on other systems (include accounting):
+
+     proposed solution(s):
+       Make the following kinds of enhancements to VUE.  (1) Rework the
+       TYMCOM-X access commands.  (2) Use paging.  (3) Implement "init"
+       files.  (4) Shrink code and speed up display functions.  (5) Add macro
+       capability.  (6) Interface VUE to external programs (such as MAGNUM).
+
+     alternative solution(s):
+       Leave VUE as is.
+
+
+
+
+
+
+
+
+
+
+
+
+
+     desired date __            division mgr. approval ______________________
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _VUE_                               
+     Title:  VUE - long term possibilities
+     For instructions see Project Request Procedures document
+
+                                 PROJECT REQUEST
+
+       requestor _____________Adele_Gadol________________ date Nov._20,_1981_                                                    
+       organization __________TYMCOM-X_Tech._Sup._Unit___  cost code __4011__                                               
+       internal mail address _VG2-B03____________________phone (408) 446-6232                                                          
+       mail username:system __ADELE:36___________________                              
+
+     current problem or market opportunity:
+       We have a large bug backlog particularly in the utilities area.  In
+       practice, anything not top priority just doesn't get done.  This
+       leaves a backlog of important bugs, some of which cost us in repeated
+       consultations and "firefighting".
+
+     current procedure:
+       Everyone tries to work around their problems and must be extremely
+       patient.
+
+     project objectives:
+       Make a commitment to review and fix outstanding important problems in
+       the utilities software.
+
+     quantifiable benefits (expected payoffs):
+       Reduction of consulting and "firefighting" time.
+
+     qualitative benefits:
+       Our credibility would be enhanced by a general improvement in the
+       quality of our utilities software.
+
+     risk:
+
+     impact on other systems (include accounting):
+       Not yet clear.
+
+     proposed solution(s):
+       Details are not clear.  However we should make a commitment to review
+       the outstanding bug reports and fixing the important ones,
+       concentrating on those which will have a payoff in reliability.  We
+       should write justifications for the problems we are ignoring.  Then
+       fix as much as we can, and get up to date.
+
+     alternative solution(s):
+       Leave as is.
+
+
+
+
+
+
+
+
+
+
+
+     desired date _4Q82_        division mgr. approval ______________________                   
+
+     attachments ____________________________________________________________
+
+     new___ old_x_ system name _TYMCOM-X utilities software_                                 
+     Title:  Reduce bug backlog
+     For instructions see Project Request Procedures document
+ xm;€
