@@ -1,0 +1,374 @@
+begin	"EMSAA"
+comment
+
+    Collect messages from ONTYME-II message switch EMSAA:
+	Collection is based on control file EMSAA.CTL. (see below)
+	Normally run at start address by INITIA (XEXEC) every hour.
+
+    syntax:
+	<emsaa.ctl> ::= {<trans-def>}
+	<trans-def> ::= <ID>,<KEY>,<primary-name>{,<cc-name>}<CRLF>
+	<primary-name> ::= <mail-name>
+	<cc-name> ::= <mail-name>
+	<mail-name> ::= <USERNAME> | <ALIAS>
+    semantics:
+	Each hour when EMSAA runs to collect mail from the ONTYME-II switch,
+	it will sign on to EMSAA under each of the <ID>'s using the
+	associated <KEY>'s and will issue the :READ ALL command.  Each
+	message received in this manner will be sent to the mail system
+	address <primary-name> with copies to each of the <cc-name>'s.
+	In addition, when EMSAA is envoked by a process attempting to deliver
+	a message addressed to <ID>:EMSAA, it will search the control file
+	for an association where <primary-name> matches the FROM field.
+	It will then sign on to EMSAA under the associated <ID> and :SEND
+	the message as indicated.  If no association is found, the message
+	will be sent from the EMSAA ID TXS.NONAME.
+
+    Known problems:
+	Code never intended for production, should be rewritten as
+	a general purpose mail collector as part of new mail system.
+	Should use :SIG command.
+	Should limit length of log.
+	Should read default ID from .CTL file.
+;
+
+require "(SAILIB)SAIL.DEF" source!file;
+!get!module(EXTEND);
+!get!module(APPEND);
+require "(MPL)UUOSYM.SAI" source!file;
+require "AUXLIB.REQ" source!file;
+require "NBSLIB.REQ" source!file;
+external boolean RPGSW;
+require 1 version;
+
+integer LOG,EOF,BRK;
+string Name,Key;
+
+string procedure TimeStamp;
+begin
+    integer A,B,D,T;
+    string S;
+    setformat(-2,0);
+    do begin
+	D_ calli( 0,calli!DATE );
+	T_ calli( 0,calli!MSTIME ) % 1000;
+    end until D = calli( 0,calli!DATE );
+    S_ StDate( D, '31 )& " "& cvs( T % 3600 )& ":"& cvs( T % 60 mod 60 );
+    setformat( A,B );
+    return( S& "  " );
+end;
+
+label FatalExit;
+procedure Fatal(string M);
+begin
+    cprint( LOG, TimeStamp, "?FATAL: ",M,crlf );
+    goto FatalExit;
+end;
+
+item ZapProcedure;
+procedure ZapHandler;
+begin
+    fatal ("circuit zapped (oh dear)");
+end;
+simple procedure ZapHandlerIni;
+assign(AuxDead_ZapProcedure,ZapHandler);
+require ZapHandlerIni initialization;
+
+string procedure GetLine(integer T(0));
+begin	"GetLine"
+    integer CH;
+    string L;
+    if T < 60 
+	then T _ T * 1000
+	else T _ T lor !bit(17);
+    L _ null;
+    do begin 
+    	calli(AuxPort*!bit(8)+!hl('110)+T,calli!HIBER);
+    	auxclv(AuxPort,0,!AXSIC);
+    	if !SKIP! 
+	    then case CH _ AuxIn land '177 of begin
+		[#lf] done;
+		['177] ;
+		else L _ L & CH end
+	    else begin !SKIP! _ false; return(L) end;
+    end until !lh(AuxPort);
+    !SKIP! _ true;
+    if equ(L,"tc> host not responding"&#cr)
+	then fatal("host not responding");
+    return (L);
+end	"GetLine";
+
+procedure SendLine(string S);
+begin
+    integer C;
+    S _ S & #cr;
+    while length(S) do AuxOut(lop(S));
+    do C _ AuxIn land '177 until C = #lf;
+end;
+
+simple boolean procedure Index (string A,B);
+begin
+    integer I,X,LB;
+    X _ length(A)-(LB_length(B))+1;
+    for I _ 1 upto X do if equ(A[i for LB],B) then return(I);
+    return(0);
+end;
+
+preload!with 
+    "JAN","FEB","MAR","APR","MAY","JUN",
+    "JUL","AUG","SEP","OCT","NOV","DEC";
+string array MonthNames[1:12];
+
+string procedure Ontyme2Nbs!Date( string OD );
+!
+    Convert one of:
+	dd mmm yy hh:mm:ss
+	dd mmm yy h:mm:ss
+	d mmm yy hh:mm:ss
+	d mmm yy h:mm:ss
+    To:
+	yyyymmdd-hhmmsszzz
+;
+begin
+    integer M;
+    if OD[1 for 1] = " " then lop(OD);
+    if OD[3 for 1] neq " " then OD_ "0"& OD;
+    if OD[11 for 1] = " " then OD_ OD[1 to 10]& "0"& OD[12 to inf];
+    if OD[13 for 1] neq ":" then OD_ OD[1 to 10]& "0"& OD[11 to inf];
+    for M_ 1 upto 12 do if equ(MonthNames[M],OD[4 to 6]) then done;
+    return( 
+	"19"& OD[8 to 9]&
+	cvs(100+M)[2 to 3]&
+	OD[1 to 2]&
+	"-"&
+	OD[11 to 12]&
+	OD[14 to 15]&
+	OD[17 to 18] );
+end;
+
+boolean procedure Connect;
+begin
+    integer I,Fail; 
+    boolean SkipSave;
+    Fail_ 0;
+    AuxZap;
+    for I_ 1 upto 10 do begin
+        creaux("EMSAA:1");	! :1 gets around micronode bug;
+	if SkipSave_ !SKIP!
+	    then done
+	    else begin
+		Fail_ Fail +1;
+		call(60,"SLEEP");
+	    end;
+    end;
+    if Fail then cprint( Log, TimeStamp,
+	"%CREAUX: ",Fail," failures for EMSAA",crlf );
+    return( SkipSave );
+end;
+
+boolean procedure Disconnect;
+begin
+    AuxZap;
+    return( true );
+end;
+
+boolean procedure SignOn( string Name,Key );
+begin
+    string S;
+    boolean AcctOkay;
+    AcctOkay_ false;
+    AuxSync("ID?");
+    SendLine(Name);
+    SendLine(Key);
+    do begin
+	S _ GetLine(20);
+	if not !SKIP! then done;
+	if equ(S[1 to 3],"ID?") then done;
+	if equ(S[1 to 4],"KEY?") then AcctOkay_ true;
+	if equ(S[1 to 8],"ACCEPTED") then return( true );
+    end until !lh(AuxPort);
+    cprint( Log, TimeStamp, "%unable to signon ", Name, " - ",
+	(if equ(S[1 to 3],"ID?")
+	    then (if AcctOkay
+		then "bad KEY"
+		else "bad ID")
+	    else (if !lh(AuxPort)
+		then "lost circuit"
+		else "bad response")), crlf );
+    if not Connect then fatal( "unable to reconnect to EMSAA" );
+    return( false );
+end;
+
+boolean procedure SignOff;
+begin
+    SendLine(":SIGNON");
+    return( true );
+end;
+boolean procedure Sync;
+begin
+    integer GIGO;
+    string S;
+    auxclv( AuxPort,0,!AXCBI );
+    SendLine(":SYNCSYNC");
+    for GIGO_ 20 downto 0 do begin
+	S _ GetLine( 20 );
+	if equ(S,"??"&#cr) or equ(S,"INVALID COMMAND"&#cr) then begin
+	    GetLine( 2 );	! wait for possible blank line;
+	    return( true );
+	end;
+    end;
+    cprint(LOG, TimeStamp, "%out of sync",crlf);
+    return( false );
+end;
+
+integer UpCase,RemvFF,DotBrk;
+simple procedure GetMsgIni;
+begin
+    setbreak( RemvFF_getbreak,null,#ff,"FINS" );
+    setbreak( UpCase_getbreak,null,null,"SINK" );
+    setbreak( DotBrk_getbreak,"."," "&#ht,"AIK" );
+end;
+require GetMsgIni initialization;
+
+simple string procedure TRIM (String S);
+begin		! eventually replace with reverse scan;
+    while S=" " do lop(S);
+    while S[inf for 1]=" " do S_ S[1 to inf-1];
+    return( S );
+end;
+
+procedure GetMsgs( NBS!pointer NBS; Name!pointer DST );
+begin
+    integer B;
+    boolean Flag;
+    string US,ACCT,S,MSG#;
+    procedure MsgIni;
+    begin
+	Flag_ false;
+	MSG#_ null;
+	NBS!rec:Date[nbs]_ null;
+	NBS!rec:From[nbs]_ null;
+	NBS!rec:ReplyTo[nbs]_ null;
+	NBS!rec:Subject[nbs]_ null;
+	NBS!rec:InReplyTo[nbs]_ null;
+	NBS!rec:Keywords[nbs]_ null;
+	NBS!rec:Text[nbs]_ null;
+	NBS!rec:Comments[nbs]_ null;
+    end;
+
+    procedure MsgSnd;
+    begin
+	if ( not NBS!Rec:From[nbs] ) then	
+	  NBS!Rec:From[nbs] := "noname:EMSAA";
+	NBS!rec:Keywords[nbs]_ Msg#& " "& NBS!rec:Keywords[nbs];
+	NbsXmit( DST, NBS );
+	cprint( Log, TimeStamp,
+	    Msg#, "  ", NBS!rec:From[nbs], " -> ", NBS!rec:To[nbs], crlf );
+    end;
+
+    ACCT_ scan( ACCT_ NBS!rec:To[nbs], DotBrk, B );
+    SendLine(":READ ALL");
+    MsgIni;
+    while true do begin
+	integer I,LLL;
+	string S1;
+	S _ GetLine (60)[1 to inf-1];	! less the CR;
+	S_ scan(S,RemvFF,B);
+	US_ scan(S1_S,UpCase,B);
+	if equ(S,"ALL MESSAGES READ") then done
+	else if equ(S[1 to 5],"MSG#:") then begin
+	    if length(MSG#) then MsgSnd;
+	    MsgIni;
+	    MSG#_ trim(S[6 to inf]);
+	    Flag_ true;
+	end 
+	else if equ(S[1 to 5],"FROM:") then begin
+	    string FROM;
+	    FROM_ trim(S[6 to inf]);
+	    if index(From,".")=0
+		then if I_ index(From," ")
+		    then From_ From[1 to I-1]&"."&trim(From[I+1 to inf])
+		    else From_ ACCT& From;
+	    if index(FROM,":")=0
+		then FROM_ FROM& ":EMSAA";
+	    NBS!rec:From[nbs]_ FROM;
+	end 
+	else if equ(US[1 to 5],"REPLY") and equ(US[7 to 9],"TO:") then begin
+	    string RTo;
+	    RTo_ trim(US[11 to inf]);
+	    if index(RTo,".")=0
+		then if I_ index(RTo," ")
+		    then RTo_ RTo[1 to I-1]&"."&trim(RTo[I+1 to inf])
+		    else RTo_ ACCT& RTo;
+	    if index(RTo,":")=0
+		then RTo_ RTo& ":EMSAA";
+	    NBS!rec:ReplyTo[nbs]_ RTo;
+	end 
+	else if equ(US[1 to 5],"SENT:") then
+	    NBS!rec:Date[nbs]_ Ontyme2Nbs!Date( US[7 to inf] )
+	else if I_ index(US,"SUBJECT") then
+	    NBS!rec:Subject[nbs]_ trim(S[I+8 to inf])
+	else if I_ index(US,"SUBJ:") then
+	    NBS!rec:Subject[nbs]_ trim(S[I+5 to inf])
+	else if I_ index(US,"SUB:") then
+	    NBS!rec:Subject[nbs]_ trim(S[I+4 to inf])
+	else if I_ index(US,"REF:") then
+	    NBS!rec:Subject[nbs]_ trim(S[I+4 to inf])
+	else if I_ index(US,"RE:") then
+	    NBS!rec:Subject[nbs]_ trim(S[I+3 to inf])
+	else if equ(US[1 to 5],"  TO:")
+	  or equ(US[1 to 5]," IN#:")
+	  or equ(US[1 to 5],"READ:") then
+	else if Flag and (LLL or length(S)) then begin
+	    NBS!rec:Text[nbs]_ NBS!rec:Text[nbs]& S& crlf;
+	    LLL_ length( S );		! length of last line;
+	end;
+    end;
+    if length(MSG#) then MsgSnd;
+end;
+
+integer CHAN,BRTAB;
+string User, OFile, IFile;
+
+ttyup(true);
+setbreak( BRTAB_getbreak, "_=,"&#lf,#cr,"SINK" );
+AuxTrace _ RPGSW;
+ifcr compiler!switch("B") thenc usererr(0,0,0,"B"); AuxTrace_ true; endc
+
+begin "MAIN"
+    intege
+    open( LOG_getchan,"DSK",0,4,4, 0,0,EOF );
+    append( LOG,"EMSAA.LOG",EOF );
+    open( CHAN_getchan,"DSK",0,4,0, 256,BRK,EOF );
+    lookup( CHAN,"EMSAA.CTL",EOF );
+    if not Connect then fatal( "unable to connect to ONTYME" );
+    do begin
+	string PNames,CNames,DNames;
+	Name!pointer PNL,CNL;
+	Name_ input( CHAN,BRTAB );
+	Key_ input( CHAN,BRTAB );
+	DNames_ input( CHAN,BRTAB );
+	while BRK="," do DNames_ DNames& ","& input( CHAN,BrTab );
+	PNames_ scan( CNames_ DNames, BrTab, BRK );
+	if EOF then done;
+	if SignOn( Name,Key ) then begin
+	    NBS!pointer NBS;
+	    Name!pointer DST;
+	    NBS_ new!record( NBS!rec );
+	    NBS!rec:To[nbs]_ Name& " ("& PNames& ")";
+	    NBS!rec:Cc[nbs]_ CV0List( CVNList( CNames ));
+	    DST_ CVNList( DNames );
+	    ExpandNames( DST );
+	    GetMsgs( NBS, DST );
+	    SignOff;
+	end;
+    end until EOF;
+    Disconnect;
+end	"MAIN";
+
+FatalExit: 
+    release( CHAN );
+    close( LOG ); release( LOG );
+    if not RPGSW then calli( 0, calli!LOGOFF );
+end $
+    q@|Ñ
