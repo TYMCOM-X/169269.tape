@@ -1,0 +1,2583 @@
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 1
+	Produced by LINK-10 version 2B(436) on 26-Feb-78 at 13:13:59
+
+	Low  segment starts at	     0 ends at	 73606 length	 73607 = 30K
+	High segment starts at	400000 ends at	634314 length	234315 = 79K
+	121 words free in Low segment, 819 words free in high segment
+	578 Global symbols loaded, therefore min. hash size is 643
+	Start address is  25634, located in program CUFSOV
+
+		*************
+
+JOEPPN	from DSK:JOEPPN.REL[3,214400]	created by MACRO on 21-Nov-66 at 17:58:00
+	Low  segment starts at	   140 ends at	   726 length	   567 (octal),   375. (decimal)
+
+	FENCE	         165	Entry	Relocatable 		JOEPP1	         521	Global	Relocatable 	
+	JOEPP2	         521	Global	Relocatable 		JOEPP3	         471	Entry	Relocatable 	
+	JOEPP4	         474	Entry	Relocatable 		JOEPPN	         302	Entry	Relocatable 	
+	JOEPPZ	         457	Entry	Relocatable 		NEWPPN	         263	Global	Relocatable 	
+	NOTBOS	         370	Global	Relocatable 		OLDPPN	         262	Global	Relocatable 	
+	OVDAT	         145	Entry	Relocatable 		OVGET	         155	Entry	Relocatable 	
+	OVNAME	         141	Entry	Relocatable 		OVPOP2	         151	Entry	Relocatable 	
+	RERUNC	         504	Entry	Relocatable 		RUNBLK	         513	Global	Relocatable 	
+	THSADR	         161	Entry	Relocatable 		.JBBLT	          45	Global	Absolute    	
+	.JBHNM	           5	Global	Absolute    Suppressed	.JBOVL	         131	Global	Absolute    Suppressed
+
+		*************
+
+MAIN2	from DSK:MAIN2.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:14:00
+	Low  segment starts at	   727 ends at	 20212 length	 17264 (octal),  7860. (decimal)
+	High segment starts at	 20213 ends at	 21575 length	  1363 (octal),   755. (decimal)
+
+	MRKERR	         727	Common	length	     1.		.COMM.	         730	Common	length	  2102.	
+	SYSID	        5016	Common	length	     1.		ACTIMF	        5017	Common	length	   111.	
+	WX	        5176	Common	length	     5.		WSSIZE	        5203	Common	length	     1.	
+	WSBEG	        5204	Common	length	     1.		WQ	        5205	Common	length	     1.	
+	KCBASE	        5206	Common	length	     4.		SAVGET	        5212	Common	length	     4.	
+	PRIVCO	        5216	Common	length	     1.		TOPS20	        5217	Common	length	     1.	
+	INICUF	        5220	Common	length	    10.		SBRCHK	        5232	Common	length	     1.	
+	CCHAIN	        5233	Common	length	   161.		HASHES	        5474	Common	length	  2401.	
+	COMLEX	       12235	Common	length	   632.		COMERR	       13425	Common	length	   152.	
+	CTRANS	       13655	Common	length	   307.		COMCMN	       14340	Common	length	    43.	
+	BDATA	       14413	Common	length	   247.		COMTRP	       15002	Common	length	   782.	
+	SUBRCM	       16420	Common	length	    77.		BRENT	       16535	Common	length	    38.	
+	EXTRA2	       16603	Common	length	   291.		CQUEST	       17246	Common	length	     8.	
+	POCOM	       17256	Common	length	   242.		ZHCOM	       17640	Common	length	    18.	
+	MARKOV	       17662	Common	length	     1.		MAIN2	       20214	Entry	Relocatable 	
+
+		*************
+
+TOOFUL	from DSK:MAIN2.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:14:00
+	Low  segment starts at	 21576 ends at	 21600 length	     3 (octal),     3. (decimal)
+	High segment starts at	 21601 ends at	 21617 length	    17 (octal),    15. (decimal)
+
+	TOOFUL	       21602	Entry	Relocatable 	
+
+		*************
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 2
+TOOFUL
+
+LAYNUM	from DSK:MAIN2.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:14:00
+	Low  segment starts at	 21620 ends at	 21747 length	   130 (octal),    88. (decimal)
+	High segment starts at	 21750 ends at	 22023 length	    54 (octal),    44. (decimal)
+
+	LAYNUM	       21751	Entry	Relocatable 	
+
+		*************
+
+.MAIN	from DSK:JOBDAT.REL[3,214400]	created by MACRO on 20-Nov-66 at 14:58:00
+
+	Zero length module
+
+		*************
+
+GETBYT	from DSK:GETBYT.REL[3,214400]	created by MACRO on 20-Nov-66 at 20:27:00
+	Low  segment starts at	 22024 ends at	 22072 length	    47 (octal),    39. (decimal)
+
+	GETBYT	       22031	Entry	Relocatable 		PUTBYT	       22037	Entry	Relocatable 	
+
+		*************
+
+INITB	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22073 ends at	 22247 length	   155 (octal),   109. (decimal)
+
+	ECHO	       22203	Entry	Relocatable 		GETJOB	       22222	Entry	Relocatable 	
+	GETPPN	       22231	Entry	Relocatable 		HRRZF	       22216	Entry	Relocatable 	
+	INITBP	       22115	Entry	Relocatable 		LSHIFT	       22110	Entry	Relocatable 	
+	NOECHO	       22207	Entry	Relocatable 		NXTBYT	       22077	Entry	Relocatable 	
+	NXTPUT	       22102	Entry	Relocatable 		OUTSTR	       22143	Global	Relocatable 	
+	OUTSTR	 51140000000	Global	Multiply-defined	OUTSTZ	       22143	Entry	Relocatable 	
+	SKPINC	       22225	Entry	Relocatable 	
+
+		*************
+
+DOFOR	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22250 ends at	 22344 length	    75 (octal),    61. (decimal)
+
+	DOFOR	       22251	Entry	Relocatable 	
+
+		*************
+
+MEMBRO	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22345 ends at	 22465 length	   121 (octal),    81. (decimal)
+
+	IFEXP	       22415	Entry	Relocatable 		MEMBRO	       22346	Entry	Relocatable 	
+	REALIF	       22413	Entry	Relocatable 		SETDDT	       22422	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 3
+
+
+OUTDEC	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22466 ends at	 22524 length	    37 (octal),    31. (decimal)
+
+	OUTDEC	       22471	Entry	Relocatable 		OUTOCT	       22466	Entry	Relocatable 	
+
+		*************
+
+GETTAB	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22525 ends at	 22571 length	    45 (octal),    37. (decimal)
+
+	BLT	       22546	Entry	Relocatable 		BLTZ	       22546	Entry	Relocatable 	
+	FILL	       22534	Entry	Relocatable 		GETTAB	       22526	Entry	Relocatable 	
+	IOR	       22562	Entry	Relocatable 		ROT	       22566	Entry	Relocatable 	
+	XOR	       22556	Entry	Relocatable 	
+
+		*************
+
+F4PRMS	from DSK:INITBP.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:40:00
+	Low  segment starts at	 22572 ends at	 22574 length	     3 (octal),     3. (decimal)
+
+	F4PRMS	       22572	Entry	Relocatable 	
+
+		*************
+
+BLDE	from DSK:BLDE2.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:00
+	Low  segment starts at	 22575 ends at	 22722 length	   126 (octal),    86. (decimal)
+
+	ADDROF	       22607	Entry	Relocatable 		BLDE2	       22600	Entry	Relocatable 	
+	CONTOF	       22612	Entry	Relocatable 		GNP	       22663	Entry	Relocatable 	
+	GNPZ	       22647	Entry	Relocatable 		RESETX	       22623	Entry	Relocatable 	
+	SETMEM	       22616	Entry	Relocatable 		TYPEOK	       22635	Entry	Relocatable 	
+
+		*************
+
+PUSH.M	from DSK:BLDE2.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:00
+	Low  segment starts at	 22723 ends at	 23165 length	   243 (octal),   163. (decimal)
+
+	GETPSH	       23013	Entry	Relocatable 		POP	       23077	Entry	Relocatable 	
+	POPJ	       23047	Entry	Relocatable 		PSHPDP	       23123	Global	Relocatable 	
+	PUSH	       23105	Entry	Relocatable 		PUSHI	       23112	Entry	Relocatable 	
+	PUSHJ	       23020	Entry	Relocatable 		PUSHZ	       22776	Entry	Relocatable 	
+	SETPSH	       23004	Entry	Relocatable 	
+
+		*************
+
+LEV	from DSK:BLDE2.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:00
+	Low  segment starts at	 23166 ends at	 23262 length	    75 (octal),    61. (decimal)
+
+	LEVPOP	       23242	Entry	Relocatable 		LEVPSH	       23234	Entry	Relocatable 	
+	LEVRES	       23250	Entry	Relocatable 		LEVZ	       23213	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 4
+
+
+NWCALL	from DSK:BLDE2.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:00
+	Low  segment starts at	 23263 ends at	 23361 length	    77 (octal),    63. (decimal)
+
+	NWCALL	       23264	Entry	Relocatable 	
+
+		*************
+
+OVTAB	from DSK:BLDE2.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:00
+
+	Zero length module
+
+		*************
+
+READA1	from DSK:READA1.REL[3,214400]	created by MACRO on 20-Nov-66 at  6:06:00
+	Low  segment starts at	 23362 ends at	 24035 length	   454 (octal),   300. (decimal)
+
+	READ1Z	       23370	Entry	Relocatable 		READA1	       23522	Entry	Relocatable 	
+
+		*************
+
+LINPUT	from DSK:LINPUT.REL[3,214400]	created by MACRO on 20-Nov-66 at 30:20:00
+	Low  segment starts at	 24036 ends at	 24506 length	   451 (octal),   297. (decimal)
+
+	HASH	       24170	Entry	Relocatable 		INITS	       24144	Entry	Relocatable 	
+	LINBPR	       24435	Global	Relocatable 		LINPTZ	       24052	Entry	Relocatable 	
+	LINPUT	       24137	Entry	Relocatable 		NAMSCN	       24151	Entry	Relocatable 	
+	NXTCHR	       24175	Entry	Relocatable 		PACK	       24163	Entry	Relocatable 	
+	PUTLIN	       24156	Entry	Relocatable 	
+
+		*************
+
+BLDLOC	from DSK:BLDLOC.REL[3,214400]	created by MACRO on 20-Nov-66 at  0:40:Low  segment starts at	 24507 ends at	 25245 length	   537 (octal),   351. (decimal)
+
+	BLDLOC	       24750	Entry	Relocatable 		GETLOC	       25003	Entry	Relocatable 	
+	GOSUB	       25043	Global	Relocatable 		GOSUB	260740000000	Global	Multiply-defined
+
+		*************
+
+USRSBR	from DSK:USRSBR.REL[3,214400]	created by MACRO on 20-Nov-66 at 21:04:00
+	Low  segment starts at	 25246 ends at	 25632 length	   365 (octal),   245. (decimal)
+
+	GSUBRI	       25371	Global	Relocatable 		SBRADR	       25362	Global	Relocatable 	
+	SUBR	       25427	Global	Relocatable 		USRSBR	       25264	Global	Relocatable 	
+
+		*************
+
+CUFSOV	from DSK:CUFSOV.REL[3,214400]	created by MACRO on 21-Nov-66 at 17:11:00
+	Low  segment starts at	 25633 ends at	 26331 length	   477 (octal),   319. (decimal)
+
+	CUFSVR	       26001	Global	Relocatable 		DDB	       26202	Global	Relocatable 	
+	DODDTM	       25756	Global	Relocatable 		OVINIT	       25653	Global	Relocatable 	
+	OVLPPN	       26206	Global	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 5
+CUFSOV
+
+		*************
+
+.MAIN	from DSK:GETCUF.REL[3,214400]	created by MACRO on 20-Nov-66 at  2:31:00
+	Low  segment starts at	 26332 ends at	 26404 length	    53 (octal),    43. (decimal)
+
+	GETCUF	       26333	Global	Relocatable 	
+
+		*************
+
+GETPUT	from DSK:GETPUT.REL[3,214400]	created by MACRO on 20-Nov-66 at 21:54:00
+	Low  segment starts at	 26405 ends at	 27415 length	  1011 (octal),   521. (decimal)
+
+	GET	       27134	Entry	Relocatable 		GETKWK	       27220	Entry	Relocatable 	
+	PUT	       27063	Entry	Relocatable 		PUTPUT	       27061	Entry	Relocatable 	
+	PUTZ	       27017	Entry	Relocatable 	
+
+		*************
+
+SMULPK	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27416 ends at	 27461 length	    44 (octal),    36. (decimal)
+
+	SMULPK	       27424	Entry	Relocatable 	
+
+		*************
+
+GETVAL	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27462 ends at	 27633 length	   152 (octal),   106. (decimal)
+
+	GETVAL	       27513	Entry	Relocatable 		GETVLZ	       27463	Entry	Relocatable 	
+	PUTVAL	       27530	Entry	Relocatable 	
+
+		*************
+
+TRLINK	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27634 ends at	 27721 length	    66 (octal),    54. (decimal)
+
+	TRLINK	       27635	Entry	Relocatable 	
+
+		*************
+
+FLOAT	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27722 ends at	 27725 length	     4 (octal),     4. (decimal)
+
+	FLOATZ	       27723	Entry	Relocatable 		IFIXZ	       27725	Entry	Relocatable 	
+
+		*************
+
+NEWM1	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27726 ends at	 27761 length	    34 (octal),    28. (decimal)
+
+	CNTRLO	       27727	Entry	Relocatable 		CORINF	       27732	Entry	Relocatable 	
+	GETKCT	       27742	Entry	Relocatable 		OUTSIX	       27747	Entry	Relocatable 	
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 6
+NEWM1
+		*************
+
+SETDEV	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+
+	Zero length module
+
+		*************
+
+MAKUPR	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 27762 ends at	 30004 length	    23 (octal),    19. (decimal)
+
+	MAKUPR	       27763	Entry	Relocatable 	
+
+		*************
+
+EQUIV	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 30005 ends at	 30012 length	     6 (octal),     6. (decimal)
+
+	EQUIV	       30006	Entry	Relocatable 		IEQUIV	       30011	Entry	Relocatable 	
+
+		*************
+
+GODDT	from DSK:NEWMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at 17:26:00
+	Low  segment starts at	 30013 ends at	 30026 length	    14 (octal),    12. (decimal)
+
+	GODDT	       30014	Entry	Relocatable 	
+
+		*************
+
+GETLNO	from DSK:NWMAC2.REL[3,214400]	created by MACRO on 20-Nov-66 at  6:06:00
+	Low  segment starts at	 30027 ends at	 30142 length	   114 (octal),    76. (decimal)
+
+	GETLNO	       30032	Entry	Relocatable 	
+
+		*************
+
+FILCHK	from DSK:FILCHK.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:34:00
+	Low  segment starts at	 30143 ends at	 30315 length	   153 (octal),   107. (decimal)
+
+	FILCHK	       30144	Entry	Relocatable 	
+
+		*************
+
+LOOKFL	from DSK:LOOKFL.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:56:00
+	Low  segment starts at	 30316 ends at	 30526 length	   211 (octal),   137. (decimal)
+
+	LOOKFL	       30316	Global	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 7
+
+
+MYREEN	from DSK:MYREEN.REL[3,214400]	created by MACRO on 20-Nov-66 at 30:20:00
+	Low  segment starts at	 30527 ends at	 30570 length	    42 (octal),    34. (decimal)
+	High segment starts at	400010 ends at	400027 length	    20 (octal),    16. (decimal)
+
+	FRMREN	      400011	Global	Relocatable 		MYAPR	      400010	Global	Relocatable 	
+	MYREEN	       30530	Entry	Relocatable 	
+
+		*************
+
+CIOINI	from DSK:CIO1.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:07:00
+	Low  segment starts at	 30571 ends at	 31273 length	   503 (octal),   323. (decimal)
+	High segment starts at	400030 ends at	400401 length	   352 (octal),   234. (decimal)
+
+	CIOBUF	       30571	Common	length	     1.		CIOERR	       30572	Common	length	     1.	
+	CIOSYS	       30573	Common	length	     1.		CIOBAS	       30574	Common	length	     1.	
+	CIOBSZ	       30575	Common	length	     1.		CIONBA	       30576	Common	length	     1.	
+	CIONBG	       30577	Common	length	     1.		CIOAGE	       30600	Common	length	     1.	
+	CIOWRT	       30601	Common	length	     1.		CIOPFL	       30602	Common	length	    30.	
+	CIOPIP	       30640	Common	length	    30.		CIOPOP	       30676	Common	length	    30.	
+	CIOPNB	       30734	Common	length	    30.		CIOPBX	       30772	Common	length	    30.	
+	CIOPBM	       31030	Common	length	    30.		CIOCHN	       31066	Common	length	    10.	
+	CIOSIZ	       31100	Common	length	    10.		CIOFMD	       31112	Common	length	    10.	
+	CIOBNF	       31124	Common	length	    15.		CIOFLN	       31143	Common	length	    15.	
+	CIOPRN	       31162	Common	length	    15.		CIOACT	       31201	Common	length	    15.	
+	CIOSTS	       31220	Common	length	    15.		CIOINI	      400031	Entry	Relocatable 	
+	CIOOPP	      400125	Entry	Relocatable 		CIOCLF	      400226	Entry	Relocatable 	
+
+		*************
+
+CIOCLP	from DSK:CIO1.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:07:00
+	Low  segment starts at	 31274 ends at	 31302 length	     7 (octal),     7. (decimal)
+	High segment starts at	400402 ends at	400447 length	    46 (octal),    38. (decimal)
+
+	CIOCLP	      400403	Entry	Relocatable 	
+
+		*************
+
+CIOSER	from DSK:CIO1.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:07:00
+	Low  segment starts at	 31303 ends at	 31317 length	    15 (octal),    13. (decimal)
+	High segment starts at	400450 ends at	400500 length	    31 (octal),    25. (decimal)
+
+	CIOSER	      400451	Entry	Relocatable 	
+
+		*************
+
+CIOCKP	from DSK:CIO1.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:07:00
+	Low  segment starts at	 31320 ends at	 31340 length	    21 (octal),    17. (decimal)
+	High segment starts at	400501 ends at	400575 length	    75 (octal),    61. (decimal)
+
+	CIOCKP	      400502	Entry	Relocatable 		CIOCKF	      400542	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 8
+
+
+CIOFOP	from DSK:CIO1.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:07:00
+	Low  segment starts at	 31341 ends at	 31362 length	    22 (octal),    18. (decimal)
+	High segment starts at	400576 ends at	400656 length	    61 (octal),    49. (decimal)
+
+	CIOFOP	      400577	Entry	Relocatable 	
+
+		*************
+
+CIOVRW	from DSK:CIO2.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  5:37:00
+	Low  segment starts at	 31363 ends at	 31417 length	    35 (octal),    29. (decimal)
+	High segment starts at	400657 ends at	401463 length	   605 (octal),   389. (decimal)
+
+	CIOVRW	      400660	Entry	Relocatable 		CIOVRD	      400711	Entry	Relocatable 	
+	CIOVWT	      401276	Entry	Relocatable 		CIOFIX	      401330	Entry	Relocatable 	
+
+		*************
+
+CIOSRD	from DSK:CIO3.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:08:00
+	Low  segment starts at	 31420 ends at	 31444 length	    25 (octal),    21. (decimal)
+	High segment starts at	401464 ends at	401737 length	   254 (octal),   172. (decimal)
+
+	CIOSRD	      401465	Entry	Relocatable 		CIOSWT	      401610	Entry	Relocatable 	
+
+		*************
+
+CIOHRD	from DSK:CIO4.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  5:50:00
+	Low  segment starts at	 31445 ends at	 31472 length	    26 (octal),    22. (decimal)
+	High segment starts at	401740 ends at	402315 length	   356 (octal),   238. (decimal)
+
+	CIOHRD	      401741	Entry	Relocatable 		CIOHWT	      402213	Entry	Relocatable 	
+
+		*************
+
+CIOOPF	from DSK:CIO5.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:08:00
+	Low  segment starts at	 31473 ends at	 31656 length	   164 (octal),   116. (decimal)
+	High segment starts at	402316 ends at	403166 length	   651 (octal),   425. (decimal)
+
+	CIOOPF	      402317	Entry	Relocatable 		CIOBIO	      402505	Entry	Relocatable 	
+	CIOBIP	      402544	Entry	Relocatable 		CIOBOP	      402616	Entry	Relocatable 	
+	CIOBXP	      402667	Entry	Relocatable 	
+
+		*************
+
+CIOFIL	from DSK:CIOFIL.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at  4:12:00
+	Low  segment starts at	 31657 ends at	 31772 length	   114 (octal),    76. (decimal)
+	High segment starts at	403167 ends at	403505 length	   317 (octal),   207. (decimal)
+
+	CIOFIL	      403170	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 9
+
+
+CIOMAC	from DSK:CIOMAC.REL[3,214400]	created on 21-Nov-66 at  4:37:00
+	Low  segment starts at	 31773 ends at	 32042 length	    50 (octal),    40. (decimal)
+	High segment starts at	403506 ends at	404104 length	   377 (octal),   255. (decimal)
+
+	CIOATM	      403531	Entry	Relocatable 		CIOBIX	      403742	Entry	Relocatable 	
+	CIOBOX	      403741	Entry	Relocatable 		CIOCFM	      404055	Entry	Relocatable 	
+	CIOINM	      403506	Entry	Relocatable 		CIOOCT	      403573	Entry	Relocatable 	
+	CIOOFM	      403614	Entry	Relocatable 		CIOSID	      403527	Entry	Relocatable 	
+	CIOXFR	      404074	Entry	Relocatable 	
+
+		*************
+
+CALL	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32043 ends at	 32112 length	    50 (octal),    40. (decimal)
+	High segment starts at	404105 ends at	404331 length	   225 (octal),   149. (decimal)
+
+	CALL	      404106	Entry	Relocatable 	
+
+		*************
+
+RETURN	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32113 ends at	 32143 length	    31 (octal),    25. (decimal)
+	High segment starts at	404332 ends at	404517 length	   166 (octal),   118. (decimal)
+
+	RETURN	      404333	Entry	Relocatable 	
+
+		*************
+
+LOKUPZ	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32144 ends at	 32214 length	    51 (octal),    41. (decimal)
+	High segment starts at	404520 ends at	405012 length	   273 (octal),   187. (decimal)
+
+	LOKUPZ	      404521	Entry	Relocatable 	
+
+		*************
+
+ACCTIM	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32215 ends at	 32226 length	    12 (octal),    10. (decimal)
+	High segment starts at	405013 ends at	405130 length	   116 (octal),    78. (decimal)
+
+	ACCTIM	      405014	Entry	Relocatable 	
+
+		*************
+
+HILOPR	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32227 ends at	 32246 length	    20 (octal),    16. (decimal)
+	High segment starts at	405131 ends at	405263 length	   133 (octal),    91. (decimal)
+
+	HILOPR	      405132	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 10
+
+
+GETVLF	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32247 ends at	 32317 length	    51 (octal),    41. (decimal)
+	High segment starts at	405264 ends at	405516 length	   233 (octal),   155. (decimal)
+
+	GETVLF	      405265	Entry	Relocatable 	
+
+		*************
+
+PUTVLF	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32320 ends at	 32342 length	    23 (octal),    19. (decimal)
+	High segment starts at	405517 ends at	405700 length	   162 (octal),   114. (decimal)
+
+	PUTVLF	      405520	Entry	Relocatable 	
+
+		*************
+
+TRAP	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32343 ends at	 32362 length	    20 (octal),    16. (decimal)
+	High segment starts at	405701 ends at	405765 length	    65 (octal),    53. (decimal)
+
+	TRAP	      405702	Entry	Relocatable 	
+
+		*************
+
+ACCTYP	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32363 ends at	 32406 length	    24 (octal),    20. (decimal)
+	High segment starts at	405766 ends at	406157 length	   172 (octal),   122. (decimal)
+
+	ACCTYP	      405767	Entry	Relocatable 	
+
+		*************
+
+LOCAL	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32407 ends at	 32420 length	    12 (octal),    10. (decimal)
+	High segment starts at	406160 ends at	406252 length	    73 (octal),    59. (decimal)
+
+	LOCAL	      406161	Entry	Relocatable 	
+
+		*************
+
+SYSERR	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32421 ends at	 32437 length	    17 (octal),    15. (decimal)
+	High segment starts at	406253 ends at	406331 length	    57 (octal),    47. (decimal)
+
+	SYSERR	      406254	Entry	Relocatable 	
+
+		*************
+
+PALIVE	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32440 ends at	 32470 length	    31 (octal),    25. (decimal)
+	High segment starts at	406332 ends at	406520 length	   167 (octal),   119. (decimal)
+
+	PALIVE	      406333	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 11
+PALIVE
+
+		*************
+
+DODDTF	from DSK:OTHRS4.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:12:00
+	Low  segment starts at	 32471 ends at	 32541 length	    51 (octal),    41. (decimal)
+	High segment starts at	406521 ends at	406560 length	    40 (octal),    32. (decimal)
+
+	DODDTF	      406522	Entry	Relocatable 	
+
+		*************
+
+PRSET	from DSK:PRSET.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:11:00
+	Low  segment starts at	 32542 ends at	 34111 length	  1350 (octal),   744. (decimal)
+	High segment starts at	406561 ends at	413706 length	  5126 (octal),  2646. (decimal)
+
+	PRSET	      406562	Entry	Relocatable 	
+
+		*************
+
+DECTIM	from DSK:PRSET.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:11:00
+	Low  segment starts at	 34112 ends at	 34114 length	     3 (octal),     3. (decimal)
+	High segment starts at	413707 ends at	413724 length	    16 (octal),    14. (decimal)
+
+	DECTIM	      413710	Entry	Relocatable 	
+
+		*************
+
+TRACKU	from DSK:TRACKU.REL[3,214400]	created by MACRO on 20-Nov-66 at 19:49:00
+	Low  segment starts at	 34115 ends at	 34572 length	   456 (octal),   302. (decimal)
+
+	TRKICR	       34522	Entry	Relocatable 		TRKINI	       34356	Entry	Relocatable 	
+
+		*************
+
+EASY	from DSK:EASY.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:54:00
+	Low  segment starts at	 34573 ends at	 36412 length	  1620 (octal),   912. (decimal)
+	High segment starts at	413725 ends at	415322 length	  1376 (octal),   766. (decimal)
+
+	EASY	      413726	Entry	Relocatable 	
+
+		*************
+
+TERRAD	from DSK:TERRAD.REL[3,214400]	created by MACRO on 20-Nov-66 at  6:06:00
+	Low  segment starts at	 36413 ends at	 36445 length	    33 (octal),    27. (decimal)
+
+	TERRAD	       36413	Entry	Relocatable 	
+
+		*************
+
+BLKDAT	from DSK:BLKDAT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 23:54:00
+	Low  segment starts at	 36446 ends at	 36544 length	    77 (octal),    63. (decimal)
+	High segment starts at	415323 ends at	415400 length	    56 (octal),    46. (decimal)
+
+	BLKDAT	      415324	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 12
+BLKDAT
+
+		*************
+
+COPY	from DSK:COPY.REL[3,214400]	created by MACRO on 20-Nov-66 at  2:36:00
+	Low  segment starts at	 36545 ends at	 37022 length	   256 (octal),   174. (decimal)
+
+	COPY	       36546	Entry	Relocatable 	
+
+		*************
+
+FRCHN	from DSK:COPY.REL[3,214400]	created by MACRO on 20-Nov-66 at  2:36:00
+	Low  segment starts at	 37023 ends at	 37073 length	    51 (octal),    41. (decimal)
+
+	FRCHN	       37024	Entry	Relocatable 		RELCHN	       37035	Entry	Relocatable 	
+
+		*************
+
+A5TOA6	from DSK:A5TOA6.REL[3,214400]	created by MACRO on 20-Nov-66 at  4:30:00
+	Low  segment starts at	 37074 ends at	 37465 length	   372 (octal),   250. (decimal)
+
+	A5TOA6	       37137	Entry	Relocatable 	
+
+		*************
+
+MLSCAN	from DSK:LSCAN.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  4:02:00
+	Low  segment starts at	 37466 ends at	 37540 length	    53 (octal),    43. (decimal)
+	High segment starts at	415401 ends at	415751 length	   351 (octal),   233. (decimal)
+
+	MLSCAN	      415402	Entry	Relocatable 	
+
+		*************
+
+LSCAN	from DSK:LSCAN.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  4:02:00
+	Low  segment starts at	 37541 ends at	 37767 length	   227 (octal),   151. (decimal)
+	High segment starts at	415752 ends at	420367 length	  2416 (octal),  1294. (decimal)
+
+	LSCAN	      415753	Entry	Relocatable 	
+
+		*************
+
+TRANS1	from DSK:TRANS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:42:00
+	Low  segment starts at	 37770 ends at	 40131 length	   142 (octal),    98. (decimal)
+	High segment starts at	420370 ends at	422307 length	  1720 (octal),   976. (decimal)
+
+	TRANS1	      420371	Entry	Relocatable 	
+
+		*************
+
+TRANS2	from DSK:TRANS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:42:00
+	Low  segment starts at	 40132 ends at	 40305 length	   154 (octal),   108. (decimal)
+	High segment starts at	422310 ends at	425230 length	  2721 (octal),  1489. (decimal)
+
+	TRANS2	      422311	Entry	Relocatable 	
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 13
+TRANS2
+		*************
+
+STACK	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40306 ends at	 40314 length	     7 (octal),     7. (decimal)
+	High segment starts at	425231 ends at	425274 length	    44 (octal),    36. (decimal)
+
+	STACK	      425232	Entry	Relocatable 	
+
+		*************
+
+FNPROC	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40315 ends at	 40415 length	   101 (octal),    65. (decimal)
+	High segment starts at	425275 ends at	427043 length	  1547 (octal),   871. (decimal)
+
+	FNPROC	      425276	Entry	Relocatable 	
+
+		*************
+
+XFNODE	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40416 ends at	 40462 length	    45 (octal),    37. (decimal)
+	High segment starts at	427044 ends at	427520 length	   455 (octal),   301. (decimal)
+
+	XFNODE	      427045	Entry	Relocatable 	
+
+		*************
+
+CHKSEM	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40463 ends at	 40470 length	     6 (octal),     6. (decimal)
+	High segment starts at	427521 ends at	427622 length	   102 (octal),    66. (decimal)
+
+	CHKSEM	      427522	Entry	Relocatable 	
+
+		*************
+
+SAYBOX	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40471 ends at	 40543 length	    53 (octal),    43. (decimal)
+	High segment starts at	427623 ends at	430170 length	   346 (octal),   230. (decimal)
+
+	SAYBOX	      427624	Entry	Relocatable 	
+
+		*************
+
+MAXSEM	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40544 ends at	 40550 length	     5 (octal),     5. (decimal)
+	High segment starts at	430171 ends at	430213 length	    23 (octal),    19. (decimal)
+
+	MAXSEM	      430172	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 14
+
+
+ISNODE	from DSK:TSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:36:00
+	Low  segment starts at	 40551 ends at	 40623 length	    53 (octal),    43. (decimal)
+	High segment starts at	430214 ends at	430441 length	   226 (octal),   150. (decimal)
+
+	ISNODE	      430215	Entry	Relocatable 	
+
+		*************
+
+EXPAND	from DSK:EXPAND.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 14:53:00
+	Low  segment starts at	 40624 ends at	 41545 length	   722 (octal),   466. (decimal)
+	High segment starts at	430442 ends at	431723 length	  1262 (octal),   690. (decimal)
+
+	EXPAND	      430443	Entry	Relocatable 	
+
+		*************
+
+ERPNT2	from DSK:ERPNT2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 30:22:00
+	Low  segment starts at	 41546 ends at	 41625 length	    60 (octal),    48. (decimal)
+	High segment starts at	431724 ends at	432273 length	   350 (octal),   232. (decimal)
+
+	ERPNT2	      431725	Entry	Relocatable 	
+
+		*************
+
+CINTRP	from DSK:CINTRP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 25:54:00
+	Low  segment starts at	 41626 ends at	 42235 length	   410 (octal),   264. (decimal)
+	High segment starts at	432274 ends at	440033 length	  5540 (octal),  2912. (decimal)
+
+	CINTRP	      432275	Entry	Relocatable 	
+
+		*************
+
+APLOUT	from DSK:APLOUT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  6:08:00
+	Low  segment starts at	 42236 ends at	 42260 length	    23 (octal),    19. (decimal)
+	High segment starts at	440034 ends at	440161 length	   126 (octal),    86. (decimal)
+
+	APLOUT	      440035	Entry	Relocatable 	
+
+		*************
+
+REVIEW	from DSK:REVIEW.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 30:16:00
+	Low  segment starts at	 42261 ends at	 42370 length	   110 (octal),    72. (decimal)
+	High segment starts at	440162 ends at	441066 length	   705 (octal),   453. (decimal)
+
+	REVIEW	      440163	Entry	Relocatable 	
+
+		*************
+
+APLCHK	from DSK:CSUBS1.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:01:00
+	Low  segment starts at	 42371 ends at	 42435 length	    45 (octal),    37. (decimal)
+	High segment starts at	441067 ends at	441626 length	   540 (octal),   352. (decimal)
+
+	APLCHK	      441070	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 15
+APLCHK
+
+		*************
+
+PNTRPT	from DSK:PNTRPT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:01:00
+	Low  segment starts at	 42436 ends at	 43002 length	   345 (octal),   229. (decimal)
+	High segment starts at	441627 ends at	446223 length	  4375 (octal),  2301. (decimal)
+
+	PNTRPT	      441630	Entry	Relocatable 	
+
+		*************
+
+VPRINT	from DSK:VPRINT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 19:21:00
+	Low  segment starts at	 43003 ends at	 43361 length	   357 (octal),   239. (decimal)
+	High segment starts at	446224 ends at	447607 length	  1364 (octal),   756. (decimal)
+
+	VPRINT	      446225	Entry	Relocatable 	
+
+		*************
+
+PRTOTL	from DSK:VPRINT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 19:21:00
+	Low  segment starts at	 43362 ends at	 43407 length	    26 (octal),    22. (decimal)
+	High segment starts at	447610 ends at	447775 length	   166 (octal),   118. (decimal)
+
+	PRTOTL	      447611	Entry	Relocatable 	
+
+		*************
+
+FANCY2	from DSK:FANCY2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 25:54:00
+	Low  segment starts at	 43410 ends at	 43614 length	   205 (octal),   133. (decimal)
+	High segment starts at	447776 ends at	452141 length	  2144 (octal),  1124. (decimal)
+
+	FANCY2	      447777	Entry	Relocatable 	
+
+		*************
+
+CNTRP3	from DSK:CNTRP3.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 25:54:00
+	Low  segment starts at	 43615 ends at	 44007 length	   173 (octal),   123. (decimal)
+	High segment starts at	452142 ends at	454157 length	  2016 (octal),  1038. (decimal)
+
+	CNTRP3	      452143	Entry	Relocatable 	
+
+		*************
+
+SUB10	from DSK:BIGPO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:31:00
+	Low  segment starts at	 44010 ends at	 44306 length	   277 (octal),   191. (decimal)
+	High segment starts at	454160 ends at	456154 length	  1775 (octal),  1021. (decimal)
+
+	SUB10	      454161	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 16
+
+
+SCAREA	from DSK:BIGPO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:31:00
+	Low  segment starts at	 44307 ends at	 45245 length	   737 (octal),   479. (decimal)
+	High segment starts at	456155 ends at	460371 length	  2215 (octal),  1165. (decimal)
+
+	SCAREA	      456156	Entry	Relocatable 	
+
+		*************
+
+PNTLST	from DSK:BIGPO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:31:00
+	Low  segment starts at	 45246 ends at	 45262 length	    15 (octal),    13. (decimal)
+	High segment starts at	460372 ends at	460474 length	   103 (octal),    67. (decimal)
+
+	PNTLST	      460373	Entry	Relocatable 	
+
+		*************
+
+SORT	from DSK:BIGPO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:31:00
+	Low  segment starts at	 45263 ends at	 45310 length	    26 (octal),    22. (decimal)
+	High segment starts at	460475 ends at	460705 length	   211 (octal),   137. (decimal)
+
+	SORT	      460476	Entry	Relocatable 	
+
+		*************
+
+MRKSEQ	from DSK:BIGPO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 17:31:00
+	Low  segment starts at	 45311 ends at	 45340 length	    30 (octal),    24. (decimal)
+	High segment starts at	460706 ends at	461067 length	   162 (octal),   114. (decimal)
+
+	MRKSEQ	      460707	Entry	Relocatable 	
+
+		*************
+
+COMPAK	from DSK:COMPAK.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  7:05:00
+	Low  segment starts at	 45341 ends at	 45430 length	    70 (octal),    56. (decimal)
+	High segment starts at	461070 ends at	461564 length	   475 (octal),   317. (decimal)
+
+	COMPAK	      461071	Entry	Relocatable 	
+
+		*************
+
+PLOTT	from DSK:PLOTT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  7:05:00
+	Low  segment starts at	 45431 ends at	 46000 length	   350 (octal),   232. (decimal)
+	High segment starts at	461565 ends at	462213 length	   427 (octal),   279. (decimal)
+
+	PLOTT	      461566	Entry	Relocatable 	
+
+		*************
+
+SCALE	from DSK:PLOTT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  7:05:00
+	Low  segment starts at	 46001 ends at	 46345 length	   345 (octal),   229. (decimal)
+	High segment starts at	462214 ends at	463347 length	  1134 (octal),   604. (decimal)
+
+	SCALE	      462215	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 17
+SCALE
+
+		*************
+
+ROUND	from DSK:PLOTT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  7:05:00
+	Low  segment starts at	 46346 ends at	 46415 length	    50 (octal),    40. (decimal)
+	High segment starts at	463350 ends at	463537 length	   170 (octal),   120. (decimal)
+
+	ROUND	      463351	Entry	Relocatable 	
+
+		*************
+
+MINMAX	from DSK:PLOTT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  7:05:00
+	Low  segment starts at	 46416 ends at	 46447 length	    32 (octal),    26. (decimal)
+	High segment starts at	463540 ends at	463670 length	   131 (octal),    89. (decimal)
+
+	MINMAX	      463541	Entry	Relocatable 	
+
+		*************
+
+HISGRM	from DSK:HISGRM.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:59:00
+	Low  segment starts at	 46450 ends at	 46570 length	   121 (octal),    81. (decimal)
+	High segment starts at	463671 ends at	464425 length	   535 (octal),   349. (decimal)
+
+	HISGRM	      463672	Entry	Relocatable 	
+
+		*************
+
+MACDEF	from DSK:MACDEF.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:59:00
+	Low  segment starts at	 46571 ends at	 46653 length	    63 (octal),    51. (decimal)
+	High segment starts at	464426 ends at	465664 length	  1237 (octal),   671. (decimal)
+
+	MACDEF	      464427	Entry	Relocatable 	
+
+		*************
+
+REACH	from DSK:REACH.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  9:04:00
+	Low  segment starts at	 46654 ends at	 46742 length	    67 (octal),    55. (decimal)
+	High segment starts at	465665 ends at	466173 length	   307 (octal),   199. (decimal)
+
+	REACH	      465666	Entry	Relocatable 	
+
+		*************
+
+REACH2	from DSK:REACH.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  9:04:00
+	Low  segment starts at	 46743 ends at	 47511 length	   547 (octal),   359. (decimal)
+	High segment starts at	466174 ends at	467520 length	  1325 (octal),   725. (decimal)
+
+	REACH2	      466175	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 18
+
+
+BLDGRP	from DSK:BLDGRP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 26:52:00
+	Low  segment starts at	 47512 ends at	 47534 length	    23 (octal),    19. (decimal)
+	High segment starts at	467521 ends at	467761 length	   241 (octal),   161. (decimal)
+
+	BLDGRP	      467522	Entry	Relocatable 	
+
+		*************
+
+SETCOL	from DSK:CSUBS2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 26:52:00
+	Low  segment starts at	 47535 ends at	 50340 length	   604 (octal),   388. (decimal)
+	High segment starts at	467762 ends at	471423 length	  1442 (octal),   802. (decimal)
+
+	SETCOL	      467763	Entry	Relocatable 	
+
+		*************
+
+COLHED	from DSK:CSUBS2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 26:52:00
+	Low  segment starts at	 50341 ends at	 50467 length	   127 (octal),    87. (decimal)
+	High segment starts at	471424 ends at	472430 length	  1005 (octal),   517. (decimal)
+
+	COLHED	      471425	Entry	Relocatable 	
+
+		*************
+
+QUIKIO	from DSK:QUIKIO.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  2:37:00
+	Low  segment starts at	 50470 ends at	 50664 length	   175 (octal),   125. (decimal)
+	High segment starts at	472431 ends at	474232 length	  1602 (octal),   898. (decimal)
+
+	QUIKIO	      472432	Entry	Relocatable 	
+
+		*************
+
+WRCONS	from DSK:WRCON.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 22:34:00
+	Low  segment starts at	 50665 ends at	 50752 length	    66 (octal),    54. (decimal)
+	High segment starts at	474233 ends at	475254 length	  1022 (octal),   530. (decimal)
+
+	WRCONS	      474234	Entry	Relocatable 	
+
+		*************
+
+WRCON2	from DSK:WRCON.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 22:34:00
+	Low  segment starts at	 50753 ends at	 51512 length	   540 (octal),   352. (decimal)
+	High segment starts at	475255 ends at	500545 length	  3271 (octal),  1721. (decimal)
+
+	WRCON2	      475256	Entry	Relocatable 	
+
+		*************
+
+SUB11	from DSK:INTERP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:05:00
+	Low  segment starts at	 51513 ends at	 52131 length	   417 (octal),   271. (decimal)
+	High segment starts at	500546 ends at	503756 length	  3211 (octal),  1673. (decimal)
+
+	SUB11	      500547	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 19
+SUB11
+
+		*************
+
+JNKTRP	from DSK:INTERP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:05:00
+	Low  segment starts at	 52132 ends at	 52165 length	    34 (octal),    28. (decimal)
+	High segment starts at	503757 ends at	504522 length	   544 (octal),   356. (decimal)
+
+	JNKTRP	      503760	Entry	Relocatable 	
+
+		*************
+
+GOFX	from DSK:INTERP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:05:00
+	Low  segment starts at	 52166 ends at	 52252 length	    65 (octal),    53. (decimal)
+	High segment starts at	504523 ends at	505101 length	   357 (octal),   239. (decimal)
+
+	GOFX	      504524	Entry	Relocatable 	
+
+		*************
+
+PRONC2	from DSK:PRONCE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:29:00
+	Low  segment starts at	 52253 ends at	 52256 length	     4 (octal),     4. (decimal)
+	High segment starts at	505102 ends at	505124 length	    23 (octal),    19. (decimal)
+
+	PRONC2	      505103	Entry	Relocatable 	
+
+		*************
+
+PRONCE	from DSK:PRONCE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 16:29:00
+	Low  segment starts at	 52257 ends at	 53504 length	  1226 (octal),   662. (decimal)
+	High segment starts at	505125 ends at	516272 length	 11146 (octal),  4710. (decimal)
+
+	PRONCE	      505126	Entry	Relocatable 	
+
+		*************
+
+ZERO2	from DSK:ZERO2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 32:45:00
+	Low  segment starts at	 53505 ends at	 53540 length	    34 (octal),    28. (decimal)
+	High segment starts at	516273 ends at	516600 length	   306 (octal),   198. (decimal)
+
+	ZERO2	      516274	Entry	Relocatable 	
+
+		*************
+
+RQUEST	from DSK:RQUEST.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 32:45:00
+	Low  segment starts at	 53541 ends at	 54412 length	   652 (octal),   426. (decimal)
+	High segment starts at	516601 ends at	525014 length	  6214 (octal),  3212. (decimal)
+
+	RQUEST	      516602	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 20
+
+
+STATUS	from DSK:SUBS6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:17:00
+	Low  segment starts at	 54413 ends at	 55433 length	  1021 (octal),   529. (decimal)
+	High segment starts at	525015 ends at	527345 length	  2331 (octal),  1241. (decimal)
+
+	STATUS	      525016	Entry	Relocatable 	
+
+		*************
+
+POLDMP	from DSK:SUBS6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:17:00
+	Low  segment starts at	 55434 ends at	 56133 length	   500 (octal),   320. (decimal)
+	High segment starts at	527346 ends at	530173 length	   626 (octal),   406. (decimal)
+
+	POLDMP	      527347	Entry	Relocatable 	
+
+		*************
+
+MNTRAN	from DSK:MNTRAN.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 13:56:00
+	Low  segment starts at	 56134 ends at	 56361 length	   226 (octal),   150. (decimal)
+	High segment starts at	530174 ends at	535405 length	  5212 (octal),  2698. (decimal)
+
+	MNTRAN	      530175	Entry	Relocatable 	
+
+		*************
+
+CURSE	from DSK:CURSE.REL[3,214400]	created by MACRO on 20-Nov-66 at 10:34:00
+	Low  segment starts at	 56362 ends at	 56635 length	   254 (octal),   172. (decimal)
+
+	CURSE	       56362	Global	Relocatable 	
+
+		*************
+
+MAINSB	from DSK:MAINSB.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 13:56:00
+	Low  segment starts at	 56636 ends at	 57026 length	   171 (octal),   121. (decimal)
+	High segment starts at	535406 ends at	536677 length	  1272 (octal),   698. (decimal)
+
+	MAINSB	      535407	Entry	Relocatable 	
+
+		*************
+
+READY2	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57027 ends at	 57215 length	   167 (octal),   119. (decimal)
+	High segment starts at	536700 ends at	540170 length	  1271 (octal),   697. (decimal)
+
+	READY2	      536701	Entry	Relocatable 	
+
+		*************
+
+LUPCHG	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57216 ends at	 57276 length	    61 (octal),    49. (decimal)
+	High segment starts at	540171 ends at	540775 length	   605 (octal),   389. (decimal)
+
+	LUPCHG	      540172	Entry	Relocatable 	
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 21
+LUPCHG
+		*************
+
+DPCHNG	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57277 ends at	 57421 length	   123 (octal),    83. (decimal)
+	High segment starts at	540776 ends at	541631 length	   634 (octal),   412. (decimal)
+
+	DPCHNG	      540777	Entry	Relocatable 	
+
+		*************
+
+HSHPTR	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57422 ends at	 57516 length	    75 (octal),    61. (decimal)
+	High segment starts at	541632 ends at	542263 length	   432 (octal),   282. (decimal)
+
+	HSHPTR	      541633	Entry	Relocatable 	
+
+		*************
+
+ALLOCV	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57517 ends at	 57555 length	    37 (octal),    31. (decimal)
+	High segment starts at	542264 ends at	542726 length	   443 (octal),   291. (decimal)
+
+	ALLOCV	      542265	Entry	Relocatable 	
+
+		*************
+
+QSTCHK	from DSK:BSUBS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 33:42:00
+	Low  segment starts at	 57556 ends at	 57573 length	    16 (octal),    14. (decimal)
+	High segment starts at	542727 ends at	543151 length	   223 (octal),   147. (decimal)
+
+	QSTCHK	      542730	Entry	Relocatable 	
+
+		*************
+
+LUPLEN	from DSK:LUPLEN.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  9:28:00
+	Low  segment starts at	 57574 ends at	 57633 length	    40 (octal),    32. (decimal)
+	High segment starts at	543152 ends at	543452 length	   301 (octal),   193. (decimal)
+
+	LUPLEN	      543153	Entry	Relocatable 	
+
+		*************
+
+READYP	from DSK:READYP.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 19:21:00
+	Low  segment starts at	 57634 ends at	 57705 length	    52 (octal),    42. (decimal)
+	High segment starts at	543453 ends at	544306 length	   634 (octal),   412. (decimal)
+
+	READYP	      543454	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 22
+
+
+CNTRP2	from DSK:CNTRP2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:15:00
+	Low  segment starts at	 57706 ends at	 60767 length	  1062 (octal),   562. (decimal)
+	High segment starts at	544307 ends at	552044 length	  5536 (octal),  2910. (decimal)
+
+	CNTRP2	      544310	Entry	Relocatable 	
+
+		*************
+
+FPBOOT	from DSK:FPBOOT.REL[3,214400]	created by MACRO on 20-Nov-66 at 20:27:00
+	Low  segment starts at	 60770 ends at	 61116 length	   127 (octal),    87. (decimal)
+
+	FPBOOT	       60770	Global	Relocatable 	
+
+		*************
+
+SYMMAK	from DSK:SYMMAK.REL[3,214400]	created by MACRO on 20-Nov-66 at 22:11:00
+	Low  segment starts at	 61117 ends at	 62065 length	   747 (octal),   487. (decimal)
+
+	SYMMAK	       61360	Global	Relocatable 	
+
+		*************
+
+MYDDT	from DSK:MYDDT.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:15:00
+	Low  segment starts at	 62066 ends at	 62126 length	    41 (octal),    33. (decimal)
+	High segment starts at	552045 ends at	552225 length	   161 (octal),   113. (decimal)
+
+	MYDDT	      552046	Entry	Relocatable 	
+
+		*************
+
+JUNK	from DSK:JUNK.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  5:00:00
+	Low  segment starts at	 62127 ends at	 62242 length	   114 (octal),    76. (decimal)
+	High segment starts at	552226 ends at	553010 length	   563 (octal),   371. (decimal)
+
+	JUNK	      552227	Entry	Relocatable 	
+
+		*************
+
+REFTBL	from DSK:JUNK.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  5:00:00
+	Low  segment starts at	 62243 ends at	 62344 length	   102 (octal),    66. (decimal)
+	High segment starts at	553011 ends at	553574 length	   564 (octal),   372. (decimal)
+
+	REFTBL	      553012	Entry	Relocatable 	
+
+		*************
+
+CHGSRC	from DSK:CHANGE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:42:00
+	Low  segment starts at	 62345 ends at	 62530 length	   164 (octal),   116. (decimal)
+	High segment starts at	553575 ends at	556116 length	  2322 (octal),  1234. (decimal)
+
+	CHGSRC	      553576	Entry	Relocatable 	
+
+		*************
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 23
+CHGSRC
+
+SRCOUT	from DSK:CHANGE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:42:00
+	Low  segment starts at	 62531 ends at	 62637 length	   107 (octal),    71. (decimal)
+	High segment starts at	556117 ends at	556503 length	   365 (octal),   245. (decimal)
+
+	SRCOUT	      556120	Entry	Relocatable 	
+
+		*************
+
+EDITCG	from DSK:CHANGE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:42:00
+	Low  segment starts at	 62640 ends at	 63006 length	   147 (octal),   103. (decimal)
+	High segment starts at	556504 ends at	560170 length	  1465 (octal),   821. (decimal)
+
+	EDITCG	      556505	Entry	Relocatable 	
+
+		*************
+
+RECOVR	from DSK:CHANGE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 29:42:00
+	Low  segment starts at	 63007 ends at	 63100 length	    72 (octal),    58. (decimal)
+	High segment starts at	560171 ends at	560534 length	   344 (octal),   228. (decimal)
+
+	RECOVR	      560172	Entry	Relocatable 	
+
+		*************
+
+BYE	from DSK:BYE.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 27:54:00
+	Low  segment starts at	 63101 ends at	 63340 length	   240 (octal),   160. (decimal)
+	High segment starts at	560535 ends at	562112 length	  1356 (octal),   750. (decimal)
+
+	BYE	      560536	Entry	Relocatable 	
+
+		*************
+
+MAXMIN	from DSK:MAXMIN.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 14:53:00
+	Low  segment starts at	 63341 ends at	 63422 length	    62 (octal),    50. (decimal)
+	High segment starts at	562113 ends at	563053 length	   741 (octal),   481. (decimal)
+
+	MAXMIN	      562114	Entry	Relocatable 	
+
+		*************
+
+RUNBAK	from DSK:RUNBAK.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 30:16:00
+	Low  segment starts at	 63423 ends at	 63534 length	   112 (octal),    74. (decimal)
+	High segment starts at	563054 ends at	564064 length	  1011 (octal),   521. (decimal)
+
+	RUNBAK	      563055	Entry	Relocatable 	
+
+		*************
+
+DOASKS	from DSK:DOASKS.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 30:16:00
+	Low  segment starts at	 63535 ends at	 64010 length	   254 (octal),   172. (decimal)
+	High segment starts at	564065 ends at	565464 length	  1400 (octal),   768. (decimal)
+
+	DOASKS	      564066	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 24
+DOASKS
+
+		*************
+
+VECFIL	from DSK:VECFIL.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  8:30:00
+	Low  segment starts at	 64011 ends at	 64016 length	     6 (octal),     6. (decimal)
+	High segment starts at	565465 ends at	565515 length	    31 (octal),    25. (decimal)
+
+	VECFIL	      565466	Entry	Relocatable 	
+
+		*************
+
+GETNUM	from DSK:GETNUM.REL[3,214400]	created by MACRO on 20-Nov-66 at 20:27:00
+	Low  segment starts at	 64017 ends at	 64347 length	   331 (octal),   217. (decimal)
+
+	GETNMZ	       64034	Entry	Relocatable 		GETNUM	       64062	Entry	Relocatable 	
+
+		*************
+
+VECFL2	from DSK:VECFL2.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 18:24:00
+	Low  segment starts at	 64350 ends at	 64450 length	   101 (octal),    65. (decimal)
+	High segment starts at	565516 ends at	566770 length	  1253 (octal),   683. (decimal)
+
+	VECFL2	      565517	Entry	Relocatable 	
+
+		*************
+
+FORINI	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 64451 ends at	 64524 length	    54 (octal),    44. (decimal)
+
+	ALCHN.	      567015	Global	Absolute    		ALCOR.	      567013	Global	Absolute    	
+	CLOSE.	      566774	Global	Absolute    		DBMS.	      567021	Global	Absolute    	
+	DEC.	      567003	Global	Absolute    		DECHN.	      567016	Global	Absolute    	
+	DECOR.	      567014	Global	Absolute    		ENC.	      567002	Global	Absolute    	
+	EXIT.	      567012	Global	Absolute    		FIN.	      567007	Global	Absolute    	
+	FIND.	      567011	Global	Absolute    		FORER.	       64513	Global	Relocatable 	
+	FUNCT.	      567020	Global	Absolute    		IN.	      566776	Global	Relocatable 	
+	IOLST.	      567006	Global	Relocatable 		MTOP.	      567010	Global	Relocatable 	
+	NLI.	      567004	Global	Relocatable 		NLO.	      567005	Global	Relocatable 	
+	OPEN.	      566773	Global	Relocatable 		OUT.	      566777	Global	Relocatable 	
+	RELEA.	      566775	Global	Relocatable 		RESET.	       64451	Entry	Relocatable 	
+	RTB.	      567000	Global	Relocatable 		TRACE.	      567017	Global	Relocatable 	
+	WTB.	      567001	Global	Relocatable 	
+
+		*************
+
+FOROTS	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	566771 ends at	576073 length	  7103 (octal),  3651. (decimal)
+
+	ACC.TB	      570464	Global	Relocatable 		ALCOR1	      575151	Global	Relocatable 	
+	CLOS..	      575044	Global	Relocatable 		CLOSB.	      575040	Global	Relocatable 	
+	CLOSI.	      575043	Global	Relocatable 		CLOSO.	      575036	Global	Relocatable 	
+	D.MASK	       17600	Global	Absolute    Suppressed	D.PNTR	      573351	Global	Relocatable 	
+	DIS.TB	      570500	Global	Relocatable 		DMEM%%	      575212	Global	Relocatable 	
+	DMPSTR	      571451	Global	Relocatable 		EFCTV.	      571007	Global	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 25
+FOROTS
+	ENDLN.	      571201	Global	Relocatable 		EXIT%	      575116	Global	Relocatable 	
+	FOROT%	      566771	Entry	Relocatable 		GMEM%%	      575154	Global	Relocatable 	
+	GT.CHN	      570733	Global	Relocatable 		IBLOK.	      571071	Global	Relocatable 	
+	IBYTE.	      571041	Global	Relocatable 		INIT%	      567022	Global	Relocatable 	
+	IOLS%%	      573020	Global	Relocatable 		IPEEK.	      571025	Global	Relocatable 	
+	MOD.TB	      570444	Global	Relocatable 		NXTLN.	      571165	Global	Relocatable 	
+	O.MASK	      760000	Global	Absolute    Suppressed	O.PNTR	      573350	Global	Relocatable 	
+	OBLOK.	      571301	Global	Relocatable 		OBYTE.	      571266	Global	Relocatable 	
+	OP.DSP	      570416	Global	Relocatable 		OP.SWT	      570371	Global	Relocatable 	
+	PMEM%%	      575304	Global	Relocatable 		RELE%%	      575066	Global	Relocatable 	
+	SAVE.	      567117	Global	Relocatable 		SMEM%%	      575354	Global	Relocatable 	
+	W.MASK	         177	Global	Absolute    Suppressed	W.PNTR	      573352	Global	Relocatable 	
+
+		*************
+
+FORFUN	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	576074 ends at	576463 length	   370 (octal),   248. (decimal)
+
+	FUNCT%	      576112	Entry	Relocatable 	
+
+		*************
+
+FORQUE	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	576464 ends at	576776 length	   313 (octal),   203. (decimal)
+
+	FORQU%	      576464	Entry	Relocatable 	
+
+		*************
+
+ALPHA%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	576777 ends at	577103 length	   105 (octal),    69. (decimal)
+
+	ALPHA%	      577000	Entry	Relocatable 		RIGHT%	      576777	Entry	Relocatable 	
+
+		*************
+
+FLIRT%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	577104 ends at	577446 length	   343 (octal),   227. (decimal)
+
+	FLINC%	      577104	Entry	Relocatable 		FLIRT%	      577106	Entry	Relocatable 	
+	REAL%	      577105	Entry	Relocatable 	
+
+		*************
+
+FLOUT%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	577447 ends at	600273 length	   625 (octal),   405. (decimal)
+
+	FLOUT%	      577447	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 26
+
+
+INTEG%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600274 ends at	600420 length	   125 (octal),    85. (decimal)
+
+	INTEG%	      600274	Entry	Relocatable 	
+
+		*************
+
+LOGIC%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600421 ends at	600475 length	    55 (octal),    45. (decimal)
+
+	LOGIC%	      600421	Entry	Relocatable 	
+
+		*************
+
+OCTAL%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600476 ends at	600574 length	    77 (octal),    63. (decimal)
+
+	OCTAL%	      600476	Entry	Relocatable 	
+
+		*************
+
+DELIM%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600575 ends at	600622 length	    26 (octal),    22. (decimal)
+
+	GFDEL%	      600603	Entry	Relocatable 		MUN	      600622	Global	Relocatable 	
+	SFDEL%	      600575	Entry	Relocatable 		SKIP%	      600610	Entry	Relocatable 	
+
+		*************
+
+POWTB%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600623 ends at	600757 length	   135 (octal),    93. (decimal)
+
+	EXP10.	      600752	Entry	Relocatable 		HITEN.	      600647	Entry	Relocatable 	
+	LOTEN.	      600720	Entry	Relocatable 		PTLEN.	          24	Entry	Absolute    Suppressed
+
+		*************
+
+LSTDR%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	600760 ends at	601002 length	    23 (octal),    19. (decimal)
+
+	LSTDR%	      600760	Entry	Relocatable 	
+
+		*************
+
+NMLST%	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	601003 ends at	602154 length	  1152 (octal),   618. (decimal)
+
+	NLIS0	      601543	Global	Relocatable 		NLOEN.	      601232	Global	Relocatable 	
+	NMLST%	      601004	Entry	Relocatable 		NMLTBL	      601042	Global	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 27
+
+
+FORTRP	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	602155 ends at	602503 length	   327 (octal),   215. (decimal)
+
+	TRPIN.	      602155	Entry	Relocatable 	
+
+		*************
+
+FORERR	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	602504 ends at	605071 length	  2366 (octal),  1270. (decimal)
+
+	FORER%	      602524	Entry	Relocatable 		TRACE%	      603751	Entry	Relocatable 	
+	TY%DDB	      602713	Global	Relocatable 	
+
+		*************
+
+FORPSE	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 64525 ends at	 64757 length	   233 (octal),   155. (decimal)
+
+	PAUS.	       64526	Entry	Relocatable 		STOP.	       64531	Entry	Relocatable 	
+
+		*************
+
+MAX.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 64760 ends at	 65003 length	    24 (octal),    20. (decimal)
+
+	AMAX0.	       64773	Entry	Relocatable 		AMAX1.	       64761	Entry	Relocatable 	
+	MAX0.	       64764	Entry	Relocatable 		MAX1.	       64767	Entry	Relocatable 	
+
+		*************
+
+MIN.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65004 ends at	 65027 length	    24 (octal),    20. (decimal)
+
+	AMIN0.	       65017	Entry	Relocatable 		AMIN1.	       65005	Entry	Relocatable 	
+	MIN0.	       65010	Entry	Relocatable 		MIN1.	       65013	Entry	Relocatable 	
+
+		*************
+
+SQRT.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65030 ends at	 65073 length	    44 (octal),    36. (decimal)
+
+	SQRT.	       65031	Entry	Relocatable 	
+
+		*************
+
+EXP1	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65074 ends at	 65151 length	    56 (octal),    46. (decimal)
+
+	EXP1.	       65075	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 28
+
+
+EXP3	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65152 ends at	 65236 length	    65 (octal),    53. (decimal)
+
+	EXP3.	       65153	Entry	Relocatable 		EXP3..	       65155	Entry	Relocatable 	
+
+		*************
+
+EXP2	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65237 ends at	 65355 length	   117 (octal),    79. (decimal)
+
+	EXP2.	       65240	Entry	Relocatable 		EXP2..	       65242	Entry	Relocatable 	
+
+		*************
+
+EXP.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65356 ends at	 65447 length	    72 (octal),    58. (decimal)
+
+	EXP.	       65357	Entry	Relocatable 	
+
+		*************
+
+ALOG.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65450 ends at	 65554 length	   105 (octal),    69. (decimal)
+
+	ALG10.	       65451	Entry	Relocatable 		ALOG.	       65465	Entry	Relocatable 	
+
+		*************
+
+SIN.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65555 ends at	 65657 length	   103 (octal),    67. (decimal)
+
+	COS.	       65571	Entry	Relocatable 		COSD.	       65556	Entry	Relocatable 	
+	SIN.	       65575	Entry	Relocatable 		SIND.	       65564	Entry	Relocatable 	
+
+		*************
+
+FLOAT	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+
+	Zero length module
+
+		*************
+
+FLOAT.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65660 ends at	 65662 length	     3 (octal),     3. (decimal)
+
+	FLOAT.	       65661	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 29
+
+
+IFIX	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+
+	Zero length module
+
+		*************
+
+IFIX.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65663 ends at	 65667 length	     5 (octal),     5. (decimal)
+
+	IFIX.	       65666	Entry	Relocatable 		INT.	       65664	Entry	Relocatable 	
+
+		*************
+
+FLT.0	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65670 ends at	 65672 length	     3 (octal),     3. (decimal)
+
+	FLT.0	       65671	Entry	Relocatable 	
+
+		*************
+
+FLT.4	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65673 ends at	 65675 length	     3 (octal),     3. (decimal)
+
+	FLT.4	       65674	Entry	Relocatable 	
+
+		*************
+
+IFX.0	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65676 ends at	 65700 length	     3 (octal),     3. (decimal)
+
+	IFX.0	       65677	Entry	Relocatable 	
+
+		*************
+
+IFX.2	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65701 ends at	 65703 length	     3 (octal),     3. (decimal)
+
+	IFX.2	       65702	Entry	Relocatable 	
+
+		*************
+
+IFX.4	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65704 ends at	 65706 length	     3 (octal),     3. (decimal)
+
+	IFX.4	       65705	Entry	Relocatable 	
+
+		*************
+
+ADJ1.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65707 ends at	 65736 length	    30 (octal),    24. (decimal)
+
+	ADJ1.	       65710	Entry	Relocatable 	
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 30
+ADJ1.
+		*************
+
+AMOD.	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65737 ends at	 65771 length	    33 (octal),    27. (decimal)
+
+	AMOD.	       65740	Entry	Relocatable 	
+
+		*************
+
+DATE	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 65772 ends at	 66047 length	    56 (octal),    46. (decimal)
+
+	DATE	       65773	Entry	Relocatable 	
+
+		*************
+
+TIME	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	Low  segment starts at	 66050 ends at	 66134 length	    65 (octal),    53. (decimal)
+
+	TIME	       66051	Entry	Relocatable 	
+
+		*************
+
+TRACE	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+
+	Zero length module
+
+		*************
+
+FORDBM	from DSK:FORLIB.REL[3,214400]	created by MACRO on 11-Sep-66 at 20:56:00
+	High segment starts at	605072 ends at	605073 length	     2 (octal),     2. (decimal)
+
+	DBMS%	      605072	Entry	Relocatable 	
+
+		*************
+
+LIB20	from DSK:LIB20.REL[3,214400]	created by MACRO on 20-Nov-66 at 30:20:00
+	Low  segment starts at	 66135 ends at	 66152 length	    16 (octal),    14. (decimal)
+
+	GETSER	       66144	Entry	Relocatable 		RUNTM	104000000015	Global	Absolute    	
+	SYSGT	104000000016	Global	Absolute    		TIME20	       66136	Entry	Relocatable 	
+
+		*************
+
+POSOUT	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66153 ends at	 66153 length	     1 (octal),     1. (decimal)
+	High segment starts at	605074 ends at	605101 length	     6 (octal),     6. (decimal)
+
+	POSOUT	      605075	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 31
+
+
+POSIN	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66154 ends at	 66154 length	     1 (octal),     1. (decimal)
+	High segment starts at	605102 ends at	605107 length	     6 (octal),     6. (decimal)
+
+	POSIN	      605103	Entry	Relocatable 	
+
+		*************
+
+UNSAVE	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66155 ends at	 66176 length	    22 (octal),    18. (decimal)
+	High segment starts at	605110 ends at	605161 length	    52 (octal),    42. (decimal)
+
+	UNSAVE	      605111	Entry	Relocatable 	
+
+		*************
+
+EOFTST	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66177 ends at	 66216 length	    20 (octal),    16. (decimal)
+	High segment starts at	605162 ends at	605252 length	    71 (octal),    57. (decimal)
+
+	EOFTST	      605163	Entry	Relocatable 	
+
+		*************
+
+CPTIME	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66217 ends at	 66225 length	     7 (octal),     7. (decimal)
+	High segment starts at	605253 ends at	605336 length	    64 (octal),    52. (decimal)
+
+	CPTIME	      605254	Entry	Relocatable 	
+
+		*************
+
+CHAINX	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66226 ends at	 66242 length	    15 (octal),    13. (decimal)
+	High segment starts at	605337 ends at	605453 length	   115 (octal),    77. (decimal)
+
+	CHAINX	      605340	Entry	Relocatable 	
+
+		*************
+
+CLOSEX	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66243 ends at	 66250 length	     6 (octal),     6. (decimal)
+	High segment starts at	605454 ends at	605535 length	    62 (octal),    50. (decimal)
+
+	CLOSEX	      605455	Entry	Relocatable 	
+
+		*************
+
+FILEIO	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66251 ends at	 66507 length	   237 (octal),   159. (decimal)
+	High segment starts at	605536 ends at	606304 length	   547 (octal),   359. (decimal)
+
+	FILEIO	      605537	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 32
+FILEIO
+
+		*************
+
+REOPEN	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66510 ends at	 66553 length	    44 (octal),    36. (decimal)
+	High segment starts at	606305 ends at	606432 length	   126 (octal),    86. (decimal)
+
+	REOPEN	      606306	Entry	Relocatable 	
+
+		*************
+
+NWHASH	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66554 ends at	 66573 length	    20 (octal),    16. (decimal)
+	High segment starts at	606433 ends at	606515 length	    63 (octal),    51. (decimal)
+
+	NWHASH	      606434	Entry	Relocatable 	
+
+		*************
+
+PALIV7	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66574 ends at	 66601 length	     6 (octal),     6. (decimal)
+	High segment starts at	606516 ends at	606551 length	    34 (octal),    28. (decimal)
+
+	PALIV7	      606517	Entry	Relocatable 	
+
+		*************
+
+CHKFIL	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66602 ends at	 66661 length	    60 (octal),    48. (decimal)
+	High segment starts at	606552 ends at	606764 length	   213 (octal),   139. (decimal)
+
+	CHKFIL	      606553	Entry	Relocatable 	
+
+		*************
+
+PNTLIN	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 66662 ends at	 67037 length	   156 (octal),   110. (decimal)
+	High segment starts at	606765 ends at	607325 length	   341 (octal),   225. (decimal)
+
+	PNTLIN	      606766	Entry	Relocatable 	
+
+		*************
+
+LIBMAC	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67040 ends at	 67115 length	    56 (octal),    46. (decimal)
+
+	DDATE	       67061	Entry	Relocatable 		OHISRU	       67064	Entry	Relocatable 	
+	ROYAL1	       67041	Entry	Relocatable 		TRUSIZ	       67072	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 33
+
+
+SCRMBL	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67116 ends at	 67153 length	    36 (octal),    30. (decimal)
+
+	SCRMBL	       67117	Entry	Relocatable 	
+
+		*************
+
+BOSUSE	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67154 ends at	 67174 length	    21 (octal),    17. (decimal)
+
+	BOSUSE	       67155	Entry	Relocatable 	
+
+		*************
+
+RUNIT	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67175 ends at	 67265 length	    71 (octal),    57. (decimal)
+
+	RUNIT	       67176	Entry	Relocatable 	
+
+		*************
+
+A6TOA5	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67266 ends at	 67315 length	    30 (octal),    24. (decimal)
+
+	A6TOA5	       67267	Entry	Relocatable 	
+
+		*************
+
+A5TOA1	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67316 ends at	 67335 length	    20 (octal),    16. (decimal)
+
+	A5TOA1	       67322	Entry	Relocatable 	
+
+		*************
+
+ISTYM	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 67336 ends at	 67354 length	    17 (octal),    15. (decimal)
+
+	ISTYM	       67337	Entry	Relocatable 	
+
+		*************
+
+PMSUBR	from DSK:LIB9.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:10:00
+	Low  segment starts at	 67355 ends at	 67551 length	   175 (octal),   125. (decimal)
+	High segment starts at	607326 ends at	607510 length	   163 (octal),   115. (decimal)
+
+	PMSUBR	      607327	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 34
+
+
+SORTSB	from DSK:LIB9.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:10:00
+	Low  segment starts at	 67552 ends at	 67566 length	    15 (octal),    13. (decimal)
+	High segment starts at	607511 ends at	607612 length	   102 (octal),    66. (decimal)
+
+	SORTSB	      607512	Entry	Relocatable 	
+
+		*************
+
+SBRERR	from DSK:LIB9.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:10:00
+	Low  segment starts at	 67567 ends at	 67575 length	     7 (octal),     7. (decimal)
+	High segment starts at	607613 ends at	607646 length	    34 (octal),    28. (decimal)
+
+	SBRERR	      607614	Entry	Relocatable 	
+
+		*************
+
+DOSUBR	from DSK:LIB9.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:10:00
+	Low  segment starts at	 67576 ends at	 67675 length	   100 (octal),    64. (decimal)
+	High segment starts at	607647 ends at	610224 length	   356 (octal),   238. (decimal)
+
+	DOSUBR	      607650	Entry	Relocatable 	
+
+		*************
+
+SBRCK1	from DSK:LIB9.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:10:00
+	Low  segment starts at	 67676 ends at	 67772 length	    75 (octal),    61. (decimal)
+	High segment starts at	610225 ends at	611073 length	   647 (octal),   423. (decimal)
+
+	SBRCK1	      610226	Entry	Relocatable 		SBRCKE	      610260	Entry	Relocatable 	
+	SBRCKA	      610322	Entry	Relocatable 		SBRCK9	      610570	Entry	Relocatable 	
+
+		*************
+
+NXTREF	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 67773 ends at	 70032 length	    40 (octal),    32. (decimal)
+	High segment starts at	611074 ends at	611350 length	   255 (octal),   173. (decimal)
+
+	NXTREF	      611075	Entry	Relocatable 	
+
+		*************
+
+BUFNUM	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70033 ends at	 70111 length	    57 (octal),    47. (decimal)
+	High segment starts at	611351 ends at	611525 length	   155 (octal),   109. (decimal)
+
+	BUFNUM	      611352	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 35
+
+
+NSORT	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70112 ends at	 70123 length	    12 (octal),    10. (decimal)
+	High segment starts at	611526 ends at	611605 length	    60 (octal),    48. (decimal)
+
+	NSORT	      611527	Entry	Relocatable 	
+
+		*************
+
+PRDIFF	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70124 ends at	 70135 length	    12 (octal),    10. (decimal)
+	High segment starts at	611606 ends at	611657 length	    52 (octal),    42. (decimal)
+
+	PRDIFF	      611607	Entry	Relocatable 	
+
+		*************
+
+NXTPOL	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70136 ends at	 70160 length	    23 (octal),    19. (decimal)
+	High segment starts at	611660 ends at	612116 length	   237 (octal),   159. (decimal)
+
+	NXTPOL	      611661	Entry	Relocatable 	
+
+		*************
+
+TYPOCT	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70161 ends at	 70167 length	     7 (octal),     7. (decimal)
+	High segment starts at	612117 ends at	612171 length	    53 (octal),    43. (decimal)
+
+	TYPOCT	      612120	Entry	Relocatable 	
+
+		*************
+
+VECTIO	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70170 ends at	 70215 length	    26 (octal),    22. (decimal)
+	High segment starts at	612172 ends at	612377 length	   206 (octal),   134. (decimal)
+
+	VECTIO	      612173	Entry	Relocatable 	
+
+		*************
+
+DATFLG	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70216 ends at	 70244 length	    27 (octal),    23. (decimal)
+	High segment starts at	612400 ends at	612573 length	   174 (octal),   124. (decimal)
+
+	DATFLG	      612401	Entry	Relocatable 	
+
+		*************
+
+WSDUMP	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70245 ends at	 70302 length	    36 (octal),    30. (decimal)
+	High segment starts at	612574 ends at	613254 length	   461 (octal),   305. (decimal)
+
+	WSDUMP	      612575	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 36
+WSDUMP
+
+		*************
+
+GETPTR	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70303 ends at	 70331 length	    27 (octal),    23. (decimal)
+	High segment starts at	613255 ends at	613352 length	    76 (octal),    62. (decimal)
+
+	GETPTR	      613256	Entry	Relocatable 	
+
+		*************
+
+CHECKP	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70332 ends at	 70372 length	    41 (octal),    33. (decimal)
+	High segment starts at	613353 ends at	613435 length	    63 (octal),    51. (decimal)
+
+	CHECKP	      613354	Entry	Relocatable 	
+
+		*************
+
+MEMBER	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70373 ends at	 70420 length	    26 (octal),    22. (decimal)
+	High segment starts at	613436 ends at	613554 length	   117 (octal),    79. (decimal)
+
+	MEMBER	      613437	Entry	Relocatable 	
+
+		*************
+
+CALCLF	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70421 ends at	 70467 length	    47 (octal),    39. (decimal)
+	High segment starts at	613555 ends at	613723 length	   147 (octal),   103. (decimal)
+
+	CALCLF	      613556	Entry	Relocatable 	
+
+		*************
+
+ISSUE3	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70470 ends at	 70527 length	    40 (octal),    32. (decimal)
+	High segment starts at	613724 ends at	614110 length	   165 (octal),   117. (decimal)
+
+	ISSUE3	      613725	Entry	Relocatable 	
+
+		*************
+
+MAKLIK	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70530 ends at	 70554 length	    25 (octal),    21. (decimal)
+	High segment starts at	614111 ends at	614234 length	   124 (octal),    84. (decimal)
+
+	MAKLIK	      614112	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 37
+
+
+DOLIKE	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70555 ends at	 70612 length	    36 (octal),    30. (decimal)
+	High segment starts at	614235 ends at	614727 length	   473 (octal),   315. (decimal)
+
+	DOLIKE	      614236	Entry	Relocatable 	
+
+		*************
+
+GINPOL	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70613 ends at	 70626 length	    14 (octal),    12. (decimal)
+	High segment starts at	614730 ends at	615027 length	   100 (octal),    64. (decimal)
+
+	GINPOL	      614731	Entry	Relocatable 	
+
+		*************
+
+DASHES	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70627 ends at	 70636 length	    10 (octal),     8. (decimal)
+	High segment starts at	615030 ends at	615063 length	    34 (octal),    28. (decimal)
+
+	DASHES	      615031	Entry	Relocatable 	
+
+		*************
+
+DEBOT2	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70637 ends at	 70674 length	    36 (octal),    30. (decimal)
+	High segment starts at	615064 ends at	615215 length	   132 (octal),    90. (decimal)
+
+	DEBOT2	      615065	Entry	Relocatable 	
+
+		*************
+
+TRACEC	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70675 ends at	 70675 length	     1 (octal),     1. (decimal)
+	High segment starts at	615216 ends at	615221 length	     4 (octal),     4. (decimal)
+
+	TRACEC	      615217	Entry	Relocatable 	
+
+		*************
+
+MRKCHG	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70676 ends at	 70703 length	     6 (octal),     6. (decimal)
+	High segment starts at	615222 ends at	615321 length	   100 (octal),    64. (decimal)
+
+	MRKCHG	      615223	Entry	Relocatable 	
+
+		*************
+
+DODATE	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70704 ends at	 70711 length	     6 (octal),     6. (decimal)
+	High segment starts at	615322 ends at	615344 length	    23 (octal),    19. (decimal)
+
+	DODATE	      615323	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 38
+DODATE
+
+		*************
+
+STKCMD	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70712 ends at	 70765 length	    54 (octal),    44. (decimal)
+	High segment starts at	615345 ends at	615730 length	   364 (octal),   244. (decimal)
+
+	STKCMD	      615346	Entry	Relocatable 	
+
+		*************
+
+ALOC15	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70766 ends at	 70776 length	    11 (octal),     9. (decimal)
+	High segment starts at	615731 ends at	616004 length	    54 (octal),    44. (decimal)
+
+	ALOC15	      615732	Entry	Relocatable 	
+
+		*************
+
+NAMPER	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 70777 ends at	 71026 length	    30 (octal),    24. (decimal)
+	High segment starts at	616005 ends at	616135 length	   131 (octal),    89. (decimal)
+
+	NAMPER	      616006	Entry	Relocatable 	
+
+		*************
+
+TABS	from DSK:LIB8.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  0:49:00
+	Low  segment starts at	 71027 ends at	 71050 length	    22 (octal),    18. (decimal)
+	High segment starts at	616136 ends at	616271 length	   134 (octal),    92. (decimal)
+
+	TABS	      616137	Entry	Relocatable 	
+
+		*************
+
+CNTPRM	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71051 ends at	 71104 length	    34 (octal),    28. (decimal)
+	High segment starts at	616272 ends at	616415 length	   124 (octal),    84. (decimal)
+
+	CNTPRM	      616273	Entry	Relocatable 	
+
+		*************
+
+MATCHP	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71105 ends at	 71140 length	    34 (octal),    28. (decimal)
+	High segment starts at	616416 ends at	616556 length	   141 (octal),    97. (decimal)
+
+	MATCHP	      616417	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 39
+
+
+ERPRNT	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71141 ends at	 71271 length	   131 (octal),    89. (decimal)
+	High segment starts at	616557 ends at	617356 length	   600 (octal),   384. (decimal)
+
+	ERPRNT	      616560	Entry	Relocatable 	
+
+		*************
+
+ERPNT3	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71272 ends at	 71330 length	    37 (octal),    31. (decimal)
+	High segment starts at	617357 ends at	617517 length	   141 (octal),    97. (decimal)
+
+	ERPNT3	      617360	Entry	Relocatable 	
+
+		*************
+
+TYPLST	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71331 ends at	 71340 length	    10 (octal),     8. (decimal)
+	High segment starts at	617520 ends at	617601 length	    62 (octal),    50. (decimal)
+
+	TYPLST	      617521	Entry	Relocatable 	
+
+		*************
+
+FORGET	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71341 ends at	 71365 length	    25 (octal),    21. (decimal)
+	High segment starts at	617602 ends at	620063 length	   262 (octal),   178. (decimal)
+
+	FORGET	      617603	Entry	Relocatable 	
+
+		*************
+
+DEBOUT	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71366 ends at	 71407 length	    22 (octal),    18. (decimal)
+	High segment starts at	620064 ends at	620210 length	   125 (octal),    85. (decimal)
+
+	DEBOUT	      620065	Entry	Relocatable 	
+
+		*************
+
+OPNCON	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71410 ends at	 71472 length	    63 (octal),    51. (decimal)
+	High segment starts at	620211 ends at	620454 length	   244 (octal),   164. (decimal)
+
+	OPNCON	      620212	Entry	Relocatable 	
+
+		*************
+
+DAYTIM	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71473 ends at	 71475 length	     3 (octal),     3. (decimal)
+	High segment starts at	620455 ends at	620472 length	    16 (octal),    14. (decimal)
+
+	DAYTIM	      620456	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 40
+DAYTIM
+
+		*************
+
+DOGROW	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71476 ends at	 71522 length	    25 (octal),    21. (decimal)
+	High segment starts at	620473 ends at	620727 length	   235 (octal),   157. (decimal)
+
+	DOGROW	      620474	Entry	Relocatable 	
+
+		*************
+
+ASKYES	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71523 ends at	 71573 length	    51 (octal),    41. (decimal)
+	High segment starts at	620730 ends at	621041 length	   112 (octal),    74. (decimal)
+
+	ASKYES	      620731	Entry	Relocatable 	
+
+		*************
+
+NEEDHP	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71574 ends at	 71600 length	     5 (octal),     5. (decimal)
+	High segment starts at	621042 ends at	621121 length	    60 (octal),    48. (decimal)
+
+	NEEDHP	      621043	Entry	Relocatable 	
+
+		*************
+
+GSTACK	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71601 ends at	 71607 length	     7 (octal),     7. (decimal)
+	High segment starts at	621122 ends at	621157 length	    36 (octal),    30. (decimal)
+
+	GSTACK	      621123	Entry	Relocatable 	
+
+		*************
+
+GPOP	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71610 ends at	 71616 length	     7 (octal),     7. (decimal)
+	High segment starts at	621160 ends at	621216 length	    37 (octal),    31. (decimal)
+
+	GPOP	      621161	Entry	Relocatable 	
+
+		*************
+
+REFOK	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71617 ends at	 71632 length	    14 (octal),    12. (decimal)
+	High segment starts at	621217 ends at	621374 length	   156 (octal),   110. (decimal)
+
+	REFOK	      621220	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 41
+
+
+TRUPST	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71633 ends at	 71640 length	     6 (octal),     6. (decimal)
+	High segment starts at	621375 ends at	621443 length	    47 (octal),    39. (decimal)
+
+	TRUPST	      621376	Entry	Relocatable 	
+
+		*************
+
+TITLES	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71641 ends at	 71666 length	    26 (octal),    22. (decimal)
+	High segment starts at	621444 ends at	621537 length	    74 (octal),    60. (decimal)
+
+	TITLES	      621445	Entry	Relocatable 	
+
+		*************
+
+PUTIOR	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 71667 ends at	 71676 length	    10 (octal),     8. (decimal)
+	High segment starts at	621540 ends at	621611 length	    52 (octal),    42. (decimal)
+
+	PUTIOR	      621541	Entry	Relocatable 	
+
+		*************
+
+SMULTN	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 71677 ends at	 71744 length	    46 (octal),    38. (decimal)
+	High segment starts at	621612 ends at	622247 length	   436 (octal),   286. (decimal)
+
+	SMULTN	      621613	Entry	Relocatable 	
+
+		*************
+
+MOVHST	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 71745 ends at	 71767 length	    23 (octal),    19. (decimal)
+	High segment starts at	622250 ends at	622361 length	   112 (octal),    74. (decimal)
+
+	MOVHST	      622251	Entry	Relocatable 	
+
+		*************
+
+ISSUE	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 71770 ends at	 72022 length	    33 (octal),    27. (decimal)
+	High segment starts at	622362 ends at	623013 length	   432 (octal),   282. (decimal)
+
+	ISSUE	      622363	Entry	Relocatable 	
+
+		*************
+
+ISSUE2	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72023 ends at	 72055 length	    33 (octal),    27. (decimal)
+	High segment starts at	623014 ends at	623241 length	   226 (octal),   150. (decimal)
+
+	ISSUE2	      623015	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 42
+ISSUE2
+
+		*************
+
+READA5	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72056 ends at	 72156 length	   101 (octal),    65. (decimal)
+	High segment starts at	623242 ends at	623763 length	   522 (octal),   338. (decimal)
+
+	READA5	      623243	Entry	Relocatable 	
+
+		*************
+
+FIXAND	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72157 ends at	 72167 length	    11 (octal),     9. (decimal)
+	High segment starts at	623764 ends at	624017 length	    34 (octal),    28. (decimal)
+
+	FIXAND	      623765	Entry	Relocatable 	
+
+		*************
+
+IFLOOR	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72170 ends at	 72175 length	     6 (octal),     6. (decimal)
+	High segment starts at	624020 ends at	624056 length	    37 (octal),    31. (decimal)
+
+	IFLOOR	      624021	Entry	Relocatable 	
+
+		*************
+
+CEILNG	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72176 ends at	 72203 length	     6 (octal),     6. (decimal)
+	High segment starts at	624057 ends at	624112 length	    34 (octal),    28. (decimal)
+
+	CEILNG	      624060	Entry	Relocatable 	
+
+		*************
+
+ORGLOC	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72204 ends at	 72211 length	     6 (octal),     6. (decimal)
+	High segment starts at	624113 ends at	624136 length	    24 (octal),    20. (decimal)
+
+	ORGLOC	      624114	Entry	Relocatable 	
+
+		*************
+
+PRDATE	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72212 ends at	 72222 length	    11 (octal),     9. (decimal)
+	High segment starts at	624137 ends at	624176 length	    40 (octal),    32. (decimal)
+
+	PRDATE	      624140	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 43
+
+
+GETTOP	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72223 ends at	 72231 length	     7 (octal),     7. (decimal)
+	High segment starts at	624177 ends at	624235 length	    37 (octal),    31. (decimal)
+
+	GETTOP	      624200	Entry	Relocatable 	
+
+		*************
+
+ISNEAR	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72232 ends at	 72241 length	    10 (octal),     8. (decimal)
+	High segment starts at	624236 ends at	624273 length	    36 (octal),    30. (decimal)
+
+	ISNEAR	      624237	Entry	Relocatable 	
+
+		*************
+
+SPEEDY	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72242 ends at	 72263 length	    22 (octal),    18. (decimal)
+	High segment starts at	624274 ends at	624361 length	    66 (octal),    54. (decimal)
+
+	SPEEDY	      624275	Entry	Relocatable 	
+
+		*************
+
+READY0	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72264 ends at	 72321 length	    36 (octal),    30. (decimal)
+	High segment starts at	624362 ends at	624446 length	    65 (octal),    53. (decimal)
+
+	READY0	      624363	Entry	Relocatable 	
+
+		*************
+
+NEWRND	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72322 ends at	 72340 length	    17 (octal),    15. (decimal)
+	High segment starts at	624447 ends at	624555 length	   107 (octal),    71. (decimal)
+
+	NEWRND	      624450	Entry	Relocatable 	
+
+		*************
+
+BAKMAX	from DSK:LIB6.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 28:01:00
+	Low  segment starts at	 72341 ends at	 72415 length	    55 (octal),    45. (decimal)
+	High segment starts at	624556 ends at	624706 length	   131 (octal),    89. (decimal)
+
+	BAKMAX	      624557	Entry	Relocatable 	
+
+		*************
+
+TMULTN	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72416 ends at	 72453 length	    36 (octal),    30. (decimal)
+	High segment starts at	624707 ends at	625250 length	   342 (octal),   226. (decimal)
+
+	TMULTN	      624710	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 44
+TMULTN
+
+		*************
+
+ZDELET	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72454 ends at	 72551 length	    76 (octal),    62. (decimal)
+	High segment starts at	625251 ends at	626155 length	   705 (octal),   453. (decimal)
+
+	ZDELET	      625252	Entry	Relocatable 	
+
+		*************
+
+LNKNAM	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72552 ends at	 72571 length	    20 (octal),    16. (decimal)
+	High segment starts at	626156 ends at	626410 length	   233 (octal),   155. (decimal)
+
+	LNKNAM	      626157	Entry	Relocatable 	
+
+		*************
+
+RANDRW	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72572 ends at	 72735 length	   144 (octal),   100. (decimal)
+	High segment starts at	626411 ends at	630411 length	  2001 (octal),  1025. (decimal)
+
+	RANDRW	      626412	Entry	Relocatable 	
+
+		*************
+
+ALLOC1	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72736 ends at	 72774 length	    37 (octal),    31. (decimal)
+	High segment starts at	630412 ends at	630670 length	   257 (octal),   175. (decimal)
+
+	ALLOC1	      630413	Entry	Relocatable 	
+
+		*************
+
+ZAPVEC	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 72775 ends at	 73017 length	    23 (octal),    19. (decimal)
+	High segment starts at	630671 ends at	631054 length	   164 (octal),   116. (decimal)
+
+	ZAPVEC	      630672	Entry	Relocatable 	
+
+		*************
+
+MOVE	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73020 ends at	 73035 length	    16 (octal),    14. (decimal)
+	High segment starts at	631055 ends at	631204 length	   130 (octal),    88. (decimal)
+
+	MOVE	      631056	Entry	Relocatable 	
+
+		*************
+
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 45
+
+
+MOVDAT	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73036 ends at	 73061 length	    24 (octal),    20. (decimal)
+	High segment starts at	631205 ends at	631311 length	   105 (octal),    69. (decimal)
+
+	MOVDAT	      631206	Entry	Relocatable 	
+
+		*************
+
+LINEFD	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73062 ends at	 73071 length	    10 (octal),     8. (decimal)
+	High segment starts at	631312 ends at	631340 length	    27 (octal),    23. (decimal)
+
+	LINEFD	      631313	Entry	Relocatable 	
+
+		*************
+
+PVSCAL	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73072 ends at	 73125 length	    34 (octal),    28. (decimal)
+	High segment starts at	631341 ends at	631551 length	   211 (octal),   137. (decimal)
+
+	PVSCAL	      631342	Entry	Relocatable 	
+
+		*************
+
+UNDOGB	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73126 ends at	 73147 length	    22 (octal),    18. (decimal)
+	High segment starts at	631552 ends at	631701 length	   130 (octal),    88. (decimal)
+
+	UNDOGB	      631553	Entry	Relocatable 	
+
+		*************
+
+PVIRR	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73150 ends at	 73262 length	   113 (octal),    75. (decimal)
+	High segment starts at	631702 ends at	632221 length	   320 (octal),   208. (decimal)
+
+	PVIRR	      631703	Entry	Relocatable 	
+
+		*************
+
+FVPBAL	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73263 ends at	 73321 length	    37 (octal),    31. (decimal)
+	High segment starts at	632222 ends at	632364 length	   143 (octal),    99. (decimal)
+
+	FVPBAL	      632223	Entry	Relocatable 	
+
+		*************
+
+GETZPR	from DSK:LIB5.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 10:02:00
+	Low  segment starts at	 73322 ends at	 73333 length	    12 (octal),    10. (decimal)
+	High segment starts at	632365 ends at	632426 length	    42 (octal),    34. (decimal)
+
+	GETZPR	      632366	Entry	Relocatable 	
+		LINK-10 symbol map of	CUFFS	version 5A(636)		page 46
+GETZPR
+
+		*************
+
+WORSTB	from DSK:LIBOHI.REL[3,214400]	created by FORTRAN-10 /KI10 on 21-Nov-66 at 17:12:00
+	Low  segment starts at	 73334 ends at	 73345 length	    12 (octal),    10. (decimal)
+	High segment starts at	632427 ends at	632464 length	    36 (octal),    30. (decimal)
+
+	WORSTB	      632430	Entry	Relocatable 	
+
+		*************
+
+A1TOA5	from DSK:LIBMAC.REL[3,214400]	created by MACRO on 20-Nov-66 at  1:06:00
+	Low  segment starts at	 73346 ends at	 73374 length	    27 (octal),    23. (decimal)
+
+	A1TOA5	       73347	Entry	Relocatable 	
+
+		*************
+
+WITHIN	from DSK:LIB7.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at  3:46:00
+	Low  segment starts at	 73375 ends at	 73403 length	     7 (octal),     7. (decimal)
+	High segment starts at	632465 ends at	632512 length	    26 (octal),    22. (decimal)
+
+	WITHIN	      632466	Entry	Relocatable 	
+
+		*************
+
+MYLEX	from DSK:LIBLEX.REL[3,214400]	created by FORTRAN-10 /KI10 on 20-Nov-66 at 32:51:00
+	Low  segment starts at	 73404 ends at	 73606 length	   203 (octal),   131. (decimal)
+	High segment starts at	632513 ends at	634314 length	  1602 (octal),   898. (decimal)
+
+	MYLEX	      632514	Entry	Relocatable 	
+
+		*************
+
+2 multiply-defined global symbols
+
+OUTSTR	22143
+GOSUB	25043
+
+		*************
+
+	Index to LINK-10 symbol map of	CUFFS	version 5A(636)		page 47
+
+	Name	Page	Name	Page	Name	Page	Name	Page
+
+	A1TOA5	46	CPTIME	31	FORQUE	25	LSCAN	12
+	A5TOA1	33	CUFSOV	 4	FORTRP	27	LSTDR%	26
+	A5TOA6	12	CURSE	20	FPBOOT	22	LUPCHG	20
+	A6TOA5	33	DASHES	37	FRCHN	12	LUPLEN	21
+	ACCTIM	 9	DATE	30	FVPBAL	45	MACDEF	17
+	ACCTYP	10	DATFLG	35	GETBYT	 2	MAIN2	 1
+	ADJ1.	29	DAYTIM	39	GETLNO	 6	MAINSB	20
+	ALLOC1	44	DEBOT2	37	GETNUM	24	MAKLIK	36
+	ALLOCV	21	DEBOUT	39	GETPTR	36	MAKUPR	 6
+	ALOC15	38	DECTIM	11	GETPUT	 5	MATCHP	38
+	ALOG.	28	DELIM%	26	GETTAB	 3	MAX.	27
+	ALPHA%	25	DOASKS	23	GETTOP	43	MAXMIN	23
+	AMOD.	30	DODATE	37	GETVAL	 5	MAXSEM	13
+	APLCHK	14	DODDTF	11	GETVLF	10	MEMBER	36
+	APLOUT	14	DOFOR	 2	GETZPR	45	MEMBRO	 2
+	ASKYES	40	DOGROW	40	GINPOL	37	MIN.	27
+	BAKMAX	43	DOLIKE	37	GODDT	 6	MINMAX	17
+	BLDE	 3	DOSUBR	34	GOFX	19	MLSCAN	12
+	BLDGRP	18	DPCHNG	21	GPOP	40	MNTRAN	20
+	BLDLOC	 4	EASY	11	GSTACK	40	MOVDAT	45
+	BLKDAT	11	EDITCG	23	HILOPR	 9	MOVE	44
+	BOSUSE	33	EOFTST	31	HISGRM	17	MOVHST	41
+	BUFNUM	34	EQUIV	 6	HSHPTR	21	MRKCHG	37
+	BYE	23	ERPNT2	14	IFIX	29	MRKSEQ	16
+	CALCLF	36	ERPNT3	39	IFIX.	29	MYDDT	22
+	CALL	 9	ERPRNT	39	IFLOOR	42	MYLEX	46
+	CEILNG	42	EXP.	28	IFX.0	29	MYREEN	 7
+	CHAINX	31	EXP1	27	IFX.2	29	NAMPER	38
+	CHECKP	36	EXP2	28	IFX.4	29	NEEDHP	40
+	CHGSRC	22	EXP3	28	INITB	 2	NEWM1	 5
+	CHKFIL	32	EXPAND	14	INTEG%	26	NEWRND	43
+	CHKSEM	13	F4PRMS	 3	ISNEAR	43	NMLST%	26
+	CINTRP	14	FANCY2	15	ISNODE	14	NSORT	35
+	CIOCKP	 7	FILCHK	 6	ISSUE	41	NWCALL	 4
+	CIOCLP	 7	FILEIO	31	ISSUE2	41	NWHASH	32
+	CIOFIL	 8	FIXAND	42	ISSUE3	36	NXTPOL	35
+	CIOFOP	 8	FLIRT%	25	ISTYM	33	NXTREF	34
+	CIOHRD	 8	FLOAT	 5	JNKTRP	19	OCTAL%	26
+	CIOINI	 7	FLOAT	28	JOEPPN	 1	OPNCON	39
+	CIOMAC	 9	FLOAT.	28	JUNK	22	ORGLOC	42
+	CIOOPF	 8	FLOUT%	25	LAYNUM	 2	OUTDEC	 3
+	CIOSER	 7	FLT.0	29	LEV	 3	OVTAB	 4
+	CIOSRD	 8	FLT.4	29	LIB20	30	PALIV7	32
+	CIOVRW	 8	FNPROC	13	LIBMAC	32	PALIVE	10
+	CLOSEX	31	FORDBM	30	LINEFD	45	PLOTT	16
+	CNTPRM	38	FORERR	27	LINPUT	 4	PMSUBR	33
+	CNTRP2	22	FORFUN	25	LNKNAM	44	PNTLIN	32
+	CNTRP3	15	FORGET	39	LOCAL	10	PNTLST	16
+	COLHED	18	FORINI	24	LOGIC%	26	PNTRPT	15
+	COMPAK	16	FOROTS	24	LOKUPZ	 9	POLDMP	20
+	COPY	12	FORPSE	27	LOOKFL	 6	POSIN	31
+	Name	Page	Name	Page	Name	Page	Name	Page
+	Index to LINK-10 symbol map of	CUFFS	version 5A(636)		page 48
+
+
+	FORQUE	25	IFIX	29	LNKNAM	44	MLSCAN	12
+	FORTRP	27	IFIX.	29	LOCAL	10	MNTRAN	20
+	FPBOOT	22	IFLOOR	42	LOGIC%	26	MOVDAT	45
+	FRCHN	12	IFX.0	29	LOKUPZ	 9	MOVE	44
+	FVPBAL	45	IFX.2	29	LOOKFL	 6	MOVHST	41
+	GETBYT	 2	IFX.4	29	LSCAN	12	MRKCHG	37
+	GETLNO	 6	INITB	 2	LSTDR%	26	MRKSEQ	16
+	GETNUM	24	INTEG%	26	LUPCHG	20	MYDDT	22
+	GETPTR	36	ISNEAR	43	LUPLEN	21	MYLEX	46
+	GETPUT	 5	ISNODE	14	MACDEF	17	MYREEN	 7
+	GETTAB	 3	ISSUE	41	MAIN2	 1	NAMPER	38
+	GETTOP	43	ISSUE2	41	MAINSB	20	NEEDHP	40
+	GETVAL	 5	ISSUE3	36	MAKLIK	36	NEWM1	 5
+	GETVLF	10	ISTYM	33	MAKUPR	 6	NEWRND	43
+	GETZPR	45	JNKTRP	19	MATCHP	38	NMLST%	26
+	GINPOL	37	JOEPPN	 1	MAX.	27	NSORT	35
+	GODDT	 6	JUNK	22	MAXMIN	23	NWCALL	 4
+	GOFX	19	LAYNUM	 2	MAXSEM	13	NWHASH	32
+	GPOP	40	LEV	 3	MEMBER	36	NXTPOL	35
+	GSTACK	40	LIB20	30	MEMBRO	 2	NXTREF	34
+	HILOPR	 9	LIBMAC	32	MIN.	27	OCTAL%	26
+	HISGRM	17	LINEFD	45	MINMAX	17	OPNCON	39
+	HSHPTR	21	LINPUT	 4
+
+	[End of LINK-10 map of	CUFFS]
+!@iG
