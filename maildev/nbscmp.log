@@ -1,0 +1,412 @@
+;
+; Being the difference between the version 1.1 sources and the last
+; contents of the directory (DWS) - whence it came originally.
+;
+
+.diff (maildev)NBS.CMD,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSLIB.CMD,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)RDMAIL.CMD,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)SEND.CMD,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSMSG.DEF,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSIN.REL,(dws)
+
+
+Input error: "NBSIN.REL" file not found
+
+
+.diff (maildev)NBSMEM.REL,(dws)
+
+
+Input error: "NBSMEM.REL" file not found
+
+
+.diff (maildev)NBSNAM.REL,(dws)
+
+
+Input error: "NBSNAM.REL" file not found
+
+
+.diff (maildev)NBSOUT.REL,(dws)
+
+
+Input error: "NBSOUT.REL" file not found
+
+
+.diff (maildev)NBSSUB.REL,(dws)
+
+
+Input error: "NBSSUB.REL" file not found
+
+
+.diff (maildev)NBSXMT.REL,(dws)
+
+
+Input error: "NBSXMT.REL" file not found
+
+
+.diff (maildev)RDMAIL.REL,(dws)
+
+
+Input error: "RDMAIL.REL" file not found
+
+
+.diff (maildev)NBSIN.REQ,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSLIB.REQ,(dws)
+
+1)1	require "(MailDev)NBSMSG.DEF" source!file;
+1)	require "(MailDev)NBSIN.REQ"  source!file;
+1)	require "(MailDev)NBSOUT.REQ" source!file;
+1)	require "(MailDev)NBSMEM.REQ" source!file;
+1)	require "(MailDev)NBSXMT.REQ" source!file;
+1)	require "(MailDev)NBSNAM.REQ" source!file;
+1)	require "(MailDev)NBSSUB.REQ" source!file;
+1)	require "(MailDev)NBSIN"  load!module;
+1)	require "(MailDev)NBSOUT" load!module;
+1)	require "(MailDev)NBSMEM" load!module;
+1)	require "(MailDev)NBSXMT" load!module;
+1)	require "(MailDev)NBSNAM" load!module;
+1)	require "(MailDev)NBSSUB" load!module;
+****
+2)1	require "(DWS)NBSMSG.DEF" source!file;
+2)	require "(DWS)NBSIN.REQ"  source!file;
+2)	require "(DWS)NBSOUT.REQ" source!file;
+2)	require "(DWS)NBSMEM.REQ" source!file;
+2)	require "(DWS)NBSXMT.REQ" source!file;
+2)	require "(DWS)NBSNAM.REQ" source!file;
+2)	require "(DWS)NBSSUB.REQ" source!file;
+2)	require "(DWS)NBSIN"  load!module;
+2)	require "(DWS)NBSOUT" load!module;
+2)	require "(DWS)NBSMEM" load!module;
+2)	require "(DWS)NBSXMT" load!module;
+2)	require "(DWS)NBSNAM" load!module;
+2)	require "(DWS)NBSSUB" load!module;
+**************
+
+Files are different
+
+
+.diff (maildev)NBSMEM.REQ,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSNAM.REQ,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSOUT.REQ,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSSUB.REQ,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSXMT.REQ,(dws)
+
+1)1	external procedure NBSXmit (Name!pointer ToWho; NBS!pointer Msg);
+1)	external procedure Archive (NBS!pointer Msg; string FileName);
+1)	external integer procedure NBSRecieve (string MailBoxName);
+****
+2)1	external procedure NBSXmit( Name!pointer ToWho; NBS!pointer Msg );
+2)	external procedure Archive( NBS!pointer Msg; string FileName );
+2)	external integer procedure NBSRecieve;
+**************
+
+Files are different
+
+
+.diff (maildev)NBSIN.SAI,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSMEM.SAI,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSNAM.SAI,(dws)
+
+1)3	    open( Chan := getchan, "DSK", '0,2,0,512,B!C,EOF );
+1)	    Text := NULL;
+****
+2)3	    Chan := getchan;
+2)	    open( Chan, "DSK", '0,2,0,512,B!C,EOF );
+2)	    Text := NULL;
+**************
+1)5		else if Text = ":" or (( Text >= "A" ) and ( Text <= "Z" )) then
+1)		  begin
+****
+2)5		else if (( Text >= "A" ) and ( Text <= "Z" )) then
+2)		  begin
+**************
+1)15	! return the filename (in sixbit) for a remote;
+1)	integer procedure ResolveRemote( string N );
+1)	  begin
+1)	    record!pointer ( Alias!List ) A;
+1)	    record!pointer ( Name!List ) NL;
+1)	    while N neq ":" do
+1)	      if lop( N ) = 0 then return( 0 );
+1)	    A := Alias!List!Head;
+1)	    while ( A neq null!record ) do
+1)	      begin
+1)		if ( kequ( N, Alias!List:Alias[A] )) then done;
+1)		A := Alias!List:Link[A];
+1)	      end;
+1)	    if A = null!record then begin
+1)	      print( "%NBSNAM: unknown remote """, N, """"&crlf );
+1)	      return( 0 );
+1)	    end;
+1)	    NL := Alias!List:Names[A];
+1)	    if Name!List:Link[NL] then 
+1)	      print( "%NBSNAM: extra destinations ignored for """, N, """"&crlf );
+1)	    return( cvsix( Name!List:Name[NL] ));
+1)	  end;
+1)16	! return true iff we this is an inter-network address ;
+****
+2)15	! return true iff we this is an inter-network address ;
+**************
+1)17		  Name!List:Info[ N ] := ResolveRemote( Name!List:Name[ N ] )
+1)		else
+****
+2)16		  Name!List:Info[ N ] := -1
+2)		else
+**************
+
+Files are different
+
+
+.diff (maildev)NBSOUT.SAI,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)NBSSUB.SAI,(dws)
+
+1)3	    do begin
+1)	      T := call( 0, "DATE" );
+1)	      MM := call( 0, "MSTIME" ) div 60000;
+1)	    end until T = call( 0, "DATE" );
+1)	      ! We resort to the loop above in order to insure that we don't get
+1)		caught by the transition between PM and AM;
+1)	    D := ( T mod 31 ) + 1;
+****
+2)3	    T := call( 0, "DATE" );
+2)	    D := ( T mod 31 ) + 1;
+**************
+1)3	    HH := MM div 60;
+****
+2)3	    MM := call(0,"MSTIME") div 60000;
+2)	    HH := MM div 60;
+**************
+
+Files are different
+
+
+.diff (maildev)NBSXMT.SAI,(dws)
+
+1)1	!
+1)	!	from (RDMAIL V1.01	(23-Oct-82, kmd)):
+1)	!
+1)	!	MAILBOX and RDMAIL.INI were being read from (and MAILBOX written
+1)	!	to) the gfd'd directory ("the PPN" in the parlance). They are
+1)	!	now referenced in the logged-in directory ("the AUN") instead.
+1)	;
+1)	! The following switch determines whether a 'RecievedDate' is added
+****
+2)1	! The following switch determines whether a 'RecievedDate' is added
+**************
+1)8		if ( Name!List:Info[N] neq 0 ) then
+1)		  begin "send"
+****
+2)8		if ( Name!List:Info[N] > 0 ) then
+2)		  begin "send"
+**************
+1)8			if ( Name!List:Info[N] > 0 ) then start!code
+1)			  movei 0,1;		! point to register 1;
+****
+2)8			start!code
+2)			  movei 0,1;		! point to register 1;
+**************
+1)8		N := Name!List:Link[N];
+****
+2)8		else if ( Name!List:Info[N] < 0 ) then
+2)		  begin
+2)		    print( "% Can't (yet) spool to ", Name!List:Name[N], crlf );
+2)		  end;
+2)		N := Name!List:Link[N];
+**************
+1)10	internal integer procedure NBSRecieve (string MailBoxName);
+1)	  begin "recieve"
+1)	    integer Length, Flag, AUN, W, Count, I, WordsAppended;
+1)	    integer array FInfo[ 0:5 ];
+1)	    NBS!pointer N;
+1)	    AUN := call( -'23, "GETTAB" );
+1)	    lookup( R!Chan, POSTOFFICE&"'"&cvos(AUN)&".MAI", Flag );
+1)	    if ( Flag ) then
+****
+2)10	internal integer procedure NBSRecieve;
+2)	  begin "recieve"
+2)	    integer Length, Flag, PPN, W, Count, I, WordsAppended;
+2)	    integer array FInfo[ 0:5 ];
+2)	    NBS!pointer N;
+2)	    PPN := call( -'23, "GETTAB" );
+2)	    lookup( R!Chan, POSTOFFICE&"'"&cvos(PPN)&".MAI", Flag );
+2)	    if ( Flag ) then
+**************
+1)11	    if ( not AppendToFile( MailBoxName )) then return( 0 );
+1)	    WordsAppended := 0;
+****
+2)11	    if ( not AppendToFile( MAILBOX )) then return( 0 );
+2)	    WordsAppended := 0;
+**************
+
+Files are different
+
+
+.diff (maildev)RDMAIL.SAI,(dws)
+
+1)1	!
+1)	!	V1.01	(23-Oct-82, kmd)
+1)	!
+1)	!	MAILBOX and RDMAIL.INI were being read from (and MAILBOX written
+1)	!	to) the gfd'd directory ("the PPN" in the parlance). They are
+1)	!	now referenced in the logged-in directory ("the AUN") instead.
+1)	;
+1)	  require "nbsmem.req" source!file;
+****
+2)1	  require "nbsmem.req" source!file;
+**************
+1)4	  string MailBoxName, AunStr, IniFileName;  boolean ChangeFlag;
+1)	  integer MailBoxSize, StartOfNewMail, WordsOfNewMail;
+****
+2)4	  string MailBoxName;  boolean ChangeFlag;
+2)	  integer MailBoxSize, StartOfNewMail, WordsOfNewMail;
+**************
+1)5	    define
+1)	      !xwdstr (X) = {("[" & cvos(!lh(X)) & "," & cvos(!rh(X)) & "]")};
+1)	    open( Chan := getchan, "DSK",'17,0,0,512,0,EOF );
+****
+2)5	    open( Chan := getchan, "DSK",'17,0,0,512,0,EOF );
+**************
+1)5	    AunStr := !xwdstr(call(-'23, "GETTAB"));
+1)	    MailBoxName := MAILBOX & AunStr;
+1)	    IniFileName := OURNAME & ".INI" & AunStr;
+1)	    lookup( CmdChan, IniFileName, CmdEOF );
+1)	    LogFile := NULL;
+****
+2)5	    lookup( CmdChan, OURNAME & ".INI", CmdEOF );
+2)	    LogFile := NULL;
+**************
+1)9	    lookup( Chan, FileSpec, Flag );
+****
+2)9	    MailBoxName := FileSpec;
+2)	    lookup( Chan, FileSpec, Flag );
+**************
+1)28	      print( "% Can't purge to a log file", crlf );
+1)	    ReWriteMailBox;
+****
+2)28	      print( "% Can't pursge to a log file", crlf );
+2)	    ReWriteMailBox;
+**************
+1)34	  WordsOfNewMail := NBSRecieve(MailBoxName);
+1)	  if (WordsOfNewMail) then
+1)	    print("[New Mail]", crlf);
+1)	  OpenMailBox(MailBoxName);
+1)	  StartOfNewMail := '377777777777;
+1)	  CommandLoop;
+1)	  if (ChangeFlag and (MailBoxSize > 0)) then ReWriteMailbox;
+1)	  release(Chan);
+1)	  release(CmdChan);
+1)	  release(X!Chan);
+1)	  call(0,"EXIT");
+1)	end "RDMail";
+****
+2)34	  WordsOfNewMail := NBSRecieve;
+2f ( WordsOfNewMail ) then
+2)	    print( "[New Mail]", crlf );
+2)	  OpenMailBox( MAILBOX );
+2)	  StartOfNewMail := '377777777777;
+2)	  CommandLoop;
+2)	  if ( ChangeFlag and ( MailBoxSize > 0 )) then ReWriteMailbox;
+2)	  release( Chan );
+2)	  release( CmdChan );
+2)	  release( X!Chan );
+2)	  call(0,"EXIT");
+2)	end "RDMail";
+**************
+
+Files are different
+
+
+.diff (maildev)SEND.SAI,(dws)
+
+
+No differences encountered
+
+
+.diff (maildev)RDMAIL.SAV,(dws)
+
+
+**File 2 read error**
+
+
+.diff (maildev)SEND.SAV,(dws)
+
+
+**File 2 read error**
+
+
+.SEND KEN
+TYPE LETTER:
+; PCOM v1.52 command processed: cmp.log = cmp.CTL
+; Options: DETACH  LOG NOAPPEND SUPERSEDE TIME:60 TRULIMIT:0 
+; Job status: completed.
+; Output recorded in file cmp.log.
+
+mail waiting
+.LOGOUT
+40.66 tru
+terminal time: 0:05:57
+    U &*
