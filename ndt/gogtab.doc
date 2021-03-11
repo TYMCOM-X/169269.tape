@@ -1,0 +1,130 @@
+	
+entries defined in EXTERNAL ARRAY GOGTAB[0:endren];
+[almost entirely not-to-be-trusted hooks to SAIL system]
+	$$FINT	;user formatting function for integers
+	$$FITM	;user formatting function for items
+	$$FLRL	;user formatting function for long real
+	$$FLST	;user formatting function for lists
+	$$FREL	;user formatting function for reals
+	$$FREC	;user formatting function for records
+	$$FSET	;user formatting function for sets
+	$$FSTR	;user formatting function for strings
+	$$PROU	;print output trap for all strings
+	$FSLIS	;list of free storage allocators
+	ARYDIR	;for telling four array routines which end is up.
+	ARYLS	;a linked list of string arrays in leap, and so forth.
+	ATTOP	;request to allocate off top of core if non-0
+	BAILOC	;if nonzero, address of bail intercept routine
+	BKGETC	;GETCHAN intercept/substitute instruction
+	BKOPEN	;OPEN intercept/substitute instruction
+	BKRELS	;RELEASE intercept/substitute instruction
+	BKTPRV	;privileged break table access if non-zerpo
+	BKTPTR	;pointers to 4 corget blocks of 18 breaktables each
+	BLKTAB	;base of block control table (3 words)
+	BRACKL	;POINTER TO LIST OF BRACKETED TRIPLE BLOCKS
+	BUFACS	;for buffer allocator  (8 words)
+	CDBLOC	;if chnl is a ch #, @cdbloc(user) gets its cdb addr
+	CHANS	;i/o channel pointer table to 16 "channel data block"s
+	CLER	;same as "uuo1"
+	CODAC	;save ac 1 over calls on "code" runtime routine
+	CORINS	;core expansion hook -- instruction replaces CORE TEMP,0
+	DATAB	;pointer to datum area.
+	DFRINF	;aobjn ptr table for deferred interrupts
+	DIGS	;global width for # of decimal digits
+	DISPAT	;dispatch table for interrupt level module
+	ENDREN	;end of user data table
+	ERBP	;erase break-point (leap)
+	EXPCHR	;"@" or "e" for real number exponent character
+	EXT	;enter-lookup table file extension
+	FNAME	;enter-lookup table file name
+	FP1	;free storage -- 1 word. (leap)
+	FP2	;free storage -- 2 words. (leap)
+	FREITM	;number of free items remaining
+	FRELST	;pointer to block free storage list
+	FRLOC	;ptr to current active foreach control block pointer
+	FSTATS	;for getsts
+	FUSER	;tymshare user name for lookup/enter
+	FUSER1	;tymshare user name word 2 for lookup/enter
+	GGDAD	;the base for the main process (if have one)
+	HASHP	;for pnames. xwd next free array entry,array base.
+	HASMSK	;the mask for hashing into our hash space.
+	HASTAB	;pointer to the leap hash table.
+	IJBCNI	;jobcni from a deferred interrupt
+	IJBTPC	;jobtpc from deferred interrupt
+	INFOTA	;pointer to "good pointer" block of core. (leap)
+	INTPRC	;interrupt process base
+	INTQRP	;read ptr
+	INTQWP	;interrupt notice buffer write ptr
+	INTQWB	;bottom of buffer
+	INTQWT	;top of buffer
+	IPDP	;interrupt pdp
+	IRUNNR	;runner at time of deferred interrupt
+	ISPDP	;string pdp for interrupt level
+	ITMTOP	;maximum permissible item number.
+	JFRCEL	;USED TO BE XX <NOTHING>
+	KNTLNK	;profile counter link end
+	LEABOT	;ptr to search control block for derived sets erase.
+	LONG2	;long form lookups and enters poke this
+	LONGWD	;long form lookups and enters poke this
+	LOWC	;low limit of allocatable "block" core
+	MAXITM	;current top item number.
+	MKBP	;make break-point (leap)
+	NOSHRK	;if on, correl not given permission to shrink core
+	NOXTMS	;if non-zero, suppress "end of SAIL execution" message
+	OFFSET	;distance to move a string space, see strngc
+	OLDITM	;linked list of old items (dump heap).
+	PDL	;iowd size,base  for system pdl
+	PATHBL	;TOPS-10: path for ersatz devices during lookup (4+SFDLVL words) 
+	PGNNFL
+	PRILIS	;priority list headers (npris=16. words)
+	PRNINF	;$print defaults
+	PROJ	;used by filnam routine
+	PRPN	;enter-lookup table ppn field
+	PRTINF	;print output information  xwd bits,chan
+	PUBP	;put break-point (not implemented) (leap)
+	RACS	;re-entrant routines save acs here (11 words)
+	REBP	;remove break-point.(not implemented) (leap)
+	REMCHR	;-remaining free chars
+	RGCOFF	;set this to turn off auto gc
+	RGCRHO	;-1.0+1/"%fill" level desired for record spaces
+	RMASK1	;new mask for modified LEAP routines
+	RMASK2	;new mask for modified LEAP routines 
+	RMASK3	;new mask for modified LEAP routines 
+	RMASK4	;new mask for modified LEAP routines 
+	RSGCLK	;the two word block required by sgins
+	RSGCL2	;and a second word
+	SCBCHN	;ptr to chain of abandoned scb's
+	SCHDRQ	;set 0 for a scheduler request
+	SEGBOT	;addr which sail free storage must not exceed (def to '400000)
+	SETLNK	;link end for sets.
+	SGACS	;ac save area for strngc (sometimes used by others) (12 words)
+	SGCCNT	;number of times strngc has been called
+	SGCNUM	;number of strings collected last gc
+	SGCTIM	;time of last gc if non-zero, else not enabled
+	SGCTOT	;total gc time while enabled (set sgctime -1 to enable)
+	SGCWAS	;number of wasted words after last gc
+	SGLIGN	;on if must be aligned to fw bdry (compiler only).
+	SGROUT	;link up string dscrptr generator routines here
+	SPARUT	;spare user table entries (1 word)
+	SPDL	;xwd size,base for string pdl
+	SPLNK	;link end for space allocation.
+	SRELOC	;string garbage collector temporary
+	STACS	;yet another ac save area (12 words)
+	STBLST	;head of chain of string descr arrays for records
+	STBUCK	;used in string gc to keep track of blocks
+	STINCR	;string space increment size, see strngc
+	STKURT	;place for stackunwinder retn adrs
+	STLIST	;head of list of string spaces
+	STREQD	;string space threshold size, see strngc
+	STRLNK	;link to string blocks for string garbage collector
+	STWCRA	;active "Width Control Record" 0 if none selected,
+	STWCRL	;HEAD of "Width Control Records" list
+	TGRADJ	;put pushj adr here to adjust own trigger levels
+	TIMER	;counted down for clock interrupts
+	TOP	;upper limit of allocatable "block" core
+	TOPBYT	;next free byte
+	TTYCVT	;neg means tty input to u-case, pos means l-case
+	UUO1	;traditional loc for gogol retrn adrs for error msgs.
+	WD3	;enter-lookup table word 3
+	WDTH	;global width for string conversion routnes
+	XPAND	;permission to expand in correl if 0
