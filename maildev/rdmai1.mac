@@ -1,0 +1,25 @@
+title	RDMAIL
+;
+;	This little slug runs the proper copy of RDMAIL.
+;	It is intended to reside on (SYS)
+
+Begin:
+	movei	1, RunBlk
+	run	1,
+	 outstr	RunErr
+	exit
+RunErr:
+	ascii	/? Cannot Run (MAILDEV)RDMAIL.  Talk to Tymcom-X Support./
+	asciz	/
+/
+RunUsr:
+	sixbit	/MAILDEV/
+	0
+RunBlk:
+	sixbit	/DSK/		; Device
+	sixbit	/RDMAIL/	; Program Name
+	exp	0		; Extension
+	exp	0		; (ignored)
+	exp	RunUsr		; Location of User Name
+	exp	0		; License
+End	Begin
