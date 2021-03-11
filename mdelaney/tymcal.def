@@ -1,0 +1,63 @@
+COMMENT*****************************************************************
+*                                                                      *
+*                                TYMCAL                                *
+*                                                                      *
+*   Definitions of mnemonics for CALLI's.                              *
+*                                                                      *
+************************************************************************
+*                                                                      *
+*                           Revision Record                            *
+*                                                                      *
+*   21 APR 78   Added Calli!SetPrv -- DEG                              *
+*                                                                      *
+*   24 APR 78   Added ATTACH and EXIT -- DEG                           *
+*                                                                      *
+*   26 APR 78   Added mnemonics for club calls -- DEG                  *
+*                                                                      *
+*   18 MAY 78   Added mnemonics for TMPCOR calls -- DEG                *
+*                                                                      *
+***********************************************************************;
+
+DEFINE CALLI!XCHARG=-'60,CALLI!XCHARG!SAVE=0,CALLI!XCHARG!READ=1,
+ CALLI!XCHARG!READOLD=2,CALLI!XCHARG!RESET=3,CALLI!RECMFL=-'57,
+ CALLI!SOAKEM=-'56,CALLI!TYMCHG=-'56,CALLI!DATUUO=-'55,
+ CALLI!DATUUO!DEC=0,CALLI!DATUUO!DAYS='400000,CALLI!DATUUO!GMT='20,
+ CALLI!DATUUO!DST='40,CALLI!DDT620=-'54,CALLI!VALRMT=-'53,
+ CALLI!IDLRMT=-'51,CALLI!ZAPRMT=-'50,CALLLI!CRERMT=-'47,
+ CALLI!AUXRED=-'46,CALLI!ZAPCIR=-'45,CALLI!CREAUX=-'44,
+ CALLI!SETTIM=-'37,CALLI!SETTIM!SEC='1000000,CALLI!SETTIM!MIN='2000000,
+ CALLI!HANG!ALL='4000000,CALLI!HANG!JOB='1000000,
+ CALLI!HANG!KJOB='2000000,CALLI!CHKLIC!LIC='1000000,
+ CALLI!CHKLIC!FILE='2000000,CALLI!SYSDVF!NAME=0,
+ CALLI!SYSDVF!DDB=1,CALLI!SYSDVF!UNIT=2,CALLI!SYSDVF!STR=3,
+ CALLI!SYSDVF!FTA=4,CALLI!DEVNAM='64,CALLI!GOBSTR='66,
+ CALLI!HIBER='72,CALLI!HIBER!MIN='2000000,CALLI!HIBER!SEC='1000000,
+ CALLI!HIBER!CHR='10000000,CALLI!HIBER!BREAK='20000000,
+ CALLI!HIBER!YELLOW='40000000,CALLI!HIBER!PORT='100000000,
+ CALLI!HIBER!WAKE='200000000,CALLI!WAKE='73,CALLI!CHGPPN='74,
+ CALLI!SETUUO='75,CALLI!SETUUO!OPRMES=0,CALLI!SETUUO!SCHED=1,
+ CALLI!SETUUO!INIT2=2,CALLI!SETUUO!TIME=3,CALLI!SETUUO!DATE=4,
+ CALLI!SETUUO!OPR=5,CALLI!SETUUO!WATCH=6,CALLI!DEVSIZ='101;
+DEFINE Calli!Sleep = '31;
+DEFINE Calli!Setjal = -'21;
+DEFINE Calli!Gettab = '41;
+DEFINE Calli!SetPrv = -'11;
+DEFINE Calli!Attach = -6, Calli!Exit = '12;
+DEFINE  Calli!ClbAdd = -'114,
+        Calli!Polprt = -'115,
+	Calli!ClbLev = -'113,
+        Calli!ClbInw = -'112,
+        Calli!ClbIni = -'111,
+        Calli!ClbRli = -'110,
+        Calli!ClbMem = -'107,
+        Calli!ClbSts = -'106,
+        Calli!ClbWak = -'105,
+        Calli!ClbHng = -'104;
+
+DEFINE  Calli!TmpCor                    = '44,
+        Calli!TmpCor!FreeSpace          = 0,
+        Calli!TmpCor!Read               = 1,
+        Calli!TmpCor!ReadAndDelete      = 2,
+        Calli!TmpCor!Create             = 3,
+        Calli!TmpCor!Directory          = 4,
+        Calli!TmpCor!DirAndDelete       = 5;
