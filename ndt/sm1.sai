@@ -1,0 +1,350 @@
+begin "sm1trn"
+
+define !="comment", crlf="('15&'12)", indent="('15&'12&'11)";
+require "[][]" delimiters;
+require 2 version;
+define byte(wd, size, left) = [
+    ifcr length(cvps(left))=0 thenc assignc left=0 endc
+    ifcr left=0 thenc ((wd) land (-1 lsh (size-36)))
+    elsec ifcr 36-left=size thenc ((wd) lsh -left)
+	  elsec ldb( bbpp( size, wd, 35-left ) )
+    endc endc];
+integer ignore!mask;
+	define	file!mask=1, coordinate!mask=2,
+		block!mask=4, procedure!mask=8;
+integer sm1ch, sm1eof, sm1last;
+
+simple integer procedure nextwd;
+if sm1eof then return(0) else return(sm1last_wordin(sm1ch));
+
+simple procedure ignore!words( integer how!many );
+for sm1last_how!many-1 step -1 until 0
+   do if sm1eof then return else wordin(sm1ch);
+
+
+simple procedure setsm1;
+while true do
+begin
+open(sm1ch_getchan,"DSK", 8, 4,0, 0,0,sm1eof_false);
+print(crlf, "program name: ");
+lookup( sm1ch, inchwl & ".SM1", sm1eof );
+if not sm1eof then return;
+print(" ...woops... ");
+release(sm1ch);
+end;
+procedure file!block;
+while true do
+begin	integer word1,size;
+if 0 = word1_ nextwd then return;
+if 4 neq size_ byte(word1, 18,0)
+ then usererr(0,1,"file record size="&cvs(size));
+
+if ignore!mask land file!mask then ignore!words(size)
+ else print( indent, byte( word1, 18,18 ), ": ",
+	cv6str(nextwd), ":",
+	cv6str(nextwd), ".",
+	cv6str(nextwd land (-1 lsh 18)),
+	"[", cvos( byte(word1_nextwd, 18,18) ),
+		",", cvos(byte(word1, 18,0)), "]"
+	);
+end;
+simple string procedure type!name( integer type );
+begin	string rslt;
+define b!covered=0,
+	covered(x)= [redefine b!covered=b!covered lor (x)];
+rslt_
+if type land '2000
+ then if type land '070 = '010
+	then "record!class"
+	else if type land '070
+		then "R*T*"&cvs( byte(type, 3,3) )
+		else "pointer"
+ else case byte(type, 3,3) of ( null,"integer","real","string",
+				"T*4","set","T*6","label");
+covered('2070);
+
+case byte(type, 3,6)
+   of begin
+	[0] ;
+	[1] rslt_ "Reference " & rslt;
+	[2] rslt_ "Local " & rslt;
+	[3] rslt_ "Value " & rslt;
+	[4] rslt_ "EXTERNAL " & rslt & " Variable";
+	[5] rslt_ "EXTERNAL " & rslt & " Code";
+	else rslt_ "A*" & cvs( byte(type, 3,6) ) & rslt
+      end;
+covered('700);
+
+case byte(type, 3,0)
+   of begin
+	[0] ;
+	[1] rslt_ rslt & " Array";
+	[2] rslt_ rslt & " Itemvar";
+	[6] rslt_ rslt & " Procedure";
+	else rslt_ rslt & "C*" & cvs( byte(type, 3,0) )
+      end;
+covered('7);
+
+if type land lnot b!covered
+ then rslt_ rslt & " [and '" & cvos(type land lnot b!covered) & "]";
+
+return(rslt);
+end;
+procedure coordinate;
+begin
+integer word1, word2;
+while word1_nextwd
+  do  if ignore!mask land coordinate!mask then nextwd else
+      begin
+	word2_ nextwd;
+	print( indent, byte(word2, 17,18),
+		(if word2<0 then "*" else "+"),
+		" @'", cvos(byte(word2, 18,0)),
+		" F=", byte(word1, 5,23),
+		": ", byte(word1, 18,0) * '200
+			+ byte(word1, 7,18)
+	);
+	if 1=word1_byte(word1, 6,30)	then print(".1")
+	else if '10=word1		then print(".2")
+	else if '17=word1		then print(".3")
+	else if '26=word1		then print(".4")
+	else if '35=word1		then print(".5")
+	else print( "+.'", cvos(word1) );
+      end;
+end;
+simple string procedure read!name( integer words );
+begin	string rslt;
+rslt_ null;
+for words_ words - 1 step -1 until 0
+   do rslt_ rslt & cvastr(nextwd);
+return(rslt);
+end;
+let r!p = record!pointer;
+
+record!class $v (string name; integer spec, ddtlevel; r!p ($v) link);
+
+record!class $ (integer range, spec, ptype; string name;
+		r!p ($v) vbls; r!p ($) before, after;
+		integer sort!value; r!p ($) less, more );
+
+r!p ($) current;
+procedure record!bproc( string name; integer spec, range, ptype(0) );
+begin	r!p ($) n$, t$; integer sort!value;
+sort!value_ byte(range, 18,0);
+n$_ new!record($);
+$:name[n$]_name;
+$:range[n$]_range;
+$:spec[n$]_spec;
+$:ptype[n$]_ptype;
+$:sort!value[n$]_sort!value;
+$:before[n$]_ current;
+
+if current then $:after[current]_ n$
+ else begin current_ n$; return; end;
+
+if sort!value leq $:sort!value[current]
+ then begin
+	while t$_$:less[current]
+	 do if sort!value leq $:sort!value[t$]
+		then current_t$ else done;
+	current swap t$;
+      end
+ else begin
+	while t$_$:more[current]
+	 do if sort!value > $:sort!value[t$]
+		then current_t$ else done;
+      end;
+
+$:more[n$]_ t$;
+$:less[n$]_ current;
+if current then $:more[current]_ n$;
+if t$ then $:less[t$]_ n$;
+current_n$;
+end;
+procedure record!variable( string name; integer ddtlevel, typeinfo );
+begin "record!variable"		r!p ($v) n$v;
+n$v_new!record($v);
+$v:name[n$v]_ name;		! add name;
+$v:spec[n$v]_ typeinfo;		! add type information;
+$v:ddtlevel[n$v]_ ddtlevel;	! add ddt level (is this ever non-0?);
+if ddtlevel neq 0 then outstr(" vbl level =" & cvs(ddtlevel) );
+
+if current=null!record
+ then begin usererr(0,1,"horrible, no block"); return end;
+
+if $:vbls[current]
+ then begin	! then extend the ring (ring points at last);
+	$v:link[n$v]_ $v:link[$:vbls[current]];
+		! make new one point at front of ring;
+	$v:link[$:vbls[current]]_ n$v;
+		! and make old last point at the new one;
+      end
+ else $v:link[n$v]_n$v;		! make a new ring (point at self);
+$:vbls[current]_ n$v;	! in all cases, new ring tail is new entry;
+end "record!variable";
+procedure no!block!proc;
+while nextwd do ;
+
+
+integer procedure block!proc( integer spec, range );
+begin	integer word1;
+
+print( " #", spec ash -18,	! coordinate;
+! level: ;
+	"(level ", byte(spec, 11,6), ")",
+! range: ;
+	" ['", cvos(byte(range, 18,0)),
+		":'", cvos(byte(range, 18,18)), "]"  );
+! local variables (or parameters): ;
+while word1_ nextwd
+   do begin	integer refdat; string vblname;
+	if 0 neq byte(word1, 18,18)
+	 then usererr(0,1," symbol LH? '" & cvos(byte(word1, 18,18)) );
+	refdat_ nextwd;
+! type: ;
+	print(indent, type!name( byte(refdat, 18,18) ), " ",
+! name: ;
+		vblname_ read!name( byte(word1, 6,0) )
+	 );
+! ddt level: ;
+	if byte(word1, 11,6)
+	 then print( indent & " (level ", byte(word1, 11,6), ")" );
+! location: ;
+	print( " ['", cvos(byte(refdat, 18,0)), "]" );
+	record!variable( vblname, byte(word1, 11,6), refdat );
+      end;
+end;
+procedure block;
+begin	integer word1, word2;
+if (1 lsh 17) land (word1_nextwd)
+ then usererr(0,1,"block, not procedure");
+if ignore!mask land block!mask
+ then begin ignore!words( 1+byte(word1,6,0) ); no!block!proc; end
+ else begin	string blname;
+	word2_ nextwd;
+	print(crlf & "Block:	",
+		blname_ read!name(byte(word1, 6,0))
+	 );
+	record!bproc( blname, word1, word2 );
+	block!proc( word1, word2 );
+      end;
+end;
+
+procedure proced;
+begin	integer word1, word2, word3;
+if 0 = (1 lsh 17) land (word1_nextwd)
+ then usererr(0,1,"block, not procedure");
+
+if ignore!mask land procedure!mask
+ then begin ignore!words( 2+byte(word1,6,0) ); no!block!proc; end
+ else begin	string prname;
+	word2_ nextwd; word3_ nextwd;
+	print(crlf);
+	if word3 < 0 then print( "Simple " );
+	print( type!name( byte(word3, 17,18) ), " ",
+		prname_ read!name(byte(word1, 6,0))
+	 );
+	! PDA address: ;
+	print(	" [PDA: '", cvos(byte(word3, 18,0)), "] " );
+	record!bproc( prname, word1, word2, word3 );
+	block!proc( word1, word2 );
+      end;
+end;
+procedure show!sm1;
+begin	integer i;
+while not sm1eof
+   do case 0 max (i_nextwd) min 5 of
+	begin
+	[1] begin
+		if 0 = ignore!mask land file!mask
+		 then print(crlf, "Files: ");
+		file!block;
+	    end;
+	[2] begin
+		if 0 = ignore!mask land coordinate!mask
+		 then print(crlf, "Coordinates: ");
+		coordinate;
+	    end;
+	[3] block;
+	[4] proced;
+	[5][0] if i = -1
+		then begin print(crlf,"EOF: "); return; end
+		else if i
+		 then usererr(0,1,"unexpected code: " & cvos(i) )
+	end;
+end;
+simple string procedure spaces( integer how!many );
+if how!many < 16 then return("                "[1 to how!many])
+ else return("                "& spaces(how!many-16) );
+procedure show!structure;
+if current then
+begin "show!structure"
+	r!p ($) t$;
+	preset!with "  "
+	    forc lvl#_1 stepc 1 untilc 9 doc [,("0"+lvl#)&" "] endc
+	    forc lvl#_0 stepc 1 untilc 25 doc [,("a"+lvl#)&" "] endc
+	    ; own safe string array dd!st[0:35];
+
+while t$_$:less[current] do current_t$;
+
+print( crlf & '14 & crlf );
+
+setformat(6,0);
+ do  begin "one block/procedure"
+		string ndnt;
+		r!p ($v) t$v;
+		integer ddtlev;
+
+	ddtlev_ byte($:spec[current], 11,6);
+	print( crlf, dd!st[0 max ddtlev min 35],
+		ndnt_ spaces( 2 * ddtlev ),
+		(if $:spec[current] land (1 lsh 17)
+		 then "P " else "B "), $:name[current],
+		"		",
+		"[", cvos(byte($:range[current], 18,0)),
+		":", cvos(byte($:range[current], 18,18)), "]"
+	);
+	if t$v_$:vbls[current]
+	 then begin	r!p($v) v;
+		ndnt_ crlf & spaces(3) & ndnt;
+		v_t$v;
+		while t$v neq v_$v:link[v]
+		  do print( ndnt, dd!st[0 max $v:ddtlevel[v] min 35],
+			$v:name[v] );
+	      end;
+     end "one block/procedure"
+ until null!record = current_ $:more[current];
+setformat(0,3);
+end "show!structure";
+string response;
+ttyup(true);
+setsm1;
+while true 
+   do begin
+	print("Mask: "); 
+	if (response_inchwl)="?" or response = "H"
+	 then print(crlf
+		&"Add values of those elements you wish to IGNORE:"&crlf
+		& " Files=", file!mask
+		, ", Coordinates=", coordinate!mask
+		, ", B=", block!mask
+		, ", Procedures=", procedure!mask, crlf)
+	 else begin	integer junk;
+		ignore!mask_ intscan(response, junk);
+		if length(response)=0
+		and (ignore!mask leq 0
+		     or 0=ignore!mask 
+			  land lnot (file!mask lor coordinate!mask
+				     lor block!mask lor procedure!mask))
+		 then done
+		 else print("??? -- ");
+	      end;
+      end;
+print("Output to file: ");
+if length(response_inchwl) > 0 and not equ(response,"TTY:")
+ then setprint(response,"F");
+show!sm1;
+show!structure;
+setprint(null,"T");
+end "sm1trn".
+ b*C
