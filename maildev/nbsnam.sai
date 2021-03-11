@@ -1,0 +1,413 @@
+Entry;
+
+begin "Name Manager"
+
+  require "(sailib)sail.def" source!file;
+  require "nbsmsg.def" source!file;
+
+  define DEBUG = {false};
+
+
+!            N   N  BBBB    SSS   N   N   AAA   M   M
+!            NN  N  B   B  S      NN  N  A   A  MM MM
+!            N N N  BBBB    SSS   N N N  AAAAA  M M M
+!            N  NN  B   B      S  N  NN  A   A  M   M
+!            N   N  BBBB   SSSS   N   N  A   A  M   M
+!
+!
+!   Dave W. Smith,  June, 82. ;
+! Data structures to implement aliasing ;
+
+! The alias list is a linked list of namelists ;
+
+define Alias!pointer = {record!pointer ( Alias!List )};
+
+record!class Alias!List (
+  Alias!pointer Link;
+  string Alias;
+  Name!pointer Names );
+
+Alias!pointer  Alias!List!Head, Alias!List!Tail;
+! set up a channel for us to use ;
+
+  integer ThisSystemNumber;
+
+  integer Chan, EOF, B!T, B!C;
+  string Text;
+
+procedure NBSNam!Init;
+  begin
+
+    ThisSystemNumber := call( '33000011, "GETTAB" );
+
+    B!T := getbreak;
+    setbreak( B!T, '15, '12, "KINS" );
+    open( Chan := getchan, "DSK", '0,2,0,512,B!C,EOF );
+    Text := NULL;
+
+  end;
+
+require NBSNam!Init initialization;
+! Routine to get the next line of Text from the file open on 'chan' ;
+
+string procedure GetLine;
+  begin
+    if ( EOF ) then
+      begin
+	release( Chan );
+	return( NULL );
+      end;
+    return( input( Chan, B!T ));
+  end;
+! Routine to return the next token & delimeter from the input stream ;
+
+procedure GetToken( reference string T; reference integer D );
+  begin
+
+    T := NULL;  D := 0;
+
+    while ( not EOF ) do
+      begin
+	if ( not length( Text )) then
+	  Text := GetLine
+	else if ( Text = "!" ) then
+	  Text := Getline
+	else if ( Text = " " ) then
+	  lop( Text )
+	else if Text = ":" or (( Text >= "A" ) and ( Text <= "Z" )) then
+	  begin
+	    while (( Text > " " ) and
+		   ((Text neq ",") and (Text neq ";") and (Text neq "="))
+		  ) do
+	      T := T & lop( Text );
+	    D := lop( Text );
+!	    if ( DEBUG ) then
+!	      print( "Token(",T,","&D&")",crlf );
+	    return;
+	  end
+	else
+	  begin
+	    print( "% Alias file is mangled", crlf );
+	    return;
+	  end;
+      end;
+  end;
+! Routine to read (MAIL)ALIAS.LIS and build the alias list ;
+
+internal procedure InitAliasList;
+  begin
+    integer Flag, D;
+    string T;
+    Alias!pointer A;
+    Name!pointer N;
+
+    lookup( Chan, POSTOFFICE & "ALIAS.LIS", Flag );
+    if ( Flag ) then
+      begin
+	print( "[No Alias File]", crlf );
+	return;
+      end;
+
+! continued ... ;
+! continued ... ;
+
+    ! add a dummy alias ;
+    A := Alias!List!Head := new!record( Alias!List );
+
+    while ( not EOF ) do
+      begin "next alias"
+
+	GetToken( T, D );
+	if (( not D ) and ( not T )) then done "next alias";
+	if (( T = NULL ) or ( D neq "=" )) then
+	  usererr(0,0,"ALIAS file mangled!","x");
+
+	Alias!List:Link[A] := new!record( Alias!List );
+	A := Alias!List:Link[A];
+
+	Alias!List:Alias[A] := T;
+!	if ( DEBUG ) then print( "alias: ",T,crlf );
+
+	! add dummy name ;
+	N := Alias!List:Names[A] := new!record( Name!List );
+
+	while ( D neq ";" ) do
+	  begin "next name"
+
+	    GetToken( T, D );
+	    if (( T = NULL ) or (( D neq "," ) and ( D neq ";" ))) then
+	      usererr(0,0,"ALIAS file mangled","x");
+
+	    ! add name ;
+	    Name!List:Link[N] := new!record( Name!List );
+	    N := Name!List:Link[N];
+	    Name!List:Name[N] := T;
+!	    if ( DEBUG ) then print( "         ",T,crlf );
+
+	  end "next name";
+
+	! remove the dummy name ;
+	Alias!List:Names[A] := Name!List:Link[ Alias!List:Names[A] ];
+
+      end "next alias";
+
+    ! remove the dummy alias ;
+    Alias!List!Head := Alias!List:Link[ Alias!List!Head ];
+
+  end;
+! scan a string and return a namelist ;
+
+internal Name!pointer procedure CVNList( string S );
+  begin
+    Name!pointer N1, N2;
+    string T;
+
+    ! create a dummy record to link things to ;
+
+    N1 := N2 := new!record( Name!List );
+
+    ! now fill it in ;
+
+    while ( length( S )) do
+      begin "scan the list"
+	T := NULL;
+	while ( S = " " ) do lop( S );
+	if ( not length( S )) then done;
+	while (( length( S )) and ( S neq "," ) and ( S > " " )) do
+	  T := T & lop( S );
+	if (( length( S )) and ( S < " " )) then
+	  begin
+	    print( "? Bad character in string", crlf );
+	    return( null!record  );
+	  end
+	else if ( S = "," ) then lop( S );
+	if ( T ) then
+	  begin
+	    Name!List:Link[N2] := new!record( Name!List );
+	    N2 := Name!List:Link[N2];
+	    Name!List:Name[N2] := T;
+	  end;
+      end "scan the list";
+
+    return( Name!List:Link[N1] );	! strip off the dummy ;
+
+  end;
+! Scan a Name!List and return a null seperated list ;
+
+internal string procedure CV0List( Name!pointer N );
+  begin
+    string T;
+
+    T := NULL;
+    while ( N neq null!record ) do
+      begin
+	if ( length( T )) then
+	  T := T & '0 & Name!List:Name[N]
+	else
+	  T := Name!List:Name[N];
+	N := Name!List:Link[N];
+      end;
+
+    return( T );
+
+  end;
+! Concatonate two name!list's and return a pointer to them ;
+
+internal Name!pointer procedure NLConcat( Name!pointer N1, N2 );
+  begin
+    Name!pointer L;
+
+    usererr(0,0,"NLConcat isn't debugged" );
+ 
+    if ( N1 = null!record ) then return( N2 );
+    if ( N2 = null!record ) then return( N1 );
+
+    L := N1;
+    while ( Name!List:Link[L] neq null!record ) do
+      L := Name!List:Link[L];
+
+    Name!List:Link[L] := N2;
+
+    return( N1 );
+
+  end;
+! Combine two name lists, eliminating duplicates ;
+
+internal procedure NLCombine( reference Name!pointer N1, N2 );
+  begin
+    Name!pointer L1, L2, P;
+
+    if ( N1 = null!record ) then N1 := new!record( Name!List );
+ 
+    L1 := N1;
+    while ( Name!List:Link[ L1 ] neq null!record ) do
+      L1 := Name!List:Link[ L1 ];
+
+    L2 := N2;
+    while ( L2 neq null!record ) do
+      begin "every member of second list"
+	P := N1;
+	while ( P neq null!record ) do
+	  begin "match?"
+	  if ( kequ( Name!List:Name[ P ], Name!List:Name[ L2 ] )) then
+	    done "match?"
+	  else
+	    P := Name!List:Link[ P ];
+	  end "match?";
+	if ( P = null!record ) then
+	  begin
+	    Name!List:Link[ L1 ] := new!record( Name!List );
+	    L1 := Name!List:Link[ L1 ];
+	    Name!List:Name[ L1 ] := Name!List:Name[ L2 ];
+	    Name!List:Info[ L1 ] := Name!List:Info[ L2 ];
+	  end;
+	L2 := Name!List:Link[ L2 ];
+      end "every member of second list";
+
+    if ( not Name!List:Name[ N1 ] ) then N1 := Name!List:Link[ N1 ];    
+
+  end;
+! Return a PPN for a username ;
+
+internal integer procedure CVPPN( string UserName );
+  begin "cvppn"
+  
+    integer array LKB[ 0 : 5 ];
+    integer Flag;
+    string T;
+
+    T := NULL;
+    while ( length( UserName ) and ( UserName neq ":" )) do
+      T := T & lop( UserName );
+
+    arrclr( LKB );
+    lookup( Chan, "(" & T & ")######.###", Flag );
+    fileinfo( LKB );
+    close( Chan, '10 );
+    if ( !rh( Flag ) ) then
+      return( 0 )
+    else
+      return( LKB[ 3 ] );
+
+  end "cvppn";
+! Return true iff 'N' is an alias ;
+
+internal boolean procedure IsAlias( string N );
+  begin
+    record!pointer ( Alias!List ) A;
+
+    A := Alias!List!Head;
+
+    while ( A neq null!record ) do
+      begin
+	if ( kequ( N, Alias!List:Alias[A] )) then
+	  return( true );
+	A := Alias!List:Link[A];
+      end;
+
+    return( false );
+  end;
+! return the name!List of an alias ;
+
+Name!pointer procedure GetAlias( string N );
+  begin
+    record!pointer ( Alias!List ) A;
+
+    A := Alias!List!Head;
+
+    while ( A neq null!record ) do
+      begin
+	if ( kequ( N, Alias!List:Alias[A] )) then
+	  return( Alias!List:Names[ A ] );
+	A := Alias!List:Link[A];
+      end;
+
+    return( null!record );
+  end;
+! return the filename (in sixbit) for a remote;
+
+integer procedure ResolveRemote( string N );
+  begin
+    record!pointer ( Alias!List ) A;
+    record!pointer ( Name!List ) NL;
+
+    while N neq ":" do
+      if lop( N ) = 0 then return( 0 );
+
+    A := Alias!List!Head;
+
+    while ( A neq null!record ) do
+      begin
+	if ( kequ( N, Alias!List:Alias[A] )) then done;
+	A := Alias!List:Link[A];
+      end;
+    if A = null!record then begin
+      print( "%NBSNAM: unknown remote """, N, """"&crlf );
+      return( 0 );
+    end;
+    NL := Alias!List:Names[A];
+    if Name!List:Link[NL] then 
+      print( "%NBSNAM: extra destinations ignored for """, N, """"&crlf );
+    return( cvsix( Name!List:Name[NL] ));
+
+  end;
+! return true iff we this is an inter-network address ;
+
+internal boolean procedure NeedToSpool( string Name );
+  begin
+    integer I;    
+    
+    while ( length( Name ) and ( Name neq ":" )) do lop( Name );
+    if ( not length( Name )) then return( false );
+
+    ! extract system name/number ;
+
+    lop( Name );
+    I := cvd( Name );
+
+    return( I neq ThisSystemNumber );
+
+  end;
+! Expand  [ Name | Alias ]*  -->  [ Name ]* ;
+
+internal procedure ExpandNames( Name!pointer NL );
+  begin "expand namelist"
+    Name!pointer N, AL;
+    integer PPN, I;
+
+    N := NL;
+
+    ! iterate through the list expanding aliases ;
+
+    while ( N neq null!record ) do
+      begin
+	AL := GetAlias( Name!List:Name[ N ] );
+	if ( AL nel!record ) then
+	  NLCombine( NL, AL );
+	N := Name!List:Link[ N ];
+      end;
+
+    ! second pass - supply PPNs ;
+
+    N := NL;
+    while ( N neq null!record ) do
+      begin
+	if ( IsAlias( Name!List:Name[ N ] )) then
+	  Name!List:Info[ N ] := 0
+	else if ( NeedToSpool( Name!List:Name[ N ] )) then
+	  Name!List:Info[ N ] := ResolveRemote( Name!List:Name[ N ] )
+	else
+	  begin
+	    I := CVPPN( Name!List:Name[ N ] );
+	    if ( I = 0 ) then
+	      print( "% ",Name!List:Name[ N ], " isn't a valid user", crlf );
+	    Name!List:Info[ N ] := I;
+	  end;
+	N := Name!List:Link[ N ];
+      end;
+
+  end "expand namelist";
+
+
+end "Name Manager" ;
+  <@5
