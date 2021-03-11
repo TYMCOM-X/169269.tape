@@ -1,0 +1,578 @@
+MONDOC
+[3,123054]
+CPARW: 100400,internal,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 6478865
+
+ZONNIE
+[3,136773]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 930.
+Password changed: 10796259
+
+OSNF
+[3,140673]
+CPARW: 110000,internal,over-shut
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 0. (group) 1. (home) 56.
+Password changed: 16777215
+
+OSP
+[3,140674]
+CPARW: 100400,internal,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+OSB
+[3,145107]
+CPARW: 104400,internal,acct-sup,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+IMPORT
+[3,152602]
+CPARW: 104400,internal,acct-sup,Tymshare
+Options: 340,non-billable,ignore-colon,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 29.
+Password changed: 10924858
+
+MATOKA
+[3,160031]
+CPARW: 110400,internal,over-shut,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 0.
+IRC: 0
+0: (class) 0. (group) 0. (home) 57.
+Password changed: 11527042
+
+LINK10
+[3,163564]
+CPARW: 100400,internal,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 7884805
+
+MAIL
+[3,167357]
+CPARW: 110000,internal,over-shut
+Options: 240,non-billable,mystery-bit
+District: 0.
+IRC: 0
+0: (class) 2. (group) 0. (home) 39.
+Password changed: 11324369
+
+SOCCI
+[3,167354]
+CPARW: 154000,internal,premium,over-shut,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 0.
+IRC: 0
+0: (class) 2. (group) 0. (home) 37.
+Password changed: 9217664
+
+XAIL
+[3,212137]
+CPARW: 0
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+DOCAIL
+[3,212143]
+CPARW: 400,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+UORAIL
+[3,212144]
+CPARW: 400,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 5507529
+
+SAIL
+[3,212140]
+CPARW: 400,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+CMUAIL
+[3,212142]
+CPARW: 400,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+SAILIB
+[3,212145]
+CPARW: 400,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 10167148
+
+TNXAIL
+[3,212141]
+CPARW: 400,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+MPL
+[3,213211]
+CPARW: 100400,internal,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 10238642
+
+FJSAIL
+[3,213567]
+CPARW: 100400,internal,Tymshare
+Options: 200,non-billable
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+TEMP
+[24526,46665]
+CPARW: 0
+Options: 140,ignore-colon,mystery-bit
+District: 211.
+IRC: 0
+0: (class) 4. (group) 2. (home) 188.
+Password changed: 9356627
+
+KL10
+[3,222635]
+CPARW: 100400,internal,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 7809385
+
+WRS
+[3,225443]
+CPARW: 156400,internal,premium,over-shut,acct-sup,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 930.
+Password changed: 10814107
+
+KS2020
+[3,230623]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 7971279
+
+MCH
+[3,231227]
+CPARW: 156400,internal,premium,over-shut,acct-sup,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 0.
+IRC: 0
+0: (class) 2. (group) 0. (home) 33.
+Password changed: 11278194
+
+MICROCYCLES
+[3,232134]
+CPARW: 142400,internal,premium,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 7889320
+
+INFO
+[3,232154]
+CPARW: 100400,internal,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 16777215
+
+FRENCH
+[3,232631]
+CPARW: 142000,internal,premium,hush
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 236.
+Password changed: 7917625
+
+FORK
+[3,232761]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 6553260
+
+PUB
+[3,234002]
+CPARW: 144400,internal,premium,acct-sup,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 7004599
+
+EMACS
+[3,234372]
+CPARW: 102400,internal,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 6553259
+
+SPPOPER
+[3,234620]
+CPARW: 104000,internal,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 10255288
+
+TYMGRIPE
+[3,235436]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 6132799
+
+SAILTEST
+[3,242733]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 16777215
+
+SPPARCH
+[3,250244]
+CPARW: 140000,internal,premium
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 8885124
+
+SYSMAINT
+[11300000003,251616]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 10706374
+
+YAMM
+[3,253600]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 16777215
+
+EDITOR
+[3,254617]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 8996674
+
+XXARC
+[3,270100]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 441.
+Password changed: 11324167
+
+XEXEC
+[3,275244]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 7209771
+
+WILKES
+[16500000003,300745]
+CPARW: 114000,internal,over-shut,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 930.
+Password changed: 11427104
+
+RCHESTNUT
+[13100000007,27102]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 11429274
+
+FOROTSQA
+[3,314667]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 8278395
+
+SPL
+[3,324525]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 37.
+Password changed: 10167306
+
+XPPTEST
+[3,326737]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 10716098
+
+JAIL
+[3,326740]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 7897055
+
+TYMAIL
+[3,326742]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 7897060
+
+DARREN
+[3,330611]
+CPARW: 152400,internal,premium,over-shut,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 56.
+Password changed: 10999525
+
+EMSAA
+[33060,101155]
+CPARW: 0
+Options: 160,ignore-colon,mystery-bit,no-password
+District: 229.
+IRC: 0
+0: (class) 4. (home) 832.
+1: (class) 16. (home) 832.
+2: (class) 50. (home) 832.
+3: (class) 9. (home) 832.
+4: (class) 2. (home) 832.
+5: (class) 2050. (class) 1280. (home) 832.
+Password changed: 11448206
+
+FLETCHERC
+[15400000003,346551]
+CPARW: 104000,internal,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 22.
+Password changed: 11540466
+
+TJB
+[3,346701]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 33. (class) 934.
+Password changed: 11069621
+
+CARL
+[3,352477]
+CPARW: 112400,internal,over-shut,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 930.
+Password changed: 9103278
+
+KEN
+[3,35556]
+CPARW: 156400,int,premium,over-shut,acct-sup,hush,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 930.
+Password changed: 11563282
+
+ISHANW
+[11334,155636]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 200.
+IRC: 0
+0: (class) 2. (group) 1. (home) 39.
+Password changed: 10778313
+
+MFICHE
+[3,365076]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (hg) 930.
+Password changed: 8455606
+
+GAZEL
+[11334,57165]
+CPARW: 104000,internal,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 200.
+IRC: 0
+0: (class) 0. (group) 0. (home) 39.
+Password changed: 11534906
+
+LOIS
+[3,367732]
+CPARW: 150400,internal,premium,over-shut,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 930. (class) 59. (class) 118. (class) 370.
+1: (class) 2. (group) 0. (home) 654. (class) 675. (class) 819. (class) 934. (class) 1051.
+Password changed: 11491204
+
+YEUX
+[3,377412]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 930. (class) 33.
+Password changed: 11254800
+
+VUE
+[3,377411]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 930. (class) 33.
+Password changed: 11324167
+
+M33
+[3,42754]
+CPARW: 140400,internal,premium,Tymshare
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 0. (home) 930.
+Password changed: 10729581
+
+TSUCOOP
+[3,50527]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 930.
+Password changed: 11175238
+
+XCONSULT
+[3,633]
+CPARW: 100000,internal
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 8676826
+
+OSMAN
+[10000000003,156346]
+CPARW: 104000,internal,acct-sup
+Options: 240,non-billable,mystery-bit
+District: 3.
+IRC: 0
+0: (class) 2. (group) 1. (home) 33.
+Password changed: 11575947
+
+EMSAA
+[33060,101155]
+CPARW: 0
+Options: 160,ignore-colon,mystery-bit,no-password
+District: 229.
+IRC: 0
+0: (class) 4. (home) 832.
+1: (class) 16. (home) 832.
+2: (class) 50. (home) 832.
+3: (class) 9. (home) 832.
+4: (class) 2. (home) 832.
+5: (class) 2050. (class) 1280. (home) 832.
+Password changed: 11448206
+   v*
