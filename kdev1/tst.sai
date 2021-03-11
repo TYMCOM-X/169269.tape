@@ -1,0 +1,198 @@
+define !  = "comment", !! = "comment";
+!! title Module Tst ;
+! *************************************************************************
+*************************************+*************************************
+*                                                                         *
+*                                                                         *
+*				    Tst					  *
+*                                                                         *
+*                                                                         *
+*************************************+*************************************
+
+
+**************************************************************************;
+
+
+begin "Tst"
+  require "(KLib)Sail.Hdr"  source!file;
+  require "(KLib)Util.Req"  source!file;
+  require "(KLib)Lic.Req"   source!file;
+
+
+! ************************************************************************;
+!! title Rtn Is.Oct ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=				Rtn Is.Oct				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+	Return true if the input character is an octal digit.
+
+
+==========================================================================;
+
+
+  simple boolean procedure Is.Oct (integer Char);
+  begin "Is.Oct"
+    return("0" <= Char <= "7");
+  end "Is.Oct";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Rtn Parse.XwdStr ;
+! =========================================================================
+=====================================+=====================================
+=                                                                         =
+=                                                                         =
+=			     Rtn Parse.XwdStr				  =
+=                                                                         =
+=                                                                         =
+=====================================+=====================================
+
+
+==========================================================================;
+
+
+  simple integer procedure Parse.XwdStr (string S; integer DefAun(0), DefUun(0));
+  begin "Parse.XwdStr"
+    integer
+      C,
+      Aun,
+      Uun;
+    string
+      AunStr,
+      UunStr;
+    label
+      S0, S1, S2, S3, S4, S5,
+      Sgood,
+      SBad;
+
+
+    print("Enter Parse.XwsStr", crlf);
+
+    Aun _ Uun _ 0;
+    AunStr _ UunStr _ null;
+
+    S0:
+      if ((C _ lop(S)) = "[") then
+	goto S1
+      else
+	goto SBad;
+
+    S1:
+      if (Is.Oct(C _ lop(S))) then
+      begin
+	appnd(AunStr, C);
+	goto S2;
+      end
+      else if (C = ",") then
+	goto S3
+      else if (C = "]") then
+	goto SGood
+      else
+	goto SBad;
+
+    S2:
+      if (Is.Oct(C _ lop(S))) then
+      begin
+	appnd(AunStr, C);
+	goto S2;
+      end
+      else if (C = ",") then
+	goto S3
+      else if (C = "]") then
+	goto SGood
+      else
+	goto SBad;
+
+    S3:
+      if (Is.Oct(C _ lop(S))) then
+      begin
+	appnd(UunStr, C);
+	goto S5;
+      end
+      else if (C = ",") then
+	goto S4
+      else if (C = "]") then
+	goto SGood
+      else
+	goto SBad;
+
+    S4:
+      if (Is.Oct(C _ lop(S))) then
+      begin
+	appnd(UunStr, C);
+	goto S5;
+      end
+      else if (C = "]") then
+	goto SGood
+      else
+	goto SBad;
+
+    S5:
+      if (Is.Oct(C _ lop(S))) then
+      begin
+	appnd(UunStr, C);
+	goto S5;
+      end
+      else if (C = "]") then
+	goto SGood
+      else
+	goto SBad;
+
+    SGood:
+      Aun _ cvo(AunStr[1 for 6]) max hr(DefAun);
+      Uun _ cvo(UunStr[1 for 6]) max hr(DefUun);
+
+      print("Enter Parse.XwsStr1", crlf);
+      return(xwd(Aun, Uun));
+
+    Sbad:
+      print("Enter Parse.XwsStr2", crlf);
+      return(0);
+  end "Parse.XwdStr";
+
+
+! ===================================+=====================================
+==========================================================================;
+!! title Mainline Code;
+! ***********************************+*************************************
+*                                                                         *
+*                                                                         *
+*			       Mainline Code				  *
+*                                                                         *
+*                                                                         *
+*************************************+************************************;
+
+
+  begin "Mainline Code"
+    string
+      Str;
+
+
+    while (length(Str _ Prompt.User("License expression: "))) do
+    begin
+      if (Substr(Str, "Help") or SubStr(Str, "?")) then
+	print("You enter a license expression as an octal number or", crlf,
+	    "a list of license designators separated by spaces.", crlf2)
+      else if (Is.Numeric(Str)) then
+	print("x: ", Prt.Lic(cvo(Str)), crlf2)
+      else if (Str = "[") then
+	print("y: ", Prt.Lic(Parse.XwdStr(Str)), crlf2)
+      else
+	print("z: ", xwdstr(Rd.Lic(Str)), crlf2);
+    end;
+
+    exit;
+  end "Mainline Code";
+end "Tst";
+
+
+! ***********************************+*************************************
+**************************************************************************;
