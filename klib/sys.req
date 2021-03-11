@@ -1,0 +1,5 @@
+external integer Sysno;
+external integer Syswhere;
+external procedure Init.Sys.Stuff;
+
+require "(KLib)Sys" load!module;
