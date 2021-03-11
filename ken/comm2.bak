@@ -1,0 +1,2730 @@
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 1-1
+     Prt: 07-Aug-84  13:11               COMM2 - Commands of moderate complexity
+
+     
+     ! *************************************************************************
+     *                                                                         *
+     *                                  COMM2                                  *
+     *                     Commands of moderate complexity                     *
+     *                                                                         *
+     ***************************************************************************
+     
+     
+                This file is required as a source!file in COMAND.SAI.
+     
+     
+     **************************************************************************;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 2-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!DelTokenF
+
+     
+     ! "Token" delete stuff.  This is sort of cute.  We delete grayspace
+     !  until non-grayspace is seen.  We take the first non-gray character
+     !  and save the descriptive bits from C!Tab which tell what kind of things
+     !  this character may be.  This character is deleted.  The descriptive
+     !  bits of the next character are ANDed with the bits.  If non-zero, then
+     !  the character is of the same token class, and may be deleted.
+     !  This idea attributed to Tim Brengle. ;
+     
+     procedure C!DelTokenF;
+       begin "delete token forward" |1|
+         integer TokenBits;
+     
+         if ( B!Lock ) then PuntCommand;
+     
+         if ( not C!ArgV ) then C!ArgV := 1;
+     
+         while ( C!ArgV ) do
+           begin "do a token" |2|
+             forever do
+               begin "grayspace" |3|
+                 if ( B!EndP ) then PuntCommand;
+                 if ( C!IsGrayP ) then
+                   B!Delete( FORWARDS )
+                 else
+                   done "grayspace";
+               end "grayspace"; |3|
+             TokenBits := C!Tab[ B!GetC ] land ChrMask;
+             B!Delete( FORWARDS );
+             forever do
+               begin "this token" |3|
+                 if ( B!EndP ) then PuntCommand;
+                 TokenBits := TokenBits land C!Tab[ B!GetC ];
+                 if ( LH( TokenBits ) = 0 ) then done "this token";
+                 B!Delete( FORWARDS );
+               end "this token"; |3|
+             C!ArgV := C!ArgV - 1;
+           end "do a token"; |2|
+     
+       end "delete token forward"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 3-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!DelTokenB
+
+     
+     ! Delete a token backwards. ;
+     
+     procedure C!DelTokenB;
+     begin "C!DelTokenB" |1|
+       integer
+         TokenBits;
+     
+       if (B!Lock) then
+         PuntCommand;
+     
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       while (C!ArgV) do
+       begin "do a token" |2|
+         while (true) do
+         begin "grayspace" |3|
+           if (B!BegP) then
+             PuntCommand;
+     
+           B!Move(BACKWARDS);
+     
+           if (C!IsGrayP) then
+             B!Delete(FORWARDS)
+           else
+             done "grayspace";
+         end "grayspace"; |3|
+     
+         TokenBits _ C!Tab[B!GetC] land ChrMask;
+         B!Delete(FORWARDS);
+     
+         while (true) do
+         begin "this token" |3|
+           if(B!BegP) then
+             PuntCommand;
+     
+           B!Move(BACKWARDS);
+           TokenBits _ TokenBits land C!Tab[B!GetC];
+     
+           if (LH(TokenBits) = 0) then
+             done "this token";
+     
+           B!Delete(FORWARDS);
+         end "this token"; |3|
+     
+         B!Move(FORWARDS);
+         decr(C!ArgV);
+       end "do a token"; |2|
+     
+       if (W!GetS = B!GetP) then
+       begin |2|
+         MoveBackwards;
+         W!Disp(true);
+         MoveForwards;
+       end; |2|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 3-2
+     Prt: 07-Aug-84  13:11                                       Rtn C!DelTokenB
+
+     
+         ! Reframe if the point is at the beginning of the window ;
+     end "C!DelTokenB"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 4-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!MovTokenF
+
+     
+     !  Routine to move forward over a token . ;
+     
+     procedure C!MovTokenF;
+     begin "move token forward" |1|
+       integer TokenBits;
+     
+       if ( not C!ArgV ) then
+         C!ArgV := 1;
+     
+       while ( C!ArgV ) do
+       begin "do a token" |2|
+         SkipGraySpace;
+     
+         if (B!EndP) then
+           PuntCommand;
+     
+         TokenBits := C!Tab[ B!GetC ] land ChrMask;
+     
+         forever do
+         begin "this token" |3|
+           if ( B!EndP ) then
+             PuntCommand;
+     
+           B!Move( FORWARDS );
+           TokenBits := TokenBits land C!Tab[ B!GetC ];
+     
+           if ( LH( TokenBits ) = 0 ) then
+             done "this token";
+         end "this token"; |3|
+     
+         C!ArgV := C!ArgV - 1;
+       end "do a token"; |2|
+     end "move token forward"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 5-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!MovTokenB
+
+     
+     ! Move backwards over a token . ;
+     
+     procedure C!MovTokenB;
+     begin "move token backwards" |1|
+       integer TokenBits;
+     
+       if ( not C!ArgV ) then
+         C!ArgV := 1;
+     
+       while ( C!ArgV ) do
+       begin "do a token" |2|
+         forever do
+         begin "grayspace" |3|
+           if ( B!BegP ) then
+             PuntCommand;
+     
+           B!Move( BACKWARDS );
+     
+           if ( not C!IsGrayP ) then
+             done "grayspace";
+         end "grayspace"; |3|
+     
+         TokenBits := C!Tab[ B!GetC ] land ChrMask;
+     
+         forever do
+         begin "this token" |3|
+           if( B!BegP ) then
+             PuntCommand;
+     
+           B!Move( BACKWARDS );
+           TokenBits := TokenBits land C!Tab[ B!GetC ];
+     
+           if ( LH( TokenBits ) = 0 ) then
+             done "this token";
+         end "this token"; |3|
+     
+         B!Move( FORWARDS );
+         C!ArgV := C!ArgV - 1;
+       end "do a token"; |2|
+     end "move token backwards"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 6-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!TokenUC
+
+     
+     ! Force a token to upper case ;
+     
+     procedure C!TokenUC;
+     begin "force token UC" |1|
+       integer TokenBits, C;
+     
+       if ( B!Lock ) then
+         PuntCommand;
+     
+       if ( not C!ArgV ) then
+         C!ArgV := 1;
+     
+       while ( C!ArgV ) do
+       begin "do a token" |2|
+         SkipGraySpace;
+     
+         if (B!EndP) then
+           PuntCommand;
+     
+         TokenBits := C!Tab[ B!GetC ] land ChrMask;
+     
+         forever do
+         begin "this token" |3|
+           if ( B!EndP ) then
+             PuntCommand;
+     
+           C := B!GetC;
+           TokenBits := TokenBits land C!Tab[ C ];
+     
+           if ( LH( TokenBits ) = 0 ) then
+             done "this token";
+     
+           if (( C >= "a" ) and ( C <= "z" )) then
+           begin |4|
+             B!Delete( FORWARDS );
+             B!Insert( C - '40 );
+           end |4|
+           else
+             B!Move( FORWARDS );
+         end "this token"; |3|
+         C!ArgV := C!ArgV - 1;
+       end "do a token"; |2|
+     
+     end "force token UC"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 7-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!TokenLC
+
+     
+     ! Force a token to lower case ;
+     
+     procedure C!TokenLC;
+     begin "force token LC" |1|
+       integer TokenBits, C;
+     
+       if ( B!Lock ) then
+         PuntCommand;
+     
+       if ( not C!ArgV ) then
+         C!ArgV := 1;
+     
+       while ( C!ArgV ) do
+       begin "do a token" |2|
+         SkipGraySpace;
+     
+         if (B!EndP) then
+           PuntCommand;
+     
+         TokenBits := C!Tab[ B!GetC ] land ChrMask;
+     
+         forever do
+         begin "this token" |3|
+           if ( B!EndP ) then
+             PuntCommand;
+     
+           C := B!GetC;
+           TokenBits := TokenBits land C!Tab[ C ];
+     
+           if ( LH( TokenBits ) = 0 ) then
+             done "this token";
+     
+           if (( C >= "A" ) and ( C <= "Z" )) then
+           begin |4|
+             B!Delete( FORWARDS );
+             B!Insert( C + '40 );
+           end |4|
+           else
+             B!Move( FORWARDS );
+         end "this token"; |3|
+     
+         C!ArgV := C!ArgV - 1;
+       end "do a token"; |2|
+     end "force token LC|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 8-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!TokenToggle
+
+     
+     ! Toggle the case of a token ;
+     
+     procedure C!TokenToggle;
+     begin "toggle case" |1|
+       integer TokenBits, C;
+     
+       if ( B!Lock ) then
+         PuntCommand;
+     
+       if ( not C!ArgV ) then
+         C!ArgV := 1;
+     
+       while ( C!ArgV ) do
+       begin "do a token" |2|
+         SkipGraySpace;
+     
+         if (B!EndP) then
+           PuntCommand;
+     
+         TokenBits := C!Tab[ B!GetC ] land ChrMask;
+     
+         forever do
+         begin "this token" |3|
+           if ( B!EndP ) then
+             PuntCommand;
+     
+           C := B!GetC;
+           TokenBits := TokenBits land C!Tab[ C ];
+     
+           if ( LH( TokenBits ) = 0 ) then
+             done "this token";
+     
+           if (( C >= "A" ) and ( C <= "Z" )) then
+           begin |4|
+             B!Delete( FORWARDS );
+             B!Insert( C + '40 );
+           end |4|
+           else if (( C >= "a" ) and ( C <= "z" )) then
+           begin |4|
+             B!Delete( FORWARDS );
+             B!Insert( C - '40 );
+           end |4|
+           else
+             B!Move( FORWARDS );
+         end "this token"; |3|
+     
+         C!ArgV := C!ArgV - 1;
+       end "do a token"; |2|
+     end "toggle case"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                             Page 9-1
+     Prt: 07-Aug-84  13:11                                 Rtn C!CapitalizeToken
+
+     
+     ! Force the next token into standard capitalization.
+     ;
+     
+     simple procedure C!CapitalizeToken;
+     begin "C!CapitalizeToken" |1|
+       integer
+         C,
+         TokenBits;
+     
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         SkipGraySpace;
+     
+         if (B!EndP) then
+           PuntCommand;
+     
+         C _ B!GetC;
+         TokenBits _ C!Tab[C] land ChrMask;
+     
+         if (IsLower(C)) then
+         begin |3|
+           B!Delete(FORWARDS);
+           B!Insert(UpShift(C));
+         end |3|
+         else
+           B!Move(FORWARDS);
+     
+         while (true) do
+         begin |3|
+           if (B!EndP) then
+             PuntCommand;
+     
+           C _ B!GetC;
+           TokenBits _ TokenBits land C!Tab[C];
+     
+           if (lh(TokenBits) = 0) then
+             done;
+     
+           if (IsUpper(C)) then
+           begin |4|
+             B!Delete(FORWARDS);
+             B!Insert(DownShift(C));
+           end |4|
+           else
+             B!Move(FORWARDS);
+         end; |3|
+     
+         decr(C!ArgV);
+       end; |2|
+     end "C!CapitalizeToken"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 10-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!MovSpecF
+
+     
+     ! Move to the next 'special' character.
+     ;
+     
+     simple procedure C!MovSpecF;
+     begin  |1|
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         if (not MoveTo(C!IsSpecial, FORWARDS)) then
+           done;
+     
+         B!Move(FORWARDS);
+         decr(C!ArgV);
+       end; |2|
+     
+       C!ArgV _ 0;
+     end ; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 11-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!MovSpecB
+
+     
+     ! Move to the previous 'special' character.
+     ;
+     
+     simple procedure C!MovSpecB;
+     begin  |1|
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         if (not MoveTo(C!IsSpecial, BACKWARDS)) then
+           done;
+     
+         decr(C!ArgV);
+       end; |2|
+     
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 12-1
+     Prt: 07-Aug-84  13:11                                         Macro KillChr
+
+     
+     ! Kill the next logical character, placing it in the Kill Buffer if
+     ! possible.  This macro assumes that the following variables exist in the
+     ! scope in which it is invoked:
+     !
+     !       Cont.Flg        Continuation Flag,
+     !                         if = 0 we may insert into KB
+     !       C!KillBP        Pointer into the KB
+     !       C!KillCnt       The number of characters in the KB.
+     !
+     ! If parameter Parm1 = "EOL", we want to delete a CRLF.
+     ! Otherwise, we will insert its value into the KB. ;
+     
+     
+     define
+       KillChr (Parm1) =
+       { |1|
+         assignc Parm1 = scanc(cvps(Parm1), null, null, "IK");
+     
+         ifcr (equ(cvps(Parm1), "EOL")) thenc
+           B!Delete(FORWARDS);
+           B!Delete(FORWARDS);
+     
+          if (not Cont.Flg) then
+           begin |2|
+             idpb(CR, C!KillBP);
+             idpb(LF, C!KillBP);
+             incr(C!KillCnt, 2);
+           end; |2|
+         elsec
+           B!Delete(FORWARDS);
+     
+           if (not Cont.Flg) then
+           begin |2|
+             idpb(Parm1, C!KillBP);
+             incr(C!KillCnt);
+           end |2|
+         endc
+       }; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 13-1
+     Prt: 07-Aug-84  13:11                                       Macro AbortKill
+
+     
+     ! Abort a text-killing operation, by removing the text killed by this
+     ! invocation of the command from the Kill Buffer and replacing it in the
+     ! Text Buffer.  Both the parameters
+     !
+     !       BP              A byte-pointer to the removable section of the KB
+     !       Count           The number of characters to remove
+     !
+     ! need to be variables, for they are manipulated as reference objects ;
+     
+     
+     define
+       AbortKill (BP, Count) =
+       { |1|
+         while (Count) do
+         begin |2|
+           B!Insert(ildb(BP));
+           decr(Count);
+         end |2|
+       }; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 14-1
+     Prt: 07-Aug-84  13:11                                        Macro SaveKill
+
+     
+     ! Save a text-killing operation, leaving as many lines as will fit
+     ! completely in the Kill Buffer intact, and returning the leading portion
+     ! of the line that will not to the Text Buffer.  This macro assumes that
+     ! the following variables exist in the scope in which it is invoked:
+     !
+     !       C!KillBP        Pointer into the KB
+     !       C!KillCnt       The number of characters in the KB.
+     ;
+     
+     define
+       SaveKill =
+       { |1|
+         begin |2|
+           integer
+             Char;
+     
+           while (C!KillCnt and
+               (Char _ ldb(C!KillBP)) neq LF and Char neq FF) do
+           begin |3|
+             B!Insert(Char);
+             B!Move(BACKWARDS);
+             C!KillBP _ DecrBP(C!KillBP);
+             decr(C!KillCnt);
+           end; |3|
+         end |2|
+       }; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 15-1
+     Prt: 07-Aug-84  13:11                                      Rtn KBFullPrompt
+
+     
+     ! Ask the user what to do when the kill buffer fills up, and force him to
+     ! answer sensibly ;
+     
+     simple integer procedure KBFullPrompt;
+     begin "KBFullPrompt" |1|
+       integer
+         Char;
+       string
+         Prompt;
+       define
+         UpShift (X) = {(X land (lnot '40))},
+         ToUpper (X) = {(if ("a" <= X <= "z") then UpShift(X) else X)};
+     
+     
+       Char   _ 0;
+       Prompt _ "Kill Buffer Full - Enter (A)bort, (P)roceed or (S)ave: ";
+     
+       while (not Char) do
+       begin |2|
+         if (not C!ReadString(Prompt, CR, ESC)) then
+           Char _ 0
+         else
+           Char _ ToUpper(C!String);
+     
+         if (Char) then
+         begin |3|
+           W!Msg(
+             Prompt & 
+               (if (Char = "A") then "Abort"
+               else if (Char = "S") then "Save"
+               else if (Char = "P") then "Proceed"
+               else Char)
+           );
+     
+           W!Disp(true);
+     
+           if (Char = "A" or Char = "P" or Char = "S") then
+             done
+           else
+             Char _ 0;
+         end; |3|
+     
+         T!Bell;
+       end; |2|
+     
+       return(Char);
+     end "KBFullPrompt"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 16-1
+     Prt: 07-Aug-84  13:11                               Rtn SearchStrFullPrompt
+
+     
+     ! Ask the user what to do when the search string fills up in the process
+     of a copy to it ;
+     
+     simple integer procedure SearchStrFullPrompt;
+     begin "SearchStrFullPrompt" |1|
+       integer
+         Char;
+       string
+         Prompt;
+       define
+         UpShift (X) = {(X land (lnot '40))},
+         ToUpper (X) = {(if ("a" <= X <= "z") then UpShift(X) else X)};
+     
+     
+       Char   _ 0;
+       Prompt _ "Search String Full - Enter (A)bort or (P)roceed: ";
+     
+       while (not Char) do
+       begin |2|
+         if (not C!ReadString(Prompt, CR, ESC)) then
+           Char _ 0
+         else
+           Char _ ToUpper(C!String);
+     
+         if (Char) then
+         begin |3|
+           W!Msg(
+             Prompt & 
+               (if (Char = "A") then "Abort"
+               else if (Char = "P") then "Proceed"
+               else Char)
+           );
+     
+           W!Disp(true);
+     
+           if (Char = "A" or Char = "P") then
+             done
+           else
+             Char _ 0;
+         end; |3|
+     
+         T!Bell;
+       end; |2|
+     
+       return(Char);
+     end "SearchStrFullPrompt"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 17-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!CopyToSearch
+
+     
+     ! Copy text into the search string.
+     ;
+     
+     simple procedure C!CopyToSearch;
+     begin "C!CopyToSearch" |1|
+       integer
+         Mark,
+         HowMany,
+         Temp;
+     
+       Mark   _ C!ArgV;
+       C!ArgV _ 0;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if ((Mark < 0) or (Mark > 9)) then
+       begin |2|
+         W!Msg("Bad Mark Number - " & cvs(Mark));
+         T!Bell;
+         return;
+       end; |2|
+      
+       if (B!GetM(Mark) < 0) then
+       begin |2|
+         W!Msg("Mark " & cvs(Mark) & " not set");
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (B!GetM(Mark) = B!GetP) then
+       begin |2|
+         W!Msg("The Point and Mark " & cvs(Mark) & " are in the same place");
+         T!Bell;
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       HowMany _ abs(B!GetP - B!GetM(Mark));
+     
+       if (HowMany > MAXSEARCHSTRING) then
+       begin |2|
+         if (SearchStrFullPrompt neq "P") then
+           return
+         else
+           HowMany _ MAXSEARCHSTRING;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       C!Search _ NULL;
+     
+       if (B!GetP > B!GetM(Mark)) then
+       begin |2|
+         Temp _ B!GetP;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 17-2
+     Prt: 07-Aug-84  13:11                                    Rtn C!CopyToSearch
+
+         B!SetP(B!GetM(Mark));
+         B!SetM(Mark, Temp);
+       end; |2|
+     
+       while (HowMany > 0) do
+       begin |2|
+         C!Search _ C!Search & B!GetC;
+         B!Move(FORWARDS);
+         decr(HowMany);
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       W!Msg("Search String Set");
+     end "C!CopyToSearch"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 18-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!DelToEOL
+
+     
+     ! Delete to the end of the Line, copying text into the kill buffer, if
+     !  there's room.  If there is no room in kill buffer, prompt the user for
+     !  verification. ;  
+     
+     forward simple procedure C!DelEOL;
+     forward simple procedure C!Wipe;
+     forward simple procedure C!Copy;
+     
+     simple procedure C!DelToEOL;
+     begin |1|
+       own integer
+         Cont.Flg,
+         SaveBP,
+         SaveCnt,
+         SavePt,
+         Temp1;
+       define
+         Eol = {Eol};
+     
+       if (B!Lock or B!EndP) then
+         PuntCommand;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (not G!AppendKillP and
+           C!LastAddr neq location(C!DelToEOL) and
+           C!LastAddr neq location(C!Wipe) and
+           C!LastAddr neq location(C!Copy) and
+           C!LastAddr neq location(C!DelEOL)) then
+       begin |2|
+         C!KillBP  _ point(7, C!KillBuf[0], -1);
+         C!KillCnt _ 0;
+       end; |2|
+     
+       clear(G!AppendKillP);
+       C!ArgV _ C!ArgV max 1;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       Cont.Flg _ 0;
+       SaveBP   _ C!KillBP;
+       SaveCnt  _ C!KillCnt;
+       SavePt   _ B!GetP;
+     
+       if (not B!EndP) then
+         while (C!ArgV) do
+         begin "argv times" |2|
+           if (not B!EndP) then
+           begin "delete" |3|
+             Temp1 _ B!GetC;
+     
+             if (Temp1 = FF) then
+               done "argv times";
+     
+             if (AtEOL) then
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 18-2
+     Prt: 07-Aug-84  13:11                                        Rtn C!DelToEOL
+
+             begin "EOL" |4|
+               if (not Cont.Flg and C!KillCnt >= KILLBUFMAX - 1) then
+                 if ((Cont.Flg _ KBFullPrompt) = "S") then
+                 begin |5|
+                   Cont.Flg _ 0;
+                   done "argv times";
+                 end |5|
+                 else if (Cont.Flg = "A") then
+                   done "argv times";
+     
+               KillChr(Eol);
+             end "EOL" |4|
+             else
+             begin "char" |4|
+               while (not B!EndP and not AtEOL) do
+               begin |5|
+                 Temp1 _ B!GetC;
+     
+                 if ((not Cont.Flg and C!KillCnt >= KILLBUFMAX) and
+                     ((Cont.Flg _ KBFullPrompt) = "A" or Cont.Flg = "S")) then 
+                   done "argv times";
+     
+                 KillChr(Temp1);
+               end; |5|
+             end "char"; |4|
+           end "delete" |3|
+           else
+             done "argv times";
+     
+           decr(C!ArgV);
+         end "argv times"; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (Cont.Flg = "A") then
+       begin |2|
+         integer
+           BP,
+           Count;
+     
+         BP    _ SaveBP;
+         Count _ C!KillCnt - SaveCnt;
+     
+         AbortKill(BP, Count);
+     
+         C!KillBP  _ SaveBP;
+         C!KillCnt _ SaveCnt;
+     
+         W!Msg("Kill Aborted");
+       end |2|
+       else if (Cont.Flg = "S") then
+       begin |2|
+         SaveKill;
+         W!Msg("Kill Saved");
+       end; |2|
+     
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 18-3
+     Prt: 07-Aug-84  13:11                                        Rtn C!DelToEOL
+
+       B!SetP(SavePt);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       W!FixS;
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 19-1
+     Prt: 07-Aug-84  13:11                                          Rtn C!DelEOL
+
+     
+     ! Delete to and including the end of the Line, copying text into the kill
+     !  buffer, if there's room.  If there is no room in kill buffer, prompt
+     !  the user for verification. ; 
+     
+     simple procedure C!DelEOL;
+     begin |1|
+       own integer
+         Cont.Flg,
+         SaveBP,
+         SaveCnt,
+         SavePt,
+         Temp1;
+       define
+         Eol = {Eol};
+     
+       if (B!Lock or B!EndP) then
+         PuntCommand;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (not G!AppendKillP and
+           C!LastAddr neq location(C!DelToEOL) and
+           C!LastAddr neq location(C!Wipe) and
+           C!LastAddr neq location(C!Copy) and
+           C!LastAddr neq location(C!DelEOL)) then
+       begin |2|
+         C!KillBP  _ point(7, C!KillBuf[0], -1);
+         C!KillCnt _ 0;
+       end; |2|
+     
+       clear(G!AppendKillP);
+       C!ArgV _ C!ArgV max 1;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       Cont.Flg _ 0;
+       SaveBP   _ C!KillBP;
+       SaveCnt  _ SaveCnt;
+       SavePt   _ B!GetP;
+     
+       if (not B!EndP) then
+         while (C!ArgV) do
+         begin "argv times" |2|
+           while (not B!EndP) do
+           begin "delete" |3|
+             Temp1 _ B!GetC;
+     
+             if (AtEOL and Temp1 neq FF) then
+             begin "EOL" |4|
+               if (not Cont.Flg and C!KillCnt >= KILLBUFMAX - 1 and
+                   ((Cont.Flg _ KBFullPrompt) = "A" or Cont.Flg = "S")) then
+                 done "argv times";
+     
+               KillChr(Eol);
+               done "delete";
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 19-2
+     Prt: 07-Aug-84  13:11                                          Rtn C!DelEOL
+
+             end "EOL" |4|
+             else
+             begin |4|
+               if (not Cont.Flg and C!KillCnt >= KILLBUFMAX and
+                   ((Cont.Flg _ KBFullPrompt) = "A" or Cont.Flg = "S")) then
+                 done "argv times";
+     
+               KillChr(Temp1);
+     
+               if (Temp1 = FF) then
+                 done "delete";
+             end; |4|
+           end "delete"; |3|
+     
+           decr(C!ArgV);
+         end "argv times"; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (Cont.Flg = "A") then
+       begin |2|
+         integer
+           BP,
+           Count;
+     
+         BP    _ SaveBP;
+         Count _ C!KillCnt - SaveCnt;
+     
+         AbortKill(BP, Count);
+     
+         C!KillBP  _ SaveBP;
+         C!KillCnt _ SaveCnt;
+     
+         W!Msg("Kill Aborted");
+       end |2|
+       else if (Cont.Flg = "S") then
+       begin |2|
+         SaveKill;
+         W!Msg("Kill Saved");
+       end; |2|
+     
+       B!SetP(SavePt);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       W!FixS;
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 20-1
+     Prt: 07-Aug-84  13:11                                            Rtn C!Copy
+
+     
+     ! "Copy" text from the point to the mark.  Abort if the copy will overflow
+     !  the kill buffer. ;
+     
+     simple procedure C!Copy;
+     begin |1|
+       integer
+         Mark,
+         HowMany,
+         OldBP,
+         OldCnt,
+         SavePt,
+         Temp;
+     
+       Mark   _ C!ArgV;
+       C!ArgV _ 0;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if ((Mark < 0) or (Mark > 9)) then
+       begin |2|
+         W!Msg("Bad Mark Number - " & cvs(Mark));
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (B!GetM(Mark) < 0) then
+       begin |2|
+         W!Msg("Mark " & cvs(Mark) & " not set");
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (B!GetM(Mark) = B!GetP) then
+       begin |2|
+         W!Msg("The Point and Mark " & cvs(Mark) & " are in the same place");
+         T!Bell;
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (not G!AppendKillP and
+           C!LastAddr neq location(C!DelEOL) and
+           C!LastAddr neq location(C!DelToEOL) and
+           C!LastAddr neq location(C!Copy) and
+           C!LastAddr neq location(C!Wipe)) then
+       begin |2|
+         OldBP     _ C!KillBP;
+         OldCnt    _ C!KillCnt;
+         C!KillBP  _ point(7, C!KillBuf[ 0 ], -1);
+         C!Killcnt _ 0;
+       end; |2|
+     
+       clear(G!AppendKillP);
+     
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 20-2
+     Prt: 07-Aug-84  13:11                                            Rtn C!Copy
+
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       HowMany _ abs(B!GetP - B!GetM(Mark));
+     
+       if (HowMany + C!KillCnt > KILLBUFMAX) then
+       begin |2|
+         C!KillBP  _ OldBP;
+         C!KillCnt _ OldCnt;
+         W!Msg("Kill Buffer would overflow by " & cvs(HowMany + C!KillCnt -
+             KILLBUFMAX) & " characters.  Copy Aborted.");
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       SavePt _ B!GetP;                      ! save the point ;
+     
+       if (B!GetM(Mark) < B!GetP) then       ! set it to mark if needed ;
+         B!SetP(B!GetM(Mark));
+     
+       while (HowMany > 0) do
+       begin |2|
+         idpb(B!GetC, C!KillBP);
+         incr(C!KillCnt);
+         B!Move(FORWARDS);
+         decr(HowMany);
+       end; |2|
+     
+       B!SetP(SavePt);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       W!Msg("Copy Complete");
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 21-1
+     Prt: 07-Aug-84  13:11                                            Rtn C!Wipe
+
+     
+     ! "Wipe" text from between the point and the mark.  The text will be
+     !   removed from the lower end of the region forward.  In the case that
+     !   the kill buffer will overflow, the user has three options:
+     !
+     !       (A)bort the command, leaving everything intact,
+     !       (P)roceed and lose whatever data cannot be accomodated in the
+     !         kill buffer,
+     !       (S)ave whatever data will fit and stop there.
+     ;
+     
+     simple procedure C!Wipe;
+     begin "C!Wipe" |1|
+       integer
+         Char,
+         Mark,
+         HowMany,
+         OldBP,
+         OldCnt,
+         SavePt,
+         Temp;
+     
+     
+       if (B!Lock) then
+         PuntCommand;
+     
+       Mark   _ C!ArgV;
+       C!ArgV _ 0;
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if ((Mark < 0) or (Mark > 9)) then
+       begin |2|
+         W!Msg("Bad Mark Number - " & cvs(Mark));
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (B!GetM(Mark) < 0) then
+       begin |2|
+         W!Msg("Mark " & cvs(Mark) & " not set");
+         T!Bell;
+         return;
+       end; |2|
+     
+       if (B!GetM(Mark) = B!GetP) then
+       begin |2|
+         W!Msg("The Point and Mark " & cvs(Mark) & " are in the same place");
+         T!Bell;
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       if (not G!AppendKillP and
+           C!LastAddr neq location(C!DelEOL) and
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 21-2
+     Prt: 07-Aug-84  13:11                                            Rtn C!Wipe
+
+           C!LastAddr neq location(C!DelToEOL) and
+           C!LastAddr neq location(C!Copy) and
+           C!LastAddr neq location(C!Wipe)) then
+       begin |2|
+         OldBP     _ C!KillBP;
+         OldCnt    _ C!KillCnt;
+         C!KillBP  _ point(7, C!KillBuf[ 0 ], -1);
+         C!Killcnt _ 0;
+       end; |2|
+     
+       clear(G!AppendKillP);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       HowMany _ abs(B!GetP - B!GetM(Mark));
+     
+       if (HowMany > KILLBUFMAX - C!KillCnt) then
+       begin |2|
+         Char _ KBFullPrompt;
+     
+         if (Char = "S") then
+           HowMany _ KILLBUFMAX - C!KillCnt
+         else if (Char = "A") then
+         begin |3|
+           C!KillBP  _ OldBP;
+           C!KillCnt _ OldCnt;
+           W!Msg("Wipe Aborted");
+           return;
+         end; |3|
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       SavePt _ B!GetP;
+     
+       if (SavePt > B!GetM(Mark)) then
+       begin |2|
+         B!SetP(B!GetM(Mark));
+         B!SetM(Mark, SavePt);
+       end; |2|
+     
+       while (HowMany > 0) do
+       begin |2|
+         if (C!KillCnt < KILLBUFMAX) then
+         begin |3|
+           idpb(B!GetC, C!KillBP);
+           incr(C!KillCnt);
+         end; |3|
+     
+         B!Delete(FORWARDS);
+         decr(HowMany);
+       end; |2|
+     
+       if (SavePt neq B!GetP) then
+       begin |2|
+         Temp _ B!GetM(Mark);
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 21-3
+     Prt: 07-Aug-84  13:11                                            Rtn C!Wipe
+
+         B!SetM(Mark, B!GetP);
+         B!SetP(Temp);
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       W!Msg("Wipe Complete");
+     end "C!Wipe"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 22-1
+     Prt: 07-Aug-84  13:11                                            Rtn C!Yank
+
+     
+     ! "Yank" text out of the kill buffer and insert it at the mark.  Leave
+     !  the point at the end of the inserted text.  The kill buffer is not
+     !  affected. ;
+     
+     procedure C!Yank;
+     begin "C!Yank" |1|
+       integer
+         BP,
+         Count,
+         SavePt;
+     
+       SavePt _ B!GetP;
+     
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       while (C!ArgV) do
+       begin  |2|
+         Count _ C!KillCnt;
+         BP    _ point(7, C!KillBuf[0], -1);
+     
+         while (Count) do
+         begin |3|
+           B!Insert(ildb(BP));
+           decr(Count);
+         end; |3|
+     
+         decr(C!ArgV);
+       end; |2|
+     
+       if (not C!SPMRegion) then
+         B!SetP(SavePt);
+     
+       W!Msg("Yank Complete");
+     end "C!Yank"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 23-1
+     Prt: 07-Aug-84  13:11                                          Rtn DoIndent
+
+     
+     ! Do the common legwork for region indent commands.
+     ;
+     
+     simple procedure DoIndent (integer Add);
+     begin "DoIndent" |1|
+       integer
+         SPt1,
+         SPt2,
+         SPt3,
+         Point,
+         Mark,
+         SavPt;
+     
+       SPt1 _ B!AllocateMark;
+       SPt2 _ B!AllocateMark;
+       SPt3 _ B!AllocateMark;
+     
+       B!SetM(SPt3, B!GetP);
+     
+       if (B!GetP < (Mark _ B!GetM(0))) then
+       begin |2|
+         MoveToBOL;
+         SavPt _ 1;
+         B!SetM(SPt1, B!GetP);
+     
+         B!SetP(Mark);
+         MoveToEOL;
+         MoveForwards;
+         B!SetM(SPt2, B!GetP);
+       end |2|
+       else
+       begin |2|
+         MoveToEOL;
+         MoveForwards;
+         SavPt _ 2;
+         B!SetM(SPt2, B!GetP);
+     
+         B!SetP(Mark);
+         MoveToBOL;
+         B!SetM(SPt1, B!GetP);
+       end; |2|
+     
+       B!SetP(B!GetM(SPt1));
+     
+       do
+       begin |2|
+         if (not AtEOL) then
+           ForceIndent(GetIndent + Add);
+     
+         DownLine;
+       end |2|
+       until (B!EndP or B!GetP >= B!GetM(SPt2));
+     
+       B!SetP
+       (
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 23-2
+     Prt: 07-Aug-84  13:11                                          Rtn DoIndent
+
+         B!GetM
+         (
+           if (not C!SPMRegion) then
+             SPt3
+           else if (SavPt = 1) then
+             SPt2
+           else
+             SPt1
+         )
+       );
+     
+       B!DeAllocateMark(SPt1);
+       B!DeAllocateMark(SPt2);
+       B!DeAllocateMark(SPt3);
+     end "DoIndent"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 24-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!AddIndent
+
+     
+     ! Command to indent the current line an additional indentation unit. ;
+     
+     procedure C!AddIndent;
+       begin |1|
+         integer Add;
+         if ( not C!ArgV ) then C!ArgV := 1;
+         Add := C!ArgV * C!IndentUnitWidth;
+         ForceIndent( GetIndent + Add );
+         C!ArgV := 0;
+       end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 25-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!IndentRegion
+
+     
+     ! Indent a region of text delimited by the point and User Mark 0.
+     ;
+     
+     procedure C!IndentRegion;
+     begin "C!IndentRegion" |1|
+       if (B!GetM(0) < 0) then
+       begin |2|
+         W!Msg("Mark 0 isn't set");
+         T!Bell;
+         PuntCommand;
+       end; |2|
+     
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       DoIndent(C!ArgV * C!IndentUnitWidth);
+       C!ArgV _ 0;
+     end "C!IndentRegion"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 26-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!UnIndent
+
+     
+     ! Command to "unindent" a line by the specified amount. ;
+     
+     procedure C!UnIndent;
+       begin |1|
+         integer Remove;
+         if ( not C!ArgV ) then C!ArgV := 1;
+         Remove := C!ArgV * C!IndentUnitWidth;
+         ForceIndent( GetIndent - Remove );
+         C!ArgV := 0;
+       end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 27-1
+     Prt: 07-Aug-84  13:11                                  Rtn C!UnIndentRegion
+
+     
+     ! Unindent a region of text delimited by the point and User Mark 0.
+     ;
+     
+     procedure C!UnIndentRegion;
+     begin |1|
+       if (B!GetM(0) < 0) then
+       begin |2|
+         W!Msg("Mark 0 isn't set");
+         T!Bell;
+         PuntCommand;
+       end; |2|
+     
+       if (not C!ArgV) then
+         C!ArgV _ 1;
+     
+       DoIndent(-(C!ArgV * C!IndentUnitWidth));
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 28-1
+     Prt: 07-Aug-84  13:11                                          Rtn C!Center
+
+     
+     ! "center" a line of text within the current margins. ;
+     
+     simple procedure C!Center;
+     begin |1|
+       own integer
+         SavePt,
+         Width;
+     
+       C!ArgV _ 0;
+       MoveToBOL;
+       SavePt _ B!GetP;
+     
+       while (C!IsWhiteP) do
+         B!Delete(FORWARDS);
+     
+       MoveToEOL;
+     
+     
+       ! Delete trailing whitespace ;
+     
+       begin |2|
+         B!Move(BACKWARDS);
+     
+         while (B!GetP > SavePt and C!IsWhiteP) do
+         begin |3|
+           B!Delete(FORWARDS);
+           B!Move(BACKWARDS);
+         end; |3|
+     
+         B!Move(FORWARDS);
+       end; |2|
+     
+     
+       Width _ B!GetP - SavePt;
+     
+       if (Width = 0) then
+         return;
+     
+       ForceIndent(C!LeftMargin - 1 +
+           (((C!RightMargin - C!LeftMargin + 1) - Width) % 2));
+       MoveToEOL;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 29-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!RightJustify
+
+     
+     ! Justify a chunk of text against the current right margin.
+     ;
+     
+     internal simple procedure C!RightJustify;
+     begin |1|
+       own integer
+         SaveMk,
+         SpacesNeeded;
+       
+       B!SetM(SaveMk _ B!AllocateMark, B!GetP);
+       CompressWS(FORWARDS);
+       MoveToEOL;
+       CompressWS(BACKWARDS, SaveMk);
+     
+       SpacesNeeded _ (C!RightMargin - GetColumn + 1) max 0;
+       B!SetP(B!GetM(SaveMk));
+     
+       GenerateWS(SpacesNeeded);
+       B!DeAllocateMark(SaveMk);
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 30-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!ShowSearch
+
+     
+     ! Display the single- and multiple-search strings ;
+     
+     procedure C!ShowSearch;
+     begin |1|
+       string
+         TmpStr;
+     
+     
+       TmpStr _ null;
+     
+       if (C!Search) then
+         appnd(TmpStr, "Search: """ & C!Search & """");
+     
+       if (C!SearchM) then
+         appnd(TmpStr, "   M-Search: """ & C!SearchM & """");
+     
+       if (not length(TmpStr)) then
+         appnd(TmpStr, "No Search Strings");
+     
+       W!Msg(TmpStr);
+       C!ArgV _ 0;
+     end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 31-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!FSearch
+
+     
+     ! Search forward through the buffer for a text string ;
+     
+     simple procedure C!FSearch;
+       begin "search" |1|
+         own integer SavePoint;
+     
+         if ( not C!ReadString( "Search: ", ESC, ESC )) then
+           begin |2|
+             W!Msg( "Search Aborted" );
+             C!ArgV := 0;
+             return;
+           end; |2|
+         if ( length( C!String ) = 0 ) then
+           begin |2|
+             if ( length( C!Search ) = 0 ) then
+               begin |3|
+                 W!Msg( "No Search String" );
+                 C!ArgV := 0;
+                 return;
+               end |3|
+             else
+               W!Msg( "Search: " & C!Search & "$" );
+           end |2|
+         else
+           C!Search := C!String;
+     
+         W!MsgF := true;
+         if ( not C!ChrP ) then W!Disp( true );
+         W!MsgF := false;
+     
+         if ( not C!ArgV ) then C!ArgV := 1;
+         while ( C!ArgV > 0 ) do
+           begin |2|
+             SavePoint := B!GetP;
+             ForwardSearch( C!Search );
+             if ( SavePoint = B!GetP ) then
+               C!ArgV := -1
+             else
+               C!ArgV := C!ArgV - 1;
+           end; |2|
+     
+         if ( C!ArgV < 0 ) then
+           begin |2|
+             W!Msg( "Search: " & C!Search & "  [failed]" );
+             C!MAbort := true;
+           end |2|
+         else
+           W!Msg( "Search: " & C!Search );
+     
+         C!ArgV := 0;
+     
+       end "search"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 32-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!RFSearch
+
+     
+     ! Repeat a forward search ;
+     
+     internal simple procedure C!RFSearch;
+       begin "repeat search" |1|
+         own integer SavePoint;
+     
+         if ( length( C!Search ) = 0 ) then
+           begin |2|
+             W!Msg( "No Search String" );
+             C!ArgV := 0;
+             return;
+           end; |2|
+     
+         W!Msg( "Search: " & C!Search & "$" );
+     
+         W!MsgF := true;
+         if ( not C!ChrP ) then W!Disp( false );
+         W!MsgF := false;
+     
+         if ( not C!ArgV ) then C!ArgV := 1;
+         while ( C!ArgV > 0 ) do
+           begin |2|
+             SavePoint := B!GetP;
+             ForwardSearch( C!Search );
+             if ( SavePoint = B!GetP ) then
+               C!ArgV := -1
+             else
+               C!ArgV := C!ArgV - 1;
+           end; |2|
+     
+         if ( C!ArgV < 0 ) then
+           begin |2|
+             W!Msg( "Search: " & C!Search & "  [failed]" );
+             C!MAbort := true;
+           end |2|
+         else
+           W!Msg( "Search: " & C!Search );
+     
+         C!ArgV := 0;
+     
+       end "repeat search"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 33-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!RSearch
+
+     
+     ! Search backwards through the buffer for a text string ;
+     
+     simple procedure C!RSearch;
+       begin "reverse search" |1|
+         own integer SavePoint;
+     
+         if ( not C!ReadString( "Reverse Search: ", ESC, ESC )) then
+           begin |2|
+             W!Msg( "Reverse Search Aborted" );
+             C!ArgV := 0;
+             return;
+           end; |2|
+         if ( length( C!String ) = 0 ) then
+           begin |2|
+             if ( length( C!Search ) = 0 ) then
+               begin |3|
+                 W!Msg( "No Search String" );
+                 C!ArgV := 0;
+                 return;
+               end |3|
+             else
+               W!Msg( "Reverse Search: " & C!Search & "$" );
+           end |2|
+         else
+           C!Search := C!String;
+     
+         W!MsgF := true;
+         if ( not C!ChrP ) then W!Disp( true );
+         W!MsgF := false;
+     
+         if ( not C!ArgV ) then C!ArgV := 1;
+         while ( C!ArgV > 0 ) do
+           begin |2|
+             SavePoint := B!GetP;
+             BackwardSearch( C!Search );
+             if ( SavePoint = B!GetP ) then
+               C!ArgV := -1
+             else
+               C!ArgV := C!ArgV - 1;
+           end; |2|
+     
+         if ( C!ArgV < 0 ) then
+           begin |2|
+             W!Msg( "Reverse Search: " & C!Search & "  [failed]" );
+             C!MAbort := true;
+           end |2|
+         else
+           W!Msg( "Reverse Search: " & C!Search );
+     
+         C!ArgV := 0;
+     
+       end "reverse search"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 34-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!RRSearch
+
+     
+     ! Repeat a backward search ;
+     
+     simple procedure C!RRSearch;
+       begin "repeat reverse search" |1|
+         own integer SavePoint;
+     
+         if ( length( C!Search ) = 0 ) then
+           begin |2|
+             W!Msg( "No Search String" );
+             C!ArgV := 0;
+             return;
+           end; |2|
+     
+         W!Msg( "Reverse Search: " & C!Search & "$" );
+     
+         W!MsgF := true;
+         if ( not C!ChrP ) then W!Disp( true );
+         W!MsgF := false;
+     
+         if ( not C!ArgV ) then C!ArgV := 1;
+         while ( C!ArgV > 0 ) do
+           begin |2|
+             SavePoint := B!GetP;
+             BackwardSearch( C!Search );
+             if ( SavePoint = B!GetP ) then
+               C!ArgV := -1
+             else
+               C!ArgV := C!ArgV - 1;
+           end; |2|
+     
+         if ( C!ArgV < 0 ) then
+           begin |2|
+             W!Msg( "Reverse Search: " & C!Search & "  [failed]" );
+             C!MAbort := true;
+           end |2|
+         else
+           W!Msg( "Reverse Search: " & C!Search );
+     
+         C!ArgV := 0;
+     
+       end "repeat reverse search"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 35-1
+     Prt: 07-Aug-84  13:11                                         Rtn C!MSearch
+
+     
+     ! The shell for a multiple search
+     ;
+     
+     procedure C!MSearch;
+     begin "C!MSearch" |1|
+       own integer
+         SavePoint;
+     
+       if (not C!ReadESCString("M-Search: ")) then
+       begin |2|
+         W!Msg("M-Search Aborted");
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       if (length(C!String) = 0) then
+       begin |2|
+         if (length(C!SearchM) = 0) then
+         begin |3|
+           W!Msg("No M-Search String");
+           C!ArgV _ 0;
+           return;
+         end |3|
+         else
+           W!Msg("M-Search: " & C!SearchM & "$");
+       end |2|
+       else
+         C!SearchM _ C!String;
+     
+       W!MsgF _ true;
+       if (not C!ChrP) then W!Disp(true);
+       W!MsgF _ false;
+     
+       if (not C!ArgV) then C!ArgV _ 1;
+       while (C!ArgV > 0) do
+       begin |2|
+         SavePoint _ B!GetP;
+         MultipleSearch(C!SearchM);
+         if (SavePoint = B!GetP) then
+           C!ArgV _ -1
+         else
+           C!ArgV _ C!ArgV - 1;
+       end; |2|
+     
+       if (C!ArgV < 0) then
+       begin |2|
+         W!Msg("M-Search: " & C!SearchM & "  [failed]");
+         C!MAbort _ true;
+       end |2|
+       else
+         W!Msg("M-Search: " & C!SearchM);
+     
+       C!ArgV _ 0;
+     end "C!MSearch"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 36-1
+     Prt: 07-Aug-84  13:11                                    Rtn C!ChangeString
+
+     
+     ! Change one string to another.
+     ;
+     
+     procedure C!ChangeString;
+     begin "C!ChangeString" |1|
+       integer
+         ChangeCount,
+         I,
+         SavePoint;    
+       string
+         AbortStr,
+         OldString,
+         Prompt,
+         NewString;
+     
+       Prompt   _ "Change: ";
+       AbortStr _ Prompt & "[Aborted]";
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       if (length(C!String) = 0) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (OldString _ C!String) & " to: ");
+     
+       if (not (C!ReadString(Prompt, ESC, ESC))) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (NewString _ C!String));
+     
+       set(W!MsgF);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+       ChangeCount _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ maxinteger;
+     
+       while (C!ArgV > 0) do
+       begin "each arg" |2|
+         SavePoint _ B!GetP;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 36-2
+     Prt: 07-Aug-84  13:11                                    Rtn C!ChangeString
+
+         ForwardSearch(OldString);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ 0
+         else
+         begin |3|
+           for I _ 1 upto length(OldString) do
+             B!Delete(BACKWARDS);
+     
+           for I _ 1 upto length(NewString) do
+             B!Insert(NewString[i for 1]);
+     
+           incr(ChangeCount);
+           decr(C!ArgV);
+         end; |3|
+       end "each arg"; |2|
+     
+       W!Msg(Prompt & "  [" & cvs(ChangeCount) & "]");
+     
+       C!ArgV _ 0;
+     end "C!ChangeString"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 37-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!QueryChange
+
+     
+     ! "Query Change" - user-friendliness in action.
+     ;
+     
+     simple procedure C!QueryChange;
+     begin "C!QueryChange" |1|
+       string
+         AbortStr,
+         Prompt;
+       own integer
+         I,
+         SavePoint,
+         Response,
+         N;
+     
+     
+       Prompt   _ "Q-Change: ";
+       AbortStr _ Prompt & "[Aborted]";
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       if (length(C!String) = 0) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (C!QOldStr _ C!String) & " to: ");
+     
+       if (not C!ReadString(Prompt, ESC, ESC)) then
+       begin |2|
+         W!Msg(AbortStr);
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+       appnd(Prompt, (C!QNewStr _ C!String));
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       set(W!MsgF);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       N _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ MaxInteger;
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 37-2
+     Prt: 07-Aug-84  13:11                                     Rtn C!QueryChange
+
+     
+       while (C!ArgV > 0) do
+       begin |2|
+         SavePoint _ B!GetP;
+         ForwardSearch(C!QOldStr);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ -1
+         else
+         begin "query" |3|
+           W!Msg(Prompt & " ?");
+           Response _ C!GetC;
+     
+           if (C!Tab[Response] land IsYes) then
+           begin "change" |4|
+             W!Msg(Prompt & " [Yes]");
+             incr(N);
+     
+             for I _ 1 upto length(C!QOldStr) do
+               B!Delete(BACKWARDS);
+     
+             for I _ 1 upto length(C!QNewStr) do
+               B!Insert(C!QNewStr[I for 1]);
+     
+             W!Disp(false);
+           end "change" |4|
+           else
+           begin |4|
+             W!Msg(Prompt & " [No]");
+             W!Disp(false);
+           end; |4|
+     
+           if (C!Tab[Response] land IsAbort) then
+             C!ArgV _ 0
+           else
+             decr(C!ArgV);
+         end "query"; |3|
+       end; |2|
+     
+       W!Msg(Prompt & "  [" & cvs(N) & "]");
+       C!ArgV _ 0;
+     end "C!QueryChange"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 38-1
+     Prt: 07-Aug-84  13:11                                   Rtn C!RepeatQChange
+
+     
+     ! Repeat "Query Change" ;
+     
+     simple procedure C!RepeatQChange;
+     begin "C!RepeatQChange" |1|
+       string
+         Prompt;
+       own integer
+         I,
+         SavePoint,
+         Response,
+         N;
+     
+     
+       if (not length(C!QOldStr)) then
+       begin |2|
+         W!Msg("No Previous Q-Change Command");
+         T!Bell;
+         C!ArgV _ 0;
+         return;
+       end; |2|
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       Prompt _ "Q-Change: " & C!QOldStr & " to: " & C!QNewStr;
+     
+       set(W!MsgF);
+       W!Msg(Prompt);
+       W!Disp(true);
+       clear(W!MsgF);
+     
+     ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+     
+       N _ 0;
+     
+       if (not C!ArgV) then
+         C!ArgV _ MaxInteger;
+     
+       while (C!ArgV > 0) do
+       begin |2|
+         SavePoint _ B!GetP;
+         ForwardSearch(C!QOldStr);
+     
+         if (SavePoint = B!GetP) then
+           C!ArgV _ -1
+         else
+         begin "query" |3|
+           W!Msg(Prompt & " ?");
+           Response _ C!GetC;
+     
+           if (C!Tab[Response] land IsYes) then
+           begin "change" |4|
+             W!Msg(Prompt & " [Yes]");
+             incr(N);
+     
+             for I _ 1 upto length(C!QOldStr) do
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 38-2
+     Prt: 07-Aug-84  13:11                                   Rtn C!RepeatQChange
+
+               B!Delete(BACKWARDS);
+     
+             for I _ 1 upto length(C!QNewStr) do
+               B!Insert(C!QNewStr[i for 1]);
+     
+             W!Disp(false);
+           end "change" |4|
+           else
+           begin |4|
+             W!Msg(Prompt & " [No]");
+             W!Disp(false);
+           end; |4|
+     
+           if (C!Tab[Response] land IsAbort) then
+             C!ArgV _ 0
+           else
+             decr(C!ArgV);
+         end "query"; |3|
+       end; |2|
+     
+       W!Msg(Prompt & " [" & cvs(N) & "]");
+       C!ArgV _ 0;
+     end "C!RepeatQChange"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 39-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!MatchDelim
+
+     
+     ! command to find matching delimiters ;
+     
+     simple procedure C!MatchDelim;
+       begin |1|
+         own integer SavePoint;
+         own integer Delim, MatchDelim, Dir, DelimCount, C;
+     
+         if (( C!Cmd land '177 ) = "(" ) then
+           begin |2|
+             Delim := ")";  MatchDelim := "(";
+             Dir := BACKWARDS;
+           end |2|
+         else if (( C!Cmd land '177 ) = ")" ) then
+           begin |2|
+             Delim := "(";  MatchDelim := ")";
+             Dir := FORWARDS;
+           end |2|
+         else
+           begin |2|
+             W!Msg( "Not set up to match that!" );
+             return;
+           end; |2|
+     
+         if ( C!ArgV = 0 ) then DelimCount := 1 else DelimCount := C!ArgV;
+         C!ArgV := 0;
+     
+         SavePoint := B!GetP;
+         B!Move( Dir );
+     
+         while ( true ) do
+           begin |2|
+             if ( Dir = FORWARDS ) and B!EndP then done;
+             C := B!GetC;
+             if ( C = MatchDelim ) then
+               DelimCount := DelimCount - 1
+             else if ( C = Delim ) then
+               DelimCount := DelimCount + 1;
+             if ( DelimCount = 0 ) then done;
+             if ( Dir = BACKWARDS ) and B!BegP then done;
+             B!Move( Dir );
+           end; |2|
+     
+         if ( DelimCount neq 0 ) then
+           begin |2|
+             B!SetP( SavePoint );
+             W!Msg( "Match Failed" );
+             C!MAbort := true;
+           end; |2|
+       end; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 40-1
+     Prt: 07-Aug-84  13:11                                           Rtn FindBOP
+
+     
+     ! Find and return the location of the beginning of the current paragraph.
+     ! Selects the beginning of the first line following the most recent blank
+     ! line.
+     ;
+     
+     simple integer procedure FindBOP;
+     begin "FindBOP" |1|
+       integer
+         BOP,
+         OrigPt;
+     
+       OrigPt _ B!GetP;
+       BOP    _ -1;
+     
+       if (LineEmpty) then
+       begin |2|
+         while (not B!EndP and C!IsGrayP) do
+           MoveForwards;
+     
+         if (not B!EndP) then
+           MoveToBOL;
+     
+         BOP _ B!GetP;
+       end |2|
+       else
+       begin |2|
+         boolean
+           CrlfSeen;
+         integer
+           SavePt;
+     
+         clear(CrlfSeen);
+         SavePt _ -1;
+     
+         MoveBackwards;
+     
+         while (not B!BegP) do
+         begin |3|
+           if (B!GetC = FF) then
+           begin |4|
+             BOP _ B!GetP + 1;
+             done;
+           end |4|
+           else
+           begin |4|
+             if (AtEOL) then
+             begin |5|
+               if (CrlfSeen) then
+               begin |6|
+                 BOP _ SavePt;
+                 done;
+               end |6|
+               else
+               begin |6|
+                 set(CrlfSeen);
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 40-2
+     Prt: 07-Aug-84  13:11                                           Rtn FindBOP
+
+                 SavePt _ B!GetP + 2;
+               end; |6|
+             end |5|
+             else
+             begin |5|
+               if (not C!IsWhiteP) then
+               begin |6|
+                 clear(CrlfSeen);
+                 SavePt _ -1;
+               end; |6|
+             end; |5|
+           end; |4|
+     
+           MoveBackwards;
+         end; |3|
+     
+         BOP _ BOP max 0;
+       end; |2|
+     
+       B!SetP(OrigPt);
+       return(BOP);
+     end "FindBOP"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 41-1
+     Prt: 07-Aug-84  13:11                                           Rtn FindEOP
+
+     
+     ! Find and return the location of the end of the current paragraph.
+     ! Selects end of the last line in the next block of nonempty lines.
+     ;
+     
+     simple integer procedure FindEOP;
+     begin "FindEOP" |1|
+       integer
+         EOP,
+         OrigPt;
+     
+       OrigPt _ B!GetP;
+     
+       if (LineEmpty) then
+       begin |2|
+         while (not B!EndP and C!IsGrayP) do
+           MoveForwards;
+       end; |2|
+     
+       if (B!EndP) then
+         EOP _ B!GetP
+       else
+       begin |2|
+         boolean
+           CrlfSeen;
+         integer
+           SavePt;
+     
+         clear(CrlfSeen);
+         SavePt _ -1;
+     
+         while (not B!EndP) do
+         begin |3|
+           if (B!GetC = FF) then
+           begin |4|
+             EOP _ 
+                 (
+                   if (CrlfSeen) then
+                     SavePt
+                   else
+                     B!GetP
+                 );
+     
+             done;
+           end |4|
+           else
+           begin |4|
+             if (AtEOL) then
+             begin |5|
+               if (CrLfSeen) then
+               begin |6|
+                 EOP _ SavePt;
+                 done;
+               end |6|
+               else
+               begin |6|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 41-2
+     Prt: 07-Aug-84  13:11                                           Rtn FindEOP
+
+                 set(CrlfSeen);
+                 SavePt _ B!GetP;
+               end; |6|
+             end |5|
+             else
+             begin |5|
+               if (not C!IsWhiteP) then
+               begin |6|
+                 clear(CrlfSeen);
+                 SavePt _ -1;
+               end; |6|
+             end; |5|
+           end; |4|
+     
+           MoveForwards;
+         end; |3|
+     
+         if (B!EndP) then
+           EOP _ B!GetP;
+       end; |2|
+     
+       B!SetP(OrigPt);
+       return(EOP);
+     end "FindEOP"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 42-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!FwdHalfPara
+
+     
+     ! Move forward a half a paragraph.
+     ;
+     
+     simple procedure C!FwdHalfPara;
+     begin "C!FwdHalfPara" |1|
+       C!ArgV _ C!ArgV max 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         if (not LineEmpty) then
+           MoveForwards;
+     
+         B!SetP(
+             if (LineEmpty) then
+               FindBOP
+             else
+               FindEOP
+         );
+     
+         decr(C!ArgV);
+       end; |2|
+     end "C!FwdHalfPara"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 43-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!BckHalfPara
+
+     
+     ! Move backwards a half a paragraph.
+     ;
+     
+     simple procedure C!BckHalfPara;
+     begin "C!BckHalfPara" |1|
+       C!ArgV _ C!ArgV max 1;
+     
+       while (C!ArgV) do
+       begin |2|
+         if (not LineEmpty) then
+           MoveBackwards;
+     
+         if (LineEmpty) then
+         begin |3|
+           MoveBackwards;
+     
+           while (not B!BegP and C!IsGrayP) do
+             MoveBackwards;
+     
+           MoveToEOL;
+         end |3|
+         else
+           B!SetP(FindBOP);
+     
+         decr(C!ArgV);
+       end; |2|
+     end "C!BckHalfPara"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 44-1
+     Prt: 07-Aug-84  13:11                                        Rtn DoParaFill
+
+     
+     ! Perform the Fill operation on some number of paragraphs, starting at
+     ! the selected point.
+     ;
+     
+     simple procedure DoParaFill (boolean StartAtBeginning);
+     begin "DoParaFill" |1|
+       integer
+         BegPt,                              ! Point corresponding to the
+                                             ! beginning of the paragraph.
+                                             ;
+         Col,                                ! The column number of the
+                                             ! current character.
+                                             ;
+         CrownOfst,                          ! The relative offset of the
+                                             ! crown from the rest of the
+                                             ! paragraph.
+                                             ;
+         EndMk,                              ! The mark corresponding to the
+                                             ! end of the paragraph.
+                                             ;
+         LM,                                 ! The value of the left margin
+                                             ! for this session.
+                                             ;
+         RepCnt,                             ! The number of times to perform
+                                             ! paragraph fill.
+                                             ;
+         RM;                                 ! The value of the right margin
+                                             ! for this session.
+                                             ;
+     
+       LM _ C!LeftMargin max 1;
+     
+       if (C!VFMode) then
+       begin |2|
+         RepCnt _ 1;
+         RM     _
+             if (C!ArgV) then
+               C!ArgV
+             else
+               C!RightMargin;
+       end |2|
+       else
+       begin |2|
+         RepCnt _ C!ArgV max 1;
+         RM     _ C!RightMargin;
+       end; |2|
+     
+       if (LM > RM) then
+       begin |2|
+         T!Bell;
+         W!Msg("The Left Margin (" & cvs(LM) &
+             ") must be less than or equal to the Right Margin (" &
+             cvs(RM) & ")");
+         PuntCommand;
+       end; |2|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 44-2
+     Prt: 07-Aug-84  13:11                                        Rtn DoParaFill
+
+     
+       EndMk  _ B!AllocateMark;
+     
+       while (RepCnt) do
+       begin |2|
+         BegPt _
+             (
+               if (StartAtBeginning) then
+                 FindBOP
+               else
+                 B!GetP
+             );
+     
+         B!SetM(EndMk, FindEOP);
+         B!SetP(BegPt);
+     
+         if (StartAtBeginning) then
+         begin |3|
+           CrownOfst _ GetIndent;
+           DownLine;
+           decr(CrownOfst, GetIndent);
+           B!SetP(BegPt);
+           CompressGS(FORWARDS, EndMk);
+     
+           Col _ (LM + CrownOfst) max 1;
+           ForceIndent(Col - 1);
+         end |3|
+         else
+           Col _ GetColumn;
+     
+         DoFill(Col, EndMk, LM, RM);
+         CompressWS(BACKWARDS);
+     
+         if (not C!VFMode) then
+           MoveForwards;
+     
+         set(StartAtBeginning);
+         decr(RepCnt);
+       end; |2|
+     
+       B!DeAllocateMark(EndMk);
+       C!ArgV _ 0;
+     end "DoParaFill"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 45-1
+     Prt: 07-Aug-84  13:11                                        Rtn C!FillPara
+
+     
+     ! Fill the current paragraph from beginning to end.
+     ;
+     
+     simple procedure C!FillPara;
+     begin "C!FillPara" |1|
+       define
+         StartAtBeginning = {true};
+     
+       DoParaFill(StartAtBeginning);
+     end "C!FillPara"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 46-1
+     Prt: 07-Aug-84  13:11                                       Rtn C!FillToEOP
+
+     
+     ! Fill the current paragraph from the point to the end and fill
+     ! subsequent paragraphs as usual.
+     ;
+     
+     simple procedure C!FillToEOP;
+     begin "C!FillToEOP" |1|
+       define
+         DontStartAtBeginning = {false};
+     
+       DoParaFill(DontStartAtBeginning);
+     end "C!FillToEOP"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 47-1
+     Prt: 07-Aug-84  13:11                                           Rtn C!SetLM
+
+     
+     ! Set the value of the Left Margin.
+     ;
+     
+     simple procedure C!SetLM;
+     begin "C!SetLM" |1|
+       C!LeftMargin _
+           (
+             if (C!ArgV > 0) then
+               C!ArgV
+             else
+               GetColumn
+           );
+     
+       W!Msg("Left Margin: " & cvs(C!LeftMargin));
+       C!ArgV _ 0;
+     end "C!SetLM"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 48-1
+     Prt: 07-Aug-84  13:11                                           Rtn C!SetRM
+
+     
+     ! Set the value of the Right Margin.
+     ;
+     
+     simple procedure C!SetRM;
+     begin "C!SetRM" |1|
+       C!RightMargin _
+           (
+             if (C!ArgV > 0) then
+               C!ArgV
+             else
+               GetColumn
+           );
+     
+       W!Msg("Right Margin: " & cvs(C!RightMargin));
+       C!ArgV _ 0;
+     end "C!SetRM"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 49-1
+     Prt: 07-Aug-84  13:11                                     Rtn C!SetTermType
+
+     
+     ! Set the Terminal type to be something other than what the monitor says.
+     ! (Note the clever call of the "Refresh Window" command in our endgame.)
+     ;
+     
+     simple procedure C!SetTermType;
+     begin "C!SetTermType" |1|
+       define
+         DontAskTheMonitor = {false};
+     
+       set(W!MsgF);
+       W!Msg(null);
+       W!Disp(false);
+       T!GetTermType(DontAskTheMonitor);
+       clear(W!MsgF);
+       C!Refresh;
+     end "C!SetTermType"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 50-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!GotoColumn
+
+     
+     ! Try to wind up in the specified column of the current line.
+     ;
+     
+     simple procedure C!GotoColumn;
+     begin "C!GotoColumn" |1|
+       TryColumn
+       (
+         if (C!ArgV) then
+           C!ArgV
+         else
+           C!LeftMargin
+       );
+     
+       C!ArgV _ 0;
+     end "C!GotoColumn"; |1|
+
+
+
+     Cre: 07-Aug-84  13:09  (PEAK)COMM2.REQ                            Page 51-1
+     Prt: 07-Aug-84  13:11                                      Rtn C!ForceToCol
+
+     
+     ! Go to a given column, and if it lies beyond the end of the line, force
+     ! your way there by filling the gap with whitespace.
+     ;
+     
+     simple procedure C!ForceToCol;
+     begin "C!ForceToCol" |1|
+       integer
+         DesiredCol;
+     
+       DesiredCol _
+           (
+             if (C!ArgV) then
+               C!ArgV
+             else
+               C!LeftMargin
+           );
+     
+       TryColumn(DesiredCol);
+       GenerateWS(DesiredCol - GetColumn);
+     
+       C!ArgV _ 0;
+     end "C!ForceToCol"; |1|
+     
+     
+     ! ************************** End of COMM2.REQ ****************************;
+  ` =÷
