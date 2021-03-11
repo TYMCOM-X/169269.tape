@@ -1,0 +1,262 @@
+begin
+require 4 version;
+require "[][]" delimiters;
+define	extendedLookup(ch,base)=[chnior(ch,base,4)];
+define crlf=[('15&'12)], tab=[('11&null)], !=[comment], space=[" "],
+	#cr=[('15 & null)], 
+	!rh(x)=[((x) land '777777)], !lh(x)=[((x) lsh -18)],
+	!xwd(l,r)=[(((l) lsh 18) lor ('777777 land (r)))];
+external integer !skip!;
+define userCacheSize=4;
+
+integer word;
+simple procedure setUp;
+setbreak(word_getbreak, space& tab& crlf& ",+;/!&|\[]{}""<>?",
+			space& tab& crlf& ",+;/!&|\[]{}""<>?", "IKTS" );
+require setUp initialization;
+
+define named!ind=0, elbstr="'0:";
+forlc xx=
+ (PPN,NAM,EXT,PRV,SIZ,VER,FUT,EST,ALC,POS,FT1,LIC,MTA,DEV,STS,ELB,XT1,
+	QTF,QTO,MXA,USD,AUT,UNM,UN1,TRU,XT2,ALP,SNM,PJC,PJ1,PJ2,PID)
+ doc [redefine  named!ind=named!ind+1, 
+		elbstr=cvms(elbstr) & cvps(xx) & ":";
+	define	!RB]&[xx=named!ind;
+] endc;
+define lookSize= (10 + named!ind) max 100;
+integer array lukb[0:lookSize];
+string simple procedure cvhalf(integer x); 
+begin integer w,d; string res;
+getformat(w,d); setformat(6,d);
+res_ cvos(x lsh -18)&",,"&cvos(x land (-1 lsh -18));
+setformat(w,d);
+return( res );
+end;
+
+string simple procedure cvxstr!( integer sixbit );
+begin		integer l,m;
+if 0 = m_ sixbit then return("");
+for l_ 1 step 1 while m_ m lsh 6 do;
+return( cvxstr(sixbit)[1 for l] );
+end;
+preset!with -1;
+own safe integer array	cacheOrd [0:userCacheSize]; 
+own safe integer array	cacheDat [0:2, 0:userCacheSize]; 
+own safe string array	cacheStr [0:userCacheSize];
+
+simple procedure initCache;
+begin	integer i;
+for i_ 1 step 1 until userCacheSize
+   do begin
+	cacheOrd[i]_ i; 
+	if cacheDat[i,1]
+	 then cacheStr[i]_ cvastr(cacheDat[i,1]) & cvastr(cacheDat[i,2])
+			&  cvastr(cacheDat[i,3]);
+      end;
+end;
+require initCache initialization;
+
+string simple procedure readCache( integer lookFor );
+begin	integer i;
+for i_ 0 step 1 until userCacheSize
+   do if lookFor=cacheDat[0, cacheOrd[i]]
+	 then begin 
+		if i > 0 then cacheOrd[i] swap cacheOrd[i-1];
+		return( cacheStr[ cacheOrd[i-1 max 0] ] );
+	      end;
+return( null );
+end;
+
+string simple procedure setCache( integer key; string val );
+begin	integer i, ndx;
+ndx_ cacheOrd[ userCacheSize ];
+for i_ 1 step 1 until userCacheSize do cacheOrd[i]_ cacheOrd[i-1]; 
+cacheOrd[ 0 ]_ ndx;
+cacheStr[ndx]_ val;
+cacheDat[ndx,0]_ key;
+if length(val) > 15
+ then cacheDat[ndx,1]_ 0
+ else begin
+	cacheDat[ndx,1]_ cvasc(val);
+	cacheDat[ndx,2]_ cvasc(val[6 for 5]);
+	cacheDat[ndx,3]_ cvasc(val[11 for 5]);
+      end;
+return( val );
+end;
+
+string simple procedure cvuser( integer ppn );
+begin	string res;
+	boolean flag; integer ch;
+	own safe integer array lb[0:!RBUN1];
+
+if length(res_readCache(ppn)) then return(res);
+arrclr(lb); 
+lb[0]_!RBUN1; 
+lb[!RBPPN]_(1 lsh 18)+1; lb[!RBNAM]_ppn; lb[!RBEXT]_cvsix("UFD");
+open(ch_getchan,"DSK",'17, 0,0, 0,0,flag_false);
+if flag then usererr(0,1,"Can't get DSK")
+ else extendedLookup(ch,lb[0]);
+release(ch);
+return( 
+ setCache( ppn, if lb[!RBUN1]
+	    then "(" & cvxstr(lb[!RBUNM]) & cvxstr!(lb[!RBUN1]) & ")"
+	    else if lb[!RBUNM] then "(" & cvxstr!(lb[!RBUNM]) & ")"
+	    else "[" & cvos(!lh(ppn)) & "," & cvos(!rh(ppn)) & "]" ) )
+end;
+
+string procedure cvfname( integer ppn, nam, ext );
+begin	string name, user;
+name_ cvxstr!(nam) & "." & cvxstr!(ext land (-1 lsh 18));
+return( if "("=(user_cvuser(ppn)) then user & name else name & user );
+end;
+simple string procedure prot(integer pr; boolean ufd);
+begin	integer i; string res,sgo;
+	preset!with "All","Cp","Upd","Ap","Rd","Run","Lk","No";
+		own safe string array filep[0:7];
+sgo_"sgo";
+res_ if ufd then "UFD:" else null;
+for i_ pr lsh -6,pr lsh -3,pr
+   do res_res& " "&lop(sgo)&"-"&
+	(if ufd
+	 then	(if i land 4 then "LK" else null) &
+		(if i land 2 then "CR" else null) &
+		(if i land 1 then "RD" else null) 
+	 else	filep[i land 7]);
+return(res);
+end;
+
+preload!with 
+	"Ascii","AsciiLine","Katakanna","3?","4?","5?","6?","7?",
+	"Image","'11?","'12?","BinaryImage","Binary","'15?",
+	"DumpRecord","Dump";
+string safe array FileModes[0:'17];
+define mode( number )="(FileModes[number])";
+
+string simple procedure time(integer min,sec);
+    return( cvs(min % 60) & ":" & cvs(min mod 60) & ":" & cvs(sec) );
+
+string simple procedure date(integer d);
+    return( cvs(64+d%365) & "." & cvs((d mod 365)*100/365) );
+simple string procedure license( integer licenseBits ); 
+begin "license"
+preload!with 
+	" WC", " RC", " OP",	" SY", " GD", " TD",  
+	" ST", " HF", " JL",	" AC", " XC", " FP1",
+	" FP2"," FP3";
+own safe string array prot[0:13];
+string licstr;
+integer bit;
+
+licstr_null; 
+for bit_0 step -1 until -13
+   do if licenseBits land ((1 lsh 17) lsh bit)
+	 then licstr_licstr & prot[-bit];
+if licenseBits land (3 lsh 2)
+ then licstr_licstr & (case (licenseBits lsh -2) land 3 
+				of (" **"," RP"," RF"," RA"));
+if licenseBits land 3
+ then licstr_licstr & (case licenseBits land 3 
+				of (" ??"," WP"," WF"," WA"));
+return(licstr);
+end "license";
+string offsets;
+
+simple procedure addList(string elements);
+begin	string s;
+while length( s_ scan(elements,word,!skip!) )
+   do begin	integer code;
+	if equ(s[1 for 3],".RB") or equ(s[1 for 3],"!RB")
+	 then s_s[4 to inf]
+	 else if equ(s[1 for 2],"RB") then s_s[3 to inf];
+	if s="'"	then code_ cvo(s[2 to inf])
+	else if length(s)=3
+	 then begin	string codstr;
+		codstr_ cvms(elbstr)[4 to inf];
+		for code_ 1 step 1 while length(codstr)
+		   do if equ(s,codstr[1 for 3]) then done
+			else codstr_ codstr[5 to inf];
+		if length(codstr)=0 then code_-1;
+	      end
+	 else code_ -1;
+	if 0 > code then print(" [don't know .RB", s, "]" )
+	else if code > !rh(lukb[0])
+		then print(" [Offset .RB", s, "='", cvos(code), 
+			" is too big [max='", cvos(!rh(lukb[0])), "]" )
+	else offsets_ offsets & code;
+      end;
+end;
+
+define	!RB.(nam,b,e)= "( (lukb[!RB" & "nam]
+				 IFCR b>0 THENC land (-1 lsh -b) ENDC)
+			      IFCR e<35 THENC lsh (e-35) ENDC )";
+procedure showLukb( integer displayZeroes );
+begin
+integer pol;
+	simple procedure sepPrint( integer ind );
+	begin
+	if 0 < pol_pol-1
+	 then print(tab)
+	 else begin pol_ 3; print(crlf); end;
+	print( ".RB", (if ind>named!ind then "'" & cvos(ind) & ":"
+			else cvms(elbstr)[ind ash 2 for 4]),
+		cvhalf(lukb[ ind ]) );
+	end;
+
+integer ind;
+string s;
+
+print( crlf, cvfname( lukb[!RBPPN], lukb[!RBNAM], lukb[!RBEXT] ),
+	tab, cvuser( lukb[!RBAUT] ), 
+	", P:", prot( !RB.(PRV,0,8), !RB.(STS,18,18) ),
+	", M:", mode( !RB.(PRV,9,12) ),
+	crlf,"  C:",date( !RB.(EXT,20,21) lsh 12 + !RB.(PRV,24,35) ),
+	    "/",time( !RB.(PRV,13,23), !RB.(LIC,12,17) ),
+	", A:", date( !RB.(EXT,22,35) ),
+	", S:", !RB.(SIZ,0,35),
+	", V:", !RB.(VER,18,35), 
+	" Luun:'", cvos( !RB.(VER,0,17) ),
+	", Lic:", license( !RB.(LIC,18,35) )
+ );
+! !RB.(EXT,18,18);
+pol_0;
+s_ offsets;
+while length(s) do sepPrint( lop(s) );
+pol_0;
+if displayZeroes = 2 then return;
+for ind_!RBFUT step 1 until lukb[0] 
+   do if displayZeroes or lukb[ind] then sepPrint( ind );
+end;
+integer ch,eof,rtv, showZero;
+
+open(ch_getchan,"DSK",'17, 0,0, 0,0,eof_false);
+if eof then usererr(0,0,"cannot get DSK","X");
+arrclr(lukb);
+
+lukb[0]_ calli( !xwd('21,'16), '41 );
+	! gettab(%lkbsz,,.gtlvd) = read lookup block size;
+if not !skip! then lukb[0]_ '40;	! size without this gettab;
+while true
+   do begin	string s;
+	outstr(crlf & " File: ");
+	s_inchwl; if !skip! neq #cr then outstr(crlf);
+	if "?" = s then print(
+"<file name>, +<.rblist>, =<.rblist>, or @ to switch all-flags")
+	else if "=" = s then begin offsets_""; addList(s[2 for inf]) end
+	else if "+" = s then addList(s[2 for inf])
+	else if equ(s,"@")
+	 then outstr( case (showZero_ showZero + 1 land 3)
+			of ([0]"show non-zero", [2]"show named only",
+				[else]"show all") )
+	 else begin	integer code;
+		lukb[2]_cvfil(s, lukb[3], lukb[1]);
+		code_ extendedLookup(ch,lukb[0]);
+		if !skip! then showLukb( showZero )
+		else print("Lookup failed: ", cvhalf(code));
+	      end
+      end;
+
+release(ch);
+
+end;
+
+ 
