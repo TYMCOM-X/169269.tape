@@ -1,0 +1,71 @@
+.Memo;
+.Page frame 60 high 77 wide;
+.Area text lines 4 to 57 chars 6 to 77;
+.Title area heading lines 1 to 3;
+.Title area footing line 60;
+.Place text;
+.UnderlineBetween (~~,~);
+.blankline;
+.indent 0;
+.single space;
+.nojust;
+.Byhand;
+~~JOB OBJECTIVES~
+.EndHand;
+.List (-4,4,0,"1.");
+.Item;
+Become a proficient user of TOPS-20 and the VAX.
+.Item;
+Develop systems programming expertise on the VAX and TOPS-20.
+.item;
+Improve performance consistency.  *** What is inconsistency really a
+symptom of?  Lack of plans?  Written schedules? ***
+### Not lack of planning!  Nor lack of written schedules! ###
+### More "oversight" and not enough recognition of perspective
+    as seen by management due to the mushroom syndrome which
+    happens when middle to upper management doesn't give enough
+    commitment to doing things thoroughly ###
+.endlist;
+.ByHand;
+.Skip 2;
+~~PERSONAL DEVELOPMENT OBJECTIVES~
+.EndHand;
+.List (-4,4,0,"1.");
+.Item;
+Become a proficient user of TOPS-20 and the VAX.
+### Is this a REPEAT?  Rather than repeat, I'd prefer to strike
+"TOPS-20 and the VAX" in favor of the phrase "newer technologies
+such as the VAX and LISA".  (TOPS-20 may be a job objective, but
+given a choice of "obsolete" operating systems, I wouldn't even
+consider it in the running as to my "preference"). ###
+.Item;
+Develop systems programming expertise on the VAX and TOPS-20.
+### Is this a REPEAT?  Please see my earlier comment! ###
+.item;
+Improve my time management skills by:   ** need to fill this in **
+### Aren't we trying to generalize this one, rather than itemize it
+    since we came to the conclusion that it isn't necessarily the
+    time management skills, but more the prior visible planning and
+    communication that we discussed that need working on?u ###
+.Item;
+Consulting:
+### I wanted this visible, since it is currently a significant amount of
+my JOB.  Why is it under "PERSONAL"? ###
+.preface 0;
+.list (-4,4,0,"a.");
+.item;
+Provide consulting support to members of the unit in
+order to increase the base of technical skills within the section.
+.Item;
+Improve my consulting skills.  Give attention to the following:  determining
+what is worth the time and what is not, conciseness, and knowing when to back
+off.
+.endlist;
+
+.item;
+### I thought that we were considering something about TRAINING, TEACHING
+and possibly more involvement with the planning processes for both new
+and current projects.  (I do not mean just project design, after the
+fact of a project is realized necessary). ###
+
+.endlist;
