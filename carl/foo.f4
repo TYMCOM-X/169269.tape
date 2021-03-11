@@ -1,0 +1,13 @@
+	integer s,t,count
+	integer n(2),r(41)
+
+	count=0
+10	read(22,11,end=20,err=20)s,n,t,r
+11	format(i2,1x,2a5,1x,i,41a1)
+	count=count+1
+	write(23,12)s,n,t,r
+12	format(i2,1x,2a5,1x,i6,1x,41a1)
+	go to 10
+20	type 21,count
+21	format(1x,'There were ',i5,' records.')
+	end
