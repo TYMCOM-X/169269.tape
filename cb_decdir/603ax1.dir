@@ -1,0 +1,354 @@
+
+  Parity:Odd  9-Track  Write enabled
+  BACKUP start save set: 
+      by version 2A(312) at 14:37:16 on 21-Dec-78
+      written on MTB260: on S/N 1026 at 800 9-track
+      under TOPS-10 system 603A(20116):     RZ603A KL10 SYS#1026
+603A	DIR     8  *** (undated)   7:17  18-Jun-90   0
+603A	DDT     2  *** (undated)  17:00  16-Jun-90   0
+603A	MCO    43  *** (undated)   8:40   5-Jun-90   0
+BEWARE	63A    23  *** (undated)   7:53  17-Jun-90   0
+CCIINT	MAC     4  *** (undated)   3:13  16-Feb-90   0
+CDPSER	MAC     7  *** (undated)   3:13  16-Feb-90   0
+CDRSRX	MAC     8  *** (undated)   3:13  16-Feb-90   0
+CLOCK1	MAC    46  *** (undated)   1:27  20-Apr-90   0
+CMBKA	CCL     2  *** (undated)   7:28   7-Dec-89   0
+CMBKI	CCL     2  *** (undated)   7:48   7-Dec-89   0
+CMBLGI	CCL     2  *** (undated)   2:34  22-Apr-90   0
+CMBLUG	CCL     2  *** (undated)   1:12   8-Dec-89   0
+CMBVL	CCL     2  *** (undated)   8:20   7-Dec-89   0
+COMCON	MAC    98  *** (undated)   2:16   7-Apr-90   0
+COMDEV	MAC    36  *** (undated)   3:15  16-Feb-90   0
+COMMOD	MAC    65  *** (undated)   3:42  17-Mar-90   1
+COMMON	MAC   115  *** (undated)   2:30   1-Jun-90   0
+COMNET	MAC    10  *** (undated)   0:50  17-Feb-90   0
+CONKA	CMD     2  *** (undated)  17:00  11-Aug-88   0
+CONKI	CMD     2  *** (undated)  13:08  16-Aug-88   0
+CONLGI	CMD     2  *** (undated)   2:22  22-Apr-90   0
+CONLUG	CMD     2  *** (undated)  17:00  11-Aug-88   0
+CONVL	CMD     2  *** (undated)   3:17   7-Dec-89   0
+CORE1	MAC    13  *** (undated)   3:17  16-Feb-90   0
+CP1SER	MAC    24  *** (undated)   2:20  27-Apr-90   0
+D76INT	MAC     7  *** (undated)   3:18  16-Feb-90   0
+D85INT	MAC     6  *** (undated)   0:52  17-Feb-90   0
+D8SINT	MAC     5  *** (undated)   3:18  16-Feb-90   0
+DATDMP	MAC    10  *** (undated)   3:18  16-Feb-90   0
+DATMAN	MAC     9  *** (undated)   3:19  16-Feb-90   0
+DCRSER	MAC     6  *** (undated)   3:19  16-Feb-90   0
+DISSER	MAC     7  *** (undated)   3:21  16-Feb-90   0
+DLPSER	MAC     9  *** (undated)   6:44  25-May-90   0
+DLSINT	MAC    13  *** (undated)   3:21  16-Feb-90   0
+DPXKON	MAC     9  *** (undated)   3:21  16-Feb-90   0
+DTASRN	MAC    23  *** (undated)   7:22   8-Mar-90   1
+DTEPRM	MAC    16  *** (undated)   0:58  17-Feb-90   0
+DTESER	MAC    34  *** (undated)   6:49  17-Feb-90   0
+ERRCON	MAC    25  *** (undated)   9:13   4-May-90   0
+FEDSER	MAC     9  *** (undated)   1:01  17-Feb-90   0
+FGEN	HLP     8  *** (undated)   1:03  17-Feb-90   0
+FHXKON	MAC     6  *** (undated)   3:22  16-Feb-90   0
+FILFND	MAC    64  *** (undated)   6:42   8-Mar-90   1
+FILIO	MAC    87  *** (undated)   1:42  20-Apr-90   0
+FILUUO	MAC    93  *** (undated)   2:32   1-Jun-90   0
+FKA	MAC     7  *** (undated)   9:16  27-Apr-90   1
+FKI	MAC     7  *** (undated)   8:32  27-Apr-90   1
+FLUG	MAC     7  *** (undated)   9:16  27-Apr-90   1
+FLUGI	MAC     7  *** (undated)   9:16  27-Apr-90   1
+FSXKON	MAC     5  *** (undated)   3:26  16-Feb-90   0
+FTDLS1	MAC     2  *** (undated)   0:45   5-Dec-74   1
+FTEJBD	MAC     2  *** (undated)   0:45   5-Dec-74  14
+FVL	MAC     7  *** (undated)   8:13  27-Apr-90   1
+HDWKA	MAC     6  *** (undated)   6:52   1-Jun-90   1
+HDWKI	MAC     6  *** (undated)   6:30   1-Jun-90   1
+HDWLGI	MAC     5  *** (undated)   7:42   1-Jun-90   1
+HDWLUG	MAC     5  *** (undated)   7:50   1-Jun-90   1
+HDWVL	MAC     7  *** (undated)   5:39   1-Jun-90   1
+IPCSER	MAC    23  *** (undated)   7:25  25-May-90   0
+JOBDAT	MAC     8  *** (undated)   3:27  16-Feb-90   0
+KALOCK	MAC    10  *** (undated)   3:27  16-Feb-90   0
+KASER	MAC    14  *** (undated)   3:27  16-Feb-90   0
+KILOCK	MAC    23  *** (undated)   3:06  15-Mar-90   0
+KISER	MAC    43  *** (undated)   8:31  13-Apr-90   0
+KLSER	MAC    60  *** (undated)   8:33  13-Apr-90   0
+KONFIG	MAC     2  *** (undated)   3:29  16-Feb-90  17
+KONPAR	MAC     5  *** (undated)   3:29  16-Feb-90   0
+LODTST	MEM    19  *** (undated)   8:37   5-Aug-89   0
+LPTSER	MAC     9  *** (undated)   6:51  13-Apr-90   0
+MACDLX	EXE    14  *** (undated)   8:41  24-Apr-88  14	27A(667)
+MCX27A	DOC     3  *** (undated)   6:50   9-Jun-90   0
+METCON	MAC    12  *** (undated)   8:45  13-Apr-90   0
+MIG603	MEM   159  *** (undated)   7:21   5-Jun-90   0
+MK002	CT      5  *** (undated)   7:05   7-Mar-90   0
+MK026W	CT      5  *** (undated)   3:06  17-Jun-90   0
+MK026Z	CT      5  *** (undated)   3:07  17-Jun-90   0
+MK040G	CT      4  *** (undated)   7:13   7-Mar-90   0
+MK514D	CT      5  *** (undated)   2:19  16-Apr-90   0
+MK514H	CT      4  *** (undated)   5:02  18-Mar-90   0
+MONGEN	CTL     2  *** (undated)   2:39  21-Sep-88   0
+MONGEN	EXE    18  *** (undated)   3:34  31-Mar-90  16	50A(136)
+MONGEN	MAC    55  *** (undated)   2:13  17-Feb-90   0
+MONMAK	MEM    13  *** (undated)   1:43   8-Jun-90   0
+MONMK0	CTL     3  *** (undated)   2:16  19-Apr-90   0
+MONMKA	CTL     7  *** (undated)   2:20  16-Apr-90   1
+MONMKG	CTL     7  *** (undated)   2:19  16-Apr-90   1
+MONMKH	CTL     7  *** (undated)   2:19  16-Apr-90   1
+MONMKI	CTL     7  *** (undated)   1:35  16-Apr-90   1
+MONMKW	CTL     8  *** (undated)   1:34  16-Apr-90   1
+MSGSER	MAC    19  *** (undated)   6:18   8-Mar-90   0
+NETKA	MAC     2  *** (undated)   6:52   1-Jun-90   1
+NETKI	MAC     3  *** (undated)   6:30   1-Jun-90   1
+NETLGI	MAC     2  *** (undated)   7:42   1-Jun-90   1
+NETLUG	MAC     2  *** (undated)   7:50   1-Jun-90   1
+NETPRM	MAC    10  *** (undated)   9:55   6-Apr-90   0
+NETSER	MAC    65  *** (undated)   8:12  25-May-90   0
+NETVL	MAC     3  *** (undated)   5:40   1-Jun-90   1
+NULSEG	MAC     3  *** (undated)   3:31  16-Feb-90   0
+ONCE	MAC    33  *** (undated)   3:31  16-Feb-90   0
+ONCMOD	MAC    56  *** (undated)  10:25   6-Apr-90   0
+PATCH	MAC     2  *** (undated)   3:33  16-Feb-90   0
+PATMON	MEM     1  *** (undated)   2:27   8-Jun-90   0
+PERFOR	MEM    13  *** (undated)   8:37   5-Aug-89   0
+PLTSER	MAC     3  *** (undated)   3:33  16-Feb-90   0
+PSISER	MAC    21  *** (undated)   7:29  25-May-90   0
+PTPSER	MAC     4  *** (undated)   3:33  16-Feb-90   0
+PTRSER	MAC     4  *** (undated)   3:33  16-Feb-90   0
+PTYSER	MAC     7  *** (undated)   2:44  27-Apr-90   0
+QUESER	MAC    24  *** (undated)   3:34  16-Feb-90   0
+RDXSER	MAC     7  *** (undated)   4:51   8-Mar-90   0
+REFSTR	MAC    23  *** (undated)   2:51  15-Mar-90   1
+RPXKON	MAC    16  *** (undated)   2:04  31-Mar-90   0
+RTTRP	MAC    13  *** (undated)   7:03  17-Feb-90   0
+S	MAC    53  *** (undated)   6:47  13-Apr-90   0
+SCHED1	MAC    55  *** (undated)   1:19  27-Apr-90   0
+SCNSER	MAC    84  *** (undated)   1:50  27-May-90   0
+SEGCON	MAC    66  *** (undated)   7:46  25-May-90   0
+STOPCD	MEM    28  *** (undated)   7:24   5-Jun-90   0
+SWPSER	MAC    10  *** (undated)   3:38  16-Feb-90   0
+SYSCHK	MAC    26  *** (undated)   3:38  16-Feb-90   0
+SYSINI	MAC    24  *** (undated)   6:33   8-Mar-90   1
+TAPSER	MAC    11  *** (undated)   3:39  16-Feb-90   0
+TAPUUO	MAC    33  *** (undated)   4:27   4-May-90   0
+TCXKON	MAC     9  *** (undated)   3:39  16-Feb-90   0
+TM2KON	MAC    12  *** (undated)   7:56  25-May-90   0
+TMPUUO	MAC     6  *** (undated)   3:40  16-Feb-90   0
+TMXKON	MAC    10  *** (undated)   4:32   4-May-90   0
+TOPA10	REL   259  *** (undated)   7:18   1-Jun-90  14
+TOPG10	REL   211  *** (undated)   8:52   1-Jun-90  14
+TOPH10	REL   220  *** (undated)   8:46   1-Jun-90  14
+TOPI10	REL   277  *** (undated)   6:59   1-Jun-90  14
+TOPW10	REL   316  *** (undated)   6:23   1-Jun-90  14
+TTDINT	MAC    11  *** (undated)   2:42  17-Feb-90   0
+TTYKA	MAC     3  *** (undated)   6:52   1-Jun-90   1
+TTYKI	MAC     3  *** (undated)   6:30   1-Jun-90   1
+TTYLGI	MAC     3  *** (undated)   7:42   1-Jun-90   1
+TTYLUG	MAC     3  *** (undated)   7:50   1-Jun-90   1
+TTYVL	MAC     3  *** (undated)   5:39   1-Jun-90   1
+TX1KON	MAC    19  *** (undated)   1:33  20-Apr-90   0
+UUOCON	MAC    98  *** (undated)   2:55  27-Apr-90   0
+VBCSER	MAC     7  *** (undated)   3:42  16-Feb-90   0
+BACKRS	MAC    71  *** (undated)  10:14   4-Sep-87   0
+BACKUP	CTL     2  *** (undated)  12:58   4-Sep-87   0
+BACKUP	EXE    27  *** (undated)   7:12   5-Aug-88  16	2(216)
+BACKUP	HLP     6  *** (undated)  13:07   4-Sep-87   0
+BACKUP	MAC    33  *** (undated)  10:14   4-Sep-87   0
+BKP2	DOC     5  *** (undated)   2:12   5-Jun-90   0
+ENDECR	MAC     2  *** (undated)   3:20  16-Sep-86   0
+ENDECR	REL     2  *** (undated)   4:29  23-Nov-86  14
+B114A	DOC     4  *** (undated)   5:18  30-Mar-90   0
+BOOT11	CTL     2  *** (undated)   6:46  31-Dec-86   0
+BOOT11	EXE     7  *** (undated)   5:52  19-Mar-88  16	4A(44)
+BOOT11	HLP     2  *** (undated)   9:33  13-Nov-86   0
+BOOT11	MAC    21  *** (undated)   9:54  13-Nov-86   0
+BOOT11	MEM     9  *** (undated)   2:09   3-May-90   0
+BDX2	DOC     2  *** (undated)   5:18  30-Mar-90   0
+BOOTDX	CTL     2  *** (undated)   3:01  23-Sep-88   0
+BOOTDX	EXE     8  *** (undated)   3:06  23-Sep-88  16	2(15)
+BOOTDX	HLP     2  *** (undated)  12:32   9-Dec-86   1
+BOOTDX	MAC    16  *** (undated)   3:22  30-Apr-88   1
+BOOTDX	MEM     5  *** (undated)   2:54   3-May-90   0
+DXMPA	A8      6  *** (undated)   1:46  20-Jun-89   0
+DXMPA	SEQ    70  *** (undated)   3:00  24-Jun-89   0
+BOOTM	CTL     2  *** (undated)  21:37  21-Feb-90   0
+BOOTM	EXB    ** (undated)  22:07  21-Feb-90  10
+BOOTM	MAC    22  *** (undated)   2:44   8-Feb-90   0
+BOOTM	RDI    13  *** (undated)  22:05  21-Feb-90  10
+BOOTM	REL     7  *** (undated)  21:38  21-Feb-90  14
+BTM4	DOC     4  *** (undated)   3:42  21-Mar-90   0
+DXD2	DOC     2  *** (undated)   5:31  30-Mar-90   0
+DXLD	CTL     2  *** (undated)  21:58  21-Feb-90   0
+DXLD	MAC     6  *** (undated)   3:54   5-Oct-89  17
+BOOTS	CTL     2  *** (undated)  22:46  21-Sep-88   0
+BOOTS	MAC    21  *** (undated)   2:38  23-Feb-90   0
+BT128K	EXB     4  *** (undated)  19:55  23-Feb-90  10
+BT256K	EXB     4  *** (undated)  18:23  23-Feb-90  10
+BTS22	DOC    10  *** (undated)   2:46  21-Mar-90   0
+CONVRT	EXE    10  *** (undated)   1:04   3-Apr-88  16	X
+MACSYM	UNV     8  *** (undated)   2:40   3-Jun-90  14
+NOPAG0	CTL     2  *** (undated)  23:30   1-Sep-88   0
+NOPAG0	EXE     3  *** (undated)   4:15  13-Sep-88  16	1(1)
+NOPAG0	MAC     3  *** (undated)   4:16  13-Sep-88   0
+NPG1	DOC     2  *** (undated)   4:59  30-Mar-90   0
+RSX3	DOC     2  *** (undated)   5:01  30-Mar-90   0
+RSXCMN	MAC     7  *** (undated)  16:00   6-Apr-88   0
+RSXFMT	HLP     3  *** (undated)   5:00  30-Mar-90   0
+RSXT10	CTL     2  *** (undated)  16:00  18-Apr-88   0
+RSXT10	EXE     7  *** (undated)  16:00  18-Apr-88   0	3(36)
+RSXT10	MAC    13  *** (undated)  16:00  18-Apr-88   0
+RSXTTL	MAC     5  *** (undated)  16:00  18-Apr-88   0
+WIBOOT	EXE     9  *** (undated)  21:46   8-Mar-90  16	6(12)
+WLBOOT	EXE    11  *** (undated)  21:46   8-Mar-90  16	6(12)
+WTB6	DOC     6  *** (undated)   5:50  12-Jun-90   0
+WTBOOT	CTL     3  *** (undated)  22:57  20-Sep-88   0
+WTBOOT	MAC     7  *** (undated)  21:46   8-Mar-90   0
+DAEMON	CTL     2  *** (undated)   7:07  31-Oct-89   0
+DAEMON	EXE    15  *** (undated)  22:10  14-Mar-90  16	16(612)
+DAEMON	MAC   108  *** (undated)   3:33  14-Mar-90   0
+DMN16	DOC    15  *** (undated)   0:51  21-Mar-90   0
+UUOSYM	UNV    15  *** (undated)   0:34  29-Apr-90  14
+DC76	BIN     5  *** (undated)   6:16  26-Dec-87  10
+DC76	CTL     2  *** (undated)   8:34   8-Jun-86  14
+DC76	P11    30  *** (undated)   6:33  28-Jun-88   0
+DC7621	DOC     4  *** (undated)   4:43   5-Jun-90   0
+DDT	CTL     3  *** (undated)   2:04  11-Feb-90   1
+DDT	EXE    21  *** (undated)   2:39  10-Feb-90  16	40A(250)
+DDT	MAC    86  *** (undated)   2:25  10-Feb-90   0	40A(250)
+DDT	REL    13  *** (undated)   2:38  10-Feb-90  14	40A(250)
+DDT40A	DOC    11  *** (undated)   7:16  16-Feb-90   0
+EDDT	REL    15  *** (undated)   2:36  10-Feb-90  14
+FILDDT	EXE     9  *** (undated)   2:40  10-Feb-90  16	40A(250)
+FTEDDT	MAC     2  *** (undated)  16:57  13-Apr-89   0
+FTFDDT	MAC     2  *** (undated)  16:58  13-Apr-89   0
+FTUDDT	MAC     2  *** (undated)  16:58  13-Apr-89   0
+FTVDDT	MAC     2  *** (undated)  16:58  13-Apr-89   0
+DTE2	DOC     5  *** (undated)   0:54  21-Mar-90   0
+DTELDR	CTL     2  *** (undated)   7:51  12-Dec-89   0
+DTELDR	EXE    11  *** (undated)   9:28  25-Oct-89  16	2(26)
+DTELDR	HLP     3  *** (undated)  17:00  11-Oct-89   0
+DTELDR	MAC    30  *** (undated)  17:00  11-Oct-89   0
+FE	CTL     2  *** (undated)   5:15   3-Jun-90   0
+FE	EXE    10  *** (undated)   5:17   3-Jun-90  16	2(47)
+FE	MAC    35  *** (undated)   0:38   5-Sep-88   0
+FE2	DOC     3  *** (undated)   5:20  30-Mar-90   0
+FEUIC	TXT     2  *** (undated)   8:25  10-Oct-88   0
+USEFE	MEM     4  *** (undated)   7:11   8-Mar-90   0
+FEFILE	EXE     5  *** (undated)   9:18  22-Jan-88  16	1(27)
+FEFILE	MAC     7  *** (undated)   9:17  22-Jan-88   0
+FEL1	DOC     3  *** (undated)   5:20  30-Mar-90   0
+FILDAE	CTL     2  *** (undated)  17:00  29-Aug-88   0
+FILDAE	EXE    14  *** (undated)  17:00   4-Sep-88   0	1(16)
+FILDAE	MAC    15  *** (undated)  17:00   4-Sep-88   0
+FILDAE	MEM    18  *** (undated)   7:49   3-May-90   0
+FLD1	DOC    11  *** (undated)   5:21  30-Mar-90   0
+FACTOR	MAC     6  *** (undated)  16:00  20-Jan-88   0
+LGN60A	DOC    17  *** (undated)   2:49  21-Mar-90   0
+LOGIN	COR     3  *** (undated)   1:58  16-Mar-90   0
+LOGIN	CTL     2  *** (undated)   0:27  18-Mar-90   0
+LOGIN	EXE    23  *** (undated)   1:17  16-Mar-90  16	60A(634)
+LOGIN	HLP     3  *** (undated)   0:44  18-Mar-90   0
+LOGIN	MAC    62  *** (undated)   1:50  16-Mar-90   0
+MACTEN	CTL     2  *** (undated)  17:00  11-Aug-86   0
+MACTEN	MAC    12  *** (undated)   7:17   9-Jul-88   0
+MACTEN	UNV     9  *** (undated)   7:19   9-Jul-88  14
+MCN2	DOC     6  *** (undated)   5:22  30-Mar-90   0
+MACROS	MAC     2  *** (undated)   5:53  15-Feb-90   1
+MACROS	UNV     2  *** (undated)   6:05  15-Feb-90  14
+MAKCH1	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH2	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH3	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH4	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH5	TST     5  *** (undated)  16:00   9-Dec-87   0
+MAKCH6	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH7	TST     2  *** (undated)  16:00   9-Dec-87   0
+MAKCH8	TST     5  *** (undated)  16:00   9-Dec-87   0
+MAKTLP	VFU     2  *** (undated)  16:00  19-Dec-87   0
+MAKTST	CTL     5  *** (undated)  17:00  25-Jun-88   0
+MAKVFU	CTL     3  *** (undated)   6:04  15-Feb-90   1
+MAKVFU	EXE     5  *** (undated)   6:05  15-Feb-90  16	1(17)
+MAKVFU	HLP     3  *** (undated)   6:05  15-Feb-90   0
+MAKVFU	MAC    23  *** (undated)   5:55  15-Feb-90   1
+NORMAL	VFU     2  *** (undated)   9:04   5-Sep-89   0
+TYPVFU	MAC     2  *** (undated)  16:00  27-Nov-87   0
+VFU1	DOC     3  *** (undated)   6:03  15-Feb-90   0
+OMOUNT	COR     2  *** (undated)  22:48  25-Aug-88   0
+OMOUNT	CTL     2  *** (undated)   1:25  18-Mar-90   0
+OMOUNT	EXE    16  *** (undated)   0:35  17-Mar-90  16	26B(110)
+OMOUNT	HLP     9  *** (undated)   9:10  10-Mar-75   1
+OMOUNT	MAC    84  *** (undated)   3:44  16-Mar-90   0
+OMT26B	DOC    17  *** (undated)   2:48  21-Mar-90   0
+REACT	CTL     2  *** (undated)  17:00  27-Aug-74  14
+REACT	EXE     9  *** (undated)   4:01  21-Apr-88  16	31(154)
+REACT	MAC    32  *** (undated)  16:00   2-Dec-86  14
+RCT31	DOC     5  *** (undated)   5:23  30-Mar-90   0
+SCD3	DOC     3  *** (undated)   1:58  21-Mar-90   0
+SCDSET	CTL     2  *** (undated)   5:13  15-Feb-90   1
+SCDSET	EXE    19  *** (undated)   5:18  15-Feb-90  16	3(10)
+SCDSET	FOR    18  *** (undated)   5:10  15-Feb-90   1
+SCDEXE	MAC     2  *** (undated)   2:29  15-Feb-90   1
+SCDSET	MEM     8  *** (undated)   1:50   4-Jan-90   0
+SYSDPA	EXE    11  *** (undated)   9:01  14-Sep-88  16	433(550)
+SYSDPB	EXE    11  *** (undated)   9:05  14-Sep-88  16	433(550)
+SYSDPY	CTL     2  *** (undated)   5:57  12-Aug-88   0
+SYSDPY	EXE    11  *** (undated)   8:56  14-Sep-88  16	433(550)
+SYSDPY	MAC    49  *** (undated)   5:04  17-Dec-87   0
+SYSDPY	MEM     2  *** (undated)   2:21   4-Jun-90   0
+SYSV52	EXE    11  *** (undated)   9:07  14-Sep-88  16	433(550)
+SYY433	DOC     4  *** (undated)   5:24  30-Mar-90   0
+SYSERA	EXE    43  *** (undated)   1:26   2-Apr-90  16	12A(1013)
+SYSERA	MAC    27  *** (undated)   7:49   1-Apr-90   0
+SYSERB	EXE    51  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERB	MAC    37  *** (undated)   8:14   1-Apr-90   0
+SYSERC	EXE    43  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERC	MAC    23  *** (undated)   8:15   1-Apr-90   0
+SYSERD	EXE    67  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERD	MAC    44  *** (undated)   8:16   1-Apr-90   0
+SYSERK	EXE    42  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERK	MAC    25  *** (undated)   8:17   1-Apr-90   0
+SYSERN	EXE    33  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERN	MAC    18  *** (undated)   8:18   1-Apr-90   0
+SYSERR	CTL     3  *** (undated)   5:24   3-Jun-90   1
+SYSERR	EXE    50  *** (undated)   1:26   2-Apr-90  16	12A(1013)
+SYSERR	HLP     4  *** (undated)   9:26   1-Apr-90   0
+SYSERR	MAC    12  *** (undated)   8:18   1-Apr-90   0
+SYSERS	EXE    60  *** (undated)   1:27   2-Apr-90  16	12A(1013)
+SYSERS	MAC    23  *** (undated)   8:18   1-Apr-90   0
+SYR12A	DOC    14  *** (undated)   1:08   2-Apr-90   0
+SYRLIB	MAC    43  *** (undated)   8:22   1-Apr-90   0
+SYRLIB	REL    13  *** (undated)   1:11   2-Apr-90  14
+SYRLOW	MAC     6  *** (undated)   8:22   1-Apr-90   0
+SYRLOW	UNV    23  *** (undated)   1:11   2-Apr-90  14
+SYRUNV	MAC    80  *** (undated)   8:23   1-Apr-90   0
+SYRUNV	UNV    39  *** (undated)   1:10   2-Apr-90  14
+SYF3	DOC     4  *** (undated)  10:14   4-Jun-90   0
+SYSINF	EXE     7  *** (undated)   3:34  11-Apr-88  16	3(270)
+SYSTAT	CTL     2  *** (undated)  13:31  28-Dec-86   0
+SYSTAT	EXE    14  *** (undated)  18:13  25-Aug-88  16	473(215)
+SYSTAT	HLP     2  *** (undated)   9:41  26-Oct-86   0
+SYSTAT	MAC    56  *** (undated)  18:05  25-Aug-88   0
+SYSTAT	MEM     3  *** (undated)   3:03   4-Jun-90   0
+SYT473	DOC     4  *** (undated)   5:25  30-Mar-90   0
+TWE4A	DOC     6  *** (undated)   2:47  21-Mar-90   0
+TWICE	CTL     5  *** (undated)  20:25  21-Feb-90   0
+TWICE	EXE    81  *** (undated)  21:50  21-Feb-90  16	4A(25)
+TWICE	MAC    15  *** (undated)  21:33  21-Feb-90   0
+USM13A	DOC     7  *** (undated)   1:58  21-Mar-90   0
+UUOSYM	CTL     2  *** (undated)   2:05  23-Feb-89   0
+UUOSYM	MAC    59  *** (undated)   0:30  29-Apr-90   0
+UUOSYM	REL    14  *** (undated)   0:33  29-Apr-90  14
+L680	PAL     3  *** (undated)  16:00  29-Mar-71  14
+L680	RIM     3  *** (undated)  16:00  29-Mar-71  14
+M680	MAC     8  *** (undated)   2:37  25-Jan-87   0
+P680	PAL    20  *** (undated)  17:00   9-Jun-71  14
+X680	BIN     8  *** (undated)   2:40  25-Jan-87  10
+X680	OPR     2  *** (undated)  17:00   1-Jun-71  14
+X6801A	DOC     3  *** (undated)   5:16  30-Mar-90   0
+QERROR	FRM     2  *** (undated)   2:32  23-Dec-88   0
+DXMPA	BIN    15  *** (undated)   1:46  20-Jun-89  10
+
+  Total of 6574 pages in 338 files
+
+  BACKUP  end  save set: 
+      by version 2A(312) at 14:42:11 on 21-Dec-78
+      written on MTB260: on S/N 1026 at 800 9-track
+      under TOPS-10 system 603A(20116):     RZ603A KL10 SYS#1026
+
+
+ suN}B
