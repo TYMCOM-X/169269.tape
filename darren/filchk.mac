@@ -1,0 +1,453 @@
+	TITLE	FILCHK - Checksum two files one page at a time
+	SUBTTL	Definitions
+
+	SEARCH	UUOSYM
+
+;Register equates
+
+	S=0
+	T1=1
+	T2=2
+	T3=3
+	T4=4
+	F=5
+
+	P=17
+
+; I/O channel equates
+
+	CH1=:1
+	CH2=:2
+	SUBTTL	Get file names and init channels
+
+ST:	JFCL
+	RESET
+	MOVE	P,[-PDLSIZ,,PDL-1]
+	SETZM	TWOFIL		;Initially assume only one file
+	MOVEI	T1,1
+	MOVEM	T1,NFILES
+	SKIPA
+F1INI:	  CLRBFI
+	MOVEI	F,F1LKB		;Point to lookup block
+	OUTSTR	[ASCIZ/
+File name(s): /]
+	PUSHJ	P,GETFNM	;Get file name from TTY, store in lookup block
+	  JRST	F1INI		;Illegal file name or some such, try again
+	MOVE	T1,[.CHOPN,,CH1]
+	CHANIO	T1,OPNARG	;Open a channel for this file
+	  JRST	OPNERR		;Die
+	HRLI	T1,.CHLK	;Set up args
+	CHANIO	T1,F1LKB	;Look up the file
+	  JRST	LKPERR		;Die
+	CAIE	T2,","		;Did GETFNM break on a delimiter?
+	  JRST	HDROUT		;No, one file only
+	SKIPA
+F2INI:	  CLRBFI
+	MOVEI	F,F2LKB
+	PUSHJ	P,GETFNM
+	  JRST	F1INI
+	MOVE	T1,[.CHOPN,,CH2]
+	CHANIO	T1,OPNARG
+	  JRST	OPNERR
+	HRLI	T1,.CHLK
+	CHANIO	T1,F2LKB
+	  JRST	LKPERR
+	SETOM	TWOFIL
+	AOS	NFILES
+
+; Both look-ups succeeded, write out header and start scanning files
+
+HDROUT:	MOVEI	T1,[ASCIZ /
+
+  Page		Checksum
+  ----		--------
+/]
+	SKIPE	TWOFIL
+	MOVEI	T1,[ASCIZ /
+
+  Page		File 1		File 2
+  ----		------		------
+/]
+	OUTSTR	(T1)
+	SETZM	FILPAG		;Init second word of .CHMFP arg block
+	MOVSI	T1,-1000	;Init left half of checksum AOBJN word
+	HLLZM	T1,CKSARG
+	MOVE	T1,.JBREL	;Highest word in low seg
+	ADDI	T1,777		;Round up
+	TRZ	T1,777		; to next even page boundary
+	HRRM	T1,CKSARG	;Right half of checksum AOBJN word
+	LSH	T1,-^D9		;Convert to page number
+	HRLI	T1,(1B7+1B17)	;Rest of .CHMFP arg (read-only, 1 page)
+	MOVEM	T1,MAPARG	;Store into first word of arg block
+	SETZM	EOF		;Clear EOF indicator for file 1
+	SETZM	EOF+1		; and for file 2
+	SETZM	CNSZER		;Init count of consecutive zero pages
+	SUBTTL	Main Program Loop
+
+LOOP:
+	MOVE	T1,[POINT 7,MSGBUF] ;Init the output message buffer pointer
+	MOVEM	T1,MSGPTR
+	AOS	T1,FILPAG	;Point to next page in file
+	PUSHJ	P,TYPDEC	;Type out T1 in decimal
+	SETZ	F,		;Index for first file
+	PUSHJ	P,MAPCKS	;Map, checksum, & type-out page
+	  JRST	MAPERR
+	SKIPN	TWOFIL
+	  JRST	LOOPB
+	MOVEI	F,1		;Index for second file
+	PUSHJ	P,MAPCKS
+	  JRST	MAPERR
+LOOPB:	MOVE	T2,CNSZER	;Count of consecutive zero pages
+	SKIPE	TWOFIL
+	  LSH	T2,1		;Adjust for number of files
+	CAIGE	T2,2		;Seen at least two per file?
+	  JRST	LOOPN		;No, go flush msg buffer normally
+	MOVEI	T1,[ASCIZ /
+		  "
+/]
+	SKIPE	TWOFIL
+	  MOVEI	T1,[ASCIZ /
+		  "		  "
+/]
+	CAIGE	T2,3		;Seen at least three per file?
+	  OUTSTR (T1)		;Exactly two, indicate "same as before"
+	JRST	LOOPE		;Bypass normal message buffer flush
+LOOPN:
+	MOVEI	T1,15		;Carriage-return
+	IDPB	T1,MSGPTR	;Append to message buffer
+	MOVEI	T1,12		;Line-feed
+	IDPB	T1,MSGPTR	;Ditto
+	SETZ	T1,		;Append a null
+	IDPB	T1,MSGPTR	; for ASCIZ
+	OUTSTR	MSGBUF		;Type out line for this file page
+LOOPE:
+	MOVE	T1,NFILES
+	SKIPN	EOF(T1)		;End-of-file for first file?
+	  JRST	LOOP		;Not yet
+	SOJG	T1,.-2		;Check all files
+
+; End-of-file reached on all files, exit cleanly
+
+XIT:
+	MOVE	T1,[.CHREL,,CH1]
+	CHANIO	T1,		;RELEASE first file I/O channel
+	  JFCL
+	MOVE	T1,[.CHREL,,CH2]
+	SKIPE	TWOFIL
+	CHANIO	T1,		;Second file I/O channel
+	  JFCL
+	EXIT
+
+	SUBTTL	GETFNM - Get File Name from terminal
+
+GETFNM:
+	SETZM	.LKPPN(F)	;Clear out PPN in lookup block
+	SETZM	USRNAM(F)	;And user name string
+	SETZM	USRNAM+1(F)
+	HRROI	T1,.AXIWL	;INCHWL AUXCAL
+	AUXCAL	T1,T2		;Get char to T2
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Yes, give error return
+	CAIN	T2," "		;Leading blank?
+	  JRST	.-3		;Yes, skip over leading blanks
+	CAIE	T2,"("		;Start of user name?
+	  JRST	FNAME		;No, scan file name
+	MOVE	T3,[POINT 6,USRNAM(F)] ;Byte pointer to user name string
+	MOVSI	T4,-^D12	;Maximum chars allowed in user name
+GETUNM:
+	AUXCAL	T1,T2		;Keep INCHWL-ing
+	  POPJ	P,
+	CAIN	T2,15		;End-of-line?
+	  POPJ	P,		;Illegal here - give error return
+	CAIN	T2,")"		;End of user name?
+	  JRST	GETUN1		;Branch if yes
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - error return
+	IDPB	T2,T3		;Store into user name string
+	AOBJN	T4,GETUNM
+	AUXCAL	T1,T2		;This should be the close paren
+	  POPJ	P,		;Give error return
+	CAIE	T2,")"		;Is it?
+	  POPJ	P,		;Error return - user name too long
+GETUN1:
+	MOVEI	T3,USRNAM(F)	;Address of SIXBIT user name string
+	MOVEM	T3,.LKPPN(F)	;Store into lookup block
+; Parse file name
+
+FNAME:
+	SETZM	.LKNAM(F)	;Clear file name from lookup block
+	SETZM	.LKEXT(F)	;Also file extension
+	MOVE	T3,[POINT 6,.LKNAM(F)] ;Byte pointer to SIXBIT file name
+	MOVSI	T4,-6		;Max length of file name
+	SKIPN	.LKPPN(F)	;Was there a user-name specified?
+	  JRST	FNAME2		;If not, T2 has first char of file name
+FNAME1:
+	AUXCAL	T1,T2		;T1 still has INCHWL args
+	  POPJ	P,		;Give bad return
+FNAME2:
+	CAIE	T2,","		;Delimiter ?
+	CAIN	T2,15		;End of line?
+	  JRST	FNEXIT		;Yes, escape from this routine
+	CAIN	T2,"."		;End of file name?
+	  JRST	FEXT		;Yes, scan for extension
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Store next char of file name
+	AOBJN	T4,FNAME1	;Loop up to 6
+
+; Have scanned 6 chars of file-name, now look for "." or c-r,
+; ignoring intermediate blanks.
+
+	AUXCAL	T1,T2
+	  POPJ	P,
+	CAIN	T2," "
+	  JRST	.-3		;Ignore blanks
+	CAIE	T2,","		;Delimiter?
+	CAIN	T2,15		;Carriage return?
+	  JRST	FNEXIT		;Escape if so
+	CAIE	T2,"."		;Seperator?
+	  POPJ	P,		;No, give error return
+
+; Here to scan file extension
+FEXT:
+	MOVE	T3,[POINT 6,.LKEXT(F)]
+	MOVSI	T4,-3		;Max length
+FEXT1:
+	AUXCAL	T1,T2
+	  POPJ	P,		;Give error return
+	CAIE	T2,","
+	CAIN	T2,15		;End-of-line?
+	  JRST	FNEXIT		;Escape if so
+	PUSHJ	P,CVT726	;Convert 7-bit ASCII to SIXBIT
+	  POPJ	P,		;Illegal char - give error return
+	IDPB	T2,T3		;Add to file extension string
+	AOBJN	T4,FEXT1	;Loop up to 3 times
+	AUXCAL	T1,T2		; Next character after extension
+	  POPJ	P,
+FNEXIT:	CAIE	T2,","		;Unless we broke on a comma
+	  PUSHJ	P,FNDEOL	;Scan to end-of-line
+	SKIPE	.LKNAM(F)	;Did we actually get some sort of file-name?
+CPOPJ1:	AOS	(P)		;General purpose success return
+	POPJ	P,		;Error return
+
+FNDEOL:	INCHWL	T2
+	  JFCL
+	CAIE	T2,12
+	  JRST	FNDEOL
+	POPJ	P,
+
+; Routine to fold lower-case ASCII to upper case and convert to SIXBIT
+; Entered with char in T2, no other AC's used.
+
+CVT726:
+	CAIL	T2,40		;Check for legal range for SIXBIT conversion
+	CAILE	T2,"z"
+	  POPJ	P,		;Give error return
+	CAIL	T2,"a"		;Within range of lower-case
+	ADDI	T2,"A"-"a"	;Fold to upper case
+	SUBI	T2,40		;Adjust to SIXBIT character codes
+	ANDI	T2,77		;And leave only six bits
+	JRST	CPOPJ1		;Give good return
+	SUBTTL	MAPCKS - Map a page and checksum it
+
+; Entered with F=index of file to look at, MAPARG set up to 
+; appropriate VM page and file page.
+
+MAPCKS:
+	SETZM	CKSUM(F)	;Clear out old checksum
+	SKIPE	EOF(F)		;Have we reached end-of-file yet?
+	  JRST	TYPCKS		;If so, just do type-out
+	MOVE	T1,[.CHMFP,,CH1
+		    .CHMFP,,CH2](F) ;Arg for Map File Page CHANIO call
+	CHANIO	T1,MAPARG	;Map file page to VM page
+	  JRST	MFPERR
+	MOVE	T1,CKSARG	;AOBJN word for looping through page
+	SETZB	T2,T3		;Accumulate checksum here
+	SETZM	NONZER		;Set to -1 if page has any non-zero data
+ILP:	SKIPE	T3,(T1)		;Load next word of page
+	SETOM	NONZER		;Indicate non-zero data in page
+	ROT	T2,7
+	XOR	T2,T3
+	AOS	T2
+	AOBJN	T1,ILP
+
+;Now convert to six-character string
+
+	SKIPE	NONZER		;Skip if zero page
+	  JRST	MAPCKN
+	PUSHJ	P,TYPZER	;Put "<zero>" in message buffer
+	JRST	MAPCKX
+MAPCKN:
+	MOVMS	T2		;Make sure always positive
+	MOVE	T1,[POINT 6,CKSUM(F)]
+	PUSHJ	P,CONS
+	PUSHJ	P,VOWL
+	PUSHJ	P,CONS
+	PUSHJ	P,CONS
+	PUSHJ	P,VOWL
+	PUSHJ	P,CONS
+	PUSHJ	P,TYPCKS	;Copy checksum into message buffer
+MAPCKX:	MOVE	T1,MAPARG	;Same format for VREMOV as for Map File Page
+	VREMOV	T1,
+	  POPJ	P,
+	JRST	CPOPJ1
+
+; Handle whatever Map File Page errors we can
+MFPERR:
+	TLZ	T1,-1		;Clear all but error code
+	CAIE	T1,FLPHP%	;Past end-of-file?
+	  JRST	MAPER1		;No ,check others
+	SETOM	EOF(F)		;Flag end-of-file seen for this file
+	PUSHJ	P,TYPEOF	;Just type "<EOF>"
+	JRST	CPOPJ1		;And give good return
+MAPER1:
+	CAIE	T1,FLHOL%	;Is this page a hole?
+	  POPJ	P,		;No, give bad return for other errors
+	PUSHJ	P,TYPHOL	;Type "<HOLE>"
+	JRST	CPOPJ1		;Give good return
+
+; CONS - extract a SIXBIT consonant from what remains of checksum
+CONS:
+	IDIVI	T2,^D25		;Remainder in T3
+	MOVEI	T3,41(T3)	;Add to SIXBIT "A"
+	MOVSI	T4,-5		;Make sure it's not a vowel
+	CAMN	T3,VOWT(T4)
+	  JRST	.+3
+	AOBJN	T4,.-2
+	SKIPA			;Skip if not any vowel
+	MOVEI	T3,66(T4)	;If vowel, convert to consonant >"V"
+	IDPB	T3,T1		;Append to CKSUM string
+	POPJ	P,
+
+;VOWL - extract a SIXBIT vowel from remainder of checksum
+VOWL:	IDIVI	T2,5
+	MOVE	T3,VOWT(T3)
+	IDPB	T3,T1
+	POPJ	P,
+
+VOWT:	41	;SIXBIT "A"
+	45	;"E"
+	51	;"I"
+	57	;"O"
+	65	;"U"
+	SUBTTL	Miscellaneous type-out routines
+
+; Type "<EOF> " instead of checksum
+TYPEOF:
+	SETZM	CNSZER		;EOF is not a zero page
+	MOVE	T2,[POINT 6,[SIXBIT /<EOF> /]]
+	JRST	TYPCK1
+
+; Type "<HOLE>tead of checksum
+TYPHOL:
+	SETZM	CNSZER		;A hole is not a zero page
+	MOVE	T2,[POINT 6,[SIXBIT /<HOLE>/]]
+	JRST	TYPCK1
+
+; Type "<ZERO>" instead of checksum
+TYPZER:
+	AOS	CNSZER		;Bump count of consecutive zero pages
+	MOVE	T2,[POINT 6,[SIXBIT /<ZERO>/]]
+	JRST	TYPCK1
+
+; Copy SIXBIT checksum from CKSUM(+1) into message buffer
+TYPCKS:
+	SETZM	CNSZER		;Must be non-zero page, clear count
+	MOVE	T2,[POINT 6,CKSUM(F)]
+TYPCK1:
+	MOVEI	T1,"	"	;Tab
+	IDPB	T1,MSGPTR
+	IDPB	T1,MSGPTR	;Two of them
+	MOVSI	T1,-6		;Loop counter
+	ILDB	T3,T2
+	ADDI	T3,40		;Convert to ASCII
+	IDPB	T3,MSGPTR
+	AOBJN	T1,.-3		;Loop
+	POPJ	P,
+
+; This routine "types out" (copies into message buffer) a number
+; passed in T1, converted to decimal ASCII, with leading zeroes
+; converted to blanks, in a six-column field.
+
+TYPDEC:
+	MOVSI	T3,-6		;Width of field
+	IDIVI	T1,^D10		;Get next-lowest-order remainder into T2
+	PUSH	P,T2		;Remember it
+	AOBJN	T3,.-2		;In fact, remember six of them
+
+	MOVSI	T3,-6
+	SETZ	T1,		;=0 indicates convert zeroes to blanks
+
+TYPD1:	POP	P,T2		;Get next-highest-order digit
+	SKIPGE	T1		;Convert zeroes?
+	  JRST	TYPD2		;No
+	SKIPE	T2		;Yes, is this a zero?
+	  TLOA	T1,-1		;No, turn off zero-conversion
+	TROA	T2," "		;Convert leading zero to blank
+TYPD2:	  ADDI	T2,"0"		;Convert to ASCII
+	IDPB	T2,MSGPTR	;Append to message buffer
+	AOBJN	T3,TYPD1
+	POPJ	P,
+
+	SUBTTL	Error message routines
+
+OPNERR:	OUTSTR	[ASCIZ /
+Error on OPEN for channel
+/]
+	JRST	XIT
+
+LKPERR:	OUTSTR	[ASCIZ /
+LOOKUP error for file
+/]
+	JRST	XIT
+
+MAPERR:	OUTSTR	[ASCIZ /
+Error on MAP or VREMOV
+/]
+	JRST	XIT
+	SUBTTL	Pure storage
+
+OPNARG:	0
+	SIXBIT	/DSK/
+	0
+
+	LIT
+	SUBTTL	Impure storage
+
+F1LKB:	PHASE	0
+.LKNAM:	0
+.LKEXT:	0
+.LKPRT:	0
+.LKPPN:	0
+USRNAM:	BLOCK	2
+	DEPHASE
+	LKBLEN=.-F1LKB
+
+F2LKB:	BLOCK	LKBLEN
+
+MAPARG:	0		;First word of Map File Page arg block, also
+			; used for VREMOV call
+FILPAG:	0		;Second word of Map File Page arg block
+
+TWOFIL:	BLOCK	1
+NFILES:	BLOCK	1
+	
+EOF:	BLOCK	2
+
+CKSUM:	BLOCK	2
+
+CKSARG:	0		;AOBJN word for looping through file page
+
+CNSZER:	0		;Count of consecutive zero pages, to avoid
+			; typing out a long string of them
+NONZER:	0		;Flag indicating current page is non-zero
+
+	PDLSIZ=40
+PDL:	BLOCK	PDLSIZ
+
+MSGPTR:	0
+MSGBUF:	BLOCK	20
+
+	END	ST
+ ! š
