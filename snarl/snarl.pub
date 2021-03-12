@@ -1,0 +1,2069 @@
+.Nojust;
+.StandardSpacing_1;
+.Journal;
+.UnderlineBetween (~~,~);
+.Page Frame 60 High 77 Wide;
+.Area Text Lines 4 to 57 Chars 6 to 77;
+.Title Area Heading Lines 1 to 3;
+.Title Area Footing Line 60;
+.Place Text;
+.MarginHeadings_true;
+.Device TTY;
+.Single Space;
+.Preface 1;
+.BlankLine;
+.Next Page;
+.Crown(0,0,0);
+.TitlePage $(
+.Begin Center;
+#############
+.skip 15;
+SNARL External Specification
+.skip 2;
+{Month} {Day}, {Year}
+.skip 20;
+Systems Technology Division
+.skip 2;
+Tymshare, Inc.
+.End;
+.)$
+.Skip To Column 1;
+.Sec Introduction, geninfo:
+
+SNARL, which stands for Store Now And Retrieve Later, is a program
+on the TYMCOM-X that is designed to be used
+for backup storage and
+retrieval of disk files to and from magnetic tape.  It is
+primarily intended to be used by Tymshare operators
+as a replacement for the existing TITO program,
+to perform the daily system backups and less frequent
+total system saves.
+It does, however, handle small transfers as well.
+SNARL is also useful for moving large quantities of files from one
+system to another.
+.Skip 1; Continue;
+The main considerations in the design of SNARL were the following:
+.List (-4,8,0,"a)");
+.Item;
+Maximize the speed of large scale file transfers, such as
+the daily backups.
+.Item;
+Maintain adequate error tracking such that large scale
+transfers may easily be restarted.
+.Item
+Make it possible for an operator to read tapes that have
+bad portions and discover how much and what has been lost.
+.Item;
+Take advantage of the paging file system.
+.Item;
+Provide maintainable software.
+.Endlist;
+
+NOTE:  Related information about the TYMCOM-X system may be found in the
+TYMCOM-X XEXEC Reference Manual
+and the
+TYMCOM-X System Calls Reference Manual (YAMM).
+For documentation about the TITO program,
+see the TITO User's Guide.
+.Skip To Column 1;
+.Sec Getting Started;
+.Ind Getting started
+
+From the EXEC level, type "R SNARL" to execute the program.  SNARL will
+print a short heading which includes its version number, the time and date,
+the system number, and
+the Monitor version number.  It will then ask for
+the name of the tape device to be used, and print a ">>" prompt for
+a reply.  Respond by typing the name of
+any magnetic tape device, followed by a carriage return.
+SNARL will print the number of tracks on
+the selected device and then prompt for a density setting.  The
+density should be a decimal number that is a legal setting for
+the device.  When SNARL is ready to accept a command, it will print the prompt
+character ">".  In this example and the ones that follow,
+user input is underlined (if the device on which the document is printed
+supports underlining).  A carriage return is assumed at the end of
+the input.
+.ByHand;
+
+.Group;
+Example:  -~~R SNARL~
+
+          SNARL (V1.0) here at 9:08 16 MAR 79
+          SYSTEM C30-P033/Q
+          DEVICE  >>~~FTA1~
+          TRACKS:  9
+          DENSITY (800,1600)  >>~~1600~
+          TAPE NOT WRITE PROTECTED
+
+	  >   (SNARL is now ready to accept commands)
+.EndHand;
+.Apart;
+
+The operation of some of the commands is affected by user
+licenses.  Certain commands require specific licenses.  These
+conditions are noted within the individual command descriptions.  The
+minimum license is GD.
+
+Many of the commands depend upon having a SNARL-format tape mounted.  If
+the program believes that it is trying to read a non-SNARL tape, it
+will print one of the following messages:
+.ByHand;
+
+.Group;
+	This is not a SNARL tape!
+
+	This is not a SNARL tape -- probably a TITO tape.
+.EndHand;
+.Apart;
+.Skip To Column 1;
+.Sec SNARL Commands, comformats:
+.Ind SNARL commands
+
+.Ss Command Overview;
+.Ind Command overview
+
+This section briefly summarizes the SNARL commands.
+
+SNARL will perform file transfers between disk and tape according
+to operating modes that can be set by the user.  Mode switch
+setting is performed by the following commands:
+.ByHand;
+
+.Group;
+   MODE            Print or print and set switch values
+   OLD             Print or set OLD switch
+   SYS             Print or set SYS switch
+   RPRINT          Print or set RPRINT switch
+   SPRINT          Print or set SPRINT switch
+   REELSET         Print or set REELSET switch
+   FILREP          Print or set DSKREP switch
+   TTYREP          Print or set TTYREP switch
+.Apart;
+
+.EndHand;
+Before a tape can be written on by SNARL, it must be
+initialized with one of the following commands:
+.ByHand;
+
+   NEW TAPE        Initialize to store at the beginning of the tape
+   APPEND          Initialize to store at the logical end of the tape
+
+.EndHand;
+The commands that request the actual file transfers
+are:
+.ByHand;
+
+   STORE           Stores files from disk to tape
+   RETRIEVE        Retrieves files to disk from tape
+   GET             Retrieves files to "gfd" directory of the SNARL user
+
+.EndHand;
+Information about a tape can be obtained with one of the
+following commands:
+.ByHand;
+
+   DIRECTORY       Reads a SNARL tape and prints its directory
+   WHERE           Prints last tape position scanned
+
+Other tape-related commands are:
+
+   CUT AFTER       Make the logical end of tape after a specified file
+   REWIND          Rewind with or without wait
+   UNLOAD          Unload tape with or without wait
+   DEVICE          Open a new tape device
+   TID or TAPEID  Change the TID (tape identifier) of the current tape
+
+These commands provide help and program information:
+
+   HELP            Briefly describes all commands or a specified command
+   ?               Like HELP, only briefer
+   INSTRUCTIONS    Gets a disk copy of this document
+   GRIPE           Allows the user to enter a gripe
+   NEWS            Prints the latest information about SNARL
+
+.Group;
+Other, miscellaneous commands are:
+
+   TRANSLATE       Translates user names for RETRIEVE
+   NO TRANSLATE    Cancels the translation table
+   COF             Changes output destination for next command
+   LOG             Sets up a transcript file of user interaction
+   NO LOG          Cancels use of the transcript file
+   COMMENT         A "do nothing" command to insert comments in the log
+   STOP            Stops the current operation cleanly
+   ABORT           Aborts the current operation
+   QUIT            Exits from SNARL
+.Apart;
+.EndHand;
+.Ss Command Formats;
+.Ind Command formats
+
+In the command descriptions in this document, the following
+conventions are observed.  Uppercase letters
+denote words that should be typed exactly as
+they appear.  Lowercase phrases denote variable information.  Quantities
+enclosed in
+brackets "[#]" are optional.  Choices appear as a column
+or are described separately in the text.
+
+Input to SNARL follows these rules:
+.List (-4,8,0,"a)");
+.Item;
+The command prompt for SNARL is ">".  When additional subcommands
+(interactions) are necessary,
+SNARL will use the prompt ">>".
+input.
+.Item;
+Command and keyword input is converted to uppercase before
+processing by SNARL.
+.Item;
+Keywords may be abbreviated to the least number of characters which
+assures uniqueness.
+.Item;
+A command may be continued on the next line if the character "&" is
+inserted in the current line just before the carriage return.  The
+problem this creates for the user is that only the current line
+may be edited.  To cancel an entire multiple line command
+in case of an error, the user must abort it with a CTRL-C or
+escape (see {SsRef useraborts}).
+.Item;
+Leading tabs and spaces at the beginning of a
+command and trailing tabs and spaces on all lines of a command will be
+ignored.
+.Item;
+User names entered in a command must be enclosed in parentheses
+"(#)" in order to be recognized.
+.Item;
+Project-programmer numbers (PPNs) entered in a command must be enclosed in brackets
+"[#]" in order to be recognized.
+.Item;
+Times and dates entered into SNARL and reported by SNARL are considered
+to be in the user's time zone.
+.EndList;
+.Ss  Mode Switch Setting Commands;
+.Ind Mode switch setting commands
+
+This section describes the switches that the user can modify
+and the associated commands.
+.ByHand;
+
+STORE switches:
+
+  SPRINT   Controls the printing during a STORE
+  REELSET  Controls the way continuation tape reels are numbered
+
+RETRIEVE switches:
+
+  OLD      Handles the selection of files during a RETRIEVE
+  SYS      Handles the selection of files in user name (SYS)
+  RPRINT   Controls the printing during a RETRIEVE
+
+Report sizes:
+
+  FILREP   Controls the width of reports sent to disk files
+  TTYREP   Controls the width of reports sent to the user's terminal
+.EndHand;
+.Sss MODE Command;
+.Ind MODE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	MODE [ALTER]						       *
+*								       *
+************************************************************************
+.Apart;
+.EndHand;
+
+The MODE command allows the user to print the values of
+all the user-settable switches or examine and modify them
+interactively.
+The simplest form of the command, "MODE", causes the
+current switch settings to be printed at the user's terminal.
+nd;
+
+.Group;
+Example:  >~~MODE~
+          STORE switches:
+            SPRINT:   USERS
+	    REELSET:  1
+	  RETRIEVE switches:
+            OLD:      NEWEST
+            SYS:      CONFIRM
+            RPRINT:   FILES
+	  report sizes:
+	    FILREP:   WIDE
+	    TTYREP:   NARROW
+.EndHand;
+.Apart;
+
+The use of the ALTER option allows the user to change any
+of the values interactively.  SNARL prints each
+value and asks for a replacement.  A carriage return
+causes  the old value to be retained.
+.Group;
+.ByHand;
+
+Example:  >~~MODE ALTER~
+          STORE switches:
+            SPRINT:   USERS    -NEW VALUE  >>
+	    REELSET:  1        -NEW VALUE  >>
+	  RETRIEVE switches:
+            OLD:      NEWEST   -NEW VALUE  >>~~CONFIRM~
+            SYS:      CONFIRM  -NEW VALUE  >>
+            RPRINT:   FILES    -NEW VALUE  >>~~USERS~
+	  report sizes:
+	    FILREP:   WIDE     -NEW VALUE  >>
+	    TTYREP:   NARROW   -NEW VALUE  >>~~WIDE~
+.Apart;
+.Group;
+
+          >~~MODE~
+          STORE switches:
+            SPRINT:   USERS
+	    REELSET:  1
+	  RETRIEVE switches:
+            OLD:      CONFIRM
+            SYS:      CONFIRM
+            RPRINT:   USERS
+	  report sizes:
+	    FILREP:   WIDE
+	    TTYREP:   WIDE
+.EndHand;
+.Apart;
+
+A more detailed explanation of the switches, their functions, and
+the possible values for each follows.
+
+.Crown(0,9,0);
+SPRINT###This switch controls the amount of statistics reporting
+done by SNARL during a STORE.  Values are:
+
+.Crown(9,18,0);
+TOTALS###Means print only the grand totals for the operation,
+that is, the total number of files copied.
+
+USERS####Instructs SNARL to print the total number of files for each
+user name along with the grand totals.  This is the default.
+
+FILES####Indicates printing of each file name as it is copied
+as well as user name totals and grand totals.
+.EndCrown;
+
+REELSET##This switch controls the numbering of new reels of tape
+during a storage operation.  The legal values for this switch are
+positive integers.  There is no reason to change the default
+value of this switch (=1) except when using more than one tape drive (and
+multiple copies of SNARL) to speed up a storage operation.  (NOTE:
+Multiple copy feature not planned for initial release.)  Reels are
+given numbers of the form "m-n" (read "m dash n") where "m" is the value of the REELSET
+switch and "n" is assigned by SNARL, starting with 1.  The maximum
+value of each is the largest integer that can be contained in a
+half word
+of storage.  See also {SecRef cont} and {SssRef multcopies}.
+
+OLD######When a file in any user name except (SYS) is found on
+both tape and disk during a RETRIEVE operation (that is, this is an
+OLD file), a decision must
+be made as to which one to put on the disk.  The possible values
+for this switch dictate the decision.
+.Crown(9,18,0);
+
+NEWEST###Indicates that the most recent file should be used, as
+determined by the creation date.
+
+DISK#####Indicates that the disk version of the file should
+always be used.  (Also DISC)
+
+TAPE#####Tells SNARL to use the tape version of the file
+in all cases.
+
+CONFIRM##Tells SNARL to ask for confirmation before writing over
+a disk file.  This is the default.
+.EndCrown;
+
+SYS######This switch works exactly like OLD for the files in user name
+(SYS).  Since (SYS) files are usually critical to the
+operation of the system, they have their own switch for
+protection.  The switch values and default value are the same as for OLD.
+
+RPRINT###This switch controls the statistics reporting
+done during a RETRIEVE.  The legal values and default value are the same
+as for SPRINT except that they apply to the transfer from tape
+to disk.
+
+FILREP###This switch controls the size of reports that are sent
+to disk files.  The possible values are:
+.Crown (9,18,0);
+
+WIDE#####Report is the size of wide line printer paper (about 120
+columns).  This is the default for FILREP.
+
+NARROW###Report will fit on 8 1/2 x 11 paper.
+.EndCrown;
+
+TTYREP###This switch controls the size of reports that are sent
+to the user's console or line printer.  The values are the same as
+for FILREP, and the default is NARROW.
+.EndCrown;
+.Sss Individual Mode Switch Setting Commands
+.Ind Mode switch setting commands;
+
+Each switch that can be viewed or modified using MODE can be more
+quickly manipulated with its own command.  These commands all have
+the following format:
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	switch command [new switch value]  			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+For viewing the current value, the command word alone is used;
+for changing
+the value, the command word and the new switch value must both be
+supplied.  Naturally, the command words are:
+.skip;
+.ByHand;
+.Group;
+	FILREP		SPRINT
+	OLD		SYS
+	REELSET		TTYREP
+	RPRINT
+.EndHand;
+.Apart;
+.skip;
+.Continue;
+and the switch values supplied with the command must be legal for
+the given switch.
+.Ss Tape Write Initialization Commands;
+.Ind Tape write initialization;
+.Sss NEW TAPE Command;
+.ByHand;
+.Ind NEW TAPE command
+
+.Group;
+************************************************************************
+*								       *
+*	NEW [TAPE] [[TID] tid number]				       *
+*	NEW [TAPE] [[TAPEID] tid number]			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+This command initializes the tape for writing at the beginning of
+the tape with file position 1.
+
+The TID or TAPEID of the tape (its library control number) is optional.  It
+can be used to verify that a tape being used is the one desired.  The
+performance of the NEW TAPE command depends upon the type of
+the tape that has been mounted and the TID parameter (or lack of it),
+as the following table illustrates.
+.ByHand;
+
+.Group;
+COMMAND   |  TAPE FORMAT  |  ACTION
+----------|---------------|---------------------------------------------
+NEW TAPE  |  Non-SNARL    |  Request confirmation of initialization
+          |               |    with no TID, and continue if confirmed.
+          |---------------|---------------------------------------------
+          |  SNARL tape   |  Request confirmation to reinitialize tape
+          |  with no TID  |    with no TID, and continue if confirmed.
+          |---------------|---------------------------------------------
+          |  SNARL tape   |  Ask user to enter TID for verification.
+	  |  with TID     |  Request confirmation before continuing.
+	  |		  |  Reinitialize tape with existing TID.
+----------|---------------|---------------------------------------------
+NEW TAPE  |  Non-SNARL    |  Request confirmation of initialization with
+with TID  |		  |    assignment of TID given in command.
+	  |		  |  Continue if confirmed.
+	  |---------------|---------------------------------------------
+	  |  SNARL tape   |  Request confirmation of initialization
+	  |  with no TID  |    with a TID assigned for the first time.
+	  |		  |  If confirmed, continue assigning TID given.
+	  |---------------|---------------------------------------------
+	  |  SNARL tape   |  If TID given matches existing one, then
+	  |  with TID     |    acknowledge and continue.
+	  |		  |  If TID's do not match, get confirmation
+	  |		  |    indicating the mismatch.
+	  |		  |  If confirmed, reinitialize assigning the
+	  |		  |    new TID given in the command.
+------------------------------------------------------------------------
+.Apart;
+
+.Group;
+Example:  >~~NEW~
+
+	  Initializing with no TID assigned.  OK to continue?  >>~~Y~
+
+	  Tape #1-1 created at  5:58 on  8 MAR 79 with no TID.
+
+Example:  >~~NEW TAPE TID 5750~
+
+	  This SNARL tape #1-1 was created on C38 at 15:57 on 31 FEB 79.
+	  Reinitializing with TID 5750 assigned for the first time.
+	  OK to continue?  >>~~N~
+
+	  NEW TAPE command aborted.
+.EndHand;
+.Apart;
+.Sss APPEND Command;
+.Ind APPEND command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	APPEND [[TID] tid.number]				       *
+*	APPEND [[TAPEID] tid.number]				       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The APPEND command rewinds the tape unless a CUT AFTER command
+has just been issued, advances to the logical end of the tape,
+and sets up for writing.
+
+The TID or TAPEID of the tape (its library control number) is optional.  It
+can be used to verify that a tape being used is the one desired.  The
+performance of the APPEND command depends upon the type of
+the tape that has been mounted and the TID parameter (or lack of it),
+as the following table illustrates.
+.ByHand;
+
+.Group;
+COMMAND  |  TAPE FORMAT  |  ACTION
+---------|---------------|----------------------------------------------
+APPEND   |  Non-SNARL    |  Illegal combination.
+         |---------------|----------------------------------------------
+	 |  SNARL tape   |  Confirm and continue.
+	 |  with no TID  |
+	 |---------------|----------------------------------------------
+	 |  SNARL tape   |  Ask user to enter TID for verification.
+	 |  with TID     |  Confirm and continue.
+---------|---------------|----------------------------------------------
+APPEND   |  Non-SNARL    |  Illegal combination.
+with TID |---------------|----------------------------------------------
+         |  SNARL tape   |  Confirm and continue, assigning new TID
+	 |  with no TID  |    given in command.
+	 |---------------|----------------------------------------------
+	 |  SNARL tape   |  If the TID given matches the existing one,
+	 |  with TID     |    then acknowledge and continue.
+	 |		 |  If the TID's do not match, request
+	 |		 |    confirmation indicating the mismatch.
+	 |		 |  If confirmed, assign new TID and initialize.
+------------------------------------------------------------------------
+.EndHand;
+.Apart;
+.Ss File Transfer Commands, transfercommands:
+.Ind File transfer commands
+
+The file transfer commands (STORE, RETRIEVE, GET) and the
+DIRECTORY command
+share a similar command structure.  Here is a "picture" of the
+command structure:
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	command word [modifiers] file list			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+For each of the file transfer commands and the DIRECTORY
+command, the file list
+parameter may consist of one of the following entities:
+.List (-4,8,0,"a)");
+.Item;
+The keyword "ALL".  This causes all files on disk to be saved
+(STOREd) or all files on the given set of tapes to be retrieved.  If
+a STORE command, files will be dumped according to alphabetic
+order of user names.
+.Item;
+A list of ranges of one or more octal global account numbers (GANs)
+preceded by the string "gan=", such as "gan=1-3,6,7-11" (to denote GANs
+1, 2, 3, 6, 7, 10, and 11) or "gan=20-E" (20 through the end).  All files
+in the designated GANs on the source device will be copied to
+the destination.
+.Item;
+A user and file list.  Each list item is a user designator
+optionally followed by a set of file names.  A user designator
+may be either a user name or a PPN.  For example:
+.skip;
+.ByHand;
+     [1,4],[11447,157776]SNARL.SAI,SNARL.SAV
+     (OPER), (GADOL)SNARL.SAV, (SGAVETTE)
+.EndHand;
+.skip;
+.Continue;
+If no files are specified for a user, all the files for
+that user are transferred.  Therefore, the first example above
+would transfer all files found for the user whose PPN is [1,4]
+and the files SNARL.SAI and SNARL.SAV for the user whose PPN
+is [11447,157776].  File names may contain the standard wild card
+characters "*" and "#", which cause the usual pattern matching.
+.Skip 1;
+.Continue;
+In the RETRIEVE command only, a user designator may consist of a
+pair such as "(BAKER)_(ABLE)", which causes files belonging to
+user (ABLE) on tape to be restored to user (BAKER) on disk.  Also,
+a file name pair, such as "SNARL.OLD_SNARL.SAI", may be used in
+place of a single file name to change the name of the file
+restored to disk from the name it carries on the tape (in this
+case SNARL.SAI on tape becomes SNARL.OLD on disk).
+.Item;
+A tape file position list.  This type of list is not valid for STORE
+but is acceptable as part of the other file transfer commands.  It
+consists of a list of ranges of one or more decimal file positions
+preceded by the string "pos=", such as "pos=1-7,20-30,99-E".
+.EndList;
+
+The file list is delimited by a space or tab.  Extra spaces may
+appear within the list, however, where they make sense.  There are
+no fixed limits on the length of the file list except for the limit on the
+amount of run-time storage that can be allocated to hold the
+information.
+
+The following modifiers are valid for the file transfer commands.
+
+.Crown (0,8,0);
+AFTER###This modifier must be followed by a date code
+expressed as HH:MM DD MON YR, where HH:MM is the time in hours
+and minutes, and DD MON YR is the day, month, and year.  Files
+to be accessed are restricted to those created after
+the specified time and date.  The time and date may be
+abbreviated.  If only HH:MM is given, the day, month,
+and year default to the current ones.  If only HH:MM DD is given,
+then the month and year default to the current ones.  If
+only HH:MM DD MON is given, the year defaults to the current one.
+
+BEFORE##This modifier must be followed by a date code as
+described for AFTER.  Files to be accessed are restricted to those
+created before the specified time and date.
+.EndCrown;
+
+For each of the file transfer commands, the following modifiers
+are valid when the "file list" is the keyword "ALL".
+
+.Crown (0,15,0);
+STARTING#WITH##This modifier must be followed by a user name
+and optionally a
+file name; it instructs SNARL to start the transfer
+with the specified user or user and file.
+
+ENDING#WITH####This modifier must be followed by a user name
+and optionally a
+file name; it instructs SNARL to terminate the transfer
+at the end of the specified user or file.
+.EndCrown;
+
+Other modifiers which are specific to individual commands
+are found in the the sections pertaining to the operation of
+those commands.
+.Sss STORE Command;
+.Ind STORE command;
+
+The STORE command is used to copy files from disk to tape.  The
+command structure is as described at the beginning of
+{SsRef transfercommands}.
+
+In addition to the modifiers already described, the following
+are valid for the STORE command:
+
+.Crown (0,13,0);
+TWICE########The entire file transfer operation will be performed twice.
+
+CHANGED######This causes files to be stored which do not have the
+"file dumped" bit on in the UFD.  Files that are accessed due to
+this modifier will have their "file dumped" bits set as
+they are stored.  Therefore the command "STORE CHANGED ALL"
+causes all files to be stored which have changed or have been
+created since the last such command was carried out (changes to
+a file clear the "file dumped" bit).
+
+INCREMENTAL##This modifier works the same as the CHANGED modifier
+with the exception that the "file dumped" bits are not set
+for the affected files.
+
+TODAY########This causes tape files to be assigned "today's" date
+(the day the program is run) rather than the date on the disk file.
+.EndCrown;
+
+The rules for the use of the STORE command are:
+
+.List (-4,8,0,"a)");
+.Item;
+Either the modifier CHANGED or the modifier INCREMENTAL may be
+used but not both.
+.Item;
+The file list may contain duplicate references to files, and the
+affected files are stored as many times as they are referenced.
+.Item;
+If the STARTING WITH modifier is used with a specific file name
+rather than a user name only, the files that will be STORED
+from the given directory are the named file and all others
+whose names are accessed from the directory after the named file.  This
+calls for a bit of caution since the directory is not considered to be
+in any particular order.
+.Item;
+The SNARL user must have OP license in order to use the
+modifiers ALL or CHANGED with the STORE command.
+.Item;
+For integrity, files being accessed by SNARL will be
+locked (exclusively entered) while they are being dumped to tape.  SNARL
+will report files on its log which it cannot open because they were
+already entered, so that users can be notified if it is necessary for
+them to make a special arrangement for that file.  Previous versions of
+this document indicated that such files were to be copied to scratch
+files, and the scratch files would be stored to tape.  I am
+convinced that this is a very bad idea.
+.Item;
+Temporary files will be ignored during a STORE.  These are defined as
+files that have the temporary bit turned on in the .RBLIC word of
+their lookup block.
+.EndList;
+.ByHand;
+
+Examples:  STORE ALL
+	   STORE CHANGED STARTING WITH (OPER) ALL
+	   STORE AFTER 10:00 19 MAR 79 (GADOL)
+	   STORE BEFORE 12:30 19 (GADOL)
+	   STORE AFTER 7:45 (GADOL)
+	   STORE INC ALL
+	   STORE TODAY TWICE (GADOL)*.PUB
+.EndHand;
+.Sss RETRIEVE Command;
+.Ind RETRIEVE command
+
+The RETRIEVE command is used to move files from tape to disk.
+The command structure is as described at the beginning of 
+{SsRef transfercommands}.
+
+In addition to the modifiers already described, the following is
+valid for the RETRIEVE command:
+
+.Crown(0,11,0);
+SETDUMPED##This causes the "dumped bit" to be set in the lookup
+blocks of all files restored to disk from tape during the
+RETRIEVE.  It should only be used during a system rebuild in order
+that the next backup not contain all the files on disk.
+.EndCrown;
+
+The rules for the use of the RETRIEVE command are:
+
+.List (-4,8,0,"a)");
+.Item;
+Files are moved according to the file list in the order in
+which they appear on the tape.
+.Item;
+Duplicate file references in the file list will not cause the
+affected files to be accessed more than once.
+.Item;
+RETRIEVE may be affected by the presence of entries in a translate
+table (see {SssRef translate}).
+.Item;
+The SNARL user must have OP and RF license to RETRIEVE a tape
+created using the STORE command with the ALL modifier or to
+perform user name translations.  During other retrievals, license should
+apply to tape file access in the same way that it applies to disk file
+access.  If files are to be put into
+directories other than the SNARL user's, WF license is needed.
+.Item;
+The
+tape is rewound before the command is executed.
+.Item;
+If retrieving a tape file that has the same name as a disk file,
+the tape file will be restored to disk in supersede mode (see
+TYMCOM-X  System Calls Reference Manual) unless storage on the affected
+directory is inadequate.  If storage is a problem, the file will be
+restored to a scratch file in a separate directory and then
+renamed by SNARL
+to the correct place.  The SNARL user will be notified that this is
+happening so that he or she can abort and skip the affected directory
+if problems persist.
+.EndList;
+.ByHand;
+
+Examples:  RETRIEVE (ADELE)_(GADOL)*.*
+	   RETRIEVE ALL STA (ABLE) END (BAKER)
+.EndHand;
+.Sss GET Command;
+.Ind GET command;
+
+The GET command functions the same as the RETRIEVE command except
+that it puts restored files into the SNARL user's file area.  Read
+files license is required to GET files of users in GANs other than
+the SNARL user's GAN.
+.Sss Handling of Sparse Files;
+.Ind Sparse files
+
+SNARL will make use of the page mapping features of the paging monitor
+to read and write files.  When storing a file on the tape, a marker
+will be put on the tape (EMP) to indicate a "hole" in the file as
+indicated by a page mapping call.  When restoring files from tape,
+the markers will be used to create a file on disk with the same "holes".
+.Sss System Rebuilds;
+.Ind System Rebuilds;
+
+A new procedure is suggested for full system rebuilds to conquer the
+problem of deleted files reappearing.  This is often the case when
+starting the rebuild with the last "all files".  Instead, the retrieval
+should be started with the latest incremental backup and working back
+to the "all files".  For the successive retrievals the DISK option to
+the OLD and SYS switches should be used so that only the files which
+have not already been retrieved will be read from the tape.  This method
+should also speed up disk recovery.
+.Sss Transfer of File Licenses;
+.Ind File licenses
+
+The transfer of file license will proceed according to the
+following rules:
+
+.List (-4,8,0,"a)");
+.Item;
+Files are stored on tape with complete information about the license
+that was assigned to the disk file.
+.Item;
+Licenses up to those that the operator has set will be restored to
+the disk file during a RETRIEVE command as long as the disk and tape
+user names and PPNs are the same.
+.Item;
+Licenses other than XC or HF will not be restored to the disk file
+during a GET or RETRIEVE if the disk and tape user names don't
+match;  instead SNARL will report the licenses it could not restore.
+.Item;
+All license restoration problems will be reported to the SNARL
+operator as well as to a file in a coded format.  (See
+{SssRef licenseproblems} and {AppRef licenseformat}.)
+.EndList;
+
+This scheme is much more restrictive than the one earlier proposed
+(which involved unconditional restoration of licenses as long as
+tape and disk user names matched).  It
+seemed preferable to restrict licensing in favor of a reporting
+scheme that could be extended at a later date to notify users and
+assist them with restoring licensing.
+.Ss Tape Information Commands;
+.Ind Tape information commands
+.Sss DIRECTORY Command, directory:
+.Ind DIRECTORY command
+
+The DIRECTORY command prints a listing of file names and positions
+on the tape.
+
+The structure of the DIRECTORY command is the same as that described
+for the file transfer commands.  Additional modifiers which are
+valid for this command only are:
+
+.Crown(0,10,0);
+CHECKSUM##This modifier tells SNARL to compute the checksums
+of the files it reports.  The algorithm used is the same as that
+employed in the CKSUM program.
+
+LIMITED###A limited directory listing using only the resident
+directory at the front of the tape is produced.  (See
+{AppRef dirformat}.)
+.EndCrown;
+
+The program proceeds for a normal directory (i.e., not LIMITED) in
+similar fashion to a
+RETRIEVE but lists each file name and position (INDEX)
+instead of transferring the files.  The
+tape is rewound before the command is executed.
+
+The directory listing contains a header indicating the TID,
+reel number, when it was first created, the system and monitor numbers,
+the version number of SNARL that wrote the tape, tape
+drive characteristics, and the time zone in which times
+will be reported.  The tape list follows with
+columns headed INDEX, FILE NAME, USER NAME, CREATION DATE,
+DATE WRITTEN, SIZE, WORD COUNT, and CHECKSUM (if requested).  The
+format is as follows when the WIDE report format is used:
+.Turn Off "}";
+.Byhand;
+
+.Group;
+COLUMNS      CONTENTS
+
+  0-5        File position number (INDEX) in decimal
+  8-13       File name			} These file specifications
+    14       "."			} come from the original
+ 15-17       File extension		} disk file from which the
+ 20-31       User name			} tape file was written.
+ 33-37       Creation time (user's time zone)
+ 39-47       Creation date (user's time zone)
+ 49-53       Time file written to tape (user's time zone)
+ 55-63       Date file written to tape (user's time zone)
+ 65-69       Allocated size of file in pages
+ 71-79       Word count of the file
+ 81-86       Checksum (if requested)
+
+.Apart;
+.EndHand;
+.Turn On "}";
+Column headings are repeated for each user, and the PPN
+and totals for each user are printed following the list of
+corresponding files.  On a NARROW listing, the time and date
+that the files were written to tape appear under the creation
+date for each file.
+
+A LIMITED directory will report only the contents of columns 0-31,
+since only the resident tape directory is used for the report.
+.Sss WHERE Command;
+.Ind WHERE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	WHERE							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The WHERE command causes SNARL to print on the user's terminal the last
+tape position scanned.
+.ByHand;
+
+.Group;
+Example:  >~~WHERE~
+	  The last complete file read from tape was
+	  (GADOL)SNARL.SAV at file position 78.
+.EndHand;
+.Apart;
+.Ss Other Tape-Related Commands;
+.Sss CUT AFTER Command;
+.Ind CUT AFTER command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	CUT AFTER file position				       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The CUT AFTER command allows the user to redefine the logical EOT
+(end of tape).
+
+The parameter is an integer describing the file
+position on the tape.  A tape directory lists these numbers.  It
+is the responsibilty of the user to determine the exact place that
+the tape should be "cut" by doing a directory or reading the file
+onto disk and checking it.  The file whose position is given will
+become the last file on the tape when the CUT is complete.
+.Sss REWIND Command;
+.Ind REWIND command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	REWIND [WAIT]						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The REWIND command rewinds the tape and normally returns control to the
+user immediately without waiting for completion.  If the WAIT option
+is included, REWIND will wait for completion before giving control
+to the user.
+
+A REWIND command issued after a STORE command "de-initializes"
+the tape.  It will be necessary to give an APPEND or NEW TAPE
+command before storing anything else on the tape.
+.Sss UNLOAD Command;
+.Ind UNLOAD command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	UNLOAD [WAIT]						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The UNLOAD unloads the tape and normally returns control to the
+user immediately without waiting for completion.  If the
+WAIT option is included, UNLOAD will wait for completion before
+giving control to the user.
+.Sss DEVICE Command;
+.Ind DEVICE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	DEVICE [device name [density]]				       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The DEVICE command can be used to read the characteristics of the
+current tape device or to change tape drives or the density setting
+of the drive.  Since device changes are dangerous, the previous
+values of the device name and density settings will be reinstated
+and the user notified
+unless this command is followed immediately by either a NEW TAPE
+command or an APPEND command.
+
+The simplest form of the command, "DEVICE", causes SNARL to print
+the characteristics of the current device.
+
+The user may not change the density unless the device is reassigned to
+a different drive.
+If the user supplies a density and device name, the new
+device is initialized with the specified density setting.
+
+If a device name only is given, SNARL will print the known
+characteristics of the device and prompt the user for
+the density setting.
+.ByHand;
+
+.Group;
+Example:  >~~DEVICE~
+          FTA0  800 BPI  7 TRACK
+
+Example:  >~~DEV FTA2~
+          TRACKS:  9
+          DENSITY (1600,6250)  >>~~6250~
+.EndHand;
+.Apart;
+.Sss TID or TAPEID Command;
+.Ind TID or TAPEID command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	TID [tid number]					       *
+*	    [DELETE]						       *
+*								       *
+************************************************************************
+*								       *
+*	TAPEID [tid number]					       *
+*	    [DELETE]						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The TID command allows the user to read or change the TID stored on
+the current SNARL tape.
+
+The simplest form of the command, "TID", causes SNARL to print the
+current TID value.
+If a TID number is supplied, that value will be stored on the
+tape as the new TID after an appropriate dialog takes place.
+If "DELETE" is used, the TID value on the tape will
+be deleted after an appropriate dialog takes place.
+
+The type of dialog that takes place depends upon the tape that
+has been mounted and the parameter to the TID command.
+.ByHand;
+
+.Group;
+COMMAND  |  TAPE FORMAT  |  ACTION
+---------|---------------|---------------------------------------------
+TID      |  Non-SNARL    |  Illegal combination.
+DELETE   |---------------|----------------------------------------------
+	 |  SNARL tape   |  Acknowledge and continue.
+	 |  with no TID  |
+	 |---------------|---------------------------------------------
+	 |  SNARL tape   |  Ask user to enter old TID for verification.
+	 |  with TID     |  If old TID is correct, then acknowledge and
+         |               |  continue, else confirm and continue.
+---------|---------------|---------------------------------------------
+TID with |  Non-SNARL    |  Illegal combination.
+tid num- |---------------|---------------------------------------------
+ber      |  SNARL tape   |  Confirm and continue.
+         |  with no TID  |
+	 |---------------|---------------------------------------------
+         |  SNARL tape   |  Acknowledge that desired TID is already set
+         |      with     |  on the tape.
+         |  matching TID |
+         |---------------|---------------------------------------------
+	 |  SNARL tape   |  Ask user to enter old TID for verification.
+	 |  with TID     |  If old TID is correct, then acknowledge and
+         |               |  continue, else confirm and continue.
+-----------------------------------------------------------------------
+.EndHand;
+.Apart;
+.Ss Help and Program Information Commands;
+.Sss HELP Command;
+.Ind HELP command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	HELP [command word]					       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+
+The HELP command by itself prints a command list with brief
+explanations.  If the optional command word parameter is included, a more
+detailed explanation of the indicated command is given.
+.Sss "Question Mark (?) Command";
+.Ind Question mark
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	? [command word]					       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The "?" command by itself prints a command list without explanations.
+If the optional command word parameter is included, a brief explanation of the 
+indicated command is given.
+.Sss INSTRUCTIONS Command;
+.Ind INSTRUCTIONS command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	INSTRUCTIONS						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The INSTRUCTIONS command gets the user a copy of this document.  The
+user will be asked for a file name where the information can be put
+for later printing or spooling.
+.Sss GRIPE Command;
+.Ind GRIPE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	GRIPE							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The GRIPE command allows the user to register complaints and
+suggestions.  SNARL will prompt for the message; any number of lines
+may be entered followed by a CTRL-D.
+.Sss NEWS Command;
+.Ind NEWS command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	NEWS							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The NEWS command prints the latest information on SNARL.  This
+is intended to be short, since program information will
+gradually be incorporated into this document.
+.Ss Miscellaneous Commands;
+.Sss TRANSLATE Command, translate:
+.Ind TRANSLATE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	TRANSLATE [user name substitution list]			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The TRANSLATE command is used to set up or add to a translation
+table for tape and disk user names.  The table is used only when
+performing a RETRIEVE request.
+
+The optional user name substitution list is a list of items separated
+by commas, where each item is of the form
+(username1)_(username2).  Translation is from username2 to username1.
+
+The word TRANSLATE by itself causes the contents of the current
+table to be displayed.
+
+These rules govern the use of translation tables:
+
+.List (-4,8,0,"a)");
+.Item;
+The translation table is used only when performing a RETRIEVE
+request.  The RETRIEVE will copy all the files indicated by its
+parameters, translating user names as indicated in the translate
+table.  A user name substitution implied in a parameter to the
+RETRIEVE command overrides a translation table entry with the same
+tape user name.
+.Item;
+The TRANSLATE command does not clear any table entries that may
+already exist; it adds to an existing table.
+.Item;
+The translation table is in effect until cleared by an UNTRANSLATE
+command.
+.Item;
+There will be no fixed limits on the length of translation tables
+except the limits on the amount of run-time storage that can be
+allocated to hold the necessary information.
+.EndList;
+.ByHand;
+
+Example:  TRANSLATE (ABLE)_(BAKER),(ABLE)_(CHARLIE)
+	  RETRIEVE ALL
+.EndHand;
+
+This example indicates that during a RETRIEVE, files of user
+names BAKER and CHARLIE will be restored to user ABLE on disk.  All
+other files will be retrieved from tape and restored on disk with
+no user name translation.
+.Sss UNTRANSLATE Command;
+.Ind UNTRANSLATE command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	UNTRANSLATE						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The UNTRANSLATE command cancels the current translation
+table.
+.Sss COF Command;
+.Ind COF command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	COF [TELETYPE] [output file name]			       *
+*	    [TERMINAL]						       *
+*	    [TTY     ]						       *
+*	    [LPT     ]						       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+Output from the DIRECTORY, STORE, RETRIEVE, and GET commands
+is normally sent to the user's terminal.  The output may be directed
+to a disk file instead of or as well as to the terminal or
+line printer by the COF (Change Output File) command.
+
+The keywords TERMINAL, TELETYPE, and TTY stand for the terminal.
+LPT stands for the line printer.
+
+The COF command with no parameters causes the current
+output destinations to be listed.  The output file name may include
+a user name or PPN.
+
+The output file and/or device remain the same until another
+COF command resets them.  The COF command
+clears the current values before setting up new ones.
+.Sss LOG Command;
+.Ind LOG command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	LOG transcript file name [ERRORS]			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The LOG command opens up a disk file to be used to log commands,
+user interaction, and errors pertaining to the SNARL run.  If
+"ERRORS" is specified, only the error information is reported
+to the file.  Reports from the DIRECTORY
+command are not included; they may be diverted to a file using the
+COF command.
+.Sss UNLOG Command;
+.Ind UNLOG command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	UNLOG							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+UNLOG cancels the use of the transcript file set up by LOG.
+.Sss COMMENT Command;
+.Ind COMMENT command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	COMMENT comment text					       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+COMMENT is a "do nothing" command which can be used for documentation
+purposes to annotate the hard copy or transcript of SNARL activity.
+.Sss STOP Command;
+.ByHand;
+.Ind STOP command
+
+.Group;
+************************************************************************
+*								       *
+*	STOP							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The STOP command is available only at keyboard interrupt time or during
+the continuation tape dialog.  See {SecRef cont} and
+{SsRef useraborts}.
+.Sss ABORT Command;
+.Ind ABORT command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	ABORT							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The ABORT command is available only at keyboard interrupt time. 
+See {SsRef useraborts}.
+.Sss QUIT Command;
+.Ind QUIT command
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	QUIT							       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The QUIT command is used to exit from SNARL.
+.Skip To Column 1;
+.Sec Continuation Tapes, cont:
+.Ind Continuation tapes
+
+When the files requested in a STORE command will not fit
+on one tape, SNARL will generate continuation tapes.  Each
+continuation tape will be assigned a new reel number.
+
+When the logical end of tape is reached, SNARL will print a
+message indicating the last file stored on the current reel.  Then
+SNARL will ask the user to enter a continuation command.  The legal
+responses at that point are:
+
+.List (-4,8,0,"a)");
+.Item;
+"?" or "HELP" to get a list of options;
+.Item;
+"STOP" to terminate the current operation at the end of the last
+complete file stored; or
+.Item;
+"CONTINUE" to continue the SNARL interaction and prepare for
+mounting the continuation tape.
+.EndList;
+
+If the command entered is "CONTINUE", SNARL will unload the
+current tape, notifying the user, and request that the next one
+be mounted.  The user will be prompted for another command.  One
+of the following may be entered:
+
+.List (-4,8,0,"a)");
+.Item;
+A "GO" command, which has this format:
+.skip;
+.ByHand;
+	GO [[TID] tape control number]
+	GO [[TAPEID] tape control number]
+.EndHand;
+.skip;
+.Continue;
+This tells SNARL that the next tape is mounted on the current drive
+and is ready to go.  The dialog that follows depends upon the
+type of tape mounted and the value, or lack of it, that is entered
+as a tape control number.  It is similar to what is done when a
+NEW TAPE command is processed.
+.Item;
+A magnetic tape drive name and optionally a density to change the
+current drive.  The format of this command is:
+.skip;
+.ByHand;
+	tape device name [density value]
+.EndHand;
+.skip;
+.Continue;
+If this response is used, SNARL will continue to prompt for
+commands until it gets a "GO".
+.EndList;
+.ByHand;
+
+.Group;
+Example:  FTA2  6250 BPI  9 TRACK
+	  Tape #1-1 ends with file (GADOL)SNARL.SAI.
+
+	  Please enter a continuation command.  >>~~CONT~
+	  Unloading the tape on FTA2.
+	  Please mount next tape and GO when ready.
+
+	  >>~~FTA3~
+	  FTA3  6250 BPI  9 TRACK
+
+	  >>~~GO TID 1032~
+	  Initializing with TID 1032 assigned.  OK to continue?  >>~~Y~
+
+	  Tape #1-2 created at 19:30 on 31 MAR 79 with TID 1032
+	  continues with file (GADOL)SNARL.REL.
+.EndHand;
+.Apart;
+
+When restoring from tape to disk, SNARL will ask the user
+to mount continuation tapes as needed.  The dialog is similar
+with the exception of the TID interaction, which is not needed.  The
+program will check some of the tape header information and the
+file position numbers on the continuation tape for consistency
+to make sure that it has the right tape.
+
+Changing the tape characteristics when starting a continuation tape
+is something that should be done with caution and only when
+necessary.  The operator should take care to
+label the stored tapes accordingly so that the same sequence may be
+used for a retrieval.  For ease of recovery of a large
+storage operation, this practice is NOT advised.
+
+The continuation tape feature is intended for use by operations for the
+daily backups.
+
+~~NOTE~:##Some re-design is needed on this feature.  The assumption has
+been that SNARL would not break files across tapes.  This must be done
+to accomodate the giant files which can be generated (particularly by
+MIS).
+.Skip To Column 1;
+.Sec Command Files, cfiles:
+.Ind Command files
+
+Command files may be used interchangeably with input from the
+terminal.  A command file may contain part of a command (such as a
+file list), a whole command, or multiple commands.  Command
+files may be nested.
+
+Command files are called at any point with the character "@"
+immediately followed by the command file name.  This construct must
+be distinguishable from any other input that may be on the
+line.  A command file name is expressed in the form
+.skip;
+.ByHand;
+     [user designator]file name
+.EndHand;
+.skip;
+.Continue;
+where the user designator may be a user name or a PPN.  There
+should be no spaces between the user designator
+and the file name.
+
+Following a command file call, new input will be read from the
+indicated file and echoed to the terminal until the end of the file
+is reached or another command file is called.  Since SNARL will
+ignore any line numbers that it finds in the input, command files
+may be created with any of the editors on the TYMCOM-X.
+
+The following rules and restrictions apply to the use of
+command files:
+.List (-4,8,0,"a)");
+.Item;
+Since the commands DEVICE and NEW TAPE tend to be variable,
+especially among different systems, and should always be used with
+caution, they will not be permitted within command files.
+.Item;
+Confirmation and interaction will always be done to/from the terminal.
+.Item;
+When an error or a user abort occurs
+during processing of commands in a command file,
+SNARL will terminate the processing of that command file and any
+others higher in the chain if calls were nested.
+.Item;
+Nesting is limited to a depth of ten command files.
+.EndList;
+.Skip To Column 1;
+.Sec Exception Handling;
+.Ind Exception handling
+.Ss User Aborts, useraborts:
+.Ind User aborts
+
+SNARL will trap on escapes (in XEXEC mode) or CTRL-C (in PDP-10 mode)
+and return the user to command level.  A limited subset of SNARL
+commands, prompted with the special character "!", will be
+available at interrupt time if a command execution
+was in progress.  They are:
+.ByHand;
+
+   SPRINT     Change printing options for STORE
+   RPRINT     Change printing options for RETRIEVE, GET
+   WHERE      Progress information about current data transfer
+   HELP       Help with available commands
+   ?          List of available commands
+   STOP       Stop the current operation cleanly
+   ABORT      Abort the current operation
+   CONTINUE   Continue with the current operation
+.EndHand;
+
+The STOP and ABORT commands will have different effects depending upon
+the operation that was in progress at the time of the abort.  In most
+cases, STOP and ABORT will cause the same behavior.  The
+general rules are:
+
+.List (-4,8,0,"a)");
+.Item;
+REWIND and UNLOAD can not be interrupted.
+.Item;
+Those commands that move tape will report the position when the tape
+is stopped (equivalent of the WHERE command).
+.Item;
+The STORE command will respond to a STOP by ending the tape as if
+everything had terminated normally after the last complete file
+stored  (i.e., a "CUT AFTER" is done before returning to the normal
+command level).  An ABORT will cause STORE to return to normal command
+level immediately without properly ending the tape.  The user will be
+warned when this happens and may always do a "CUT AFTER" if the
+current tape data is to be used.
+.Item;
+The RETRIEVE and GET commands will terminate immediately, leaving
+no partially retrieved files on the disk.
+.Item;
+Execution of a non-tape command will terminate, and the state of
+SNARL will be restored to what it was prior to the
+command.  However, it will probably not be possible
+in practice to abort any non-tape command.
+.Item;
+If an interrupt and subsequent abort occur
+while at command level or before command execution has been started,
+then the command buffers are cleared, and the user is returned to
+the normal command level.  The user will be advised of the action
+taken.
+.Item;
+If a command file was being processed, SNARL will bail out of all
+opened command files.
+.EndList;
+.Ss Bad Tape Recovery
+.Ind Bad tape recovery
+
+A maintenance program (DSNARL) will be developed, one of whose
+functions will be to recover (as much as possible) and copy bad
+tapes.
+.Skip To Column 1;
+.Sec Future Commands and Features
+.Ind Future commands
+
+This section is a discussion of some commands and features that will
+be implemented in a later version.  The descriptions here may lack
+some of the detail elsewhere in this document.
+.Ss Commands;
+.Sss BACKUP Command;
+
+This command would be used to do the daily system backups.  It would
+rely upon a stored schedule of the operations to be done each day,
+which might encompass a week's or month's worth of archiving.  The
+operator would need only give this command, and the appropriate
+command for that day would be executed.  OP license would
+be required.
+.Sss SCHEDULE Command;
+
+SCHEDULE is the complement to BACKUP.  It would allow viewing or
+changing the stored system backup schedule.  Manager license would
+be needed to change the schedule.
+.Sss ARCHIVE Command, archcom:
+.ByHand;
+
+.Group;
+************************************************************************
+*								       *
+*	ARCHIVE archive file name [CHECKSUM]			       *
+*								       *
+************************************************************************
+.EndHand;
+.Apart;
+
+The ARCHIVE command causes SNARL to create an archive disk file
+from a SNARL format tape.  The format is such that a data base could
+be loaded from the contents of this file.
+
+ARCHIVE will create an archive only of the whole tape and will optionally
+compute checksums of the files on tape.  Headings (as in the
+DIRECTORY format) are not written; the format of each record in the
+file is:
+.ByHand;
+
+.Group;
+COLUMNS      CONTENTS
+
+  0-5        File position number (INDEX) in decimal
+  8-13       File name
+    14       "."
+ 15-17       File extension
+ 20-31       User name
+ 33-37       Creation time (GMT)
+ 39-47       Creation date (GMT)
+ 49-53       Time file written to tape (GMT)
+ 55-63       Date file written to tape (GMT)
+ 65-69       Allocated size of file in pages
+ 71-79       Word count of the file
+ 81-95       PPN
+ 97-101      Reel number
+103-109      TID number
+111-116      Checksum (if requested)
+.EndHand;
+.Apart;
+.Ss Features;
+.Sss Archives for Daily Backups;
+
+It would be helpful for operations to have a data base or data bases
+that catalog the files stored on the current month's worth of
+daily backup tapes.  It would be reasonable to build an archive file
+(with the same format as would be produced by the ARCHIVE command)
+automatically while the STORE operation is in progress.  Then
+the results could be loaded into a data base upon completion.
+
+To have something truly useful, some additional data base
+programming would be necessary to make it easier for the operators
+to ask frequently used questions, such as "Where is the most recent
+copy of file x?".
+.Sss Restarting a STORE with CHANGED Modifier
+
+Building the archive file during STORE processing saves the information
+that is needed if it is necessary to restart a STORE that employed
+the "CHANGED" modifier.  Presently in TITO, the information as to which
+files have been dumped if such an operation is aborted is lost.  If
+the operator wishes to restart, he or she must use the "CREATED AFTER"
+modifier to be sure to pick up all the files that have
+changed, probably requesting more files than necessary.
+.Sss Using Multiple Copies of SNARL, multcopies:
+
+It will be possible to use multiple tape drives with multiple copies
+of SNARL to speed up a file transfer (in particular, a complete system
+dump or reload).  The STARTING WITH and ENDING WITH modifiers to the
+file transfer commands and the
+REELSET mode switch enable this possibility.
+.Ssss  During a STORE;
+
+The operator must start each transfer at the beginning of a user
+name.  A feature could be added to SNARL which would calculate the
+appropriate breakpoints based upon the sizes of the various
+user directories and the number of tape drives and copies of
+SNARL that could be run.  It is also necessary to get
+unique reel numbers
+assigned when multiple program copies are run.  The REELSET switch
+can be used to create unique reel numbers for tapes mounted on
+secondary drives.  In
+addition, a MULTIPLE switch for the STORE command could be used to tell
+SNARL to mark the last tape in the set as if it were to be continued.  This
+will allow the retrieval process to be smooth if only one copy of SNARL
+is used for the retrieval or a directory.
+.Ssss During a RETRIEVE;
+
+If restoring a tape set created with multiple drives, it
+will be easiest to use the same configuration used during the storage
+operation.
+.Sss Recovering Bad Tapes
+
+Among the features of a companion maintenance program for SNARL should
+be a means of recovering tapes.  This should include such functions as
+recreating the resident tape directory or tape header and recovering
+as much information as possible from tapes with bad portions.  The
+format of SNARL tapes is designed with these objectives in mind.  SNARL
+itself should report discrepancies when it finds them.
+.Sss Sort Options on Files
+
+Adding an option to sort files according to criteria such as creation
+time or alphabetic ordering of names is a possibility for consideration.
+.Sss Dummy User Names on Tape
+
+Allowing the user to translate user names during a STORE to a dummy
+user name on tape is another option to consider.  Such a feature would
+make it easy for the user to catalog or classify sets of files for
+quick retrieval.  For security purposes, it would probably be
+necessary to retain on tape the information concerning the original
+disk user name.
+
+Another possibility might be the creation of subcategories of a user's
+files.  Relationships could be established with other users' files by
+means of creating subcategories with the same name for files in several
+directories.
+.Sss Tape Descriptions
+
+Allowing the "labeling" of tapes with a description of variable
+length might be helpful.
+.Sss EXPERT Mode;
+
+Shorter messages and perhaps less interaction in some cases
+should be helpful to expert SNARL users.  The normal mode is what
+this document describes.
+.Sss License Restoration Problems, licenseproblems:
+
+Perhaps these could be reported to the individual account by a
+program that reads the file of license problems.
+
+To assist users in restoring license, a program like SETLIC could
+be set up to handle a list of file licensing commands that could
+be produced for individual users from the log of licensing
+problems.  Or perhaps a command file that would be used to run SETLIC
+could be produced from that log or during the SNARL data transfer.
+.Sss Storing Temporary Files;
+
+An option to STORE might be necessary to allow storing temporary files.
+.Sss DIRECTORY Command Extension
+
+It might be helpful to have the DIRECTORY command work consistently
+with the file transfer commands.  An additional modifier would
+cause SNARL to report the list of files that would be stored
+if the DIRECTORY command word were replaced with STORE.  An
+analogous modifier could cause a similar report from the tape,
+indicating the files that would be retrieved if the DIRECTORY
+command word were replaced by RETRIEVE.  Of course, the
+applicable file list parameters, including the full RETRIEVE set,
+would need to be accepted as part of the command.  A modifier to
+the STORE and RETRIEVE commands that would cause the file list
+from the most recent DIRECTORY command to be used could be added.
+
+Another method of implementing this might be the addition of a
+TEST command.  The command would consist of the word TEST followed
+by a complete STORE or RETRIEVE command.  The result of the TEST
+would be a file list.  Another command, such as EXECUTE could be used
+to carry out the STORE or RETRIEVE command included within the TEST.
+.Appendix Major Differences from TITO;
+.Ind TITO
+
+Many of the TITO commands have been retained in SNARL.  The
+major changes are as follows:
+.List (-4,8,0,"a)");
+.Item;
+The concept of a "saveset" is not retained in SNARL.
+.Item;
+SNARL will not retain backward compatibility with older
+tape formats such as TITO, TEX, or FAILSAFE.
+.Item;
+The following commands have changed or are no longer needed in SNARL.
+.ByHand;
+
+    MODE - operation of command has changed
+    SKIP - not needed
+    SKIP WRITE E - not needed, an APPEND should be done instead
+    FAILON - not needed
+    FAILOFF - not needed
+    PREALLOCATE - not needed, monitor does not support
+                  preallocation
+    NOPREALLOCATE - not needed
+    FLAGOFF - incorporated in the data transfer commands
+    NOFLAGOFF - incorporated in the data transfer commands
+    UPDATE - not needed, file mode decision made by SNARL
+    NOUPDATE - not needed, file mode decision made by SNARL
+.EndHand;
+.Item;
+The following commands are new:
+.ByHand;
+
+    OLD
+    SYS
+    RPRINT
+    SPRINT
+    FILREP
+    TTYREP
+    REELSET
+    LOG
+    UNLOG
+    COMMENT
+    GRIPE
+    NEWS
+    TID or TAPEID
+    STOP
+    ABORT
+.EndHand;
+.EndList;
+.Appendix SNARL Tape Format, tapeformat:
+.Ind SNARL tape format
+The tapes are oriented toward 36-bit words and are written
+using DEC compatible 7 and 9-track modes.  A
+tape is written as a single file composed of fixed-length large
+physical records each of which contains a set of logical
+records of various types.  The first word of each of these records
+is a descriptor with a half-word integer identifier in
+the left half and the count of the total number of words in the
+logical record in the right half.  This scheme should make tape
+searching fairly easy and allow for expandability of the types.  The
+various data records and their definitions are as follows:
+.ByHand;
+
+.EndHand;
+.Continue;
+A TAPE HEADER will be found at the beginning of each tape.  It
+will occupy a large physical block (the same size as all the others)
+with the unused portion of the block marked with a DUMMY record.
+.ByHand;
+
+         word 0:  HED,,count=17
+	 word 1:  the word SNARL in ASCII
+	 word 2:  SNARL version numbers
+	 word 3:  tape format number (to allow for changes)
+      words 4-5:  TID (in ASCII)
+	 word 6:  reel number (low order half > 1 if continuation)
+	 word 7:  time tape was created (GMT) in seconds since midnight
+	 word 8:  date tape was created (GMT) in DEC format
+	 word 9:  non-zero if a system backup tape; 0 otherwise
+	word 10:  density setting used when tape was created
+	word 11:  size of the other physical records
+    words 12-16:  system number and monitor version information
+
+
+.EndHand;
+A DIRECTORY HEADER will be found at the beginning of each physical
+record containing tape directory information.
+.ByHand;
+
+	 word 0:  DIR,,count=# of words of directory in this block
+	 word 1:  physical record number
+
+
+.EndHand;
+A RECORD HEADER will be found at the beginning of each
+non-directory physical record.
+.ByHand;
+
+         word 0:  RCD,,count=4
+         word 1:  record number
+         word 2:  position number of first file in record
+         word 3:  user PPN of first file in record
+
+
+.EndHand;
+LOOKUP records contain the information from the
+extended lookup of each file to be dumped.
+.ByHand;
+
+         word 0:  LOK,,count=5+lookup size
+         word 1:  position number of this file on the tape
+         word 2:  time file was written (GMT) in seconds since midnight
+         word 3:  date file was written (GMT) in DEC format
+  words 4-count:  the extended lookup information
+
+
+.EndHand;
+DATA records are used to hold file data, UFD entries, or
+MFD entries.
+.ByHand;
+
+         word 0:  DAT,,count
+  words 1-count:  the data words
+
+
+.EndHand;
+An EMPTY record is really not empty; it indicates a "hole"
+in the file (one or more pages of zeroes).
+.ByHand;
+
+         word 0:  EMP,,count=2
+         word 1:  number of contiguous zero pages
+
+
+.EndHand;
+An EOF (internal notation is FEO) record marks the end of a stored
+disk file.
+.ByHand;
+
+         word 0:  FEO,,count=1
+
+
+.EndHand;
+A BEGINNING OF USER marker indicates the beginning
+of the file storage for a particular user.
+.ByHand;
+
+         word 0:  BOU,,count=2
+	 word 1:  user PPN 
+      words 2-3:  user name (SIXBIT)
+
+
+.EndHand;
+An END OF USER marker indicates the end of the file storage
+for a particular user.
+.ByHand;
+
+         word 0:  EOU,,count=2
+	 word 1:  user PPN
+
+
+.EndHand;
+An END OF TAPE marker indicates the logical end of the data
+on a tape or set of tapes.
+.ByHand;
+
+         word 0:  EOT,,count=1
+
+
+.EndHand;
+A data CONTINUED marker indicates the end of data on this tape
+with more files to be found on continuation tapes.
+.ByHand;
+
+	 word 0:  CON,,count=1
+
+
+.EndHand;
+A DUMMY record is a filler which will be used to fill
+out a physical record in cases where it is not worth starting
+a new file (such as a few words before the physical end of
+tape).
+.ByHand;
+
+         word 0:  DUM,,count
+  words 1-count:  meaningless
+
+
+.EndHand;
+A UFD record marks the data record or records immediately
+following as UFD entries.
+.ByHand;
+
+         word 0:  UFD,,count=5+lookup size
+  words 1-count:  same as for LOK
+
+.EndHand;
+An MFD record marks the data record or records immediately
+following as MFD entries.
+.ByHand;
+
+         word 0:  MFD,,count=1
+  words 1-count:  same as for LOK
+.EndHand;
+.Appendix Directory Record Format, dirformat:
+.Ind DIRECTORY record format
+Having a limited tape directory resident on the SNARL tape allows
+for quicker scanning to determine what may be on a tape and faster
+access for individual files.
+
+The first two words of each directory record on a SNARL tape are
+the directory header words as described in {AppRef tapeformat}.
+The actual directory, which follows the directory header words,
+is composed of eight-word
+entries with the following format.
+.ByHand;
+
+	word 0:  position number
+	word 1:  physical record number
+	word 2:  word index
+	word 3:  PPN 
+     words 4-5:  user name (SIXBIT)
+     words 6-7:  file name (SIXBIT)
+.EndHand;
+.Appendix Special File LOOKUP Bits for SNARL, filebits:
+.Ind LOOKUP bits for SNARL
+
+The following bits in the .RBSTS word will be used or
+set by SNARL.
+
+.Crown(0,5,0);
+14#-#set (on UFD LOOKUP only) by SNARL if it
+finds a bad file in the corresponding directory while restoring
+files from tape.  The monitor will report files flagged as bad to
+the user when he or she logs in.
+
+21#-#read by SNARL and used during STORE commands when the file list
+is the keyword "ALL".  If this bit is set, SNARL will
+not dump the corresponding file.  If this bit is set in
+the lookup block of a UFD, SNARL will not dump any files
+in the corresponding user's directory.  The program DMPUFD
+may be used to set or clear the bit in the lookup block of one's own
+UFD.  This bit is currently used
+in the same way by TITO.
+
+32#-#set by SNARL if it finds the file bad while restoring
+from tape.
+.EndCrown;
+
+The following bits in the .RBLIC word will be used or set by SNARL.
+.Crown (0,5,0);
+#4#-#This is the "file dumped" bit.  It is set by SNARL on all
+files dumped during processing of the command "STORE ALL CHANGED"
+(with or without other modifiers).  These bits are normally cleared
+when a file is changed or created.
+
+#8#-#This is the temporary file bit.  It is also bit 23 of the
+status word returned by the .CHUFD UUO.
+.EndCrown;
+
+The following is obsolete.  If files are reported rather than copied
+when busy, bit 9 is not needed.
+.Crown(0,5,0);
+#9#-#This bit is used during a STORE when the file list is the
+keyword "ALL".  If the
+bit is on, SNARL will not copy the corresponding file
+for the purpose of dumping it to tape if the file is
+busy (entered).  This use of such a bit was requested by the
+MAGNUM group to insure the integrity of files that
+are dumped and could be used by other subsystems as well.
+
+.EndCrown;
+.Appendix License Problems File Format, licenseformat:
+.Ind License problems file
+
+The license problems file is used to report all problems with restoration
+of license during a RETRIEVE.  It is stored in the SNARL
+operator's directory as LICENS.XXX, where XXX is a three-digit number
+between 000 and 999.  The name is reported by SNARL when
+it starts the RETRIEVE.
+
+The file consists of six-word entries, each of which looks
+like the following:
+.ByHand;
+
+	 word 0:  PPN
+      words 1-2:  user name (SIXBIT)
+	 word 3:  file name (SIXBIT)
+	 word 4:  file extension (SIXBIT)
+	 word 5:  total file license bits (same as in lookup block)
+.EndHand;
+.EndCrown;
+.Standard Back;
+    s'3
