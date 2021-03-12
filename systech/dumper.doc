@@ -1,0 +1,782 @@
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+
+
+
+
+
+
+
+
+                               - SUMMARY -                                 
+
+
+
+DUMPER on TOPS-20 is the equivalent of TITO on TYMCOM-X. They are utility
+programs to save files on magnetic tapes from disk, and later to restore
+them to disk.
+
+
+DUMPER and TITO features:   
+
+     1)  incremental and weekly save
+     2)  file restoration
+     3)  wild cards for file specification
+     4)  minimum characters needed to be typed for commands
+
+
+DUMPER features which TITO lacks:    
+
+     1)  archive and migrate files
+     2)  can make tapes in interchange mode, which can be read by the
+         TOPS-10 BACKUP program
+     3)  user can give save set names for each set of tapes being
+         saved
+     4)  more file date selection options, for example, select files
+         whose last system write date is before the date and time
+         specified. The last system write date is the most recent
+         time the file was physically changed on disk. This change
+         includes copying the file.
+     5)  user can specify how many logical records per physical
+         record written on tape
+     6)  can interrupt an operation
+
+
+TITO features which DUMPER lacks:    
+
+     1)  can use indirect files as file specification
+     2)  tape directory includes tape positions for each file on
+         tape, faster file restoration
+     3)  user can specify the logical beginning and end of tape
+     4)  prompts user whether to continue saving files when
+         encountering tape write errors
+
+
+
+
+
+
+                                    1
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+
+
+
+             Comparison of Tymcom-X TITO with TOPS-20 DUMPER                   
+
+
+                                by Chia Wu
+                             October 28, 1982
+
+
+
+                           SECTION I - OVERVIEW                              
+
+
+
+
+access of TITO and DUMPER    
+
+     TITO can be run by typing "r TITO" at the monitor level in Tymcom-X,
+     DUMPER by typing "DUMPER" at the monitor level in TOPS-20.  A
+     privileged user on TOPS-20 is a user with operator or wheel
+     capability.  With privileges enabled, he/she can run DUMPER to backup
+     all user files; a non-privileged user can only save/restore files
+     he/she has access to.  Write file and get device license need to be
+     set before running TITO. If the user wants to save all system files,
+     systat and operator license also needed to be set before running
+     TITO.
+
+
+flavors of commands  
+
+     TITO's most common commands (STORE, RESTORE, GET and DIRECTORY) are
+     composed of three parts: verb, object and modifier to the objects;
+     the "modifier" equivalent in DUMPER are
+
+          1)  either commands by themselves which have to be input before
+              the verb.  For example, "*store all created after 10:10 10
+              OCT 82" in TITO is equivalent to in DUMPER:
+
+                   DUMPER> since 10-OCT-82 10:10
+                   DUMPER> save *.*
+
+          2)  or there are switches which act just like TITO's modifiers.
+
+     The objects and modifiers acceptable by TITO are on page 16-17 of
+     TITO USER'S GUIDE. The switches acceptable by DUMPER are in section
+     7.6 of TOPS-20 USER UTILITY GUIDE.
+
+
+Incremental and full-dump  
+
+     incremental refers to saving changed files. Doing a full-dump on TITO
+     is referred to as "all-file". Doing a full-dump on DUMPER is referred
+
+
+
+                                    2
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+     to as "full-dump". Full-dump saves all system files.  DUMPER's
+     incremental dump saves files which are modified since the previous
+     full-dump or incremental dump. TITO's incremental dump saves files
+     which are modified since the previous incremental dump.  In other
+     words, incremental dump is treated as part of full-dump by DUMPER but
+     not by TITO, so after a full-dump, there are generally more files to
+     be dumped using TITO than DUMPER.
+
+
+general command comparison  
+
+     DUMPER and TITO commands will be classified into
+
+          1)  action commands, which start, stop, interrupt or continue a
+              file operation
+          2)  status-setting commands, which set up the parameters for
+              action command
+          3)  tape-positioning commands, which positions the tape
+          4)  information commands, which type out information
+
+
+
+1) action commands
+
+-----------------------------------------------------------------------
+        function                        DUMPER          TITO
+-----------------------------------------------------------------------
+
+save disk file on tape                  save            store
+restore tape file to disk               restore         restore
+compare disk and tape files             check           !not available
+print directory of tape                 print           directory
+halt command operation                  ctrl/E          !not available
+continue command operation              continue        !not available
+exits to monitor level                  exit/quit       quit
+retrieve migrated or archieved files    retrieve        !not available
+
+
+
+2) status-setting commands
+
+-----------------------------------------------------------------------
+        function                        DUMPER          TITO
+-----------------------------------------------------------------------
+
+transfer files whose last user written  before          !not available
+   date is before the date and time
+   specified. The last user written date
+   is the most recent time the user
+   changed the actual data of the file
+transfer files whose last user access   abefore         !not available
+   is before the date and time
+   specified. The last access date is
+   the most recent time the files was
+
+
+                                    3
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+   typed, printed, or read, but not
+   modified
+transfer files whose last system write  mbefore         !not available
+   date is before the date and time
+   specified. The last system write
+   date is the most recent time the file
+   was physically changed on disk. This
+   change includes copying the file
+transfer files whose last user written  since           /modifier
+   date is later than the date and time                 created after
+   specified
+transfer files whose last system write  msince          !not available
+   date is later than the time and date
+   specified
+tape version overwrites disk version    supersede       mode tape
+prints directory names on terminal      directories     mode users
+assume directory in failsafe format     !not available  failon
+assume directory in TITO format         !not available  failoff
+prints out file specification on        files           mode files
+   terminal
+produce log file                        list            directory
+equivalent to the command no dir/files  silence         !not available
+restore to the user directory or the    account         get
+   directory on tape
+restore with system or tape protection  protection      *by default
+   code
+density of tape (bits/inch)             density         device
+write tape that can be read by earlier  format          !not available
+   DUMPER
+read/write tapes to be read by the      interchange     !not available
+   TOPS-10 BACKUP program
+set parity to be even or odd            parity          !not available
+identifies the mounted tape             tape            device
+compatible 36-bit industry mode         industry        !not available
+set # logical records/physical records  set blocking-   !not available
+   on tape                              factor
+saveset header name                     ssname          !not available
+include checksum when a list of saved   checksum        *by default
+   files is printed
+continue action operations at the       initial         /modifier
+   specified file                                       starting with
+set tape # after the "initial"          set tape-       :prompt by TITO
+   command, or restore nonsequentially  number n
+   from a multi-reel saveset
+mark files as dumped for rebuild        !not available  flagoff
+mark files not dumped when restored     *by default     noflagoff
+translates users names for restore      !not available  translate
+clear out the translation table         !not available  untranslate
+change output file for next command     !not available  cof
+initialize to save at tape beginning    *by default     new tape
+make eot after specified file           !not available  cut after
+restore files to its original blocks    *by lt     update
+   on disk to save space
+turn off update flag                    *by default     noupdate
+
+
+                                    4
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+3) tape-positioning commands
+
+-----------------------------------------------------------------------
+        function                        DUMPER          TITO
+-----------------------------------------------------------------------
+
+position to the end of last saveset     eot             skip E
+initialize to save at tape end          eot then save   append/
+                                                        skip write E
+to the beginning of the currently       rewind          rewind/rwnw
+   mounted tape
+initialize to save at the nth from     skip n then save skip write n
+   current saveset
+rewind the tape retirely onto the       unload          unload
+   source reel
+
+
+
+4) information commands
+
+-----------------------------------------------------------------------
+        function                        DUMPER          TITO
+-----------------------------------------------------------------------
+
+prints out available help commands      help/?          help/?
+print last tape position scanned        !not available  where
+
+-----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    5
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+further comments 
+
+     1)  TITO has very limited documentation. for example, TITO USER'S
+         GUIDE listed error messages printed out by TITO but without any
+         suggestions about what user should do with these errors.
+
+     2)  TOPS-20 has the concept of "structure", so user should specify
+         structure names as part of command if the particular structures
+         needed to be saved/restored.
+
+     3)  An operator often needs to run DUMPER along with other programs
+         (like OPR); this can be done with commands PUSH and POP. The
+         tricky part is that operator is just like any other user when
+         running DUMPER, so even though he/she is in charge of all the
+         mount tape requests on the system, he/she still has to submit a
+         mount tape request on the monitor level, then get into OPR to
+         answer his/her own request, then get out of OPR to continue
+         DUMPER operation. If the operator does not use the /NOWAIT switch
+         in the command MOUNT TAPE, then he/she would hopelessly sit in an
+         infinite loop until sundown. In such case, the operator should
+         control-C out of the infinite wait, use the command CANCEL to
+         cancel the previous mount request and submit another mount tape
+         request with the /NOWAIT switch. Also note that READ-ONLY is the
+         default mode for MOUNT TAPE command, users have to specify the
+         /WRITE-ENABLED switch if he/she wants to write from disk to tape.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    6
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+
+
+
+                 SECTION II - ANALYSIS OF SPECIFIC ITEMS                       
+
+
+
+
+file license 
+
+     DUMPER - no file license on TOPS-20.
+
+     TITO   - operator, write files, systat and get devices license should
+              be set before running TITO to do incremental or full dump.
+              However, during file restoration, if the file on tape has a
+              certain license set which user doesn't set before running
+              TITO, then TITO will restore the file but not restore the
+              license. It kindly prints out the message "file (filename)
+              not given license (licensename)". User can then restore the
+              license later.
+
+
+logging
+
+     Both DUMPER and TITO have the capability of logging individual files,
+     or restricting the log to directories, or suppressing the log except
+     for the totals. In DUMPER the commands are FILES and NO DIRECTORIES,
+     in TITO the commands are MODE FILES and MODE TOTALS.  The nice
+     feature of DUMPER error messages is that the warning messages are
+     prefixed with a question-mark and fatal messages with a percent-sign.
+     DUMPER allows the user to specify the name to be written in the
+     saveset header on the tape by the command "SSNAME", and this name
+     also appears on the terminal as a header for each tape saved or
+     restored.  There is no way to give a save set name in TITO, so on the
+     terminal, it prints out something like "TAPE NUMBER 1 FOR 12:12 10-
+     OCT-82".
+
+
+restart capability 
+
+     In case of a system crash during a save or restore process, the user
+     of DUMPER and TITO can restart by picking up where he/she left off.
+     In DUMPER the command is "INITIAL (filename)". In TITO use the
+     modifier "STARTING WITH (filename)" to the appropriate command,
+     filename being the last file saved or restored before system crash.
+
+
+user aborts 
+
+     DUMPER - control C aborts DUMPER.  To halt the current command, type
+              control E. DUMPER will interrupt the current command. User
+              can then type any status-setting command followed by the
+              "CONTINUE" command to continue the interrupted operation. If
+
+
+
+                                    7
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+              the user types any other command, DUMPER will ask: " do you
+              really want to abort your interrupted command?" Answering
+              "YES" aborts the command.
+
+     TITO   - not very user-friendly. Control C at the prompt "*" level
+              aborts TITO. When TITO is in the middle of an operation,
+              type two control Z then one control C.  When TITO is waiting
+              for a new tape to be mounted, typing "NO" for the prompt
+              "mount next tape:" will abort TITO.
+
+
+use DUMPER to migrate/archive   
+
+     DUMPER has the feature of migrating files or saving files from an
+     archive area which TITO lacks. Migration is involuntary file transfer
+     from disk to tape while archival is voluntary. Archiving files are
+     done at the user's request.  Migrating files are not done at the
+     user's request. Migration is a means of clearing disk space of files
+     that have not been referenced within a specified period of time. To
+     migrate files, operator runs REAPER program and specifies a period of
+     time, so that files not touched within such period are marked for
+     migration. To archive files, the user types the "ARCHIVE" command at
+     EXEC level to have their files marked for archival. DUMPER then can
+     be run with the switch "/ARCHIVE" or "/MIGRATE". This is a 2-pass
+     process to provide a backup system in case one tape is bad or
+     misplaced. Files then are deleted from disk; unless the user has
+     specified the subcommand "RETAIN" in the "ARCHIVE" command to have
+     the contents of files be retained.  Users can issue the TOPS-20
+     command "RETRIEVE" to retrieve archived or migrated files, this
+     creates an entry in the system retrieval queue which can be displayed
+     by typing the command "INFORMATION RETRIEVAL-REQUESTS". Then DUMPER
+     can be run with the command "RETRIEVE". Be sure that the retrieval-
+     requests queue is NOT empty, otherwise DUMPER waits indefinitely.
+
+
+tape error recovery  
+
+     for both DUMPER and TITO, there is very little to do for tape error
+     recovery. They both print out a warning message when encountering a
+     bad spot on tape during file restoration and dump.  Tape error
+     recovery is possible during file dump but not during file
+     restoration.  During the file dump, user can recover the file
+     manually by mounting a new tape and restart saving the same file.
+     TITO is nicer than DUMPER in the way that TITO asks the user if the
+     operation should be aborted while DUMPER only prints out warning
+     message.
+
+     DUMPER - when DUMPER encounters bad spots on tape where data can not
+              be written or read, it writes a duplicate record immediately
+              following the invalid record, and prints the message "write
+              error on tape, record [n], writing duplicate record".
+
+     TITO   - when TITO encounters write error on tape, it asks the user
+
+
+
+                                    8
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+              whether to continue the job. If user answers yes then the
+              end of file mark will be written and TITO will store the
+              file on tape again. If user answers no then TITO writes an
+              end of file mark and returns to command level.
+
+
+can DUMPER handle a very large file?      
+
+     yes, the size of any single file is limited only by TOPS-20 file-
+     length restriction. If a file goes over one tape during DUMPER
+     operation, DUMPER simply prompts user to mount another tape.
+
+
+tape block size  
+
+     blocking refers to writing physical records on tape which contain
+     more than one logical record. Blocking saves tapes and time, since
+     the number of gaps between records on tape are reduced.
+
+     DUMPER - user can set blocking factor using the command "set block
+              number". The number must be between 1 and 15 and depends on
+              the tape density. The default number is 1. Currently it is
+              recommended that user sets blocking facter to 8 for tape
+              density 1600. However, interchange mode must use blocking
+              factor of 1.
+
+     TITO   - fixed by TITO.
+
+
+tape format 
+
+     each user file is written as one physical record on tape with tape
+     format description included. In TITO it is called "file header
+     record". In DUMPER it is called "file descriptor block". They contain
+     information such as the time tape is written and number of bytes in
+     the file.  DUMPER has more potential for error recovery since it
+     actually has a command "check" which checks to see if every file's
+     file description block on tape agrees with the files on disk.
+
+     DUMPER - emphasizes user access information, for example, date and
+              time of the last non-write access to the file.  See table 7-
+              4 of TOPS-20 USER UTILITIES GUIDE for the entries of file
+              description block.
+
+     TITO   - emphasizes tape parameters, for example, tape density and
+              file number on tape.  See APPENDIX A of TITO USER'S GUIDE
+              for the entries of the file header record.
+
+
+ability to use command file    
+
+     at program level:
+
+
+
+
+                                    9
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+          DUMPER can be run from a command file through a batch job, TITO
+          can be run from a command file through a pcom job. This is not
+          recommended because DUMPER and TITO often require terminal input
+          in the middle of operation. For example, user has to input tape
+          specification for each consecutive tape, or TITO may output
+          messages such as "tape write parity error encountered,
+          continue?". These interactive inputs are not possible through a
+          command file.
+
+
+     at command level:
+
+          DUMPER - not available
+
+          TITO   - the STORE, RESTORE, GET, and DIRECTORY command can be
+                   followed by "@(filename)". The file following the at-
+                   sign "@" is called an indirect file, and it may contain
+                   anything which can be typed on the same line from the
+                   terminal, with one important difference: carriage
+                   returns in the file are automatically treated as
+                   commas. Also, indirect files may not contain more than
+                   62 filenames or 125 individual user names.
+
+
+file selection options  
+
+     wild carding:
+
+          filename may contain wild card characters pound-sign or
+          question-mark for TITO, percent-sign for DUMPER. Both DUMPER and
+          TITO can take "*" as the filename or the extension of the
+          filename to match all filenames or all extensions
+
+
+     date selection:
+
+          DUMPER takes the format of any standard American or European
+          format such as 10-OCT-82 or 10/10/82 for date, and 24-hour or
+          AM/PM format such as 17:17 or 5:17pm for time.  TITO takes the
+          format of HH:MM DD MMM YY for hour, minute, day, month and year.
+          DUMPER has more options than TITO for date selection. The
+          following are the available options:
+
+               DUMPER - BEFORE, ABEFORE, MBEFORE, SINCE, ASINCE, and
+                        MSINCE commands transfers only files whose last
+                        user/system written/access date is before/since
+                        the specified date. See the general command
+                        comparison table of section I of this report for
+                        details.
+
+               TITO   - CREATED AFTER and CHANGED modifiers to the STORE
+                        command store only files created after the
+                        specified date or have been changed since the last
+                        backup
+
+
+                                    10
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+tape directories 
+
+     DUMPER and TITO both have a "DIRECTORIES" command but with very
+     different usage. DUMPER prints directory names on user's terminal as
+     it saves or restores them by default. User can suppress such printing
+     by the command "NO DIRECTORIES". TITO can suppress directory name
+     printing on the terminal by the command "MODE TOTALS".  To do a
+     directory of what's been saved on tape, the command to use in TITO is
+     "DIRECTORIES", in DUMPER is "PRINT". TITO's "DIRECTORY" command
+     prints out a listing of tape file names, position, user name,
+     creation date, date written , file size and checksum on the terminal.
+     This listing can go to a file by typing "COF (filename)" before the
+     command "DIRECTORY". DUMPER's listing lacks tape positions and file
+     creation date, also checksum won't be included unless user gives the
+     command "CHECKSUM SEQUENTIAL/BY-PAGE".  It is easier to load DUMPER'S
+     tape directories into a database and search them than TITO's,because
+     although both TITO and DUMPER's tape directories have alphabetized
+     user names, only DUMPER tape directories' filenames are alphabetized
+     for each user name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    11
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+
+
+
+                    SECTION III - OPERATIONAL EXAMPLES                        
+
+
+
+
+TITO incremental/all-file operations:  
+
+ .o op sy gd wf$ (password)
+ .r TITO
+ TITO ...
+ SYSTEM C930-P034/
+ DEVICE: mta0
+ TRACKS: 9
+ DENSITY(1600,800): 1600
+ TAPE NOT WRITE PROTECTED
+ *new tape
+ ARE YOU SURE? y
+ *store all changed             note: "store all" for all-file                                
+ TAPE NUMBER 1 ...                operation
+        .
+        .
+        .
+ CONTINUE ON DEVICE: mta0
+        .
+        .
+        .
+ LAST FILE AT POSITION ...
+ STORE COMPLETE ... FILES.
+ *rew
+ *cof ddmmdd.inc               note: as a convention, ddmmdd stands                               
+                                 for day of week-month-day;
+                                 ddmmdd.all for all-file operation
+ *dir all
+ INPUT TAPE POS RANGE: (c.r.)
+        .
+        .
+        .
+ LOGICAL EOT -- NO SAVE SETS FOLLOW.
+ TOTAL ... FILES PROCESSED
+ *unl
+ *quit
+ EXIT
+ .                             note: back to monitor level                               
+
+DUMPER incremental/full-dump operations:
+
+@enable
+$information structure *
+        .
+        .
+        .
+
+
+                                    12
+Analysis of DUMPER and TITO                               October 28, 1982
+
+
+$mount structure (structurename):       note: mount those structures                                        
+                                          that will be operated on
+$DUMPER
+DUMPER> tape mta0:
+DUMPER> set block 8
+DUMPER> ssname mmm-dd-inc               note: as a convention,                                        
+                                          mmm-dd-full for full-dump
+DUMPER> list mmm-dd-inc
+DUMPER> save /incremental:1 (structurename):, (structurename):
+
+                                        note: "save /full-incremental                                        
+                                              structurename):" for
+                                              full-dump
+DUMPER TAPE 1 ...
+        .
+        .
+        .
+$ End of tape, continue save on
+$ Tape filespec mta0:
+        .
+        .
+        .
+TOTAL files dumped = ...
+TOTAL pages dumped = ...
+DUMPER> unload
+DUMPER> quit
+$                                       note: return to monitor                                        
+                                          prompt
+
+
+example of DUMPER/TITO file restoration    
+
+DUMPER> restore (WINNIE)pooh            note: restore the file pooh to                                        
+* restore (WINNIE)pooh                    its original directory WINNIE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    13
+ k 
+E
