@@ -1,0 +1,102 @@
+ENTRY;
+BEGIN "MODES"
+
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndefs.sai" SOURCE!FILE;
+REQUIRE "snsym.sai" SOURCE!FILE;
+
+EXTERNAL STRING snstat;				\ SNARL status vector;
+EXTERNAL INTEGER spr!sw, ree!sw,		\ These are the settable mode switches;
+   old!sw, sys!sw, rpr!sw,			\ All except ree!sw contain a token number.;
+   dsk!sw, tty!sw;				\ Ree!sw contains the reel # value.;
+
+EXTERNAL STRING PROCEDURE getkey (INTEGER toknum);
+EXTERNAL INTEGER PROCEDURE readkey (STRING prompt;  INTEGER rule);
+EXTERNAL INTEGER PROCEDURE readint (STRING prompt;  INTEGER rule;
+   REFERENCE INTEGER result);
+EXTERNAL PROCEDURE i!kybd;
+EXTERNAL SIMPLE BOOLEAN PROCEDURE ab!cond;
+EXTERNAL SIMPLE STRING PROCEDURE pad (STRING str;  INTEGER totlen);
+
+REQUIRE "{}<>" DELIMITERS;
+
+
+INTERNAL PROCEDURE s!mode (BOOLEAN alter);
+	\ This routine handles the MODE command.  The parameter "alter"
+tells whether the ALTER switch was part of the user's MODE command.  If
+so, then the user is allowed to modify the switches interactively.  If
+not, then the current switch settings are simply reported to the user.;
+BEGIN
+
+   INTEGER keytkn;  STRING dspstr;
+   DEFINE do!sw(prompt,swnam,swtyp)={
+      dspstr_prompt&getkey(swnam);
+      IF alter THEN BEGIN
+	 IF (keytkn_readkey(pad(dspstr,21)&"-NEW VALUE  >>",swtyp))
+	    THEN swnam_keytkn;
+      END
+      ELSE outstr( dspstr & crlf );
+      poll;  i!kybd;  if ab!cond then return;
+   };
+
+   poll;  i!kybd;  if ab!cond then return;
+   outstr( "STORE switches:" & crlf );
+   do!sw(<"  SPRINT:  ">,<spr!sw>,<!p!fmt>)
+   dspstr_"  REELSET:  "&cvs(ree!sw);
+   IF alter THEN readint(pad(dspstr,21)&"-NEW VALUE  >>",!reelno,ree!sw)
+   else outstr( dspstr & crlf );
+   poll;  i!kybd;  if ab!cond then return;
+   outstr( "RETRIEVE switches:" & crlf );
+   do!sw(<"  OLD:  ">,<old!sw>,<!old!sw>);
+   do!sw(<"  SYS:  ">,<sys!sw>,<!old!sw>);
+   do!sw(<"  RPRINT:  ">,<rpr!sw>,<!p!fmt>);
+   print("report sizes:"&crlf);
+   do!sw(<"  DSKREP:  ">,<dsk!sw>,<!rep!sw>);
+   do!sw(<"  TTYREP:  ">,<tty!sw>,<!rep!sw>);
+   snstat_ "C"&snstat;  RETURN;
+END;
+
+
+INTERNAL PROCEDURE s!spr (INTEGER swval(0));
+	\ This procedure handles the SPRINT command.;
+if swval then spr!sw_ swval
+else outstr( "SPRINT:  " & getkey(spr!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!ree (INTEGER swval(0));
+	\ This procedure handles the REELSET command.;
+if swval then ree!sw_ swval
+else outstr( "REELSET:  " & getkey(ree!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!old (INTEGER swval(0));
+	\ This procedure handles the OLD command.;
+if swval then old!sw_ swval
+else outstr( "OLD:  " & getkey(old!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!sys (INTEGER swval(0));
+	\ This procedure handles the SYS command.;
+if swval then sys!sw_ swval
+else outstr( "SYS:  " & getkey(sys!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!rpr (INTEGER swval(0));
+	\ This procedure handles the RPRINT command.;
+if swval then rpr!sw_ swval
+else outstr( "RPRINT:  " & getkey(rpr!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!dsk (INTEGER swval(0));
+	\ This procedure handles the DSKREP command.;
+if swval then dsk!sw_ swval
+else outstr( "DSKREP:  " & getkey(dsk!sw) & crlf );
+
+
+INTERNAL PROCEDURE s!tty (INTEGER swval(0));
+	\ This procedure handles the TTYREP command.;
+if swval then tty!sw_ swval
+else outstr( "TTYREP:  " & getkey(tty!sw) & crlf );
+
+
+END "MODES";
