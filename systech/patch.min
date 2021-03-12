@@ -1,0 +1,22 @@
+.endhand;
+
+
+
+    CORE			SYSTEM                  NEWMON
+
+1. cty message*		1. patch file to m33	    1. patch file to m33
+2. patch it		2. install patch	    2. install patch
+3. then start at	3. r patlog		    3. r patlog**
+   1 under SYSTEM	4. cty message, mail        4. send mail @cralst
+			   @cralst, with patch         with patch file name
+			   file name in remark         in remark
+			5. set reliability timer***
+
+*filddt should output message to cty when first poke is done, log patch
+
+**patlog will have to be modified to look at newmon
+
+***reliability timer sets up time necessary before automatic copying of
+  patched system.sav to backup.sav  (needs to be implemented)
+
+
