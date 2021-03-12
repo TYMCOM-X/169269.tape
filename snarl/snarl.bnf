@@ -1,0 +1,534 @@
+{LF}	::= 12
+{COM}	::= ","
+{Q}	::= 77
+{CLN}	::= ":"
+{UNDER}	::= 137
+{DASH}	::= "-"
+{DOT}	::= "."
+{EQ}	::= "="
+{LBRKT}	::= "["
+{RBRKT}	::= "]"
+
+<command> "Extra input in command."
+	::= <statement> {LF}
+
+<statement>
+	::= <mode_c>
+	::= <spri_c>
+	::= <reel_c>
+	::= <old_c>
+	::= <sys_c>
+	::= <rpri_c>
+	::= <dskr_c>
+	::= <ttyr_c>
+	::= <new_c>
+	::= <appe_c>
+	::= <stor_c>
+	::= <retr_c>
+	::= <get_c>
+	::= <dire_c>
+	::= <wher_c>
+	::= <cut_c>
+	::= <rewi_c>
+	::= <unlo_c>
+	::= <devi_c>
+	::= <tid_c>
+	::= <help_c>
+	::= <qmrk_c>
+	::= <inst_c>
+	::= <grip_c>
+	::= <news_c>
+	::= <tran_c>
+	::= <untr_c>
+	::= <cof_c>
+	::= <log_c>
+	::= <unlg_c>
+	::= <comm_c>
+	::= <quit_c>
+	::= <stop_c>
+	::= <cont_c>
+	::= <go_c>
+	::= <abor_c>
+
+<mode!c> "Illegal command word."
+	::= 'MODE' 'ALTER'
+	::= 'MODE'
+
+<spri!c> "Illegal command word."
+	::= 'SPRINT' <p_fmt>
+	::= 'SPRINT'
+
+<p_fmt> "Illegal switch value."
+	::= 'TOTALS'
+	::= 'USERS'
+	::= 'FILES'
+
+<reel_c> "Illegal command word."
+	::= 'REELSET' <reelno>
+	::= 'REELSET'
+
+<reelno> [HALFSV] "Need a number between 1 and (2**18)-1."
+	::= {integer}
+
+<old_c> "Illegal command word."
+	::= 'OLD' <old_sw>
+	::= 'OLD'
+
+<old_sw> "Illegal switch value."
+	::= 'NEWEST'
+	::= 'DISK'
+	::= 'DISC'
+	::= 'TAPE'
+	::= 'CONFIRM'
+
+<sys_c> "Illegal command word."
+	::= 'SYS' <old_sw>
+	::= 'SYS'
+
+<rpri_c> "Illegal command word."
+	::= 'RPRINT' <p_fmt>
+	::= 'RPRINT'
+
+<dskr_c> "Illegal command word."
+	::= 'DSKREP' <rep_sw>
+	::= 'DSKREP'
+
+<rep_sw> "Illegal switch value."
+	::= 'WIDE'
+	::= 'NARROW'
+
+<ttyr_c> "Illegal command word."
+	::= 'TTYREP' <rep_sw>
+	::= 'TTYREP'
+
+<new_c> "Illegal command word."
+	::= 'NEW' 'TAPE' <tidfld>
+	::= 'NEW' 'TAPE'
+	::= 'NEW' <tidfld>
+	::= 'NEW'
+
+<tidfld> [TIDSAV] "Illegal TID parameter."
+	::= 'TID' <tidval>
+
+<tidval> [TIDSAV]
+	::= {integer}
+	::= {identifier}
+
+<appe_c> "Illegal command word."
+	::= 'APPEND' <tidval>
+	::= 'APPEND'
+
+<stor_c> "Illegal command word."
+	::= 'STORE' <stmods> <stlist>
+	::= 'STORE' <stlist>
+
+<stlist> "Illegal store list."
+	::= <allst>
+	::= <ganlst>
+	::= <filist>
+
+<allst>
+	::= 'ALL'
+
+<ganlst>
+	::= 'GAN' {EQ} <gans>
+
+<gans>
+	::= <ganitm> {COM} <gans>
+	::= <ganitm>
+
+<ganitm> [GANSAV]
+	::= <ganno> {DASH} <ganno>
+	::= <ganno>
+
+<ganno> [GITSAV] "Need an octal number between 1 and (2**18)-1 or E."
+	::= <gannum>
+	::= 'E'
+
+<gannum> [HOCTSV]
+	::= {integer}
+
+<filist>
+	::= <usritm> {COM} <filist>
+	::= <usritm>
+
+<usritm>
+	::= <usrdes> <filset>
+	::= <usrdes>
+
+<filset>
+	::= <wldfil> {COM} <filset>
+	::= <wldfil>
+
+<usrdes> "Need a PPN or user name."
+	::= <ppn>
+	::= <user>
+
+<ppn> [PPNSAV]
+	::= {LBRKT} <ppnpc> {COM} <ppnpc> {RBRKT}
+
+<ppnpc> [HOCTSV]
+	::= {integer}
+
+<user> [STRSAV]
+	::= {usrnam}
+
+<wldfil>
+	::= <wldnm> {DOT} <wldext>
+	::= <wldnm> {DOT}
+	::= <wldnm>
+
+<wldnm> [STRSAV]
+	::= {wldpc}
+	::= {filpc}
+	::= {identifier}
+	::= {integer}
+
+<wldext>
+	::= <wldnm>
+
+<stmods>
+	::= <stm> <stmods>
+	::= <stm>
+
+<stm> "Illegal STORE modifier."
+	::= <af_mod>
+	::= <be_mod>
+	::= <st_mod>
+	::= <en_mod>
+	::= <tw_mod>
+	::= <ch_mod>
+	::= <in_mod>
+	::= <to_mod>
+
+<af_mod> [DTSAV]
+	::= 'AFTER' <time> <date>
+	::= 'AFTER' <time>
+
+<be_mod> [DTSAV]
+	::= 'BEFORE' <time> <date>
+	::= 'BEFORE' <time>
+
+<st_mod>
+	::= 'STARTING' 'WITH' <stpnt>
+	::= 'STARTING' <stpnt>
+
+<en_mod>
+	::= 'ENDING' 'WITH' <stpnt>
+	::= 'END' <stpnt>
+
+<tw_mod>
+	::= 'TWICE'
+
+<ch_mod>
+	::= 'CHANGED'
+
+<in_mod>
+	::= 'INCREMENTAL'
+
+<to_mod>
+	::= 'TODAY'
+
+<date> [DATSAV] "Illegal date expression."
+	::= <day> <mon> <year>
+	::= <day> <mon>
+	::= <day>
+
+<day> [DAYSAV]
+	::= {integer}
+
+<mon> [STRSAV]
+	::= 'JAN'
+	::= 'FEB'
+	::= 'MAR'
+	::= 'APR'
+	::= 'MAY'
+	::= 'JUN'
+	::= 'JUL'
+	::= 'AUG'
+	::= 'SEP'
+	::= 'OCT'
+	::= 'NOV'
+	::= 'DEC'
+
+<year> [YRSAV]
+	::= {integer}
+
+<time> [TIMSAV] "Illegal time expression."
+	::= <hour> {CLN} <min>
+
+<hour> [HRSAV]
+	::= {integer}
+
+<min> [MINSAV]
+	::= {integer}
+
+<stpnt>  "Need a user or PPN and file name."
+	::= <user> <filnm>
+
+<filnm>
+	::= <fname> {DOT} <fext>
+	::= <fname> {DOT}
+	::= <fname>
+
+<fname> [STRSAV]
+	::= {filpc}
+	::= {identifier}
+	::= {integer}
+
+<fext>
+	::= <fname>
+
+<retr_c>
+	::= 'RETRIEVE' <remds> <relist>
+	::= 'RETRIEVE' <relist>
+
+<relist> "Illegal retrieve list."
+	::= <allst>
+	::= <ganlst>
+	::= <poslst>
+	::= <rtrlst>
+
+<poslst>
+	::= 'POS' {EQ} <pstns>
+
+<pstns>
+	::= <positm> {COM} <pstns>
+	::= <positm>
+
+<positm>
+	::= <posno> {DASH} <posno>
+	::= <posno>
+
+<posno> [POSSAV] "Need an integer or E."
+	::= <posnum>
+	::= 'E'
+
+<posnum> [INTSAV]
+	::= {integer}
+
+<rtrlst>
+	::= <rtritm> {COM} <rtrlst>
+	::= <rtritm>
+
+<rtritm>
+	::= <retusr> <retset>
+	::= <retusr>
+
+<retusr> "Need a PPN or user name or a pair of either."
+	::= <upair>
+	::= <usrdes>
+
+<upair>
+	::= <usrdes> {UNDER} <usrdes>
+
+<retset>
+	::= <retfil> {com} <retset>
+	::= <retfil>
+
+<retfil>
+	::= <fpair>
+	::= <wldfil>
+
+<fpair>
+	::= <filnm> {UNDER} <wldfil>
+
+<remds>
+	::= <rem> <remds>
+	::= <rem>
+
+<rem> "Illegal RETRIEVE or GET modifier."
+	::= <af_mod>
+	::= <be_mod>
+	::= <st_mod>
+	::= <en_mod>
+	::= <se_mod>
+
+<se_mod>
+	::= 'SETDUMPED'
+
+<get_c>
+	::= 'GET' <remds> <gelist>
+	::= 'GET' <gelist>
+
+<gelist> "Illegal GET or DIRECTORY list."
+	::= <allst>
+	::= <ganlst>
+	::= <poslst>
+	::= <filist>
+
+<dire_c>
+	::= 'DIRECTORY' <dimds> <gelist>
+	::= 'DIRECTORY' <gelist>
+
+<dimds>
+	::= <dim> <dimds>
+	::= <dim>
+
+<dim> "Illegal DIRECTORY modifier."
+	::= <af_mod>
+	::= <be_mod>
+	::= <st_mod>
+	::= <en_mod>
+	::= <ck_mod>
+	::= <li_mod>
+
+<ck_mod>
+	::= 'CHECKSUM'
+
+<li_mod>
+	::= 'LIMITED'
+
+<wher_c> "Illegal command word."
+	::= 'WHERE'
+
+<cut_c> "Illegal command word."
+	::= 'CUT' 'AFTER' <filno>
+
+<filno> [INTSAV] "Need a file position number."
+	::= {integer}
+
+<rewi_c> "Illegal command word."
+	::= 'REWIND' <rwopt>
+	::= 'REWIND'
+
+<rwopt>
+	::= 'WAIT'
+
+<unlo_c> "Illegal command word."
+	::= 'UNLOAD' <rwopt>
+	::= 'UNLOAD'
+
+<devi_c> "Illegal command word."
+	::= 'DEVICE' <dvnam> <dens>
+	::= 'DEVICE' <dvnam>
+	::= 'DEVICE'
+
+<dvnam> [STRSAV] "Not a mag-tape device name."
+	::= {identifier}
+
+<dens> [INTSAV] "Expected a mag-tape density."
+	::= {integer}
+
+<tid_c> "Illegal command word."
+	::= 'TID' <tidval>
+	::= 'TID' 'DELETE'
+	::= 'TID'
+
+<help_c> "Illegal command word."
+	::= 'HELP' <cmdwd>
+	::= 'HELP'
+
+<qmrk_c> "Illegal command word."
+	::= {Q} <cmdwd>
+	::= {Q}
+
+<cmdwd> "Expected a command word."
+	::= 'MODE'
+	::= 'OLD'
+	::= 'SYS'
+	::= 'RPRINT'
+	::= 'SPRINT'
+	::= 'REELSET'
+	::= 'DSKREP'
+	::= 'TTYREP'
+	::= 'NEW' 'TAPE'
+	::= 'NEW'
+	::= 'APPEND'
+	::= 'STORE'
+	::= 'RETRIEVE'
+	::= 'GET'
+	::= 'DIRECTORY'
+	::= 'WHERE'
+	::= 'CUT' 'AFTER'
+	::= 'REWIND'
+	::= 'UNLOAD'
+	::= 'DEVICE'
+	::= 'TID'
+	::= 'HELP'
+	::= {Q}
+	::= 'INSTRUCTIONS'
+	::= 'GRIPE'
+	::= 'NEWS'
+	::= 'TRANSLATE'
+	::= 'UNTRANSLATE'
+	::= 'COF'
+	::= 'LOG'
+	::= 'UNLOG'
+	::= 'COMMENT'
+	::= 'QUIT'
+	::= 'STOP'
+	::= 'CONTINUE'
+	::= 'GO'
+	::= 'ABORT'
+
+<inst_c> "Illegal command word."
+	::= 'INSTRUCTIONS'
+
+<grip_c> "Illegal command word."
+	::= 'GRIPE'
+
+<news_c> "Illegal command word."
+	::= 'NEWS'
+
+<tran_c> "Illegal command word."
+	::= 'TRANSLATE' <trlst>
+	::= 'TRANSLATE'
+
+<trlst> "Illegal TRANSLATE list."
+	::= <tritm> {COM} <trlst>
+	::= <tritm>
+
+<tritm>
+	::= <user> {UNDER} <user>
+
+<untr_c> "Illegal command word."
+	::= 'UNTRANSLATE'
+
+<cof_c> "Illegal command word."
+	::= 'COF' <prdev> <fildes>
+	::= 'COF' <prdev>
+	::= 'COF' <fildes>
+	::= 'COF'
+
+<prdev> "Not a legal print device."
+	::= 'TTY'
+	::= 'LPT'
+	::= 'TELETYPE'
+	::= 'TERMINAL'
+
+<fildes> "Need a user or PPN and file name."
+	::= <usrdes> <filnm>
+	::= <filnm>
+
+<log_c> "Illegal command word."
+	::= 'LOG' <fildes> 'ERRORS'
+	::= 'LOG' <fildes>
+
+<unlg_c> "Illegal command word."
+	::= 'UNLOG'
+
+<comm_c> "Illegal command word."
+	::= 'COMMENT' {text}
+
+<quit_c> "Illegal command word."
+	::= 'QUIT'
+
+<stop_c> "Illegal command word."
+	::= 'STOP'
+
+<cont_c> "Illegal command word."
+	::= 'CONTINUE'
+
+<go_c> "Illegal command word."
+	::= 'GO' 'TID' <tidval>
+	::= 'GO' <tidval>
+	::= 'GO'
+
+<abor_c> "Illegal command word."
+	::= 'ABORT'
+
+<yes_or_no>
+	::= 'YES'
+	::= 'NO'
+ 
