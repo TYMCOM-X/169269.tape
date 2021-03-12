@@ -1,0 +1,45 @@
+begin "INIT" require "(wrs)settrm.sai" source!file;
+
+if KjobPending=0
+    then begin "Login"
+	lc;
+	backspace;
+	erase;
+! 	form;
+	stall;
+	width(80);
+	setmail;
+	addproc("TECO","(EMACS)TEC124");
+!	addproc("SAIL","(SYS)FTSAIL");
+	addproc("SAIL","(SAILTEST)SAIL");
+	addproc("DIRIT","(WRS)EDIRIT");
+	addproc("EDIT10","(STAMMERS)HPEDIT");
+	RPGini;
+	if TIC neq TIC!AUX then begin "terminal"
+	    list DJL;
+	    SetAlp("(MPL)ZEN");
+	    if STATES land '700000 then print(7&
+		"~ ", STATE!NAME, " ~"&nl);
+	    print(
+		"Load ", LOAD!AVERAGE,"%, "&
+		"response ", RESPONSE!TIME," ms"&
+		nl, SOFTWARE,
+		" [", HARDWARE, "] ",
+		cvos(NODE), "-",
+	    	cvos(PORT), nl );
+	    DJL _ DetachedJobList;
+	    if length(DJL) then begin "detached jobs"
+		string  J;
+	    	print(7&7, user, " has detached jobs: ", DJL, nl);
+		do begin
+	    	    print("attach # or <cr>: ");
+		    Attach(cvd(J_inchwl));
+		end until length(J)=0;
+	    end "detached jobs";
+            setlic(mylic);
+	    run("(WRS)REMINI");
+	end "terminal";
+    end "Login"
+    else begin "Logout"
+    end "Logout";
+exit; end $
