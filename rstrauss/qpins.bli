@@ -1,0 +1,299 @@
+module QPINS(dollar,debug,entries=($QPINS))=
+  begin
+  
+  require (midas)c2defs.bli;
+  require (midas)dddefs.bli;
+  require (midas)dvdefs.bli; 
+  require (midas)e3defs.bli;
+  require (midas)k3defs.bli;
+  require (midas)q1defs.bli;
+  require (midas)q2defs.bli;
+  require (midas)q6defs.bli;
+  require (midas)rcdefs.bli;
+  require (midas)rsdefs.bli;
+  require (midas)tdefs.bli;
+  require (midas)u2defs.bli;
+  
+  external $QESC, $QGREL, $QBRCS, $QRALL, $QBSCB%, $QBFLEX%;
+  external $QBWCS, $QBRILB, $QEOPL, $QBDRB, $QBFLST, $QBUFD, $QBINC;
+  external $QMRCS, $QBRBLK, $QTIN, $QFSTF, $RSALL, $RERR, $QNSRT;
+  external $UAPSZ, $UOUTL, $UAPDC, $UOOUTL, $UOAPZ;
+  external $CGETZ, $CFREE, $CGTAREA, CAREA$, CMEMA$;
+  external $RFTCH, $ROPEN, $RNSRT, $RCLSE, $TOPNI, $TOPNO;
+  external $TCLSI,$TCLSO,$TSEQO;
+  external QSYMP$, QUERC$, QRCSP$, QRGBP$;
+  external QWCSP$, QRILP$, QRCB$, QCNT$, QFLIST$, SRPRT$, CIHDT$, QURCS$;
+
+
+MACRO samerelation=
+l:begin
+  if .QUERC$ neq 0
+    then
+      if .QRCB$ neq 0
+        then
+	  if .QUERC$[rc$rsb] eql .QRCB$[rc$rsb]
+	    then
+	      leave l with TRUE;
+  FALSE;
+  end&;
+  
+  % Useful facts to know:
+      Upon entrance to this routine the following has already been done:
+      1) QRCB$ contains the RCB address for the INTO relation (by call
+          to $QUPDRC on INTO clause).
+      2) QUERC$ contains the RCB address for the USING EVERY relation
+         (if one exists) or the ALL relation in the insert command
+	 form INSERT ALL of R1 into R2.
+  %	 
+  global routine $QPINS(tree)=
+    begin
+    map QNODE$ tree;
+    map QRGB$ QRGBP$;
+    map RCB$ QUERC$;
+    map RCB$ QRCB$;
+    local RCB$ destrcb;
+    local QNODE$ node:lstnode:defaultcls:fldlst:intocls:whrcls:fromcls;
+    local QFLST$ flst:tlst;
+    local RCB$ rcb:ircb;
+    local RSB$ irsb;
+    local DFI$ fi;
+    local scb,rb;
+    local DD$ dd;	% tst %
+    local relname,destp,sourcep;  % tst %
+    local setinsert,fldexprlist;
+      
+    label loop,l;      
+    
+    CIHDT$ := $QESC<0,0>;
+
+
+    if .QRGBP$[QG$FIELDERR]		% Semantics field error	%
+      then				% - don't process	%
+         return 0;			
+!    QRGBP$[QG$CMDTYPE] := QGV$INSERT;   % this is a INSERT command %
+
+    QCKCOM(E$INSERT);
+   
+% global variable initialization
+%
+  QFLIST$ := QRILP$ := QWCSP$ := QCNT$ := QRCSP$ := 0;          
+  QRCSP$ := 0;
+
+  fldexprlist  := setinsert := FALSE;
+    
+  defaultcls := (.tree)<0,18>;
+  node := .defaultcls[qn$suc];
+  node := .node[qn$suc];   % gobble INSERT token %
+  
+  if .node[qn$ntype] eql QNV$TERM
+    then
+      begin	% form 1 insert: insert into r1 f1=val1,f2=val2, ... %
+      intocls := .node;
+      fldlst := .intocls[qn$suc];
+      whrcls := .fldlst[qn$suc];
+      end	
+    else
+      begin	 % form 2 insert %
+      if .node[qn$altn] eql NV$ALL
+        then    % insert * of r1 into r2 %
+          begin
+  	  setinsert := TRUE;
+	  fldlst := 0;
+	  end
+        else    % insert val1,val2 into r1 %
+	  begin
+	  outstr('This form of INSERT command not yet implemented.');
+	  typecrlf;
+          fldexprlist := TRUE;
+	  return 0;
+	  end;
+      intocls := .node[qn$suc];
+      whrcls := .intocls[qn$suc];
+      end;
+
+$QBRCS(.QUERC$,.QUERC$);	% Make initial entry in RCS list %
+
+% process WHERE clause (if any)            
+%
+  if .whrcls[qn$ttype] neq TV$DEFAULT
+    then  
+      if .QUERC$ neq 0
+        then
+          begin
+          if (QWCSP$ := $QBWCS(.whrcls)) eql -1
+            then	% bad where clause %
+              return -1;
+          end    
+        else  
+          begin
+          TYPECRLF;
+          OUTSTR('?? No FROM relation specified');
+          TYPECRLF;
+          return 0
+          end;
+
+% if we are reading from the same relation we are inserting into      
+  then set rc$insdel so to get write locks (instead of read locks)
+  on the reads.
+%
+  if samerelation
+    then
+       QUERC$[rc$insdel] := TRUE;
+      
+  irsb := .QRCB$[rc$rsb];    
+% lets get a new RCB
+%
+  destrcb := $QBINC(.QRCB$,RCV$UPDATE);
+  
+% process field list
+%
+  if .fldlst neq 0
+    then
+      % 
+        left half of QFLIST$ will contain fields whose values will
+        be gotten thru terminal input; right half will contain
+	fields  whose values were specified in field list.
+      %
+      if .fldexprlist
+        then
+          begin
+%          if (QFLIST$ := $QBFLEX(.destrcb, .lstnode)) eql -1
+            then%
+              return 0;
+          end
+        else  
+          if (QFLIST$ := $QBFLST(.destrcb,.fldlst)) eql -1
+            then
+              return 0;
+  
+% set up Report Block for output; if any terminal input set up
+  source block.
+%  
+    rb := scb := 0;
+    if not .setinsert
+      then   
+        if .QFLIST$<18,18> neq 0 or .QFLIST$ eql 0
+          then
+            begin  % open source for terminal input %
+            scb := SRPRT$ := $QBSCB(.rb,.irsb[rs$dct]);
+            $TOPNI(.scb);
+            end;
+       
+
+   if .defaultcls[qn$ttype] eql TV$DEFAULT and .whrcls[qn$ttype] eql TV$DEFAULT
+		 and .setinsert eql FALSE
+     then
+       begin local area;
+       area := .CAREA$;
+       $CGTAREA(.CMEMA$[CV$IQLPERM]);
+       $ROPEN(.destrcb);
+       $CGTAREA(.area);
+loop:  if .fldlst[qn$ttype] neq TV$DEFAULT
+         then do
+           begin
+           local fldno;
+           $QBUFD(.destrcb);   % put all default values in instance buf %
+           tlst := .QFLIST$<18,18>;
+           until .tlst eql 0
+             do
+               begin
+               fldno := .tlst[q$fldno];
+               if not .destrcb[rc$phntmfld,.fldno]
+                 then
+                   begin
+                   if $QTIN(.destrcb, .scb, .fldno, 1) neq .fldno
+                     then
+                       leave loop;   % do not insert this instance %
+                   $QFSTF(.destrcb, .tlst, .destrcb[rc$fld,.fldno], FALSE);
+                   $RFTCH(.destrcb, .fldno, .QRCB$[RC$FLD,.fldno])
+                   end;
+               tlst := .tlst[q$next]
+               end;
+           flst := .QFLIST$< 0,18>;
+           until .flst eql 0
+             do
+               begin
+               fi := $QEOPL(.flst[q$srcexpr]);
+               $QFSTF(.destrcb, .flst, .fi, TRUE);
+               $RFTCH(.destrcb,.flst[q$fldno],.QRCB$[RC$FLD,.flst[q$fldno]]);
+               flst := .flst[q$next];
+               end;
+          
+          if not $QNSRT(.destrcb)
+            then
+              QCNT$ := .QCNT$ + 1
+            else  
+               $RERR(.destrcb,3,0);
+          end	% of flst exists %
+         until .QFLIST$<18,18> eql 0   % Loop if any terminal input %
+        else              
+          while TRUE     % get all values from terminal %
+            do
+              begin
+              local dct;
+              dct := .irsb[rs$dct] - (.irsb[rs$phantom] neq 0);
+              $QBUFD(.destrcb);
+              if $QTIN(.destrcb, .scb, 0, .dct) lss .dct-1
+                then	% end of input reached %
+                  leave loop;
+              $RSALL(.destrcb);
+              if not $QNSRT(.destrcb)
+                then
+                  QCNT$ := .QCNT$ + 1
+                else  
+                  $RERR(.destrcb,3,0);
+              end;
+      $RCLSE(.destrcb);
+      end	% of QRCSP$ eql 0 %
+   else
+      begin
+      if .setinsert 
+        then
+	  if (QURCS$ := $QMRCS(.QUERC$, .destrcb, TRUE)) eql 0
+	    then
+	      return 0;
+            
+      % Set up default report item list;  Some of this info is needed for
+        performing setkeys, selects etc. on 'from rcb'
+      %  
+      if  (QRILP$ := $QBRILB(.QUERC$, 0)) eql 0
+         then
+           return 0;
+      if .scb neq 0
+        then
+          begin  % Set up report block for old values output %
+          rb := $QBDRB(.QRILP$,0);
+          $TOPNO(.rb);
+          $TSEQO(.rb);
+          end;
+
+      $QRALL(.QUERC$, .destrcb);        
+      end;
+      
+       
+   typecrlf;
+   if .QCNT$ eql 0
+     then
+       outstr('No instances satisfying request.')
+     else  
+       begin
+       $UAPDC(UV$OUTPUT,.QCNT$);
+       if .QCNT$ gtr 1
+         then
+           outstr(' instances inserted.')
+	 else  
+           outstr(' instance inserted.');    
+       end;
+   typecrlf;
+    
+   if .scb neq 0
+      then $TCLSI(.scb);
+   if .rb neq 0
+      then $TCLSO(.rb);
+   end;	% of global routine $QPINS %
+   
+  end  
+eludom
+
+    
+ 
