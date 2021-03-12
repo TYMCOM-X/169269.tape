@@ -1,0 +1,842 @@
+BEGIN "Format"
+
+COMMENT Written in TENEX SAIL by R.L. Smith at the Institute for
+Mathematical Studies in the Social Sciences, Stanford University.  
+Modified by M.C. Hinckley at I.M.S.S.S.  
+Modified for Tymcom-X by Adele Gadol.
+Some changes by Bill Soley.
+Cleaned up by M. C. Hinckley at Tymshare.
+;
+
+REQUIRE "<><>" DELIMITERS;
+REQUIRE 10000 STRING!SPACE;
+
+EXTERNAL INTEGER !SKIP!;
+
+DEFINE WantBail	= <FALSE>;
+
+IFC WantBail THENC
+EXTERNAL PROCEDURE BAIL;
+REQUIRE "(SYS)BAIPD8.REL" LOAD!MODULE;
+ENDC
+
+EXTERNAL INTEGER PROCEDURE RchPtr(INTEGER Chan);
+EXTERNAL PROCEDURE SchPtr(INTEGER Chan,CharacterPosition);
+EXTERNAL STRING PROCEDURE StDate(INTEGER Date,Flags);
+
+DEFINE 	!	= <COMMENT>,
+	DSCR	= <COMMENT>,
+	EIF	= <ELSE IF>,
+	Inc(X)	= <X_1+X>;
+
+DEFINE Dividers=<TRUE>;	! This switch brings in a section of code;
+			! whichs marks the position of file pages.;
+			! It should be eliminated if such an option;
+			! is added to SPOOL.;
+
+DEFINE	TokenSize	=<3200>,
+	BucketSize	=<101>,
+	PlListSize	=<12000>,
+	FileSize	=<200>,
+	FplStackSize	=<5000>,
+	CommentSize	=<20>,
+	ReservedSize	=<600>,
+	RbucketSize	=<101>,
+	LineLength	=<71>,
+	PageSize	=<59>;
+
+DEFINE 	FF	=<'14&NULL>,
+	CR	=<'15>,
+	CrLf	=<'15&'12>,
+	CrLf2	=<'15&'12&'15&'12>,
+	Spaces	=<"                                     ">,
+	Space	=<'40&Null>,
+	Tab	=<'11>,
+	Quote	= <'42>,
+	Chars=<"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!$#.\">,
+	QChars=<Chars&Quote>;
+! Most global variables (too many!) reside here;
+
+INTEGER CrlfTbl,FfTbl,DumpTbl,ScanTbl,NoQuoteScanTbl,SemiTbl,CopyTbl,
+	QuoteTbl,FileTbl;
+INTEGER InChn,Eof,InBrk;
+INTEGER OutChn,OutBrk,OutEof;
+INTEGER AllChn,AllBrk,AllEof;
+BOOLEAN WantAll,MetaIndex,WantIndex,IndirectFlag,AllIndirectFlag;
+
+INTEGER PageCnt;
+STRING FileSpec;
+
+INTEGER FileChn,FileBrk,FileEof, FileCnt;
+STRING ARRAY FileNames[1:FileSize];
+
+INTEGER PageNo;
+INTEGER Page,Line,SosNum;
+INTEGER ARRAY Buf[0:511];
+
+STRING ARRAY Tokens[1:TokenSize];
+INTEGER ARRAY Links[1:TokenSize];
+INTEGER ARRAY FplS[1:TokenSize];
+INTEGER ARRAY Buckets[0:BucketSize];
+
+INTEGER ARRAY FplData,FplList[1:PlListSize];
+
+INTEGER LastToken,FplCnt;
+
+INTEGER CommentCnt;
+STRING ARRAY Comments[1:CommentSize];
+
+INTEGER ReservedCnt;
+STRING ARRAY Reserved[1:ReservedSize];
+INTEGER ARRAY Rlinks[1:ReservedSize];
+INTEGER ARRAY Rbuckets[0:RbucketSize];
+
+BOOLEAN NoQuote;
+SIMPLE STRING PROCEDURE Clean(STRING S);
+DSCR Returns a copy of S minus any leading/trailing spaces/tabs
+;
+BEGIN INTEGER JnkChr;
+WHILE (S=Space) OR (S=Tab) DO JnkChr_LOP(S);
+WHILE (JnkChr_S[INF TO INF]=Space) OR (JnkChr=Tab) DO S_S[1 TO INF-1];
+RETURN(S);
+END;
+SIMPLE STRING PROCEDURE Crunch(STRING S);
+DSCR Removes any leading spaces or tabs from S, then returns the rest
+     of S up to the first semicolon.
+;
+BEGIN INTEGER Junk; STRING T;
+WHILE S=Space OR S=Tab DO Junk_LOP(S);
+T_NULL;
+WHILE S AND (S NEQ ";") DO T_T & LOP(S);
+RETURN(T);
+END;
+SIMPLE STRING PROCEDURE Convert(STRING S);
+DSCR Do not modify this procedure unless you are a SAIL wizard.
+     It examines S, replacing any occurrences of control-x by "!".
+     Note that, in effect, S is passed by REFERENCE.
+     Needed to handle files from SUAI.
+;
+START!CODE LABEL Loop,Ret;  DEFINE SP=<'16>,P=<'17>;
+	HRRZ	1,-1(SP);		! Fetch length of S;
+	JUMPE	1,Ret;			! Just return if S is null;
+	MOVE	2,(SP);			! Fetch byte ptr to S;
+	MOVEI	3,'41;			! ASCII for "!";
+Loop:	ILDB	4,2;			! Get a char from S;
+	CAIN	4,'30;			! Is it a ctl-X?;
+	  DPB	3,2;			! Yep, so change to "!";
+	SOJG	1,Loop;			! Keep going if more S;
+Ret:	POPJ	P,;			! RETURN S (now modified);
+END;
+SIMPLE PROCEDURE Fpl(INTEGER TokPtr);
+DSCR (Incomplete)
+     Updates FplCnt and uses it as an index into FplData.
+     The entry in FplData gets the following info:
+	bits  0-11	ptr to the File name
+	     12-23	page number on which the token occurs
+	     24-35	line number on which the token occurs
+;
+BEGIN
+Inc(FplCnt);
+FplData[FplCnt]_(FileCnt LSH 24) LOR (Page LSH 12) LOR (Line+1);
+FplList[FplCnt]_FplS[TokPtr];
+FplS[TokPtr]_FplCnt;
+END;
+SIMPLE INTEGER PROCEDURE New(STRING Tok);
+DSCR Used to store a new token in the array Tokens.
+     Returns the new total of tokens seen (for use as an index).
+;
+BEGIN
+Inc(LastToken);
+Tokens[LastToken]_Tok;
+RETURN(LastToken);
+END;
+SIMPLE PROCEDURE Insert(STRING Tok);
+DSCR If Tok has already been seen, just call Fpl to store the file,
+     page number, and line number on which it occurs.
+     If Tok is a new token, it will be stored in the array Token.
+     If it is the first token with this hash, a pointer to it is
+     stored in Buckets.  If the bucket is full, we chase the overflow
+     chain and add a ptr to Tok to it.
+     Also stores the data by calling Fpl.
+;
+BEGIN INTEGER Hash,ChainPtr;
+ 
+Hash_ABS(CVASC(Tok) XOR LENGTH(Tok)) MOD BucketSize;
+ChainPtr_Buckets[Hash];
+
+IF NOT ChainPtr
+  THEN BEGIN					! Found a new token;
+	 Buckets[Hash]_ChainPtr_New(Tok);
+	 Fpl(ChainPtr);
+	 RETURN;
+       END;
+
+WHILE TRUE DO
+  BEGIN
+    IF EQU(Tokens[ChainPtr],Tok)
+      THEN BEGIN Fpl(ChainPtr); RETURN; END;	! Token already seen;
+    IF Links[ChainPtr]
+      THEN ChainPtr_Links[ChainPtr]
+      ELSE DONE;			! Found end of oveflow chain;
+  END;
+
+Fpl(Links[ChainPtr]_New(Tok));
+END;
+SIMPLE BOOLEAN PROCEDURE IsComment(STRING Tok);
+DSCR RETURNS TRUE if Tok is "COMMENT" or a comment synonym.
+;
+BEGIN INTEGER I;
+IF EQU(Tok,"COMMENT") THEN RETURN(TRUE);
+FOR I_1 STEP 1 UNTIL CommentCnt DO
+  IF EQU(Tok,Comments[I]) THEN RETURN(TRUE);
+RETURN(FALSE);
+END;
+SIMPLE PROCEDURE Rinsert(STRING Tok);
+DSCR Used to set up things for the list of reserved words.
+     If the token Tok is new, it will be saved in the array Reserved.
+     If Tok is also the first token that hashes to Hash,
+     the index into Reserved is saved in Rbuckets[Hash].
+     If Tok is NOT the first token in the bucket, we have to
+     chase the overflow chain.  Rbucket[Hash] points to
+     the top of the chain for Tok.
+;
+BEGIN INTEGER Hash,ChainPtr;
+
+  SIMPLE INTEGER PROCEDURE Rnew(STRING S);
+  DSCR Updates count and inserts S in the reserved word list.
+  ;
+  BEGIN
+  Inc(ReservedCnt);
+  Reserved[ReservedCnt]_S;
+  RETURN(ReservedCnt);
+  END;
+
+Hash_ABS(CVASC(Tok) XOR LENGTH(Tok)) MOD RbucketSize;
+ChainPtr_Rbuckets[Hash];
+
+IF NOT ChainPtr
+  THEN BEGIN					! Nothing in the bucket;
+	Rbuckets[Hash]_Rnew(Tok);
+        RETURN;
+    END;
+
+WHILE TRUE DO
+    BEGIN					! Need to chase link;
+	IF EQU(Reserved[ChainPtr],Tok)
+	  THEN RETURN;				! Tok was already there;
+	IF Rlinks[ChainPtr]
+          THEN ChainPtr_Rlinks[ChainPtr]
+	  ELSE DONE;				! Found the end;
+    END;
+
+Rlinks[ChainPtr]_Rnew(Tok);
+END;
+SIMPLE BOOLEAN PROCEDURE Need(STRING Tok);
+DSCR Returns TRUE if Tok is NOT a reserved word.
+;
+BEGIN INTEGER Char,Hash,ChainPtr;
+
+IF "0" LEQ (Char_Tok) LEQ "9" OR Char="."
+  THEN RETURN(FALSE);
+
+Hash_ABS(CVASC(Tok) XOR LENGTH(Tok)) MOD RbucketSize;
+ChainPtr_Rbuckets[Hash];
+
+WHILE ChainPtr DO
+    BEGIN
+	IF EQU(Reserved[ChainPtr],Tok) THEN RETURN(FALSE);
+	ChainPtr_Rlinks[ChainPtr];
+    END;
+
+RETURN(TRUE);
+END;
+SIMPLE STRING PROCEDURE OdTim;
+DSCR This procedure returns a printable string reporting the
+     current date and time in the format:  dd-mon-yr hr:min:sec
+;
+BEGIN INTEGER Date,Time1,Time2;  STRING TimStr;
+Date_CALLI(0,'14);
+Time1_CALLI(0,'22);
+IF (Time2_CALLI(0,'22)) < Time1 THEN Date_CALLI(0,'14);
+SETFORMAT(-2,0);
+Time2_Time2/60;
+TimStr_CVS(Time2 MOD 60);
+Time2_Time2/60;
+Time1_Time2 MOD 60;
+TimStr_CVS(Time2/60)&":"&CVS(Time1)&":"&TimStr;
+RETURN(StDate(Date,'31)&" "&TimStr);
+END;
+SIMPLE STRING PROCEDURE ZapQuote( STRING T );
+BEGIN INTEGER JnkChr; STRING JnkStr;
+JnkChr_LOP(T);
+
+JnkStr_SCAN(T,QuoteTbl,InBrk);
+IF InBrk=Quote
+  THEN RETURN(T)
+  ELSE BEGIN
+	 DO JnkStr_INPUT(InChn,QuoteTbl) UNTIL InBrk=Quote OR Eof;
+	 RETURN(NULL);
+       END;
+END;
+PROCEDURE PrintTokens(INTEGER Chn; BOOLEAN WantAll);
+BEGIN "Toke"
+INTEGER FplStackCnt,FFcnt,LineCnt;
+INTEGER I,J,K;
+INTEGER ARRAY FplStack[1:FplStackSize];
+INTEGER ARRAY FFCntTokens,Ptr[1:LastToken MAX 1];
+
+  SIMPLE PROCEDURE PageChk(INTEGER SkippedLines; BOOLEAN HaveToken);
+  DSCR This inserts page marks in the Master Index and builds
+       the array containing the page number (in the Master Index)
+       on which each token occurs.
+  ;
+  BEGIN
+  LineCnt_LineCnt+SkippedLines;
+  IF LineCnt GEQ PageSize OR (HaveToken AND LineCnt GEQ PageSize-2)
+    THEN BEGIN CPRINT(Chn,FF); LineCnt_1; Inc(FFcnt); END;
+  IF HaveToken THEN FFCntTokens[Ptr[I]]_FFcnt;
+  END;
+
+EXTERNAL INTEGER PROCEDURE CmpStr(STRING First,Second);
+
+  BOOLEAN PROCEDURE OrderOK(INTEGER I,J);
+  DSCR Returns TRUE if the tokens are in alphabetical order;
+  RETURN( CmpStr(Tokens[Ptr[I]],Tokens[Ptr[J]]) > 0);
+
+  PROCEDURE Shell(INTEGER ARRAY Data);
+  DSCR Shell performs a shell sort (see Knuth vol 3 Page 84).
+       This procedure is courtesy of Scott Daniels.;
+  BEGIN INTEGER Spread,Dmin,Dmax,Grain,Ceiling,LastRound;
+  Spread_1+(Dmax_ARRINFO(Data,2))-(Dmin_ARRINFO(Data,1));
+  WHILE Spread_Spread ASH -1 DO
+    BEGIN
+      LastRomax-Spread;
+      FOR Ceiling_Dmin STEP 1 UNTIL LastRound DO
+        FOR Grain_Ceiling STEP -Spread UNTIL Dmin DO
+	  IF OrderOK(Grain,(Grain+Spread))
+	    THEN Data[Grain] SWAP Data[Grain+Spread]
+	    ELSE DONE;
+    END;
+  END;
+
+  PROCEDURE MakeMetaIndex;
+  DSCR Prepares the index to the Master Index if one has been requested.
+       This index is prepared a page at a time.  The left column is
+       stored in LeftCol and then the page is printed.  
+       Blank lines are left between tokens that begin with different
+       letters. 
+       No attempt is made to cope with long tokens (over 30 chars. can
+       cause a line to become too long for ordinary teletype paper).
+  ;
+  BEGIN "MakeMeta"
+  INTEGER OldChr,TokIdx,LineNum;
+  OWN STRING ARRAY LeftCol[1:PageSize];
+
+  TokIdx_1;				! Point to 1st token;
+  CPRINT(Chn,FF,CrLf,"               ***Index to the Master Index***",
+	     CrLf2);			! Print the heading;
+  LineNum_4;				! First page starts on line 4;
+					! --because of heading;
+  WHILE TokIdx LEQ LastToken DO
+    BEGIN  INTEGER Cnt;
+      OldChr_Tokens[Ptr[TokIdx]];	! Initialize current char;
+      FOR Cnt_LineNum STEP 1 UNTIL PageSize DO
+	BEGIN 
+	  IF TokIdx>LastToken
+	    THEN BEGIN              	! Print the (partial) left col;
+		   FOR LineNum_LineNum STEP 1 UNTIL Cnt-1 DO
+		     CPRINT(Chn,LeftCol[LineNum],CrLf);
+		   RETURN;		! We are all done;
+		 END;
+	  IF OldChr=Tokens[Ptr[TokIdx]]
+	    THEN BEGIN
+		   LeftCol[Cnt]_Tokens[Ptr[TokIdx]] & Space &
+					       CVS(FFCntTokens[TokIdx]);
+		   Inc(TokIdx);		! Token processed so get next;
+		 END
+	    ELSE BEGIN
+		   LeftCol[Cnt]_NULL;		! Leave a blank line;
+		   OldChr_Tokens[Ptr[TokIdx]];  ! And reset old char;
+		 END;
+	END;
+
+      ! We can only get here if we have a full left column and at least;
+      ! one token for the right column ;
+      OldChr_Tokens[Ptr[TokIdx]];		! Reinit current char;
+      FOR Cnt_LineNum STEP 1 UNTIL PageSize DO
+	BEGIN "Print Page"
+	  IF TokIdx>LastToken
+	    THEN BEGIN				! Print end of left col;
+		   FOR LineNum_Cnt STEP 1 UNTIL PageSize DO
+		     CPRINT(Chn,LeftCol[LineNum],CrLf);
+		   RETURN;				! All done;
+		 END;
+	  CPRINT(Chn,LeftCol[Cnt]);
+	  IF OldChr=Tokens[Ptr[TokIdx]]
+	    THEN BEGIN
+		   CPRINT(Chn,Spaces[1 TO 35-LENGTH(LeftCol[Cnt])],
+			      Space,Tokens[Ptr[TokIdx]],Space,
+			      CVS(FFCntTokens[TokIdx]));
+		   Inc(TokIdx);
+		 END
+	    ELSE OldChr_Tokens[Ptr[TokIdx]]; 	! And leave a blank;
+	  CPRINT(Chn,CrLf);
+	END "Print Page";
+
+      IF TokIdx LEQ LastToken THEN CPRINT(Chn,FF);	! More to do;
+      LineNum_1;					! Use top line;
+    END;
+  END "MakeMeta";
+
+
+! *** TOP of PrintTokens;
+
+FOR I_1 STEP 1 UNTIL LastToken DO Ptr[I]_I;	! Initialize Ptr;
+Shell(Ptr);					! Sort the tokens;
+
+FFcnt_2;	! Init to 2 because p. 1 contains the list of files;
+LineCnt_1;
+
+FOR I_1 STEP 1 UNTIL LastToken DO
+  BEGIN INTEGER Fi,Pg,Li, Fpl,Fic,Cnt; STRING T;
+    FplStackCnt_0;
+    Fpl_FplS[Ptr[I]];
+    WHILE Fpl DO
+      BEGIN
+	J_FplData[Fpl];
+	Fi_J LSH -24;			! Recover the ptr to file name;
+	IF WantAll OR Fi=FileCnt
+	  THEN BEGIN
+		 Inc(FplStackCnt);
+		 FplStack[FplStackCnt]_J;
+	       END;
+	Fpl_FplList[Fpl];
+      END;
+  IF FplStackCnt
+    THEN BEGIN "WantSomething"
+	   IF WantAll
+	     THEN BEGIN
+		    PageChk(2,TRUE);
+		    CPRINT(Chn,CrLf2,Tokens[Ptr[I]]);
+		  END
+	     ELSE CPRINT(Chn,CrLf,Tokens[Ptr[I]],CrLf,"    ");
+	     Cnt_4;
+	     IF WantAll THEN Fic_0;
+	   FOR K_FplStackCnt STEP -1 UNTIL 1 DO
+	     BEGIN
+	       J_FplStack[K];
+	       Fi_J LSH -24;
+	       Pg_(J LSH -12) LAND '7777;
+	       Li_J LAND '7777;
+	       IF WantAll AND Fic NEQ Fi
+	         THEN BEGIN
+		        IF FileCnt > 1
+			  THEN BEGIN
+			         PageChk(2,FALSE);
+			         CPRINT(Chn,CrLf,"  ",FileNames[Fi],
+					    CrLf,"    ");
+		               END
+			  ELSE BEGIN
+			         IF WantAll THEN PageChk(1,FALSE);
+			         CPRINT(Chn,CrLf,"    ");
+			       END;
+		        Fic_Fi;
+		        Cnt_4;
+		    END;
+	       T_CVS(Pg) & "." & CVS(Li) & " ";
+	       IF Cnt+LENGTH(T) > LineLength
+	         THEN BEGIN
+		        IF WantAll THEN PageChk(1,FALSE);
+		        CPRINT(Chn,CrLf,"    ");
+		        Cnt_4;
+		      END;
+	       CPRINT(Chn,T);
+	       Cnt_Cnt+LENGTH(T);
+	     END;
+        END "WantSomething";
+  END;
+
+IF WantAll AND MetaIndex THEN MakeMetaIndex;
+	
+END "Toke";
+SIMPLE PROCEDURE ReadTokens;
+DSCR This is the routine that scans an input file to find and
+     process tokens.  It ignores comments and reserved words.
+     If NoQuote is TRUE, it also ignores anything in quote marks.
+     Note that the loops here are very tight, i.e. we drop through
+     them once for each OCCURRENCE of a comment or a token in the
+     file(s) being processed.  So efficiency does count here.
+     That is the main justification for having two quite similar loops.
+;
+BEGIN STRING TheToken;
+
+IF NoQuote
+  THEN WHILE TRUE DO
+    BEGIN
+      INPUT(InChn,DumpTbl);
+      IF InBrk=Quote
+        THEN BEGIN
+       	       INPUT(InChn,QuoteTbl);
+	       InBrk_0;
+ 	       DO INPUT(InChn,QuoteTbl) UNTIL (InBrk=Quote) OR Eof;
+	     END;
+      IF Eof THEN RETURN;
+      TheToken_Convert(INPUT(InChn,NoQuoteScanTbl));
+      IF NOT LENGTH(TheToken) THEN CONTINUE;
+      IF IsComment(TheToken)
+        THEN DO INPUT(InChn,SemiTbl) UNTIL (InBrk=";") OR Eof
+        EIF Need(TheToken) THEN Insert(TheToken);
+      IF Eof THEN RETURN;
+    END
+  ELSE WHILE TRUE DO
+    BEGIN
+      INPUT(InChn,DumpTbl);
+      IF Eof THEN RETURN;
+      TheToken_Convert(INPUT(InChn,ScanTbl));
+      IF NOT LENGTH(TheToken) THEN CONTINUE;
+      IF IsComment(TheToken)
+        THEN DO INPUT(InChn,SemiTbl) UNTIL InBrk=";" OR Eof
+        EIF Need(TheToken) THEN Insert(TheToken);
+      IF Eof THEN RETURN;
+    END;
+
+END;
+PROCEDURE GetInputFiles;
+DSCR Get the files to be processed (can be a command file)
+;
+BEGIN INTEGER Char; STRING Str;
+WHILE TRUE DO
+  BEGIN
+    PRINT(CrLf,"Files (or ?) * ");
+    Str_Clean(INCHWL);
+    IF (Char_LOP(Str))="@"
+      THEN BEGIN
+	     OPEN((FileChn_GETCHAN),"DSK",0,1,0,200,FileBrk,FileEof);
+	     LOOKUP(FileChn,Str,FileEof);
+	     IF FileEof
+	       THEN BEGIN
+		      PRINT("Cannot open file ",Str,".",CrLf);
+		      CONTINUE;
+		    END;
+	     IndirectFlag_TRUE;
+	     DONE;
+	    END
+      EIF Char="?"
+	THEN BEGIN
+	       PRINT("
+Type the name of the file to format, else @file where file is
+a list of files to be done at one sitting.  The master index
+will contain all tokens found in all files.
+See FORMAT.DOC for details.",CrLf);
+	       CONTINUE;
+	     END
+	ELSE BEGIN
+ 	       OPEN((InChn_GETCHAN),"DSK",0,1,0,200,InBrk,Eof);
+	       LOOKUP(InChn,(FileSpec_Char&Str),Eof);
+	       IF Eof
+		 THEN BEGIN
+			PRINT("Cannot open file ",FileSpec,".",CrLf);
+			CONTINUE;
+		      END;
+	       IndirectFlag_FALSE;
+	       DONE;
+	     END;
+  END;
+END;
+PROCEDURE GetMaster;
+DSCR Ask about the master index.
+;
+BEGIN STRING Str;
+WHILE TRUE DO 
+  BEGIN
+    PRINT("Master index (? for help, CrLf for none)  *");
+    Str_Clean(INCHWL);
+    IF NOT LENGTH(Str)
+      THEN BEGIN WantAll_(MetaIndex_FALSE); DONE; END
+      EIF Str="?"
+	THEN BEGIN
+               PRINT("
+A master index file contains a list of all tokens found in all
+files, listed by file.  Type the name of the master index file,
+else type a carriage return if you do not want one.",CrLf);
+	       CONTINUE;
+	     END;
+      OPEN((AllChn_GETCHAN),"DSK",0,0,1,200,AllBrk,AllEof);
+      ENTER(AllChn,Str,AllEof);
+      IF Eof
+	THEN BEGIN
+	       PRINT("Cannot open file ",Str,".",CrLf);
+	       CONTINUE;
+	     END
+	ELSE BEGIN
+	       WantAll_TRUE;
+	       WHILE TRUE DO
+		 BEGIN INTEGER Char;
+		   PRINT("Index for the Master Index? ",
+			 "(?, Y, or anything else for none)  *");
+		   IF (Char_Clean(INCHWL))="?"
+		     THEN PRINT("
+You have asked for a Master Index listing all the SAIL tokens in the
+files you are searching.  This next index will be appended to the
+Master Index and list just the tokens and the page number (in the
+Master Index) where they occur.  Unless your Master Index will be
+very large (over 100 pgs.), you probably want to answer no.")
+
+		     EIF Char="Y" THEN MetaIndex_TRUE;
+		   IF Char NEQ "?" THEN DONE;
+		 END;
+	       DONE;
+	     END;
+  END;
+END;
+PROCEDURE GetIndex;
+DSCR Ask for info about indexing
+;
+BEGIN INTEGER Char;
+WHILE TRUE DO
+  BEGIN
+    PRINT(CrLf,"Index each file (Y, N or ?) *");
+    IF (Char_Clean(INCHWL))="?"
+      THEN BEGIN
+	     PRINT("
+The first page of each file will be a contents page.  The
+question here is whether you want the second page of each
+file to be an index for that file.");
+	     CONTINUE;
+	   END;
+    IF Char="Y"
+      THEN BEGIN WantIndex_TRUE; DONE; END
+      EIF Char="N"
+	THEN BEGIN WantIndex_FALSE; DONE; END
+	ELSE PRINT(CrLf,"Need a yes, no or a ? for help.");
+  END;
+END;
+PROCEDURE GetComment;
+DSCR Ask about comment substitutes;
+BEGIN INTEGER Junk; STRING Str;
+CommentCnt_0;
+WHILE TRUE DO
+  BEGIN
+    PRINT(CrLf,"COMMENT synonyms (or ?) *");
+    IF NOT Str_Clean(INCHWL) THEN DONE;
+    IF Str="?"
+      THEN BEGIN
+	     PRINT("
+COMMENT synonyms are tokens that you have defined to mean the
+same thing as COMMENT.  Hence, everything from the comment
+synonym to the next semicolon is skipped in the file.  
+
+Type a list of tokens, separated by spaces or some other SAIL
+separator.  Terminate with a carriage return.  Or just type a
+carriage return if you don't want any COMMENT synonyms.");
+	     CONTINUE;
+	   END
+      ELSE BEGIN STRING T;
+	     WHILE Str DO
+	       BEGIN
+		 SCAN(Str,DumpTbl,Junk);
+		 T_SCAN(Str,ScanTbl,Junk);
+		 IF T
+		   THEN BEGIN
+			  Inc(CommentCnt);
+			  Comments[CommentCnt]_T;
+			END;
+	       END;
+	     DONE;
+	   END;
+  END;
+END;
+PROCEDURE GetReserved;
+DSCR Ask about reserved words to ignore
+;
+BEGIN INTEGER Chn,Brk,Eof; STRING Str;
+ReservedCnt_0;
+
+WHILE TRUE DO
+  BEGIN
+    PRINT(CrLf,"Reserved Word File *");
+    Str_Clean(INCHWL);
+    IF NOT Str THEN DONE;
+    IF Str="?"
+      THEN BEGIN
+	     PRINT("
+The tokens on the Reserved Word File will be ignored by FORMAT.
+The file can contain real SAIL reserved words, runtime routines,
+or anything you like.");
+	     CONTINUE;
+	   END;
+    OPEN((Chn_GETCHAN),"DSK",0,1,0,1000,Brk,Eof);
+    LOOKUP(Chn,Str,Eof);
+    IF Eof
+      THEN BEGIN
+	     PRINT("Cannot open file ",Str,".",CrLf);
+	     CONTINUE;
+	   END;
+    DO BEGIN STRING S;
+	 INPUT(Chn,DumpTbl);
+	 S_Convert(INPUT(Chn,ScanTbl));
+	 IF S THEN Rinsert(S);
+      END UNTIL Eof;
+    RELEASE(Chn);
+    DONE;
+  END;
+END;
+PROCEDURE GetQuote;
+DSCR Ask if user wants to ignore text inside of quote marks
+;
+BEGIN INTEGER Char;
+
+IFC FALSE THENC
+WHILE TRUE DO
+  BEGIN
+    PRINT("Ignore quoted text? (Y, N or ?): ");
+    Char_Clean(INCHWL);
+    IF Char="Y"
+      THEN BEGIN NoQuote_TRUE; DONE; END
+      EIF Char="?"
+        THEN BEGIN
+	       PRINT("
+Type Y to exclude anything inside quote marks from the index(es).
+This will exclude block name labels, but avoids picking up text
+inside of PRINT, OUTSTR, etc. and so may be useful if you have
+many string constants.  Typing anything other than Y will cause
+text inside quote marks to be included among the tokens.");
+	       CONTINUE;
+	     END
+	ELSE BEGIN NoQuote_FALSE; DONE; END;
+  END;
+ELSEC
+NoQuote_TRUE;
+PRINT(CrLf,"THIS VERSION IGNORES ANY TEXT INSIDE QUOTE MARKS!!");
+ENDC
+PRINT(CrLf);
+END;
+! *** TOP OF PROGRAM ***;
+TTYUP(TRUE);
+
+SETBREAK(CrLfTbl_GETBREAK,       '12,     '14&'15,"IN");
+SETBREAK(FFTbl_GETBREAK,         FF,      NULL,   "INA");
+SETBREAK(NoQuoteScanTbl_GETBREAK,Chars,   NULL,   "XNKR");
+SETBREAK(ScanTbl_GETBREAK,       Qchars,  NULL,   "XNK");
+SETBREAK(DumpTbl_GETBREAK,       Qchars,  NULL,   "INR");
+SETBREAK(SemiTbl_GETBREAK,       ";" & FF,NULL,   "IN");
+SETBREAK(CopyTbl_GETBREAK,       FF,      NULL,   "IN");
+SETBREAK(QuoteTbl_GETBREAK,      Quote,   NULL,   "IN");
+SETBREAK(FileTbl_GETBREAK,       ".",     NULL,   "IN");
+
+IFC WantBail THENC BAIL; ENDC
+
+AllIndirectFlag_FALSE;
+GetInputFiles;
+GetMaster;
+GetIndex;
+GetComment;
+GetReserved;
+GetQuote;
+
+FileCnt_LastToken_FplCnt_0;
+
+DO BEGIN "READ LIST" STRING Str;  LABEL GotFile;
+     IF NOT IndirectFlag THEN GOTO GotFile;
+     FileSpec_INPUT(FileChn,CrLfTbl);
+     IF NOT FileSpec THEN CONTINUE;
+     OPEN((InChn_GETCHAN),"DSK",0,1,0,200,InBrk,Eof);
+     LOOKUP(InChn,FileSpec,Eof);
+     IF Eof
+       THEN BEGIN
+	      PRINT("Cannot open File ",FileSpec,".",CrLf);
+	      CONTINUE;
+	    END;
+   GotFile:
+     SETPL(InChn,Line,Page,SosNum);
+
+     BEGIN "READ File" INTEGER SavedPtr; STRING S;
+       Inc(FileCnt);
+       FileNames[FileCnt]_FileSpec;
+       PRINT("Reading ",FileNames[FileCnt],CrLf);
+       OPEN(OutChn_GETCHAN,"DSK",0,0,1,0,OutBrk,OutEof);
+       Str_SCAN(FileSpec,FileTbl,InBrk);
+       ENTER(OutChn,Str,OutEof);
+       IF OutEof
+	 THEN BEGIN
+		PRINT("Cannot open file ",Str,".",CrLf);
+		DONE;
+	      END;
+       CPRINT(OutChn,"COMMENT **CONTENTS**",CrLf,
+		     "      Written ",OdTim,CrLf2);
+       S_INPUT(InChn,CrLfTbl);
+       IF EQU(S,"COMMENT **CONTENTS**")
+	 THEN BEGIN INTEGER Ptr;
+		DO INPUT(InChn,FFTbl) UNTIL InBrk=FF OR Eof;
+		Ptr_RchPtr(InChn);
+		S_INPUT(InChn,CrLfTbl);
+		IF EQU(S,"COMMENT **INDEX**")
+		  THEN BEGIN
+			 DO INPUT(InChn,FFTbl) UNTIL InBrk=FF OR Eof;
+		       END
+		  ELSE SchPtr(InChn,Ptr);
+	       END
+	 ELSE SchPtr(InChn,0);  		! Back up;
+       SETFORMAT(3,1);
+       SavedPtr_RchPtr(InChn);			! Ptr to data;
+       PageNo_(IF WantIndex THEN 2 ELSE 1);
+! Next line is correct IF we are not using dividers and if the output
+  file is intended to become the new source.  
+       PageNo_(IF WantIndex THEN 3 ELSE 2);
+       WHILE NOT Eof DO
+	 BEGIN INTEGER Ptr;
+	   CPRINT(OutChn,CVS(PageNo),"   ");
+	   Ptr_RchPtr(InChn);
+	   DO S_Crunch(INPUT(InChn,CrLfTbl)) UNTIL Eof OR S;
+	   CPRINT(OutChn,S,CrLf);
+	   SchPtr(InChn,Ptr);		! Pointer back to page start;
+	   DO UNTIL WORDIN(InChn)=FF OR Eof;
+	   Inc(PageNo);
+	 END;
+       CPRINT(OutChn,CrLf,";",CrLf,FF);
+       IF WantIndex OR WantAll
+	 THEN BEGIN
+		SchPtr(InChn,SavedPtr);		! Set to data;
+		Page_1;				! Say it's on page 3;
+		Line_0;				! This will be increm.;
+		ReadTokens;
+		IF WantIndex
+		  THEN BEGIN
+			 SETFORMAT(1,7);
+			 CPRINT(OutChn,FF,"COMMENT **INDEX**",CrLf);
+			 PrintTokens(OutChn,FALSE);
+			 CPRINT(OutChn,CrLf,";",CrLf,FF);
+		       END;
+	      END;
+
+       ! now copy actual text of File;
+       SchPtr(InChn,SavedPtr);			! Beginning of data;
+       PageCnt_1;
+       CPRINT(OutChn,CrLf,"=========================== File Page ",
+		     CVS(PageCnt)," ==============================",
+		     CrLf2);
+       DO BEGIN
+	    CPRINT(OutChn,INPUT(InChn,CopyTbl));
+	    IF InBrk=FF
+	      THEN CPRINT(OutChn,CrLf,
+		               "=========================== File Page ",
+		  	       CVS(Inc(PageCnt)),
+		  	       " ==============================",CrLf2);
+	  END UNTIL Eof;
+       RELEASE(OutChn);
+       RELEASE(InChn);
+     END;
+   END UNTIL NOT IndirectFlag OR FileEof;
+
+IF WantAll
+  THEN BEGIN INTEGER I;
+	 CPRINT(AllChn,CrLf,
+	   "Token Search of the Following SAIL Files on ",OdTim,CrLf2 );
+	 FOR I_1 STEP 1 UNTIL FileCnt DO
+	   CPRINT(AllChn,FileNames[I],CrLf);
+	 CPRINT(AllChn,FF);
+	 PrintTokens(AllChn,TRUE);
+	 RELEASE(AllChn);
+       END;
+END "Format"; .
+ FR=ü
