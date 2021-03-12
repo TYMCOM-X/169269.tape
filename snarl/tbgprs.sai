@@ -1,0 +1,363 @@
+ENTRY;
+BEGIN "Top-down parser"
+
+
+LET R!C = RECORD!CLASS;  LET R!P = RECORD!POINTER;
+LET n!r = null!record;
+DEFINE \ = "COMMENT";
+REQUIRE 1000 SYSTEM!PDL;
+REQUIRE 1000 STRING!SPACE;
+REQUIRE "tdp001.sai" source!file;
+REQUIRE "{}<>" DELIMITERS;
+
+DEFINE xtkn(wd) = {ldb(point(12,gramr[wd],11))};
+DEFINE xdef(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xrou(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xerr(wd) = {gramr[wd] land '7777};
+DEFINE xsucc(wd) = {gramr[wd] land '7777};
+DEFINE xfail(wd) = {gramr[wd] land '7777};
+DEFINE nlft(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE clrsucc(wd) = {gramr[wd] land '777777770000};
+DEFINE psucc(wd,value) = {gramr[wd]_clrsucc(<wd>) lor value};
+
+
+
+REQUIRE "tbgsym.sai" SOURCE!FILE;
+
+
+PRESET!WITH
+'000140000000, '400000110003, '000200110005, '000000000000, '000300340007, 
+'000000000000, '000400560000, '000000000000, '000240000000, '400000200013, 
+'000501210000, '000600200000, '000700260000, '400100000000, '000000000000, 
+'000640000000, '400000260022, '400200000000, '400200000000, '400300000000, 
+'000000000000, '000740000000, '400000340030, '400400000032, '000000000000, 
+'400500000000, '000000000000, '000340000000, '400000560036, '001001010041, 
+'400100000041, '000000000000, '001001010045, '001101270045, '400100000045, 
+'000000000000, '001001010051, '001201350051, '400100000051, '000000000000, 
+'001001010000, '001101270000, '001201350000, '400100000000, '000000000000, 
+'000440000000, '400000640060, '000600200000, '001300640000, '400100000000, 
+'000000000000, '001340000000, '400000730066, '001400730071, '001300640071, 
+'000000000000, '001400730000, '000000000000, '001440000000, '400001010075, 
+'001001010077, '000000000000, '001501070000, '000000000000, '001040000000, 
+'400001070103, '401200000000, '401400000000, '401300000000, '000000000000, 
+'001540000000, '400001150111, '001601150113, '000000000000, '000501210000, 
+'000000000000, '001640000000, '400001210117, '400500000000, '000000000000, 
+'000540000000, '400001270123, '401000000000, '401400000000, '401100000000, 
+'000000000000, '001140000000, '400001350131, '400600000000, '401400000000, 
+'400700000000, '000000000000, '001240000000, '400000000137, '400500000000, 
+'000000000000;
+INTERNAL INTEGER ARRAY gramr[1:96];
+
+
+COMMENT *** TOKEN TABLE ***;
+
+PRESET!WITH
+	'12,'4001,
+	'72,'4002,
+	'75,'4003,
+	'133,'4006,
+	'135,'4007,
+	'173,'4010,
+	'175,'4011,
+	'74,'4012,
+	'76,'4013;
+INTEGER ARRAY deltok[1:18];
+
+
+PRESET!WITH null;
+STRING ARRAY keywrd[0:0];
+
+PRESET!WITH 0;
+INTEGER ARRAY keytok[0:0];
+
+
+
+PRESET!WITH
+	null;
+OWN INTERNAL STRING ARRAY messgs[0:0];
+
+
+
+
+INTERNAL SIMPLE PROCEDURE tdinit;
+BEGIN
+   pgrhed_n!r;  tokhed_(toktop_(cursor_n!r));
+   cmdstr_null;  msghgh_(curhgh_0);  RETURN;
+END;
+
+REQUIRE tdinit INITIALIZATION;
+
+
+RECURSIVE R!P (any!class) PROCEDURE reset!cursor (R!P (any!class) link);
+	\ This procedure is used by "free!graph" to reset the "cursor"
+pointer back so that it reflects the position being scanned in the input
+string when the node referenced by "link" was built.  In other words, it
+backtracks in the input string in an analogous fashion to the backtracking
+in the parsing tree done by "backtrack".  It need only search along a
+list of definitions to the first terminal symbol to find the proper
+place, since that terminal would be the first one to have been found
+when building the branch.  The "link" parameter points to the position
+in the graph where a branch is to be erased.;
+
+BEGIN
+  R!P (any!class) def;
+  IF (def_pgraph:def[link])=n!r then RETURN (cursor);
+  IF pgraph:tkn[link] < '4000 THEN RETURN (reset!cursor(def));
+  RETURN (def);
+END;
+
+
+RECURSIVE PROCEDURE backtrack (R!P (any!class) link);
+	\ This procedure is used by "free!graph" to get rid of the
+branch of the graph beginning with the node pointed to by "link".  This
+includes all of the tree which defines the given node.  Any intermediate
+results are unlinked also.;
+
+BEGIN
+  R!P (any!class) def, succ;
+  IF link=n!r THEN RETURN;
+  IF (succ_pgraph:succ[link]) neq n!r THEN 
+  BEGIN
+    backtrack(succ);  pgraph:succ[link]_n!r;
+  END;
+  IF (def_pgraph:def[link]) neq n!r THEN
+    IF pgraph:tkn[link] > '4000 then pgraph:def[link]_n!r
+    ELSE BEGIN
+      backtrack(def);  pgraph:def[link]_(pgraph:result[link]_n!r);
+    END;
+  RETURN;
+END;
+
+
+R!P (any!class) PROCEDURE free!graph (R!P (any!class) link);
+	\ This procedure erases a branch of the tree, the definition of
+the node pointed to by "link", by unlinking the node pointers.  The
+input cursor is also put back to the appropriate position.  "Free!graph"
+is called by "parse" and always returns N!R.;
+
+BEGIN
+  cursor_reset!cursor(link);  backtrack(link);  RETURN (n!r);
+END;
+
+
+INTERNAL STRING PROCEDURE messag;
+	\ This routine returns the error message corrsponding to the
+value of "msghgh".  It is available to subroutines in the user's
+program which must access the "messgs" array.;
+RETURN (messgs[msghgh]);
+
+	
+INTERNAL INTEGER PROCEDURE delim (INTEGER char);
+	\ This procedure searches the delimiter array "deltok" for the
+occurrance of "char".  If found, the corresponding token value is
+returned.  Otherwise a zero is returned.;
+BEGIN
+   INTEGER low, high, i;
+   low_arrinfo(deltok,1);  high_arrinfo(deltok,2);
+   FOR i_low step 2 until high DO
+      IF deltok[i]=char THEN RETURN (deltok[i+1]);
+   RETURN (0);
+END;
+
+
+INTERNAL INTEGER PROCEDURE keychk (STRING find);
+	\ This routine checks to see whether "find" is in the keyword
+table and returns the correct token number if it is.  If not a keyword,
+the procedure returns a zero.;
+BEGIN
+  EXTERNAL SIMPLE INTEGER PROCEDURE strsrc (STRING ARRAY names;
+    STRING look;  REFERENCE BOOLEAN exact);
+  BOOLEAN exact;  INTEGER i;
+  IF (i_strsrc(keywrd,find,exact))=0 THEN RETURN (0)
+  ELSE RETURN (keytok[i]);
+END;
+
+
+INTERNAL STRING PROCEDURE getkey (INTEGER toknum);
+	\ This routine searches "keytok" for the given token number
+"toknum".  If it succeeds, then the corresponding keyword string from
+"keywrd" is returned.  A null string is returned on failure.;
+BEGIN
+   INTEGER low,high,i;
+   low_arrinfo(keytok,1);  high_arrinfo(keytok,2);
+   FOR i_low step 1 until high DO
+      IF keytok[i]=toknum THEN RETURN (keywrd[i]);
+   RETURN (null);
+END;
+
+
+INTERNAL INTEGER PROCEDURE getdel (INTEGER toknum);
+	\ This routine searches "deltok" for the given token number
+"toknum".  If it succeeds, then the corresponding delimiter character
+is returned.  A zero is returned on failure.;
+BEGIN
+   INTEGER low,high,i;
+   low_arrinfo(deltok,1);  high_arrinfo(deltok,2);
+   FOR i_low step 2 until high DO
+      IF deltok[i+1]=toknum THEN RETURN (deltok[i]);
+   RETURN (0);
+END;
+
+
+INTERNAL R!P (any!class) PROCEDURE check!sym (INTEGER toknum, key!id);
+	\ This procedure functions as the scanner and symbol
+matcher.  "Toknum" is the token number needed for a match.  If the next
+symbol called for in a parsing rule is a terminal, then this routine is
+called to get the next input token and check if it matches "toknum",
+the one required.  If successful, "check!sym" returns a pointer to the
+token entry in "pgraph".  If unsuccessful, it returns n!r.
+	The "key!id" parameter, if it is the same as "toknum", will
+cause a keyword symbol to be treated as a match even if its assigned
+token value is not the same as "toknum".  This can be used to cause
+keyword symbols to match an alphanumeric identifier (for example) if
+such an identifier is the desired symbol.  A "key!id parameter of zero
+causes "check!sym" to match only when the current token value is exactly
+the same as the one required.;
+
+BEGIN
+  INTEGER token, i, fst!key, lst!key;
+  fst!key_arrinfo(keytok,1);  lst!key_arrinfo(keytok,2);
+  IF cursor=n!r THEN RETURN (n!r);
+  IF (token_tokent:token[cursor])=toknum THEN RETURN (cursor)
+  ELSE IF toknum=key!id THEN FOR i_fst!key STEP 1 UNTIL lst!key DO
+    IF keytok[i]=token THEN RETURN (cursor);
+  RETURN (n!r);
+END;
+
+
+INTERNAL RECURSIVE R!P (any!class) PROCEDURE parse (INTEGER dict(1), msglst(0));
+	\ This is the routine which builds the parsing graph including
+all necessary linking to complete the tree structure.  It ultimately
+returns to the caller a pointer to the first element of the structure
+if the parse was successful.  If unsuccessful, it returns N!R.
+	The parameter "dict" is an array index to the rule of the
+grammar that parse should begin with (usually the goal symbol
+production).
+	"msglst" is usually not supplied by the caller.  It is used
+to keep track of the current message which is associated with the
+rule being checked.  When "parse" calls itself, it will pass the
+value of "msglst" to the next level.;
+
+BEGIN "parsing"
+
+  EXTERNAL R!P (any!class) PROCEDURE chksym (INTEGER token);
+  INTEGER spcsub, token, nxtlft;
+  R!P (any!class) link;
+  BOOLEAN spcret;
+
+  IF gramr[dict]=0 THEN RETURN (n!r);
+  IF (gramr[dict] LSH 12) < 0 THEN
+  BEGIN									\ Left-hand-side;
+    DO BEGIN								\ Find non-empty rule;
+      IF (token_xerr(<dict>)) THEN msglst_token;			\ Save ptr. to error message;
+      spcsub_xrou(<dict>);						\ Save ptr. to special subroutine;
+      nxnlft(<dict+1>);						\ Get index of next left-hand side;
+      IF (dict_xsucc(<dict+1>))=0 THEN dict_nxtlft ELSE DONE;
+    END UNTIL nxtlft=0;
+    IF dict=0 THEN RETURN (n!r);
+    WHILE (link_parse(dict,msglst))=n!r DO				\ While rule portion fails,;
+      IF (dict_xfail(<dict>))=0 THEN RETURN (n!r);
+
+   CASE spcsub of BEGIN
+[0]   RETURN (link)
+   END;
+    IF spcret THEN RETURN (pgrhed_link)
+    ELSE BEGIN
+      free!graph(link);  curhgh_tokent:pos[cursor];  RETURN (n!r);
+    END;
+  END;
+
+  link_new!record(pgraph);						\ Right-hand-side element.;
+  pgraph:tkn[link]_(token_xtkn(<dict>));					\ Build new graph element.;
+  IF token > '4000 THEN
+  BEGIN									\ If terminal symbol, ;
+    pgraph:def[link]_chksym(token);					\ try to match with ;
+    IF cursor neq n!r THEN IF tokent:pos[cursor] > curhgh THEN		\ symbol from input.;
+    BEGIN								\ If the cursor is farther ;
+      curhgh_tokent:pos[cursor];					\ than it has been before, ;
+      msghgh_msglst;							\ then keep track of ;
+    END;								\ latest message.;
+  END
+  ELSE pgraph:def[link]_parse(xdef(<dict>),msglst);			\ If non-terminal, must ;
+									\ parse using definition.;
+  IF pgraph:def[link]=n!r THEN RETURN (free!graph(link))		\ Match or parse failed - backtrack.;
+  ELSE BEGIN								\ Success.;
+    IF token > '4000 THEN cursor_tokent:next[cursor];			\ If symbol match, bump cursor.;
+    IF gramr[dict+1]=0 THEN RETURN (pgrhed_link);			\ If no successor, done.;
+    pgraph:succ[link]_parse(dict+1,msglst);				\ Parse successor - save ptr.;
+    IF pgraph:succ[link]=n!r THEN RETURN (free!graph(link))		\ If succ. parse failed, backtrack.;
+    ELSE RETURN (pgrhed_link);
+  END;
+
+END "parsing";
+
+
+INTERNAL PROCEDURE init!graph;
+	\ This procedure resets the parsing graph "pgraph" and the
+token entry list "tokent" back to their initial states and puts the
+other pointers to either structure back to their initial values.;
+
+BEGIN
+  backtrack(pgrhed);
+  WHILE tokhed neq n!r DO tokhed_tokent:next[tokhed];
+  tdinit;
+END;
+
+
+INTERNAL PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match(true));
+	\ This procedure fixes the right-hand-side links in the grammar
+so that the designated rules are removed from the set of grammar
+rules.  "Tknlst" is an array of token values each representing the
+left-hand-side of a rule.  If "match" is TRUE, then all rules whose
+left-hand-sides match an entry in "tknlst" will be removed from the
+command set.  If "match" is FALSE, then all rules whose left-hand-sides
+do not match any entry in "tknlst" will be removed.  If the "tknlst"
+array contains a 0 value in the first word, then the whole set of rules
+is set to be used (no elements removed, and removed ones put back).;
+
+BEGIN
+  INTEGER tknlow, tknup, i, j;
+  BOOLEAN compar;
+
+  i_arrinfo(gramr,1);  tknlow_arrinfo(tknlst,1);
+  tknup_arrinfo(tknlst,2);
+  IF tknlst[tknlow]=0 THEN
+    WHILE i neq 0 DO BEGIN
+      i_i+1;  j_i+1;
+      psucc(<i>,<j>);  i_nlft(<i>);
+    END;
+  WHILE i neq 0 DO BEGIN
+    compar_false;
+    FOR j_tknlow step 1 until tknup DO BEGIN
+      IF xtkn(<i>)=tknlst[j] THEN compar_true;
+      IF compar THEN DONE;
+    END;
+    compar_not(compar xor match);
+    i_i+1;  IF compar THEN gramr[i]_clrsucc(<i>);  i_nlft(<i>);
+  END;
+  RETURN;
+END;
+
+
+INTERNAL INTEGER PROCEDURE fndgrm (INTEGER toknum);
+	\ This procedure searches the stored grammar representation for
+the beginning of the rule which defines the token "toknum".  If
+successful, the array index in "gramr" of the rule is returned.  Zero
+is returned otherwise.  The value "toknum" must represent a non-terminal
+symbol.
+	This routine is used when a program needs to call "parse" on a
+branch or subset of the grammar.  It can use "fndgrm" to locate the
+array index which must be used as a parameter to "parse".;
+
+BEGIN
+  INTEGER i;
+  i_arrinfo(gramr,1);
+  WHILE i neq 0 DO BEGIN
+    IF xtkn(<i>)=toknum THEN RETURN (i);
+    i_nlft(<i+1>);
+  END;
+  RETURN (0);
+END;
+
+END "Top-down parser";
+.Yl»
