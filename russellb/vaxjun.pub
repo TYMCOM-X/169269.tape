@@ -1,0 +1,38 @@
+.require "MEMOHD.PUB" sourcefile
+.to |Carl D/Ray G./Brett F.|
+.from |Ben Russell|
+.cc |Tim R.|
+.re |June Vax 11/780 configuration|
+.body
+.begin verbatim
+
+ Below please find the configuration of the June Vax 11/780.  In order
+for this system to shipped as the first or second Rabo system, the following
+changes would have to be made:
+ . add an extra 512k bytes of memory
+ . change the tape drive from a TEE16 to a TU77
+ . keep one of the RMO3 disk drive 
+ . down grade the line printer to a 300 lpm printer
+ . keep the DZ11-B
+ . keep the DL-11 and DUP-11 communications devices
+
+ Given all of the above configuration changes, I would like to recommend
+that we not plan on shipping this system to Rabo.
+
+ The June VAX 11/780 is configured as follows:
+  SV-AXTVB-CA
+   11/780
+    512k bytes memory
+    LA120 console
+    3 REM03 disk drives and controller
+    TEE16 tape drive and controller
+    32 async ports (DZ11-A, DZ11-B, DZ11-E)
+    DL-11-DA  Async interfaces
+    DUP-11-DA  Sync interface
+    LP-11-YA  600 lpm printer
+
+ I will call in the morning to discuss the above.
+
+ Ben Russell
+.end
+.endbody
