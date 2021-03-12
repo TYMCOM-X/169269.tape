@@ -1,0 +1,381 @@
+ENTRY;
+BEGIN "SNIO"
+require processes;
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndsn.sai" SOURCE!FILE;
+ck!sn
+REQUIRE "snsym.sai" SOURCE!FILE;
+elsec
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+endc
+REQUIRE "sndefs.sai" SOURCE!FILE;
+!get!definitions(<tymint>);
+
+EXTERNAL STRING snstat;				\ SNARL or DSNARL status vector.;
+EXTERNAL INTEGER jobtpc,			\ program counter at interrupt time;
+   apracs;					\ saved AC's at interrupt time start here.;
+EXTERNAL INTEGER ARRAY gogtab[0:'300];
+
+EXTERNAL INTEGER mtchan, mteof,			\ mag tape channel stuff.;
+   mtstat,					\ sense data,,status bits;
+   mtdens,					\ currently set density;
+   mtrec,					\ Physical record containing the beginning of current tape file;
+   mtpos,					\ Position of last complete file processed.;
+   mtibuf,					\ number of buffers for buffered input;
+   mtobuf,					\ number of buffers for buffered output;
+   tapbloc,					\ current tape physical block number;
+   tappos,					\ current tape file position number;
+   tapppn,					\ current tape ppn value;
+   cmdtkn;					\ token value of command currently executing;
+EXTERNAL STRING mtdev;				\ mag tape device name;
+EXTERNAL BOOLEAN dskdev;			\ true if current mag tape device is really disk;
+
+EXTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];
+
+ITEM intpro;					\ For sprouting interrupt process "intpro";
+ITEM io!itm;					\ For sprouting I/O processes;
+INTEGER ARRAY trpvct[0:7];			\ Interrupt trap vector;
+PRESET!WITH
+   !command, !statement,
+ck!sn
+   !spri!c, !p!fmt, !rpri!c, !wher!c,
+endc
+   !help!c, !cmdwd, !stop!c,
+   !qmrk!c, !abor!c, !cont!c;
+ck!sn
+INTEGER ARRAY attn!g[1:12];			\ Keyboard interrupt time commands;
+elsec
+INTEGER ARRAY attn!g[1:8];			\ Keyboard interrupt time commands;
+endc
+
+INTEGER hchans;					\ Bit map word to keep track of assigned "high" channels;
+INTEGER tape!word!count;			\ Keeps track of position in the physical tape record.;
+
+EXTERNAL BOOLEAN PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+EXTERNAL PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match(true));
+EXTERNAL SIMPLE BOOLEAN PROCEDURE ab!cond;
+\  Alternate channel procedures;
+
+INTERNAL SIMPLE INTEGER PROCEDURE getmchan;
+	\ This procedure is used to get a channel for mapping.  The
+channels assigned will be in the range 16-31 (which SAIL does not use or
+know about).  The bit map word "hchans" is used to keep track of the
+channels (a 1 in the leftmost bit means channel 16 is in use, etc.).
+;
+BEGIN
+   LABEL gotone, alldon;
+   START!CODE
+	setcm	0,hchans	;					\ Get channel word complement;
+	jffo	0,gotone	;					\ First "1" will represent a free channel;
+	setcm	1,1		;					\ Ac1 is SAIL's return ac;
+	jrst	alldon		;
+gotone:	movn	2,1		;
+	addi	1,16		;					\ Compute available channel number;
+	movsi	3,'400000	;
+	lsh	3,(2)		;
+	xor	0,3		;
+alldon:	setcab	0,hchans	;
+   END;
+END;
+
+
+SIMPLE PROCEDURE setchan;
+	\ Initialization for the alternate channel assignment routine.;
+hchans_ '3777777;
+
+REQUIRE setchan INITIALIZATION;
+
+
+INTERNAL SIMPLE PROCEDURE relchan (REFERENCE INTEGER channel;
+  INTEGER closebits(0));
+	\ This is an alternate "RELEASE".  If the channel was assigned
+by SAIL (less than 16) then SAIL's RELEASE is invoked.  Otherwise, an
+alternate is invoked which will work with the channels assigned for
+mapping.
+;
+BEGIN
+   if channel > 15 then
+   BEGIN
+      chnioi( <channel>, <closebits>, <1> );  chniov( channel, 0, 0 );
+      START!CODE
+	movn	1,channel	;
+	addi	1,16		;	
+	movsi	0,'400000	;
+	lsh	0,(1)		;
+	setcm	0,0		;
+	andm	0,hchans	;
+      END;
+   END
+   else if channel > 0 then release( channel, closebits);
+   channel_ -1;  return;
+END;
+INTERNAL BOOLEAN PROCEDURE xeof (INTEGER eofvar);
+	\ This procedure checks to see whether the "eof" bit is set in
+the given "eof" variable.
+;
+if (eofvar land '20000000000) then
+BEGIN
+   print("*** EOF ***" & crlf);  return (true);
+END
+else return (false);
+INTERNAL BOOLEAN PROCEDURE xerr (INTEGER eofvar);
+	\ This procedure checks to see whether the "eof" variable
+indicates an error condition and prints some information about the error.
+;
+\  more to come - more specifics;
+if eofvar then
+BEGIN
+   print("Tape error condition detected." & crlf);  return (true);
+END
+else return (false);
+ck!sn INTERNAL PROCEDURE tapout (INTEGER channel, rcdtyp, count,
+   offset(1);  INTEGER ARRAY tapbuf);
+	\ This procedure outputs an array of information to tape.  It
+keeps track of the word counts with respect to the physical tape record
+boundaries and puts out record headers or dummy records where they are
+appropriate.
+	"Channel" is the tape channel.  "Rcdtyp" is the logical record
+type.  The "count" parameter is the size of the data array (in words
+including the record marker) to be output.  "Taprcd" marks the beginning
+of a buffer of data to be written.
+;
+BEGIN
+   INTEGER i, j;
+
+PROCEDURE new!rec;
+	\ Starts a new physical tape block for "tapout".;
+BEGIN
+   wordout(channel,rcd+4);  wordout(channel,(tapbloc_ tapbloc+1));
+   wordout(channel,tappos);  wordout(channel,tapppn);			\ This should be PPN;
+   tape!word!count_ 4;  return;
+END;
+
+   if tape!word!count = 0 then new!rec;
+   if (i_ tape!buf!size-tape!word!count) < count then			\ If there is not enough room;
+   BEGIN								\ to put the logical record in;
+      if rcdtyp=dat and i > 1 then					\ the current physical record . . .;
+      BEGIN								\ Break up a data record into;
+	 wordout(channel,rcdtyp+i);					\ two parts.;
+	 arryout(channel,tapbuf[offset],i-1);
+	 new!rec;
+	 wordout(channel,rcdtyp+count-i+1);
+	 arryout(channel,tapbuf[offset+i-1],(j_ count-i));
+	 tape!word!count_ tape!word!count + j + 1;
+      END
+      else BEGIN
+	 wordout(channel,dum+i);					\ If not a data record,;
+	 arryout(channel,tapblk[1],i-1);				\ then finish the current;
+	 new!rec;							\ physical record with a dummy;
+	 wordout(channel,rcdtyp+count);					\ record, and put the desired;
+	 if (count-1) then arryout(channel,tapbuf[offset],count-1);	\ record in the next physical record.;
+	 tape!word!count_ tape!word!count + count;
+      END;
+   END
+   else BEGIN								\ If there is room, then;
+      wordout(channel,rcdtyp+count);					\ output the logical record.;
+      if (count-1) then arryout(channel,tapbuf[offset],count-1);
+      tape!word!count_ tape!word!count + count;
+   END;
+   if rcdtyp=eot and (i_ tape!buf!size-tape!word!count) > 0 then
+   BEGIN
+      wordout(channel,dum+i);  arryout(channel,tapblk[1],i-1);
+      tape!word!count_ 0;
+   END;
+   if tape!word!count = tape!buf!size then tape!word!count_ 0;
+   return;
+END;
+endc
+ck!sn INTERNAL PROCEDURE to!begin;
+	\ This routine initializes variables so that "tapout" will start
+a new physical record when called by "s!sto".;
+tape!word!count_ 0;
+endc
+ck!sn INTERNAL INTEGER PROCEDURE retwdpos;
+	\ Returns the word position in the tape block where the next
+output for STORE will begin.
+;
+BEGIN
+   integer i;
+   i_ (tape!word!count+1) mod tape!buf!size;
+   if not i then i_ 5;
+   return( i );
+END;
+endc
+PROCEDURE i!attn;
+	\ This deferred interrupt procedure is executed when a keyboard
+interrupt is detected.;
+BEGIN
+   if snstat[1 for 1]="K" then return;					\ Ignore if already aborting;
+   snstat_"K"&snstat;
+   return;
+END;
+
+
+PROCEDURE i!hung;
+	\ This deferred interrupt procedure is executed when a hung
+device condition is detected.;
+BEGIN
+   IF snstat[1 for 1]="H" THEN RETURN;					\ Ignore if already aborting;
+   snstat_"H"&snstat;
+   RETURN;
+END;
+
+
+PROCEDURE i!mag;
+	\ This deferred interrupt procedure is executed when a device
+error condition is detected.;
+BEGIN
+   IF snstat[1 for 1]="D" THEN RETURN;					\ Ignore if already aborting;
+   snstat_"D"&snstat;
+   RETURN;
+END;
+
+
+INTERNAL PROCEDURE i!kybd;
+	\ This procedure can be called from other routines in SNARL to
+check for and service a keyboard interrupt.  If one has occurred (and
+is marked on the SNARL status vector, then the user is prompted for one
+of the interrupt-time commands, which is then executed.;
+BEGIN
+   BOOLEAN cmdok;
+   if snstat[1 for 1] neq "K" then return;
+   lop(snstat);
+   cmdset(attn!g,false);  cmdok_false;
+   while not cmdok do
+   BEGIN
+      print(crlf&">");  cmdok_do!cmnd(true,false);
+      if not ab!cond and (cmdtkn neq !cont!c) then cmdok_ false;
+      poll;  if snstat[1 for 1] = "K" then lop(snstat);
+   END;
+   return;
+END;
+
+
+PROCEDURE i!time;
+	\ This procedure is invoked to make notification of time!out
+interrupts.;
+BEGIN
+   calli(0,settim);  terminate(io!itm);
+   snstat_ "T" & snstat;  return;
+END;
+SIMPLE PROCEDURE i!panic;
+	\ This routine handles an immediate keyboard interrupt.  It
+will take care of the case where the program is expecting keyboard input
+from the user and the CTRL-C is entered as part of the input.  Checking
+is done by looking at the save program counter to see if it points at an
+INCHRW instruction or an XCT for that instruction.  If so, the saved PC
+is incremented and the appropriate register loaded with the CTRL-C code
+in order to simulate the receipt of the CTRL-C as an actual character.
+;
+BEGIN
+   BOOLEAN inptty;  LABEL noxct, no!op, noreg;
+
+   STODE
+	move	1,@jobtpc	;
+	hlrz	3,1		;
+	andi	3,'776000	;
+	caie	3,'256000	;
+	jrst	noxct		;
+	hlrz	2,1		;
+	andi	2,'1037		;
+	iori	2,'200040	;
+	hrl	2,2		;
+	hrr	2,1		;
+	hlrz	6,1		;
+	andi	6,'17		;
+	move	4,@6		;
+	move	5,apracs(6)	;
+	movem	5,@6		;
+	andi	1,'777777	;
+	cail	1,'17		;
+	jrst	noreg		;
+	caig	1,0		;
+	jrst	noreg		;
+	movei	7,apracs	;
+	add	7,1		;
+	hllz	2,2		;
+	ior	2,7		;
+noreg:	xct	2		;
+	movem	4,@6		;
+	hlrz	3,1		;
+noxct:	caie	3,'51200	;
+	jrst	no!op		;
+	setom	inptty		;
+	hrrz	3,1		;
+	movei	2,3		;
+	movem	2,apracs(3)	;
+	aos	jobtpc		;
+no!op:	jfcl			;
+   END;
+   if inptty then dfr1in(location(trpvct[0]))
+   else
+ifc debug thenc
+   BEGIN
+      INTEGER ch;
+      outstr("Int or Xit? ");
+      while "I" neq (ch_ inchrw land '137) neq "X" do;
+      if ch = "I" then dfr1in(location(trpvct[0]))
+      else call (0,"EXIT");
+   END;
+elsec
+   dfr1in(location(trpvct[0]));
+endc
+END;
+INTERNAL PROCEDURE int!init;
+	\ This routine sets up the SAIL deferred interrupt handling
+required by SNARL.
+;
+BEGIN
+   intset(intpro,0);
+   trpvct[1]_(-1 lsh 18)+location(i!attn);
+   trpvct[3]_(-1 lsh 18)+location(i!hung);
+   trpvct[5]_(-1 lsh 18)+location(i!mag);
+   trpvct[7]_(-1 lsh 18)+location(i!time);
+   trpvct[0]_(trpvct[2]_(trpvct[4]_(trpvct[6]_2)));
+   intmap(tinass(-1,cause!tty!escape,ch!attn),i!panic,0);		\ Immediate keyboard interrupt;
+   enable(tinass(-1,cause!tty!escape,ch!attn));
+   intmap(intass(cause!hung,ch!hung),dfrint,
+      location(trpvct[2]));
+   enable(intass(cause!hung,ch!hung));
+   intmap(intass(cause!deverr,ch!mag),dfrint,
+      location(trpvct[4]));
+   enable(intass(cause!deverr,ch!mag));
+   intmap(intass(cause!timer,ch!time),dfrint,
+      location(trpvct[6]));
+   enable(intass(cause!timer,ch!time));
+   RETURN;
+END;
+INTERNAL BOOLEAN PROCEDURE set!tape!bufs (INTEGER direction);
+	\ This procedure initializes or re-initializes the tape channel
+for buffered data transfers.  The "direction" should be either "I" for
+input or "O" for output.;
+BEGIN
+   relchan(mtchan);
+   IF direction = "O" THEN
+      if dskdev then open( (mtchan_ getchan), mtdev, binary!mode,
+	 (mtibuf_0), (mtobuf_ dsk!index),mteof,mteof,mteof)
+      else open( (mtchan_ getchan), mtdev,binary!mode,(mtibuf_0),
+	 (mtobuf_ !xwd(<tape!buf!size+1>,<num!tape!bufs>)),
+	 mteof,mteof,mteof)
+   ELSE IF direction = "I" THEN
+      if dskdev then open( (mtchan_ getchan), mtdev, binary!mode,
+	 (mtibuf_ dsk!index), (mtobuf_ 0),mteof,mteof,mteof)
+      else open( (mtchan_ getchan), mtdev,binary!mode,
+	 (mtobuf_ !xwd(<tape!buf!size+1>,<num!tape!bufs>)),
+	 (mtobuf_0), mteof,mteof,mteof)
+   ELSE return (false);
+   IF mteof neq 0 THEN
+      BEGIN
+	 print("Cannot initialize device " & mtdev & " for " &
+	    (if direction="O" then "output." else "input.") & crlf);
+	 return (false);
+      END;
+   if not dskdev then return (true);
+   lookup(mtchan,"snarl.tap",mteof);
+   if direction="O" then enter(mtchan,"snarl.tap",mteof);
+   return (true);
+END;
+
+
+END "SNIO";
+ WwsM
