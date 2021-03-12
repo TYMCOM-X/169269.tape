@@ -1,0 +1,203 @@
+TABGEN	.BNF		;Grammar description of input to TABGEN.
+TABGEN	.CMD		;Command file for loading TABGEN.
+DSNARL	.DOC		;DSNARL externals document
+LOKBIT	.DOC		;LOKBIT program description
+SNARL	.DOC		;SNARL externals document
+SNARLI	.DOC		;SNARL internals document
+SNBUGS	.DOC		;SNARL bug and development list
+SNMILE	.DOC		;SNARL milestones
+SNPLNS	.DOC		;SNARL planning document
+TABGEN	.DOC		;TABGEN documentation.
+DSN000	.PUB		;body of DSNARL externals document
+DSN001	.PUB		;record map diagram - DSNARL externals
+DSN002	.PUB		;data display diagram - DSNARL externals
+DSN003	.PUB		;record display formats - DSNARL externals
+DSNARL	.PUB		;master file for DSNARL externals document
+TABGEN	.PUB		;TABGEN documentation.
+BLDHLP	.SAI		;Source for BLDHLP.  See .SAV description.
+DSDUMP	.SAI		;Dump functions portion of DSNARL.
+DSHARR	.SAI		;DSNARL "HELP" index tables.
+DSN	.SAI		;DSNARL switches.  Copy to SNDSN.SAI to load.
+DSNSYM	.SAI		;DSNARL symbols produced by TABGEN.
+DSPARS	.SAI		;Parser for DSNARL.
+FTRANS	.SAI		;File transfer portion of SNARL.
+IMAGE	.SAI		;For entering characters which are sent to the display.
+MODES	.SAI		;Mode switch stuff in SNARL.
+MTDUMP	.SAI		;Old magtape dumping program/hack.
+SN	.SAI		;SNARL switches.  Copy to SNDSN.SAI to load.
+SNARL	.SAI		;Main program source for SNARL and DSNARL.
+SNCLI	.SAI		;Command language interpretation for SNARL.
+SNDEFS	.SAI		;Definitions used by most SNARL/DSNARL modules.
+SNDSN	.SAI		;SNARL/DSNARL and debugging switches for loading.
+SNHARR	.SAI		;SNARL "HELP" tables build by BLDHLP.
+SNHELP	.SAI		;"HELP" functions in SNARL and DSNARL.
+SNIO	.SAI		;I/O functions in SNARL and DSNARL.
+SNMISC	.SAI		;Miscellaneous commands in SNARL and DSNARL.
+SNPARS	.SAI		;"SNARL" parser source built by TABGEN.
+SNSYM	.SAI		;"SNARL" symbols built by TABGEN.
+TABGEN	.SAI		;Source for main program of TABGEN.
+TAPCOM	.SAI		;Assorted tape commands for SNARL/DSNARL.
+TBGPRS	.SAI		;TABGEN's parser.
+TBGSCN	.SAI		;TABGEN's scanning routines.
+TBGSYM	.SAI		;Token symbol equates for TABGEN.
+TDPARS	.SAI		;"Skeleton" top-down recursion parser.
+TDPLIB	.SAI		;TDPARS library routines.
+TABGEN	.SAV		;Table generator for TDPARS.
+DSNARL	.BNF	A	;a
+FSTAR1	.BNF	A	;a
+SNARL	.BNF	A	;a
+TABGEN	.BNF	A	;a
+LINK	.CCL	A	;a
+COM1	.CMD	A	;a
+COM2	.CMD	A	;a
+COMND	.CMD	A	;a
+DSNARL	.CMD	A	;a
+FORMAT	.CMD	A	;a
+GARBG	.CMD	A	;a
+JUNK	.CMD	A	;a
+SNARL	.CMD	A	;a
+TABGEN	.CMD	A	;a
+SAIL	.DAT	A	;a
+DSNARL	.DEB	A	;a
+SNARL	.DEB	A	;a
+SNARL	.DIR	A	;a
+TDPARS	.DIR	A	;a
+038TEL	.DIR	A	;a
+DSHELP	.DOC	DR	;a
+DSNARL	.DOC	DR	;a
+LOKBIT	.DOC	DR	;a
+MEMO	.DOC	DR	;a
+SN1101	.DOC	DR	;a
+SNARL	.DOC	DR	;a
+SNARLI	.DOC	DR	;a
+SNBUGS	.DOC	DR	;a
+SNHELP	.DOC	DR	;a
+SNPLNS	.DOC	DR	;a
+STATUS	.DOC	DR	;a
+TABGEN	.DOC	DR	;a
+TDPARS	.DOC	DR	;a
+TVDEFS	.DOC	DR	;a
+SNARL	.FIL	A	;a
+SNPUBS	.FIL	A	;a
+TABGEN	.FIL	A	;a
+TDPARS	.FIL	A	;a
+MASTER	.INF	A	;a
+CKSUM	.MAC	A	;a
+DMPUFD	.MAC	A	;a
+MAP	.MAP	A	;a
+MTDUMP	.MEM	A	;a
+TITO	.MEM	A	;a
+PROCOM	.MID	A	;a
+TMP	.MTP	A	;a
+TBGPRS	.NEW	A	;a
+TBGSYM	.NEW	A	;a
+DSDUMP	.OLD	A	;a
+DSNSYM	.OLD	A	;a
+DSPARS	.OLD	A	;a
+FTRANS	.OLD	A	;a
+MODES	.OLD	A	;a
+PROCOM	.OLD	A	;a
+SNARL	.OLD	A	;a
+SNCLI	.OLD	A	;a
+SNHELP	.OLD	A	;a
+SNIO	.OLD	A	;a
+SNMISC	.OLD	A	;a
+SNPARS	.OLD	A	;a
+SNSYM	.OLD	A	;a
+TAPCOM	.OLD	A	;a
+TBGPRS	.OLD	A	;a
+TBGSYM	.OLD	A	;a
+TDPARS	.OLD	A	;a
+SNARL	.PBO	A	;a
+DSN000	.PUB	DS	;a
+DSN001	.PUB	DS	;a
+DSN002	.PUB	DS	;a
+DSN003	.PUB	DS	;a
+DSNARL	.PUB	DS	;a
+LOKBIT	.PUB	DS	;a
+MEMO	.PUB	DS	;a
+PROCOM	.PUB	DS	;a
+SAIPIT	.PUB	DS	;a
+SN1101	.PUB	DS	;a
+SNARL	.PUB	DS	;a
+SNARLI	.PUB	DS	;a
+SNBLOK	.PUB	DS	;a
+SNBUGS	.PUB	DS	;a
+SNCMDL	.PUB	DS	;a
+SNLIST	.PUB	DS	;a
+SNMILE	.PUB	DS	;a
+SNPLNS	.PUB	DS	;a
+TAB001	.PUB	DS	;a
+TABGEN	.PUB	DS	;a
+TDP000	.PUB	DS	;a
+TDP001	.PUB	DS	;a
+TDPARS	.PUB	DS	;a
+FORMAT	.RES	A	;a
+MTDUMP	.RNO	A	;a
+BLDHLP	.SAI	PS	;a
+DSCHEC	.SAI	PS	;a
+DSDUMP	.SAI	PS	;a
+DSHARR	.SAI	PS	;a
+DSN	.SAI	PS	;a
+DSNSYM	.SAI	PS	;a
+DSPARS	.SAI	PS	;a
+FAKEB	.SAI	PS	;a
+FORMAT	.SAI	PS	;a
+FTRANS	.SAI	PS	;a
+IMAGE	.SAI	PS	;a
+LOKLUD	.SAI	PS	;a
+MODES	.SAI	PS	;a
+MTDUMP	.SAI	PS	;a
+PROCOM	.SAI	PS	;a
+SHELL	.SAI	PS	;a
+SN	.SAI	PS	;a
+SNA010	.SAI	PS	;a
+SNA020	.SAI	PS	;a
+SNA030	.SAI	PS	;a
+SNA040	.SAI	PS	;a
+SNARL	.SAI	PS	;a
+SNCLI	.SAI	PS	;a
+SNDEFS	.SAI	PS	;a
+SNDSN	.SAI	PS	;a
+SNHARR	.SAI	PS	;a
+SNHELP	.SAI	PS	;a
+SNIO	.SAI	PS	;a
+SNMISC	.SAI	PS	;a
+SNPARS	.SAI	PS	;a
+SNSYM	.SAI	PS	;a
+TAB000	.SAI	PS	;a
+TABGEN	.SAI	PS	;a
+TAPCOM	.SAI	PS	;a
+TBGPRS	.SAI	PS	;a
+TBGSCN	.SAI	PS	;a
+TBGSYM	.SAI	PS	;a
+TDP000	.SAI	PS	;a
+TDP001	.SAI	PS	;a
+TDP002	.SAI	PS	;a
+TDPARS	.SAI	PS	;a
+TDPLIB	.SAI	PS	;a
+WTRUNC	.SAI	PS	;a
+DSCHEC	.SUB	DSX	;a
+DSDUMP	.SUB	DSX	;a
+DSPARS	.SUB	DSX	;a
+FTRANS	.SUB	DSX	;a
+MODES	.SUB	DSX	;a
+SNARL	.SUB	DSX	;a
+SNCLI	.SUB	DSX	;a
+SNHELP	.SUB	DSX	;a
+SNIO	.SUB	DSX	;a
+SNMISC	.SUB	DSX	;a
+SNPARS	.SUB	DSX	;a
+TAPCOM	.SUB	DSX	;a
+ACCESS	.TEL	A	;a
+SNARL	.TFI	A	;a
+SNCLI	.TRY	A	;a
+FTRANS	.UNB	A	;a
+SNIO	.UNB	A	;a
+TAPCOM	.UNB	A	;a
+SNPLNS	.V1	A	;a
+SNPLNS	.V2	A	;a
+STATUS	.1ST	A	;a
+STATUS	.2ND	A	;a
+MILES	.4TH	A	;a
+STATUS	.4TH	A	;a
