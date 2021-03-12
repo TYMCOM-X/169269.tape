@@ -1,0 +1,68 @@
+ENTRY alpha, digchk, fndtok, prserr, st!int, st!str;
+
+BEGIN "parsing library"
+
+DEFINE \ = "COMMENT";
+LET R!C = RECORD!CLASS;  LET R!P = RECORD!POINTER;
+LET n!r = null!record;
+
+REQUIRE "tdp002.sai" source!file;
+
+
+INTERNAL BOOLEAN PROCEDURE alpha (INTEGER char);
+	\ This procedure returns TRUE if "char" is alphabetic and FALSE
+otherwise.;
+IF ("A" leq char) and (char leq "Z") THEN RETURN (true)
+ELSE IF ("a" leq char) and (char leq "z") THEN RETURN (true)
+ELSE RETURN (false);
+
+
+INTERNAL BOOLEAN PROCEDURE digchk (INTEGER char);
+	\ This procedure returns "true" if "char" is a decimal digit
+and "false" otherwise.;
+IF ("0" leq char) and (char leq "9") THEN RETURN (true) ELSE RETURN (false);
+
+
+INTERNAL RECURSIVE R!P (any!class) PROCEDURE fndtok (R!P (any!class) link;
+  INTEGER toknum);
+	\ This procedure searches the parsing graph, starting at "link",
+for the token whose value is "toknum".  If successful, a pointer to the
+node containing the token is returned.  If unsuccessful, n!r is
+returned.  "Fndtok" goes for depth in the tree before successor elements.;
+BEGIN
+  R!P (any!class) temprp;
+  WHILE link neq n!r DO BEGIN
+    IF pgraph:tkn[link]=toknum THEN RETURN (link);
+    IF pgraph:tkn[link] leq '4000 THEN
+      IF (temprp_fndtok(pgraph:def[link],toknum)) THEN RETURN (temprp);
+    link_pgraph:succ[link];
+  END;
+  RETURN (n!r);
+END;
+
+
+INTERNAL PROCEDURE st!int (R!P (any!class) link;  INTEGER result, type);
+	\ This procedure stores the intermediate result "result" at the
+place in the parsing graph pointed to by "link".  The position pointer
+must point at a non-terminal symbol.  The "type" parameter is the value
+stored in pgraph marking the type of the result.  The remainder of the
+branch which defined the node marked by "link" is pruned (storage
+removed).;
+BEGIN
+  R!P (any!class) rp;
+  intres:intval[rp_new!record(intres)]_result;
+  pgraph:type[link]_type;  pgraph:result[link]_rp;
+END;
+
+
+INTERNAL PROCEDURE st!str (R!P (any!class) link;  STRING result;
+  INTEGER type);
+	\ This procedure works the same as "st!int! for string results.;
+BEGIN
+  R!P (any!class) rp;
+  strres:strval[rp_new!record(strres)]_result;
+  pgraph:type[link]_type;  pgraph:result[link]_rp;
+END;
+
+END "parsing library";
+
