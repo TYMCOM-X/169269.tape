@@ -1,0 +1,395 @@
+MODULE QCFR(DEBUG,DOLLAR,ENTRIES=($QARLST,$QCFROM,$QKEYS))=
+
+BEGIN
+
+REQUIRE (MIDAS)Q2DEFS.BLI;
+REQUIRE (MIDAS)Q3DEFS.BLI;
+REQUIRE (MIDAS)Q5DEFS.BLI;
+REQUIRE (MIDAS)Q6DEFS.BLI;
+REQUIRE (MIDAS)QNDEFS.BLI;
+REQUIRE (MIDAS)DDDEFS.BLI;
+REQUIRE (MIDAS)RCDEFS.BLI;
+REQUIRE (MIDAS)RSDEFS.BLI;
+REQUIRE (MIDAS)UDEFS.BLI;
+
+EXTERNAL QRGB$ QRGBP$, QRCSP$, QTDCN$, QTCON$;
+EXTERNAL QUERC$,$CGET,$CGETZ,$CFREE,$QCMPSTR,QRCB$;
+
+GLOBAL ROUTINE $QARLST(RCB)=
+
+BEGIN
+
+LOCAL QSRCH$ RELCH:NRELCH:HEADOFLST;
+
+IF (RELCH := .QRGBP$[QG$RELLST]) EQL 0
+   THEN
+      BEGIN
+      RELCH := QRGBP$[QG$RELLST] := $CGETZ(QV$SRHEADSIZE);
+      RELCH[Q$SRELPTR] := .RCB;
+      RELCH[Q$SRCOUNT] := 1;
+      RETURN
+      END;
+
+NRELCH := HEADOFLST := .RELCH;
+
+DO
+   BEGIN
+   RELCH := .NRELCH;
+   IF .RCB EQL .RELCH[Q$SRELPTR]
+      THEN RETURN
+   END
+UNTIL (NRELCH := .RELCH[Q$SRELNEXT]) EQL 0;
+
+NRELCH := RELCH[Q$SRELNEXT] := $CGETZ(QV$SRSIZE);
+NRELCH[Q$SRELPTR] := .RCB;
+HEADOFLST[Q$SRCOUNT] := .HEADOFLST[Q$SRCOUNT] + 1
+
+END;
+
+
+ROUTINE CONSTANTKEYS(RCB,KEYS)=
+
+BEGIN
+
+MAP RCB$ RCB;
+MAP UDYNARY$ KEYS;
+LOCAL RSB$ RSB;
+LOCAL QRCS$$ RCS;
+
+RSB := .RCB[RC$RSB];
+RCS := .QRCSP$;
+UNTIL .RCS[QRCV$RCB] EQL .RCB
+   DO RCS := .RCS[QRCV$NEXT];
+
+INCR J FROM 0 TO .RSB[RS$XCT]-1
+  DO IF .RCS[QRCV$NWRDS,.J] NEQ 0 
+    THEN IF .RCS[QRCV$OPR,.J] EQL QV$EQ
+      THEN KEYS[.J] := 1;
+END;
+
+ROUTINE MARKKEYS(RCB,RCB2,KEYS)=
+
+BEGIN
+
+MAP RCB$ RCB:RCB2;
+LOCAL RSB$ RSB:RSB2;
+LOCAL DD$ DD:DD2:NDD:NDD2;
+LOCAL QNECT$ QNECT;
+MAP UDYNARY$ KEYS;
+LOCAL L,L2,STR,STR2,RET,N,INDX;
+LABEL LOOKUP;
+
+RSB := .RCB[RC$RSB];
+RSB2 := .RCB2[RC$RSB];
+
+LOOKUP:
+   BEGIN
+   QNECT := .QTDCN$;
+   UNTIL .QNECT EQL 0
+      DO IF .QNECT[Q$INDX1] EQL -1
+         THEN
+            BEGIN
+            IF (.QNECT[Q$RCB1] EQL .RCB AND .QNECT[Q$RCB2] EQL .RCB2)
+            OR (.QNECT[Q$RCB2] EQL .RCB AND .QNECT[Q$RCB1] EQL .RCB2)
+               THEN LEAVE LOOKUP;
+            QNECT := .QNECT[Q$NEXTN]
+            END;
+
+   INCR I FROM 0 TO .RSB[RS$DCT]-1
+      DO
+         BEGIN
+         DD := .RSB[RS$FLD,.I];
+         STR := (.DD[DD$NAME])<36,7>;
+         NDD := @(.STR-1);
+         L := .NDD[DD$QP];
+         INCR J FROM 0 TO .RSB2[RS$XCT]-1
+            DO
+               BEGIN
+               DD2 := .RSB2[RS$FLD,.J];
+               STR2 := (.DD2[DD$NAME])<36,7>;
+               NDD2 := @(.STR2-1);
+               L2 := .NDD2[DD$QP];
+               IF $QCMPSTR(.STR,.L,.STR2,.L2) EQL 1
+                  THEN KEYS[.J] := 1
+               END
+      END
+   END;
+
+QNECT := .QTCON$;
+UNTIL .QNECT EQL 0
+  DO
+    BEGIN
+    INDX := -1;
+    IF .QNECT[Q$RCB1] EQL .RCB AND .QNECT[Q$RCB2] EQL .RCB2
+       THEN INDX := .QNECT[Q$INDX2];
+    IF .QNECT[Q$RCB2] EQL .RCB AND .QNECT[Q$RCB1] EQL .RCB2
+       THEN INDX := .QNECT[Q$INDX1];
+    IF .INDX NEQ -1
+      THEN IF .INDX LSS .RSB2[RS$XCT]
+         THEN KEYS[.INDX] := 1;
+    QNECT := .QNECT[Q$NEXTN]
+    END
+
+END;
+
+ROUTINE COMPUTEKEYS(KEYS,XCT)=
+
+BEGIN
+MAP UDYNARY$ KEYS;
+
+INCR J FROM 0 TO .XCT
+   DO IF .KEYS[.J] EQL 0
+      THEN IF .J EQL 0 THEN RETURN 0
+                       ELSE RETURN 2;
+
+RETURN 3
+END;
+
+GLOBAL ROUTINE $QKEYS(RCB1,RCB2,ORDREL)=
+
+BEGIN
+
+MAP RCB$ RCB1:RCB2;
+MAP UDYNARY$ ORDREL;
+LOCAL RSB$ RSB:RSB1:RSB2;
+LOCAL RCB$ RCB;
+LOCAL UDYNARY$ KEYS;
+LOCAL L,L2,STR,STR2,RET,N;
+LABEL LOOP;
+
+RSB1 := .RCB1[RC$RSB];
+RSB2 := .RCB2[RC$RSB];
+KEYS := $CGETZ(.RSB2[RS$XCT]);
+MARKKEYS(.RCB1,.RCB2,.KEYS);
+CONSTANTKEYS(.RCB2,.KEYS);
+
+N:=0;
+UNTIL (RCB:= .ORDREL[.N]) EQL 0
+   DO
+      BEGIN
+      MARKKEYS(.RCB,.RCB2,.KEYS);
+      N := .N + 1
+      END;
+
+RET := COMPUTEKEYS(.KEYS,.RSB2[RS$XCT]);
+
+$CFREE(.KEYS);
+RETURN .RET
+
+END;
+
+ROUTINE ELIMINATE(RELARR,SIZE,INDX)=
+
+BEGIN
+MAP UDYNARY$ RELARR;
+
+INCR I FROM .INDX TO .SIZE-2
+   DO RELARR[.I] := .RELARR[.I+1];
+
+END;
+
+
+ROUTINE PICKREL(ORDREL,RELARR,SIZE)=
+
+BEGIN
+STRUCTURE MATRIX[I$$,J$$]= (@.MATRIX+.SIZE*.I$$+.J$$)<0,36>;
+
+MAP UDYNARY$ ORDREL:RELARR;
+LOCAL MATRIX MAT;
+LOCAL RCB$ RCB:RCB2;
+LABEL LOOP,LOOP2,LOOP3;
+
+LOCAL N,RET;
+
+N := .SIZE-1;
+MAT := $CGETZ(.SIZE*.SIZE);
+
+INCR I FROM 0 TO .N
+   DO
+      BEGIN
+      RCB := .RELARR[.I];
+      INCR J FROM 0 TO .N
+         DO IF .I NEQ .J
+            THEN
+               BEGIN
+               RCB2 := .RELARR[.J];
+               MAT[.I,.J] := $QKEYS(.RCB,.RCB2,.ORDREL)
+               END;
+      END;
+
+INCR I FROM 0 TO .N
+   DO INCR J FROM 0 TO .N
+      DO IF .MAT[.J,.I]
+         THEN INCR K FROM 0 TO .N
+            DO MAT[.J,.K] := .MAT[.J,.K] OR .MAT[.I,.K];
+
+LOOP2:
+      BEGIN
+      INCR I FROM 0 TO .N
+         DO
+LOOP:
+            BEGIN
+            INCR J FROM 0 TO .N
+               DO IF .I NEQ .J
+                  THEN IF .MAT[.I,.J] NEQ 3
+                     THEN LEAVE LOOP;
+            RET := .I;
+            LEAVE LOOP2
+            END;
+      INCR I FROM 0 TO .N
+         DO
+LOOP3:
+            BEGIN
+            INCR J FROM 0 TO .N
+               DO IF .I NEQ .J
+                  THEN IF .MAT[.I,.J] EQL 0
+                     THEN LEAVE LOOP3;
+            RET := .I;
+            LEAVE LOOP2
+            END;
+      RET := 0
+      END;
+
+$CFREE(.MAT);
+RETURN .RET
+END;
+
+ROUTINE COMPUTESCORE(RELARR,ORDREL,RETARR,N)=
+
+BEGIN
+
+MAP UDYNARY$ RELARR:ORDREL:RETARR;
+LOCAL RCB$ RCB:RCB2;
+LOCAL RSB$ RSB;
+LOCAL KEYS,M;
+
+   INCR J FROM 0 TO .N-1
+      DO
+         BEGIN
+         RCB := .RELARR[.J];
+         RSB := .RCB[RC$RSB];
+         M := 0;
+         KEYS := $CGETZ(.RSB[RS$XCT]);
+         CONSTANTKEYS(.RCB,.KEYS);
+         UNTIL (RCB2 := .ORDREL[.M]) EQL 0
+            DO
+               BEGIN
+               MARKKEYS(.RCB2,.RCB,.KEYS);
+               M := .M + 1
+               END;
+         RETARR[.J] := COMPUTEKEYS(.KEYS,.RSB[RS$XCT]);
+         $CFREE(.KEYS);
+         END;
+END;
+
+ROUTINE FINDBEST(RELARR,ORDREL,N)=
+
+BEGIN
+
+MAP UDYNARY$ RELARR:ORDREL;
+LOCAL UDYNARY$ RETARR;
+LOCAL RET;
+
+   RETARR := $CGETZ(.N);
+   COMPUTESCORE(.RELARR,.ORDREL,.RETARR,.N);
+   INCR J FROM 0 TO .N-1
+      DO IF .RETARR[.J] EQL 3
+         THEN
+            BEGIN
+            $CFREE(.RETARR);
+            RETURN .J
+            END;
+   INCR J FROM 0 TO .N-1
+      DO IF .RETARR[.J] EQL 2
+         THEN
+            BEGIN
+            $CFREE(.RETARR);
+            RETURN .J
+            END;
+   RET := PICKREL(.ORDREL,.RELARR,.N);
+   $CFREE(.RETARR);
+   RETURN .RET
+
+END;
+
+GLOBAL ROUTINE $QCFROM=
+
+BEGIN
+
+LOCAL RCOUNT;
+LOCAL UDYNARY$ RELARR:ORDREL:RETARR;
+
+LOCAL QSRCH$ RELCH:NRELCH;
+LOCAL RCB$ RCB:RCB2;
+LOCAL RSB$ RSB;
+LOCAL N,INDX,M,RET;
+
+RCOUNT := 1;
+RELCH := .QRGBP$[QG$RELLST];
+IF .RELCH NEQ 0
+   THEN RCOUNT := .RELCH[Q$SRCOUNT];
+ORDREL := $CGETZ(.RCOUNT+1);
+IF .RELCH EQL 0
+   THEN
+      BEGIN
+      ORDREL[0] := .QRCB$;
+      RETURN .ORDREL
+      END;
+IF .RCOUNT EQL 1
+   THEN
+      BEGIN
+      ORDREL[0] := .RELCH[Q$SRELPTR];
+      QRGBP$[QG$RELLST] := 0;
+      $CFREE(.RELCH);
+      RETURN .ORDREL
+      END
+   ELSE
+      BEGIN
+      RELARR := $CGETZ(.RCOUNT);
+      N := .RCOUNT-1;
+
+      INCR I FROM 0 TO .N
+         DO
+            BEGIN
+            RELARR[.I] := .RELCH[Q$SRELPTR];
+           RELCH := .RELCH[Q$SRELNEXT]
+           END;
+
+      IF .QUERC$ NEQ 0
+         THEN INCR I FROM 0 TO .N
+            DO IF .QUERC$ EQL .RELARR[.I]
+               THEN INDX := .I
+               ELSE .VREG
+         ELSE INDX := FINDBEST(.RELARR,.ORDREL,.RCOUNT);
+      ORDREL[0] := .RELARR[.INDX];
+      ELIMINATE(.RELARR,.RCOUNT,.INDX);
+
+      INCR I FROM 1 TO .N-1
+         DO
+            BEGIN
+            INDX := FINDBEST(.RELARR,.ORDREL,.RCOUNT-.I);
+            ORDREL[.I] := .RELARR[.INDX];
+            ELIMINATE(.RELARR,.RCOUNT-.I,.INDX);
+            END;
+
+      ORDREL[.N] := .RELARR[0];
+
+      $CFREE(.RELARR)
+      END;
+
+RELCH := .QRGBP$[QG$RELLST];
+QRGBP$[QG$RELLST] := 0;
+
+UNTIL .RELCH EQL 0
+   DO
+      BEGIN
+      NRELCH := .RELCH[Q$SRELNEXT];
+      $CFREE(.RELCH);
+      RELCH := .NRELCH
+      END;
+
+RETURN .ORDREL
+END;
+
+END ELUDOM
+   
