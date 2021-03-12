@@ -1,0 +1,295 @@
+From: <LOIS@930.Tymnet>
+Date: Fri, 29 Jun 84 11:09:01 PST
+To: carl,sppoper
+Subject: 56 analysis
+
+All the test data from 56 tests is now on directory SYSFIL, all titled
+56.###.
+Received: from 39.Tymnet by 930.Tymnet; Thu, 12 Jul 84 12:09:22 PDT
+Return-path: <KEN@39.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Thu, 12 Jul 84 12:09:02 PDT
+To: carl@930,sppoper@930
+Cc: ken
+Subject: COEES Sail problem
+
+    Carl, Jon, whomever:
+
+    A fellow calling himself INSD.J/O'CONNELL ((201)981-2879) called
+    me from Newark New Jersey or some such place complaining that
+    COEES is having trouble recompiling their SAIL INIT programs on
+    :29, even though said programs reportedly compile fine on :36.  A
+    clue is that they use (FTSYS)SAIL.  My guess is they include some
+    horrible module which on :29 was not compiled under the same
+    version of the SAIL compiler as the one on :36.
+
+    I looked at the version of SAIL on both systems, and find no
+    discrepencies.  Since it's not my job to handle this kind of
+    stuff, I'll let you deal with it further.
+
+    /Ken
+From: <CARL@930.Tymnet>
+Date: Fri, 13 Jul 84 2:04:52 PDT
+To: sppoper@930
+Subject: COEES Sail problem.
+
+I really can't do much unless I know what usernames and what files
+are being re-compiled on either system 36 or 29.  Please contact
+Angela or J/O'Connell and obtain more information.  Ken's primary
+diagnosis is probably correct, but without further information....
+/Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 19 Jul 84 13:32:15 PDT
+To: ken,osman,wilkes,sppoper
+Subject: My schedule.
+
+Except for a brief trip to the office, I plan on working from home on
+the COEES TRU interrupt code.  If you need me for anything, call me
+at 415-961-1082.  I am working at home in order to decrease the number
+of interruptions so that I can finish the TRU stuff by tomorrow, and
+make sure it is properly tested.  /Carl
+From: <CARL@930.Tymnet>
+Date: Sat, 21 Jul 84 19:15:50 PDT
+To: sppoper,fletcherc
+Subject: COEES TRU interrupt
+
+At this point, there should be no problems in making the delivery schedule
+of an operating system with a TRU interrupt installed.  The code has been
+written and installed to set the limit and trap the interrupt.  This is
+what "I" promised to have completed by the middle of July.
+
+There is one complication!
+
+COEES will still need a routine which sets the limit and takes the trap
+from within a FORTRAN (F40) program.  Trivil task, except that the runtimes
+already use the interrupt system, and I cannot give COEES a routine which
+usurps the interrupt vector in use by the runtimes just to setup (add) one
+interrupt cause for exceeding the TRU limit.  Again, trivial to change,
+EXCEPT that sources (or even proper .REL files) containing the current
+interrupt code are UNAVAILABLE or NON-EXISTENT.
+
+Please locate the sources, or contact Tim Brengle about locating what
+sources are available.  Until then, I can do no more.
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Tue, 24 Jul 84 14:27:25 PDT
+To: sppoper
+Subject: TRU interrupt
+
+Well, it's been done since sunday night... the monitor anyway....
+
+I'm still looking for the sources to TRULIM, 'cause it seems that I
+may not be able to do much without them.  reconstruction may be able
+to be done, but to what ramifications, I'm not sure.  I'll know in
+2 days whether there are any sources anywhere...
+
+In the meantime, if you could contact Tim Brengle, ask if he knows of
+any, or who might have them...  Also, find out what his relationship
+to Tymshare is concerning F40 (is he a possible consultant? or was that
+just rumor? if either, are we [you and craig] going to continue the
+arrangement?).  [I have no opinion on this matter.]
+
+Thanks.  Call or leave mail. I'll be in and out, I'm trying to locate
+people in software distribution to have them restore various f40/lib40
+transmittals dating back to 1975 to see if we can find anything! Sigh!
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 25 Jul 84 0:48:48 PDT
+To: sppoper
+Subject: TRU interrupt status
+
+Craig,
+  As I mentioned on Monday, the monitor with the TRU interrupt is UP
+and running on system 26.  In talking with Angela, she caught some flak
+about the version change P034/L21 to P034/N04 but I told her to explain
+that /N04 is equivalent to /L35 (14 source changes).  COEES still wanted
+to have had a new TRULIM routine by yesterday as well.  Sigh!
+
+  Anyway, I told Angela to explain that that is a change to LIB40 and to
+isolate possible problems, that COEES was getting things in stages, i.e. it
+would be a couple of days before I could tell her WHEN I'd have the next
+version ready (with the new TRULIM routine).
+
+  Since I spent all day and most of each night Friday thru Sunday getting
+all of this ready (including searching for TRULIM sources) I did not get
+some errands which I MUST get done, done over the weekend.  As such, I
+will be working on the TRULIM / F40 stuff from home for the next couple
+of days.  If you or Jon need me for anything, please send mail or call me
+at home (415) 961-1082.
+
+PS. If you are sure about the RFP's and the positions being available,
+    I'd appreciate it if you'd let me know when you'd be available to
+talk to Cheryl.  We'll be out running some errands this morning, but
+some MAIL, or I can have her call you sometime today would be fine.  How
+do I call your Fremont number form a "real" telephone?
+
+/Carl
+
+From: <CARL@930.Tymnet>
+Date: Wed, 25 Jul 84 9:41:17 PDT
+To: fletcherc,sppoper,osman
+Subject: SOURCES!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+I found them, or some facsimile... will tell you all later after I've
+had time to check them out.  They were with some old transmittals from
+1975/1976 era.
+/Carl
+From: <CARL@930.Tymnet>
+Date: Thu, 26 Jul 84 1:32:48 PDT
+To: fletcherc,sppoper
+Subject: TRULIM changes, LIB40 release
+
+I've made the changes necessary for the TRULIM routine to work with
+the new monitor.  As soon as I can re-construct a LIB40 transmittal,
+I'll call Angela and tell her that it's ready.  As it stands, I may
+have to back out one set of changes that Tim started to make to the
+current sources (FORSE doesn't assemble), however, the archived copies
+of FORSE.MAC exist and should be no problem.  I'm still working from
+home, so feel free to call me, or leave mail.
+
+Jon,  about the associate programmer, or tech-writer positions, let me
+know when you'll have time to talk to Cheryl.  I'm trying to balance
+her schedule between you and Dave Miller/Ron Saltgaver.  Thanks again!
+
+-Carl
+From: <CARL@930.Tymnet>
+Date: Fri, 27 Jul 84 13:22:34 PDT
+To: fletcherc,sppoper
+Subject: TRULIM
+
+Craig, Jon,
+  All that's left is for me to finish digging through the last couple
+of LIB40 transmittals to get a "good" copy of FORSE with which to make
+the changes.  Tim left the current sources in a non-working state.  I'll
+let you know as soon as I'm ready to give COEES a special LIB40.  Any
+actual LIB40 transmittal is going to require a lot more work, and another
+body.  /Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 0:52:55 PDT
+To: sppoper
+Subject: TRU Limit status
+
+See next message for details....
+
+  I got your msg while in the meeting, and finally got to your mail
+much later after the meeting finished.  There wasn't anything *new*
+to tell about the status until about 15 minutes ago.  I just hadn't
+any luck in finding the missing transmittal sources.
+
+/Carl
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 1:16:58 PDT
+To: osman,fletcherc
+Cc: sppoper,wilkes,  carl
+Subject: TRULIM/FORSE sources to match (SYS:26)LIB40.REL
+
+Well,
+  After a week of scrounging, with little or no "luck", I found a
+source file which generated a binary .REL file the same size as the
+one included in LIB40.REL on system 26.  In a stroke of luck, it was
+found that although it didn't match, the only difference was the
+version number in module FORSE.  I changed the version, re-assembled
+it, and VOILA!!!!  FORSE.MAC which generates the proper .REL file!
+
+  A similar comparison shows that no changes were made to TRAPS.REL
+(which contains TRULIM) and the ancient source that I found is still
+valid.
+
+  One last note:  System 26 has a different LIB40 than that of most
+                  of the rest of the world, so I still need to perform
+                  a cursory set of tests on system 26 before we give
+		  it to COEES for testing.
+
+  Delay!  System 26 has been down from 11pm til 5am for the past two
+          days, so the testing will have to wait until this afternoon.
+
+
+PS:  Jon, feel free to contact Angela and tell her she will have a new
+     FTLIB40.REL for COEES to test by tomorrow (Thursday) morning at
+     the very latest.  If all goes well in my testing, sooner. I will
+     try to call her sometime Wednesday afternoon.
+
+/Carl
+
+---------------------------------------------------------------------
+
+If it pases their tests, I will have to build them a separate version
+to use on their production systems.
+
+---------------------------------------------------------------------
+From: <CARL@930.Tymnet>
+Date: Wed, 1 Aug 84 15:57:02 PDT
+To: osman,sppoper,fletcherc
+Subject: TRU limit code've just completed my testing and installed the new LIB40 on system 26
+for COEES to test.  I've sent mail to Angela (rather than a phone call
+since it is well after 6pm east-coast time) on system 26 relating the
+current status.
+
+Notes on general release of the TRU interrupt code for the rest of the
+world....
+
+  1.  F40 - LIB40 on other systems than 26 still need to track down
+            proper source files via "trial and error" before a general
+            release can be properly made.
+  2. P034/P will be the first general release of the monitor to support
+            the TRU interrupt, scheduled for October release.
+  3. YAMM - Documentation release, also due in October will include TRU
+            limit and interrupt descriptions as well as any other changes
+            made for P034/P.
+
+-------------------------------------------------------------------------
+From: <OSMAN@930.Tymnet>
+Date: Thu, 2 Aug 84 10:36:47 PDT
+To: Fletcherc,Sppoper,Carl,Osman
+Subject: D37's Problem..
+
+
+	I just talked with some one from Operation and Maintenence in Dallas
+about the yesterday's problem with D37. They told me that it  was a solid CPU
+problem. Since they were going to move the D37 software to a KL this week end,
+last night they went ahead and moved D37 to KL,  so as of today D37 is running
+on KL health and happy...
+
+Osman..
+
+From: <KEN@930.Tymnet>
+Date: Mon, 6 Aug 84 10:28:45 PDT
+To: sppoper
+Cc: ken
+Subject: see for yourself
+
+----------
+RCPT To: <NTD.J/MOSSER@EMSII.Ontyme.Tymnet>
+From: <KEN@39.Tymnet>
+Date: Fri, 3 Aug 84 12:08:03 PDT
+To: j/mosser@ontyme
+Cc: ken
+Subject: Users using Peak?
+
+    Jon,
+
+    I got a call from a Ron Vivier about his travels in Europe, and
+    the demand he ran into from the European affiliates for User
+    availibility of Peak on Tymcom-X.  As you know, to date we've had
+    an explicit test for the Tymshare Internal Bit in Peak as a means
+    of preventing real users from using it.  I told Ron that there is
+    no documentation worthy of a general user's consideration, and he
+    said that they (the European Operations types making the request)
+    were aware of that, but these were no normal users.  In fact, they
+    (either the Operations people or the users in question) might very
+    well write their own manual for Peak!
+
+    Our options at present are to either continue our past practice of
+    adding these users to the execption list, or removing the filter
+    altogether, and making it publicly usable.  (In the case of the
+    latter, finding out what the "writing their own manual" really
+    means would be a good idea.)
+
+    I was wondering about your thoughts on the matter.
+
+    /ken
+
+    PS:  Each path is equally easy to implement.
+It<
