@@ -1,0 +1,771 @@
+begin "eztape"
+
+define	safe = null;
+
+require 25 polling!interval;
+require 4096 system!pdl;
+require 1024 string!pdl;
+require 512 new!items;
+require 512 pnames;
+require processes;
+
+require "{}()" delimiters;
+define
+  Priority(x) = {(x LSH 4)},
+  symbol = {record!pointer(any!class)},
+  stringstack (x) = {(x lsh 14)},
+  pstack (x)      = {(x lsh 8)},
+  ! = {comment},
+  bel = {(7&null)},
+  ht = {('10&null)},
+  lf = {('12&null)},
+  cr = {('15&null)},
+  esc = {('33&null)},
+  crlf = {('15&'12)},
+  forever = {while true},
+  never = {while false},
+  nothing = {},
+  upto = {step 1 until},
+  downto = {step -1 until},
+  ctrl (c) = {(((c) land '37)&null)},
+  bit (i) = {(1 lsh (35-(i)))};
+let
+  n!r = null!record,
+  r!p = record!pointer,
+  a!c = any!class;
+define
+  auxcli (port,e,funct) = {auxclr(port,memory[e],funct)};
+define
+  lh (i) = {((I) lsh -18)},
+  hl (i) = {((I) lsh 18)},
+  rh (i) = {((I) land '777777)},
+  hr (i) = {((I) land '777777)},
+  ucase (a) = {scanc(a,null,null,"K")};
+
+
+
+define Normal!exit = {'4000001},
+       Frm!Clrd    = {'4000006};
+
+
+define AUXCAL!LEVDEF = '11,
+       AUXCAL!INCHRS = '45,
+       AUXCAL!OUTPTR = 5;
+
+DEFINE CALLI!CREAUX = -'44;
+
+
+define Sched  = {Require 100 Polling!Interval};
+define noSched  = {Require 0 Polling!Interval};
+external integer !SKIP!;
+require "(SAILIB)TYMINT.DEF" source!file;
+
+
+
+
+
+INTEGER Port;
+STRING Instrng, Hold!File, Fta!Num;
+BOOLEAN Result;
+
+
+
+
+ITEM IDLE!ITEM;
+
+ITEM INTPROC;
+
+
+DEFINE WAIT = 2;
+
+FORWARD PROCEDURE CHAR!HANDLER;
+
+INTEGER COUNT;
+
+
+integer array InterruptBlock[0:1];
+
+define Char!Chan = '11;
+
+record!class FD (
+        integer j;                  ! frame descriptor;
+        r!p(FD) itemvar fi;         ! frame item;
+        boolean rf;                 ! run flag (is it expected to run);
+        integer hc;                 ! halt count;
+        integer sts;                ! frame status word (JBTSTS);
+        integer hsb;                ! beginning of HSB;
+        integer hsbType;            ! halt type and class;
+        integer hsbCount;           ! halt count;
+        integer hsbPC;              ! pc of halt or exit;
+        integer hsbUUOPC;           ! pc of last uuo;
+        integer hsbDev;             ! sixbit device name;
+        integer hsb1;               ! halt type dependent data (1);
+        integer hsb2 );             ! halt type dependent data (2);
+
+
+define  hsbSize = 7;                ! # data words in hsb;
+
+define frame = {record!pointer(FD)};
+
+FORWARD SYMBOL PROCEDURE RUNPROG ( FRAME F;
+                                   STRING PROG;
+                                   BOOLEAN GIVEPORT(TRUE) );
+
+Frame Frm!Ptr;
+
+
+define	!FRMOP =('044 lsh 27);
+
+define	!FOCLF ='0;	! CALL FRAME (ZERO FOR FAST DISPATCH);
+define	!FOCFM ='1;	! CREATE FRAME;
+define	!FORVA ='2;	! READ A VIRTUAL ADDRESS;
+define	!FOWVA ='3;	! WRITE A VIRTUAL ADDRESS;
+define	!FOSAA ='4;	! START AT ABSOLUTE ADDRESS;
+define	!FOHLT ='5;	! HALT FRAME;
+define	!FORPC ='6;	! READ PC (USER MODE PC);
+define	!FOREP ='7;	! REPLICATE TO/FROM FRAME;
+define	!FOVRM ='10;	! VREMOV FOR ANOTHER FRAME;
+define	!FOVCL ='11;	! VCLEAR FOR ANOTHER FRAME;
+define	!FOCFH ='12;	! CREATE HANDLE;
+define	!FODFH ='13;	! DESTROY HANDLE;
+define	!FOCLR ='14;	! CLEAR A STOPPED FRAME;
+define	!FORSI ='15;	! RETURN STANDARD ACCESS RIGHT INFO;
+define	!FORAR ='16;	! READ A HANDLE'S ACCESS RIGHTS;
+define	!FORER ='17;	! READ HANDLE'S EFFECTIVE RIGHTS;
+define	!FOSMF ='20;	! SET MAX FRAME RIGHTS;
+define	!FOCHR ='21;	! CHANGE RIGHTS IN A HANDLE;
+define	!FOSVA ='22;	! START FRAME AT START VECTOR ADDRESS;
+define	!FOHST ='23;	! READ HALT STATUS BLOCK FOR FRAME;
+define	!FOGFT ='24;	! GRAFT A FRAME;
+define	!FOCON ='25;	! CONTINUE A FRAME;
+
+preload!with
+"NOH: no handle in slot",
+"BDI: unmatching universal id number",
+"NRT: no rights to do operation",
+"BDF: bad frame number",
+"NLC: not enough license",
+"UND: undefined frame descriptor type",
+"NCH: fd said child but gave non-child frame number.",
+"CLP: can't lock context pages (fd2upx)",
+"BAR: bad access rights code",
+"NPR: orphan asked for its parent",
+"BFD: bad family dispatch type",
+"BDH: bad handle index number in fd",
+"BFN: bad function code to frmop",
+"ADB: address found bad (replicate failed) in .fo?va",
+"IOE: page i/o error in frmrvm/frmwvm",
+"ALR: attempt to start a running frame",
+"ALH: attempt to halt non-running frame",
+"CSJ: attempt to halt frame with jacct on",
+"FHE: handle descriptor expected, not given",
+"FHU: handle (index already) used",
+"NFH: no handle indices left.",
+"BCN: bad count",
+"BTN: bad table number",
+"BHT: bad handle type",
+"CCH: can't create handle (access failure)",
+"BSV: bad start vector offset",
+null; string array FRMOP!err[1:64];
+
+simple integer procedure Frmopr (
+	integer FD;
+	reference integer ARG;  
+	integer FN );
+start!code
+	MOVE 	1,FD;
+	HRL	1,FN;
+	SETZM 	!SKIP!;
+	!FRMOP 	1,ARG;
+	  MOVEM 1,!SKIP!;
+end;	
+ 
+simple integer procedure Frmopi (integer FD,ARG,FN);
+return (Frmopr (FD,memory[ARG],FN) );
+
+simple integer procedure Frmop(integer FD,ARG,FN);
+return (Frmopr (FD,ARG,FN) );
+
+simple procedure ErrCheck (string Msg; integer Val);
+if !SKIP! then print (
+	"? ", Msg, crlf,
+	"? ", FRMOP!err[rh(!SKIP!)], ": ", Val, crlf );
+
+simple integer procedure GetTab (
+	integer Index,
+		Table );
+start!code
+	HRL	1,Index;
+	HRR	1,Table;
+	SETOM	!SKIP!;		! assume a skip;
+	CALLI	1,'41;		! do a gettab;
+	  SETZM	!SKIP!;		! alas, it failed;
+end;				! return (1);
+
+define	!GTFTR	=-'54;	! frame tree information;
+define	!GTUID	=-'53;	! universal frame id;
+define	!GTPNO	=-'52;	! program number;
+define	!GTSPW	=-'51;	! double precision pages-to-WS*size;
+define	!GTPWS	=-'50;	! pages to working-set;
+define	!GTMPC	=-'47;	! pages mapped/created;
+define	!GTMCY	=-'46;	! double precision microcycles;
+define	!GTKCM	=-'45;	! double precision K-core microcycles;
+define	!GTTRU	=-'44;	! double precision TRUs * 10^4;
+define	!GTTR2	=-'43;	! high order TRUs * 10^4;
+define	!GTMC2	=-'42;	! high order microcycles;
+define	!GTBIO	=-'41;	! block IO chars transmitted;
+define	!GTBET	=-'40;	! BIO elapsed time (sec);
+define	!GTSOK	=-'37;	! TYMCHG TRUs * 10^4;
+define	!GTLNK	=-'36;	! debugging tables;
+define	!GTERN	=-'33;	! ENTER + RENAME count;
+define	!GTLPS	=-'32;	! tty input line position;
+define	!GTMOD	=-'31;	! tty mode (GETSTS info);
+define	!GTLIM	=-'30;	! time limit (TRUs * 10^4);
+define	!GTLIN	=-'27;	! TTY: name in SIXBIT, (lh)=0 if detached;
+define	!GTJOB	=-'26;	! job who owns this port;
+define	!GTFPN	=-'25;	! File Proj-prog Number;
+define	!GTLOG	=-'24;	! LDBLOG info (Table 65);
+define	!GTAUN	=-'23;	! Accounting User Number;
+define	!GTUNM	=-'22;	! user name (1-6) SIXBIT;
+define	!GTUN1	=-'21;	! user name (7-12) SIXBIT;
+define	!GTLIC	=-'20;	! license word;
+define	!GTMC1	=-'15;	! low order microcycles;
+define	!GTKM2	=-'14;	! high order K-core microcycles;
+define	!GTBCS	=-'13;	! K-core break chars;
+define	!GTCNK	=-'12;	! attach time (sec);
+define	!GTELP	=-'11;	! K-core seconds;
+define	!GTCOT	=-'10;	! characters output;
+define	!GTCIN	=-'7;	! characters input;
+define	!GTSOT	=-'6;	! K-core DSK blocks out;
+define	!GTSIN	=-'5;	! K-core DSK blocks in;
+define	!GTSRN	=-'4;	! K-core ENTER + RENAME;
+define	!GTSLK	=-'3;	! K-core LOOKUP;
+define	!GTDLK	=-'2;	! LOOKUP count;
+define	!GTSTS	='0;	! Status Bits (Table 3);
+define	!GTPPN	='2;	! Project Programmer Number;
+define	!GTNAM	='3;	! SIXBIT user program name;
+define	!GTTR1	='4;	! low order TRUs * 10^4;
+define	!GTKM1	='5;	! low order K-core microcycles;
+define	!GTPRV	='6;	! Privilege Bits (Table 1);
+define	!GTSWP	='7;	! swapper status bits;
+define	!GTTTY	='10;	! address of TTY DDB;
+define	!GTCNF	='11;	! config data (Table 64);
+define	!GTNSW	='12;	! nonswap data (Table 68);
+define	!GTODP	='15;	! once disk (Table 69);
+define	!GTLVD	='16;	! level-D disk (Table 67);
+define	!GTRCT	='17;	! DSK blocks in;
+define	!GTWCT	='20;	! DSK blocks out;
+define	!GTSLF	='23;	! GETTAB table addresses;
+define	!GTWSC	='25;	! wait states (Table 70);
+!	frame data ;
+
+set	AllFrames;		! contains FI's for all frames;
+
+
+!	events ;
+
+item	FrameHalt;		! any frame has halted;
+
+simple procedure EventIni;
+begin
+    Mkevtt (FrameHalt);
+end;
+require EventIni initialization[0];
+
+!	msg _ FrameErrMsg (F)
+
+Return appropriate error message for why the frame died
+;
+recursive string procedure FrameErrMsg ( frame	F );
+begin "FEM"
+    string  M;			! string to be returned;
+    integer L,R;		! class and type of error;
+    L _ lh( FD:hsbType[f] );	! class in left half;
+    R _ rh( FD:hsbType[f] );	! type in right half;
+    case L of begin "class"
+  	[0] case R of begin	! memry violations;
+	    [0] M_"?PC out of bounds at "&cvos(FD:hsbPC[f]);
+	    [1] M_"?ill mem ref for "&cvos(FD:hsb1[f])&" at "&cvos(FD:hsbPC[f]);
+	    [2] M_"?write violation for "&cvos(FD:hsb1[f])&" at "&cvos(FD:hsbPC[f]);
+	    [3] M_"?address check for "&cv6str(FD:hsb1[f])&": at "&cvos(FD:hsbPC[f]);
+	    [4] M_"?ill mem ref for "&cvos(FD:hsb1[f])&" in UUO at "&cvos(FD:hsbUUOPC[f]);
+	    [5] M_"?illegal interrupt address "&cvos(FD:hsb1[f]    [6] M_"?address break";
+	    [7] M_"?PDL overflow at "&cvos(FD:hsbPC[f]);
+	    else M_"?meory violation #"&cvos(R)&" -no message" end;
+	[1] case R of begin	! system errors;
+	    [0] M_"?page I/O error";
+	    [1] M_"?disk full durring copy on write";
+	    [2] M_"?paging hardware error";
+	    [3] M_"?too many locked pages - can't handle fault";
+	    [4] M_"?context page I/O error";
+	    [5] M_"?parity error(s - core removed";
+	    else M_"?system error #"&cvs(R)&" -no message" end;
+	[2] case R of begin	! device errors;
+	    [0] M_"?device "&cv6str(FD:hsb1[f])&" can't do output";
+	    [1] M_"?device "&cv6str(FD:hsb1[f])&" can't do input";
+	    [2] M_"?illegal data mode for device "&cv6str(FD:hsb1[f]);
+	    [3] M_"?IO to unassigned channel";
+	    [4] M_"?device "&cv6str(FD:hsb1[f])&": hung";
+	    [5] M_"?operator action requested for device "&cv6str(FD:hsb1[f])&":";
+	    else M_"?device error #"&cvos(R)&" -no message" end;
+	[3] case R of begin	! illegal instructions;
+	    [0] M_"?illegal uuo at "&cvos(FD:hsbUUOPC[f]);
+	    [1] M_"?fatal uuo error at "&cvos(FD:hsbUUOPC[f]);
+	    [2] M_"?ill inst at "&cvos(FD:hsbUUOPC[f]);
+	    [3] M_"?halt at "&cvos(FD:hsbUUOPC[f]);
+	    else M_"?ill inst trap #"&cvos(R)&" -no message" end;
+	[4] case R of begin	! frame exits (normal);
+	    [0] M_"exit";	! EXIT;
+	    [1] M_null;		! EXIT 1,;
+	    [2] M_"failed";	! FAIL exit;
+	    [4] M_cv6str(FD:hsb1[f])&" setup";
+	    [5] M_cv6str(FD:hsb1[f])&" saved";
+	    [6] M_"cleared";
+	    else M_"?frame exit #"&cvos(R)&" -no message" end;
+	[5] case R of begin	! SEGCON errors;
+	    [0] M_"?transmission error";
+	    [1] M_"?"&cvs(FD:hsb1[f])&" pages needed";
+	    [2] M_"?device "&cv6str(FD:hsb1[f])&": not available";
+	    [3] M_"?"&cv6str(FD:hsb1[f])&"."&cv6str(FD:hsb2[f])&" not found";
+	    [4] M_"?not a save file";
+	    [5] M_"?"&cv6str(FD:hsb1[f])&"."&cv6str(FD:hsb2[f])&" ENTER failure";
+	    [6] M_"?core argument must be specified";
+	    [7] M_"?mag tape HISEG format bad of system error";
+	    [8] M_"?fatal errors durring REMAP";
+	    [9] M_"?mag tape GET failure";
+	    [10] M_"?no start address";
+	    else M_"?SEGCON error #"&cvos(R)&" -no message" end;
+	else if FD:hsbType[f] =-1
+	    then M_"<^C>"	! ^C (or gate jump);
+	    else M_"?halt class "&cvos(L)&" type "&cvos(R)&" -no message" end;
+    return (M);
+end "FEM";
+!	ppn _ CvPPN ("username")
+
+Convert a username into a PPN by looking up its UFD.  This is more
+efficient than reading the LUD but it does not work if the user has
+no directory!  Beware!
+;
+
+integer procedure cvppn(string user);
+begin
+    external integer !SKIP!;
+    integer CH,E;
+    integer array X[0:3],U[0:1];
+    X[0] _ 3;
+    X[1] _ '1000001;
+    X[2] _ location(U[0]);
+    X[3] _ cvsix("UFD");
+    U[0] _ cvsix(user[1 for 6]);
+    U[1] _ cvsix(user[7 for 6]);
+    open (CH_getchan,"DSK",0,0,0, 0,0,E);
+    if E then return(0);
+    chnior(CH,X[0],4);
+    release (CH);
+    if not !SKIP! then return(0);
+    return(X[2]);
+end;
+!	HALT interrupt service
+
+This routine is called by DFRINT in response to an interrupt on the
+channel HALTchan (which is assigned cause HALTcause: interrupt when
+any child halts).  Note that it is assumed that if the RUN bit in
+JBTSTS has changed from FD:rf, but the halt count has not changed
+(FD:hc = FD:hsbCount), that the frame halted as the result of an
+untrapped ^C or HALT command given by an attached console.  This
+is hopefully temporary.
+;
+
+procedure HALTservice;
+begin "HALTservice"
+    frame F;
+    frame itemvar FF;
+    NoSched;			! no interrupts durring this;
+    foreach FF | FF in AllFrames do begin "next frame"
+	F _ datum(FF);
+	FD:sts[f] _ GetTab (FD:j[f],!GTSTS);! get current frame status;
+	if (FD:sts[f] xor FD:rf[f]) land bit(0) = 0 then continue;
+				! if run bit hasn't changed ignore;
+	FD:rf[f] _ FD:sts[f] land bit(0);! update run bit;
+	FD:hsb[f] _ hsbSize;	! setup and get halt status block;
+	frmopr (FD:j[f],FD:hsb[f],!FOHST);
+	ErrCheck("HALTservice: can't read halt status block for frame",
+	    FD:j[f] land '7777);
+        if FD:hc[f]=FD:hsbCount[f] then FD:hsbType[f] _ -1;
+				! if hasn't incrimented, halted by ^C;
+	FD:hc[f] _ FD:hsbCount[f];! update halt count;
+        cause (FrameHalt,FF);
+    end "next frame";
+    Sched;
+end "HALTservice";
+
+!	Initialize HALT interrupt
+;
+
+safe integer array HALTblock[1:2];
+define	HALTcause = '14;	! HALT in a child frame;
+define	HALTchan = '10; 	! HALT psi channel;
+
+simple procedure HALTini;
+begin
+    HALTblock[1] _ 2;
+    HALTblock[2] _ hl(-1) + location(HALTservice);
+    intmap (intass (HALTcause,HALTchan),
+	dfrint, hl(-2) + location(HALTblock[1]) );
+    enable (newenb(HALTchan));
+end;
+require HALTini initialization[2];
+
+!	create a new frame
+;
+
+frame procedure NewFrame;
+begin "newframe"
+    frame F;
+    frame itemvar FF;
+    NoSched;			! dont let anybody see us this way;
+    F _ new!record(FD);		! new frame descriptor;
+    FF _ new(F);		! make an item for it;
+    FD:fi[f] _ FF;		! link it into FD;
+    FD:j[f] _ Frmop (0, 0, !FOCFM);! create the frame;
+    if !SKIP! then begin	! handle error condition;
+	Sched;
+! error(L,n!r,
+	    "NewFrame: cannot bear child, "&FRMOP!err[!SKIP!]);
+! return (n!r);
+    end;
+    FD:sts[f] _ GetTab (FD:j[f], !GTSTS); ! store JBTSTS;
+    put FF in AllFrames;	! it exists;
+    Sched;			! okay to be interrupted now;
+    return (F);			! return the FD;
+end;
+
+!	symbol _ RunProg(F,"program",[t/f])
+
+Run the named rogram in the named frame. If GivePort is
+true or unspecified, give the frame the port after it starts running.
+If the port is given away, wait for its return.
+;
+
+symbol procedure RunProg (
+	frame 	F; 
+	string 	Prog;
+	boolean	GivePort(true) );
+begin
+    integer J;			! frame number;
+    integer I;			! tmp;
+    integer array AC[0:'17];	! place to store data to deposit;
+    label AC!data,StAdr;	! address of program;
+    NoSched;			! don't allow interruptions;
+    J _ FD:j[f];		! get child frame handle;
+    calli (J,-'126);		! SetOTF;
+!   if not !SKIP! then return(error(L,n!r,
+	"RunProg: cannot SETOTF"));
+    calli (hl('206001),-'67);	! give it 1 page;
+    if false then quick!code	! program to be deposited;
+        AC!data:
+		0;0;0;0;0;0;0;0;	! [0:7];
+		0;			! [10];
+        StAdr:  CALLI '10,'35;		! RUN uuo;
+		  JRST 4,'13;		! HALT;
+    end;
+    arrblt(AC[0],memory[location(AC!data)],'20);! copy program;
+    AC[0] _ cvsix("DSK");	! device;
+    AC[1] _ cvfil(Prog,AC[2],AC[4]);! program name;
+    if AC[4] and (lh(AC[4])=0) then begin ! copy username if given;
+        AC['6] _ memory[AC[4]];
+        AC['7] _ memory[AC[4]+1];
+        AC[4] _ '6;
+    end;
+    for I _ 0 step 1 until '17 do begin
+        integer array A[0:1];
+        A[0] _ I; A[1] _ AC[I];	! address, data;
+        Frmopr(J,A[0],!FOWVA);	! copy array to his address space;
+! if !SKIP! then return(error(L,n!r,
+	    "RunProg: cannot deposit frame, "&FRMOP!err[!SKIP!]));
+    end;
+    Frmop(J,hl(-1) lor (location(StAdr)-location(AC!data)),!FOSAA);
+!   if !SKIP! then return(error(L,n!r,
+	"RunProg: cannot start frame, "&FRMOP!err[!SKIP!]));
+    FD:rf[f] _ true;		! flag as running;
+    Sched;			! allow scheduling;
+!   if GivePort then FrameWait (F);
+    return (n!r);
+end;
+
+
+
+
+
+ PROCEDURE SIMPLE!OUTPUT (STRING Str);
+
+   BEGIN
+
+       INTEGER I;  
+       INTEGER ARRAY OUT!MSG[ 0:255];
+
+       FOR I _ 1 STEP 5 UNTIL LENGTH(STR)
+       DO
+         Out!msg[I%5] _ CVASC(Str[I FOR 5]);
+       Out!msg[(I%5)+1] _ 0;
+
+       AUXCLV( Port, POINT(7,Out!msg[0],-1), Auxcal!outptr);
+
+   END;
+
+
+ PROCEDURE BUILDCKT( STRING Loginstring;
+                       REFERENCE INTEGER Portnumber;
+                       REFERENCE BOOLEAN Success);
+
+   BEGIN
+
+       INTEGER ARRAY Login[0:5];
+       INTEGER I;
+
+       FOR I _ 1 STEP 5 UNTIL 29 MIN LENGTH(Loginstring)
+       DO
+         Login[I%5] _ CVASC ( Loginstring[I FOR 5]);
+
+       Portnumber _ Calli( LOCATION(Login[0]),Calli!Creaux);
+
+       Success _ !SKIP!;
+
+
+   END;
+
+
+
+ PROCEDURE  IMMED!INT;
+
+   BEGIN
+
+       CALLI ( Bit(0) LSH - Char!Chan, -'34);  ! disable channel;
+       
+       DFR1IN ( (-2 LSH 18) + LOCATION( InterruptBlock[0]) );
+
+   END;
+
+
+ PROCEDURE INITIALIZE!INTERRUPTS;
+
+   BEGIN
+
+       InterruptBlock[0] _ 2;
+       InterruptBlock[1] _ -1 LSH 18 LOR LOCATION( Char!Handler);
+
+       HaltBlock[1] _ 2;
+       HaltBlock[2] _ hl(-1) + LOCATION( HaltService);
+
+   END;
+
+
+ PROCEDURE ATTACH!CHAR!INT;
+
+   BEGIN
+
+      INTEGER Index;
+
+      Index _ TINASS ( Port, Cause!TTy!Chr, Char!Chan );
+
+      INTMAP (Index, Immed!Int, 0 );
+
+      ENABLE( NEWENB (Char!Chan));
+
+   END;
+
+
+ PROCEDURE ATTACH!HALT!INT;
+
+   BEGIN
+
+       INTMAP ( TINASS (Port,HaltCause,HaltChan), DFRINT,
+                hl(-2) + LOCATION (HaltBlock[1]) );
+
+       ENABLE ( NEWENB ( HaltChan ) );
+
+   END;
+
+
+
+
+ PROCEDURE CHAR!HANDLER;
+
+   BEGIN
+
+       STRING  Char,Line;  INTEGER Loop;
+
+       Char _ AUXCLV ( Port, 0, Auxcal!Inchrs);
+
+       WHILE  !SKIP! DO
+       BEGIN
+
+           IF Char = "*"
+           THEN
+           BEGIN
+
+               Count _ Count + 1;
+               IF Count > 3
+               THEN
+                   SIMPLE!OUTPUT ( "QUIT" )
+               ELSE
+                   Simple!Output ("STORE @STOR"& CVS(Loop) & CRLF);
+               Simple!Output(CR);
+           END
+           ELSE
+           IF Char = CR
+           THEN
+           BEGIN
+  
+               PRINT (Line,CRLF);
+               Line _ NULL;
+
+           END
+           ELSE
+           BEGIN
+
+               Line _ Line & Char;
+
+           END;
+
+           Char _ AUXCLV(Port, 0, Auxcal!Inchrs);
+           Loop _ Loop + 1;
+      END;
+
+       AUXCLV( Port, 0, Auxcal!Levdef);
+
+       ENABLE ( NEWENB (Char!Chan) );
+
+END;
+
+
+
+PROCEDURE SetUp!Stor!Files( REFERENCE BOOLEAN Result);
+BEGIN
+
+! For each product in HOLD!FILE, create file STORn that will make
+  up a "save-set" ( where n is a running count of the number of
+  save-sets. The total number created should be stored in TOTAL.
+
+  STORn
+
+      PROD.DOC
+      PROD.CHG
+      PROD.INS
+      PROD.BAK
+      CONTENTS OF PROD.FLS
+
+
+ NEXT create TAPDIR.inf
+
+
+  When Char!Handler detects an * a command STORE  @STORn
+  will be sent to TITO (the first command will be STORE TAPDIR.INF).
+
+;
+
+END;
+
+
+
+PROCEDURE IDLE!RTN;
+
+BEGIN
+
+    WHILE TRUE DO
+    BEGIN
+
+        PSTATUS(MAINPI);
+
+    END;
+
+END;
+
+PROCEDURE FRAME!CLEAR(frame F);
+
+BEGIN
+
+       FD:rf[F] _ true;
+
+       FRMOP (FD:j[F], 0, !FOCLR);
+
+       IF !SKIP! THEN PRINT (FRMOP!ERR[RH(!SKIP!)], CRLF);
+
+END;
+ ! ****************************************************************
+
+                        MAIN
+
+   ******************************************************************;
+
+
+
+PRINT ( "HOLD FILE NAME: ");
+Hold!File _ INCHWl;
+
+PRINT ("FTA NUMBER: ");
+FTA!NUM _ INCHWL;
+
+
+PRISET(MAINPI, 1);
+SPROUT (Idle!Item, Idle!Rtn, Priority(15) + '1);
+SETUP!STOR!FILES( Result);
+
+Initialize!Interrupts;
+
+INTSET (INTPROC, PSTACK(32) + StringSTACK(16));
+
+ATtach!Halt!Int;
+
+INSTRNG _ cv6str(gettab(-1,-'22))&cv6str(gettab(-1,-'21));
+
+Frm!Ptr _ NewFrame;
+
+BuildCkt(Instrng & ":37;", Port, Result);
+
+
+IF NOT Result
+THEN
+BEGIN
+     PRINT ("** BAD LOGON ** ",Port,CRLF);
+END
+ELSE
+BEGIN
+
+    Simple!Output (CR&CR);
+
+    Simple!Output("RUN ATTACH"&CR&CVS( FD:j[Frm!Ptr] LAND '7777) & CR);
+    RunProg (Frm!Ptr,"TITO");
+
+
+    
+    Attach!Char!Int;
+    Simple!Output(CR);
+
+
+
+     INTERROGATE( FrameHalt, WAIT);
+     IF FD:HsbType[Frm!Ptr] = Normal!Exit
+     THEN
+     BEGIN
+          FRAME!CLEAR (Frm!Ptr);
+	  interrogate (FrameHalt, WAIT);
+	  if FD:HsbType[Frm!Ptr] = Frm!Clrd
+		then PRINT ( "**** TAPE COMPLETE ****",CRLF)
+		else PRINT ( "?Not cleared ",FrameErrMsg(Frm!Ptr),crlf);
+	  RunProg(Frm!Ptr, "(SYS)LOGOUT")
+      END
+      ELSE
+        PRINT("ABNORMAL EXIT 2  ",FrameErrMsg(Frm!Ptr),CRLF);
+
+
+END;
+
+
+
+
+
+   TERMINATE (IDle!Item);
+
+end "eztape";
+y@j∆
