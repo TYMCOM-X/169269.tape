@@ -1,0 +1,5 @@
+DEFINE !snarl= "false", !dsnarl= "true";
+DEFINE debug= "true", production!version= "false";
+DEFINE ck!sn= "ifcr !snarl thenc";
+DEFINE ck!dsn= "ifcr !dsnarl thenc";
+
