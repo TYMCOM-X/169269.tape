@@ -1,0 +1,60 @@
+begin "INIT" require "(wrs)settrm.sai" source!file;
+
+Define Term!444 = { begin ;
+        auxclv( -1, cvsix( "HP2621" ), '100 );
+	Tym!444;
+end };
+
+lc;					! lower case input allowed;
+backspace;				! backspace on erase character;
+erase;					! erase with bs-sp-bs;
+form;					! don't simulate form feeds;
+stall;					! respond to ^S/^Q from term;
+width(80);				! length of line=80;
+DEM;					! Deferred Echo Mode;
+BSD;					! Backspace Delete;
+case out!baud of begin
+      [baud!300] Tym!325;		! assume diablo if at 300 baud;
+!     [baud!1200] Term!444;		! assume HP2621 if at 1200 baud;
+!     [baud!2400] Term!444;		! assume HP2621 if at 2400 baud;
+!     [baud!4800] Term!444;		! assume HP2621 if at 4800 baud;
+!     [baud!9600] Term!444;		! assume HP2621 if at 9600 baud;
+      [else] Term!444			! everything defaults to HP2621;
+end;
+setmail;				! save mail in MAIL.BOX;
+addproc("DIRIT","(WRS)EDIRIT");		! alternate DIRIT;
+addproc("EDITOR","(dws)ftded");
+addproc("EDIT10","(dws)ftded");
+! addproc("EDITOR","(sys)vue");
+! addproc("EDIT10","(sys)vue");
+addnon("(carl)pcom","pco","pou","pco","");
+! addnon("com","com","tem","stf","");
+setdo("SGAVETTE","MPL","M33","WRS","SPL");	! do list;
+RPGini;					! set this all up;
+if tic then begin "terminal"
+    list DJL;				! for detached job list;
+    def;				! stay in deffered echo mode;
+    SetAlp("(MPL)ZEN");			! ZEN on logout;
+    if STATES land '700000 then print(7&
+	"~ ", STATE!NAME, " ~"&nl);	! shut, restricted, etc;
+    print(
+	"Load ", LOAD!AVERAGE,"%, "&
+	"response ", RESPONSE!TIME," ms"&
+	nl, SOFTWARE,
+	" [", HARDWARE, "] ",
+	cvos(NODE), "-",
+	cvos(PORT), nl );		! statistics;
+    DJL _ DetachedJobList;		! detached jobs if any;
+    if length(DJL) then begin "detached jobs"
+	string  J;
+	print(7&7, user, " has detached jobs: ", DJL, nl);
+	do begin
+	    print("attach # or <cr>: ");
+	    Attach(cvd(J_inchwl));
+	end until length(J)=0;
+    end "detached jobs";
+    run("(SGAVETTE)REMINI");		! reminders;
+end "terminal";
+
+exit; end $
+
