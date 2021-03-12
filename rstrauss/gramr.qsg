@@ -1,0 +1,901 @@
+<IQL> ::=
+        <IQL-command> e-o-com   \
+        \
+
+<IQL-command> ::=
+        <ALIAS-command>    <semicolon>   !  LIST 2 CALL $QALIA !   \
+        <ALTER-command>    <semicolon>   !  LIST 2 CALL $QPALT !   \
+        <DEFAULT-command>  <semicolon>   !  LIST 2 CALL $QDFLT !   \
+        <DELETE-command>   <semicolon>   !  LIST 2 CALL $QPDEL !   \
+        <DIRCTRY-command>  <semicolon>   !  LIST 2 CALL $QDIR  !   \
+        <DO-command>       <semicolon>   !  LIST 2 CALL $QDO   !   \
+        <DROP-command>     <semicolon>   !  LIST 2 CALL $QDROP !   \
+        <INSERT-command>   <semicolon>   !  LIST 2 CALL $QPINS !   \
+        <FIND-command>     <semicolon>   !  LIST 2 CALL $QFCOM !   \
+        <QUERY-command>    <semicolon>   !  LIST 2 CALL $QQSET !   \
+        <LIST-command>     <semicolon>   !  LIST 2 CALL $QLIST !   \
+        <EDIT-command>     <semicolon>   !  LIST 2 CALL $QEDIT !   \
+        <EXIT-command>     <semicolon>   !  LIST 2 CALL $QEXIT !   \
+        <OBTAIN-command>   <semicolon>   !  LIST 2 CALL $QOBTA !   \
+        <SAVE-command>     <semicolon>   !  LIST 2 CALL $QSAVE !   \
+        <SIX12-command>    <semicolon>   !  LIST 2 CALL $QSIX  !   \
+        <PRINT-command>    <semicolon>   !  LIST 2 CALL $QTYPE !   \
+        <TYPE-command>     <semicolon>   !  LIST 2 CALL $QTY   !   \
+        <function-def>     <semicolon>   !  LIST 2 CALL $QFNDF !   \
+        <field-def>        <semicolon>                             \
+        <SET-command>      <semicolon>   !  LIST 2 CALL $QSET  !   \
+        \
+
+
+<semicolon>  ::=          ';'           ! LIST 1 CALL $QSEMI !   \
+        \
+
+
+<SET-command> ::=
+        SET <SET-clause-list>   ! LIST 1 ! \
+        \
+
+<SET-clause-list> ::=
+        <SET-clause> || ','     \
+        \
+
+<SET-clause> ! ROOT ! ::=
+        <setable> <set-op> <complete-expr>         ! LIST 3 1 ! \
+        <set-expr>                                              \
+        \
+
+<setable> ::=
+        PAGE.SIZE                   \
+        TOP.MARGIN                  \
+        BOTTOM.MARGIN               \
+        PAGE.FOOTING                \
+        \
+
+<EDIT-command> ::=
+        EDIT <integer-value>            \
+        \
+
+<PRINT-command> ::=
+        PRINT <expression-list> \
+        \
+
+<TYPE-command> ::=
+        TYPE <edit-object>      \
+        \
+
+<EXIT-command> ::=
+        EXIT                    \
+        QUIT                    \
+        \
+
+<SIX12-command> ::=
+        SIX12                   \
+        \
+
+<ALIAS-command> ::=
+        ALIAS <alias-spec>|| ','     ! LIST 2 1 ! \
+        \
+
+<ALTER-command> ::=
+        <ALTER-clause> <fld-assign-clause> FOR [EVERY] <ALTER-relation-name>
+        <opt-WHERE-clause>       ! LIST 6 5 4 2 1 !  \
+        \
+
+<ALTER-clause> ::=
+        ALTER                   ! LIST 1 CALL $QSALT ! \
+        \
+        
+<DEFAULT-command> ::=
+        DEFAULT <noise-clause> <default-option>     ! LIST 1 ! \
+        \
+
+<default-option> ::=
+        relation-name   \
+        NONE            \
+        \
+
+<DELETE-command> ::=
+        <opt-FROM-clause> DELETE <del-clause>  \
+        \
+
+<DIRCTRY-command> ::=
+        DIRECTORY <dir-spec>                        \
+        \
+
+<DO-command> ::=
+        DO <do-spec>                                \
+        \
+
+<DROP-command> ::=
+        DROP <drop-spec>                            \
+        \
+
+<INSERT-command> ::=
+        <opt-FROM-clause> INSERT <ins-clause>       \
+        \
+        
+<QUERY-command> ::=
+        QUERY <query-spec>                          \
+        \
+
+<OBTAIN-command> ::=
+        OBTAIN <obtain-spec>                    \
+        \
+
+<SAVE-command> ::=
+        SAVE <save-spec>                        \
+        \
+
+<FIND-command> ::=
+        <FIND-clause> <FIND-support-clause>*    \
+        \
+
+<FIND-support-clause> ! ROOT ! ::=
+        <WHERE-clause>                  ! ALT NV$WHERE LIST 1 !   \
+        <USING-EVERY-clause>            ! ALT NV$USEVERY LIST 1 ! \
+        <LIST-INTO-clause>              ! ALT NV$INTO LIST 1 ! \
+        \
+
+
+<LIST-command> ::=
+        <complete-clause-list>    \
+        \
+
+<complete-clause-list> ::=
+        <clause>* <LIST-clause> <clause>* \
+        \
+
+
+<clause> ! ROOT ! ::=
+        <WHERE-clause>                  ! ALT NV$WHERE LIST 1 ! \
+        <USING-EVERY-clause>            ! ALT NV$USEVERY LIST 1 ! \
+        <REPORT.HEADING-clause>         ! ALT NV$RPTHDNG LIST 1 ! \
+        <REPORT.FOOTING-clause>         ! ALT NV$RPTFTNG LIST 1 ! \
+        <PAGE.HEADING-clause>           ! ALT NV$PGHDNG LIST 1 ! \
+        <GROUP.HEADING-clause>          ! LIST 1 CALL $QGRHI ! \
+        <GROUP.FOOTING-clause>          ! LIST 1 CALL $QGRFI ! \
+        <TO-clause>                     ! ALT NV$TO LIST 1 ! \
+        <LIST-INTO-clause>              ! ALT NV$INTO LIST 1 ! \
+        \
+
+
+
+<LIST-clause> ! ROOT ! ::=
+        LIST <report-item-list>         ! ALT NV$LIST LIST 1 ! \
+        LIST <default>                  ! ALT NV$LIST LIST 1 ! \
+        \
+
+
+<FIND-clause> ! ROOT ! ::=
+        FIND <find-item-list>           ! ALT NV$FIND LIST 1 ! \
+        FIND <default>                  ! ALT NV$FIND LIST 1 ! \
+        \
+
+
+<find-item-list> ::=
+        <find-item>   \
+        <find-item-list> ',' <find-item>    ! LIST 3 1 !    \
+        \
+
+
+<report-item-list> ::=
+        <report-item>   \
+        <report-item-list> ',' <report-item>    ! LIST 3 1 !    \
+        \
+
+
+<find-item> ! ROOT ! ::=
+        <default>
+          <default>
+            <rooted-default>
+              <fname-spec>
+                <unique-spec>
+                  <expr>
+                    <rooted-default>
+                      <default>
+                        <default>                       \
+        <all-fields>                                \
+        <key-fields>                                \
+        \
+
+
+<rooted-default> ! ROOT ! ::=
+        <default>        \
+        \
+
+<fname-spec> ::=
+        <default>                                \
+        ':' <name-string> ':'         ! LIST 2 ! \
+        \
+
+<unique-spec> ::=
+        <default>                   \
+        UNIQUE                      \
+        \
+
+<report-item> ! ROOT ! ::=
+        <control-word>
+          <sort-direction>
+            <agr-spec>
+              <fname-spec>
+                <unique-spec>
+                  <expr>
+                    <sbttl-spec>
+                      <centering-keyword>
+                        <heading-clause>            \
+        '/'                                         \
+        <all-fields>                                \
+        <key-fields>                                \
+        \
+
+<all-fields> ::=
+        ('*' | ALL) (OF | '_') relation-name
+                        ! MODID 3 TV$ALL LIST 3 1  CALL $QGRCB !  \
+        ('*' | ALL)
+                        ! MODID 1 TV$ALL LIST 1    CALL $QGRCB !  \
+        \
+<all-of-relation-update> ::=
+        ('*' | ALL) (OF | '_') relation-name  ! LIST 1 CALL $QUSEV ! \
+        \
+
+<key-fields> ::=
+        KEY <of-option> relation-name     ! LIST 3 1 CALL $QGRCB !  \
+        KEY                               ! LIST 1   CALL $QGRCB !  \
+        \
+
+
+<control-word> ::=
+        <default>       \
+        ON              \
+        BY              \
+        NEW             \
+        \
+
+
+<sort-direction> ::=
+        <default>                                         \
+        (ASC | ASCENDING)      ! INSERT TV$PLUS LIST 1 !  \
+        (DSC | DESCENDING)     ! INSERT TV$MINUS LIST 1 ! \
+        \
+
+
+
+<sbttl-spec> ! ROOT ! ::=
+        <WITH-noise> SUBTOTAL                ! INSERT TV$SUM LIST 1 !   \
+        <WITH-noise> SUBTOTAL <total-spec>   ! INSERT TV$SUM
+                                               SUBID 1 TV$TOTAL
+                                               LIST 1 !                 \
+        <WITH-noise> TOTAL                   ! LIST 1 !                 \
+        <WITH-noise> <agr>                   ! LIST 1 !                 \
+        <default>                                                       \
+        \
+
+<total-spec> ::=
+        <WITH-noise> TOTAL       \
+        \
+
+
+<WITH-noise> ::=
+        <default>                \
+        WITH                     \
+        \
+
+<agr-spec> ! ROOT ! ::=
+        <default>                                \
+        <agr>                                    \
+        <agr> AS <picture> FOR      ! LIST 4 2 ! \
+        \
+
+
+<agr> ::=
+        SUM             \
+        COUNT           \
+        AVG             \
+        MIN             \
+        MAX             \
+        \
+
+
+
+<centering-keyword> ::=
+        <default>       \
+        L.              \
+        R.              \
+        C.              \
+        \
+
+
+<heading-clause> ::=
+        <default>       \
+        <heading-list>  \
+        \
+
+
+
+<heading-list> ! ROOT ! ::=
+        '[' <unrooted-heading-list> ']'         ! LIST 2 ! \
+        '[' <default> ']'                       ! LIST !   \
+        \
+
+
+<unrooted-heading-list> ::=
+        <heading-item>  \
+        <unrooted-heading-list> heading-item>
+                                        ! LIST 3 1 !\
+        \
+
+
+<heading-item> ::=
+        <expr> L.   ! LIST 1 2 ! \
+        <expr> R.   ! LIST 1 2 ! \
+        <expr> C.   ! LIST 1 2 ! \
+        <expr>      ! INSERT TV$DEFAULT LIST 1 2 ! \
+        \
+
+<ALTER-relation-name> ::=
+        relation-name                ! LIST 1 CALL $QATRC ! \
+        \
+
+<ins-clause>  ::=
+        <INTO-clause> <fld-assign-clause> <opt-WHERE-clause> \
+        <fld-spec-list> <INTO-clause> <opt-WHERE-clause>     \        
+        \ 
+
+<del-clause> ::=        
+        <del-element-list> <FROM-clause> <opt-WHERE-clause>   \
+        <FROM-clause> <DEL-options>                       \
+        \
+
+<DEL-options> ::=
+        <WHERE-clause>      \
+        ALL                 \
+        \
+        
+
+<noise-clause> ::=
+        RELATION            \
+        <default>           \
+        \
+
+<opt-FROM-clause> ::=
+        <outer-FROM-clause>                       \
+        <default>                                    \
+        \
+
+<FROM-clause> ::=
+        FROM relation-name    ! LIST 1 CALL $QDELRC ! \
+        \
+
+<outer-FROM-clause> ::=
+        FROM relation-name     ! LIST 1 CALL $QUSEV ! \
+        \
+
+<USING-EVERY-clause> ::=
+        USING EVERY relation-name       ! LIST 1 CALL $QUSEV !  \
+        \
+
+<LIST-INTO-clause> ::=
+        INTO name             ! LIST 1 CALL $QEREL ! \
+        \
+
+
+<INTO-clause> ::=
+        INTO relation-name    ! LIST 1 CALL $QINSRC ! \
+        \
+
+<del-element-list> ! ROOT ! ::=
+        <all-of-relation-update>     ! ALT NV$ALL !      \
+        <fld-list>                   ! ALT NV$LIST !     \
+        \
+  
+<fld-spec-list> ! ROOT ! ::=
+        <all-of-relation-update>           ! ALT NV$ALL         ! \
+        [ USING ] <fld-spec> || ','        ! LIST 1 ALT NV$LIST ! \
+        \
+
+<fld-spec> ! ROOT ! ::=
+        <field-spec> ':' <expr>            ! LIST 3 1 ALT NV$FLDNAM ! \
+        <field-spec>                       ! ALT NV$DATA !            \
+        \
+
+<fld-list> ::=
+        <field-spec> || ','                       ! LIST 1 !  \
+        \
+
+<name-list> ::=
+        name || ','      \
+        \
+
+<REPORT.HEADING-clause> ::=
+        REPORT.HEADING PRINT <expr-list>              ! LIST 1 ! \
+        \
+
+<REPORT.FOOTING-clause> ::=
+        REPORT.FOOTING PRINT <expr-list>              ! LIST 1 ! \
+        \
+
+<PAGE.HEADING-clause> ::=
+        PAGE.HEADING PRINT <expr-list>                ! LIST 1 ! \
+        \
+
+<GROUP.HEADING-clause> ::=
+        GROUP.HEADING ON <expr> PRINT <expr-list>       ! LIST 3 1 ! \
+        \
+
+<GROUP.FOOTING-clause> ::=
+        GROUP.FOOTING ON <expr> PRINT <group-footing-list>
+                                                     ! LIST 3 1 ! \
+        \
+
+<group-footing-list> ::=
+        <group-footing-item>                                            \
+        <group-footing-list> ',' <group-footing-item>    ! LIST 3 1 !   \
+        \
+
+
+<rooted-agr> ! ROOT ! ::=
+        <agr>                \
+        \
+
+
+<group-footing-item> ::=
+        <rooted-default> <expr>        ! LIST 1 2 ! \
+        <rooted-agr> <expr>            ! LIST 1 2 ! \
+        \
+
+<TO-clause> ::=
+        <APPEND-clause> TO FILE <file-spec>             ! LIST 2 4 1 ! \
+        <APPEND-clause> TO TEXT name                    ! LIST 2 4 1 ! \
+        <APPEND-clause> TO name                         ! INSERT TV$TEXT LIST 1 4 2 ! \
+        \
+
+<APPEND-clause> ::=
+        APPEND     \
+        <default>  \
+        \
+
+<edit-object> ::=
+        [TEXT] name             ! INSERT TV$TEXT LIST 1 2 ! \
+        FILE <file-name>        \
+        \
+
+<alias-spec> ! ROOT ! ::=
+        name FOR name           \
+        \
+
+<dir-spec> ::=
+        <dir-obj> <dir-name-list> [FULL]                    \
+        \
+
+<do-spec> ::=
+        TERMINAL                \
+        INPORT                  \
+        [TEXT] name             ! INSERT TV$TEXT LIST 1 2 ! \
+        \
+
+<drop-spec> ::=
+        <TABLE-tables> <name-list>      \
+        <ALIAS-aliases> <name-list>     \
+        FIELD <name-list>               \
+        \
+
+<file-name> ! ROOT ! ::=
+        <file-spec-paren>       \
+        \
+
+<file-spec> ::=
+        name                    ! LIST 1 ! \
+        '(' name ')' name       ! LIST 1 3 ! \
+        <q-string>              ! LIST 1 ! \
+        \
+
+<file-spec-paren> ::=
+        name                    \
+        '(' name ')' name       \
+        <q-string>              \
+        \
+
+<fld-assign-clause>  ::=        
+        <fld-assign-list>                ! LIST 1 CALL $QNALT ! \
+        <default>                        ! LIST 1 CALL $QNALT ! \
+        \
+
+<fld-assign-list> ! ROOT ! ::=
+        [ USING ] <fld-assign-item> || ','   ! LIST 1 !   \   
+        \
+        
+<fld-assign-item>  ::=
+        <field-spec> '=' <fld-value>        ! LIST 3 1 ! \
+        <field-spec>                    ! INSERT TV$INPUT LIST 2 1 ! \
+        \
+        
+<fld-value> ::=        
+        <expr>            \
+        INPUT             \    
+        \
+
+<query-spec> ::=
+        <query-list>      \
+        <default>         \
+        \
+
+<query-list> ::=
+        <query-item> || ','        \
+        \
+
+<query-item> ! ROOT ! ::=
+        '+' name          ! ALT NV$PLUS    LIST 1 !     \
+        '-' name          ! ALT NV$MINUS   LIST 1 !     \
+        name              ! ALT NV$DEFAULT LIST 1 !     \
+        \
+
+<obtain-spec> ::=
+        <obt-name> FROM <file-name> [RELEASE]   \
+        \
+
+<obt-name> ::=
+        name                                    \
+        <default>                               \
+        \
+
+<save-spec> ::=
+        name AS <file-name> [RELEASE]           \
+        \
+
+<opt-WHERE-clause> ::=
+        <default>         \
+        <WHERE-clause>    \
+        \
+        
+<WHERE-clause> ::=
+        WHERE <boole-expr>      ! LIST 1 !      \
+        \
+
+<dir-obj> ::=
+        FIELD                                   \
+        [<RELATION-relations>]  ! INSERT TV$RELATN LIST 1 !   \
+        <TABLE-tables>                          \
+        <ALIAS-aliases>                         \
+        QUERY [SET]                             \
+        \
+
+<dir-name-list> ! ROOT ! ::=
+        <dir-name> || ','                       \
+        <default>                               \
+        \
+
+<dir-name> ::=
+        name                                    \
+        <q-string>                              \
+        \
+
+
+<boole-expr> ! ROOT ! ::=
+        <boole-exp>                                          \
+        \
+
+<boole-exp> ::=
+        <boole-factor>                                       \
+        <boole-exp> OR <boole-factor>       ! LIST 3 1 2 !   \
+        \
+
+<boole-factor> ::=
+        <boole-primary>                                      \
+        <boole-factor> AND <boole-primary>  ! LIST 3 1 2 !   \
+        \
+
+<boole-primary> ::=
+        <boole-unit>                                         \
+        NOT <boole-unit>                 ! LIST 1 2 !        \
+        \
+
+<boole-unit> ::=
+        '(' <boole-exp> ')'              ! LIST 2 !          \
+        TRUE                                                 \
+        FALSE                                                \
+        <rel-exp>                                            \
+        \
+
+
+<rel-exp> ! ROOT ! ::=
+        <expr> <rel-op> <expr>         ! ALT NV$BOOL LIST 3 1 2 ! \
+        <expr> <rel-op> <DEFAULT-bogus-expr>
+                           ! ALT NV$BOOL LIST 3 1 2 CALL $QFDBU ! \
+        \
+
+
+<DEFAULT-bogus-expr> ! ROOT ! ::=
+        DEFAULT            ! ALT NV$AE LIST 1 ! \
+        \
+
+
+<rel-op> ::=
+        LT      \
+        GT      \
+        EQ      ! MODID 1 TV$EQ !\
+        LE      \
+        GE      \
+        NE      \
+        =       \
+        \
+
+
+<expression-list> ::=
+        <expression>                                            \
+        <expression-list> ',' <expression>    ! LIST 3 1 !      \
+        \
+
+<expression> ::=
+        <expr>            \
+        <boole-expr>      \
+        \
+
+<expr-list> ::=
+        <expr>                                  \
+        <expr-list> ',' <expr>   ! LIST 3 1 !   \
+        \
+
+
+<expr> ! ROOT ! ::=
+        <complete-expr>        ! ALT NV$AE !     \
+        \
+
+
+<complete-expr> ::=
+        <assign-expr>                           \
+        <arith-exp>                             \
+        \
+
+
+<arith-exp> ::=
+        <term>                                          \
+        <arith-exp> '+' <term>          ! LIST 3 1 2 !  \
+        <arith-exp> '-' <term>          ! LIST 3 1 2 !  \
+        \
+
+<term> ::=
+        <primary>                               \
+        <term> '*' <primary>    ! LIST 3 1 2 !  \
+        <term> '/' <primary>    ! LIST 3 1 2 !  \
+        <term> MOD <primary>    ! LIST 3 1 2 !  \
+        \
+
+<primary> ::=
+        <secondary>                             \
+        '+' <secondary>         ! LIST 1 !      \
+        '-' <secondary>         ! MODID 2 TV$8UMINUS LIST 1 2 ! \
+        \
+
+<secondary> ::=
+        <tertiary>                              \
+        <tertiary> AS <picture> ! LIST 3 1 2 !  \
+        \
+
+<tertiary> ::=
+        <data>                                  \
+        <function-call>                         \
+        <system-variable>                       \
+        '(' <complete-expr> ')'     ! LIST 2 !  \
+        \
+
+<data> ::=
+        <integer-value>         \
+        <decimal-value>         \
+        <date-value>            \
+        <week-day-value>         \
+        <char-literal>          \
+        <field-spec>            \
+        \
+
+<assign-expr> ::=
+        <field-spec> <assign-op> <complete-expr>  ! LIST 3 1 2 ! \
+        <field-spec> <assign-op> DEFAULT    ! LIST 3 1 2 CALL $QFDEF ! \
+        \
+
+<set-expr> ::=
+        <field-spec> <set-op> <complete-expr>  ! LIST 3 1 2 ! \
+        <field-spec> <set-op> DEFAULT    ! LIST 3 1 2 CALL $QFDEF ! \
+        \
+
+<assign-op> ::=
+        ':' '='        ! MODID 1 TV$MOVE LIST 1 ! \
+        \
+
+<set-op> ::=
+        <assign-op>                               \
+        TO             ! MODID 1 TV$MOVE LIST 1 ! \
+        \
+
+<function-call> ! ROOT ! ::=
+        <function-name> '(' <args> ')'  ! ALT NV$FUNCTION LIST 4 2 ! \
+        \
+
+<args> ::=
+        <expr-list>    \
+        <null>         \
+        \
+
+
+<function-name> ::=
+        ABS                     \
+        SQRT                    \
+        UPPER.CASE              \
+        LOWER.CASE              \
+        TRIM                    \
+        SIZE                    \
+        LENGTH                  \
+        SUBSTR                  \
+        POSITION                \
+        CHECKSUM                \
+        FIRST.DAY               \
+        LAST.DAY                \
+        WEEK.DAY                \
+        NEXT.DATE               \
+        YEAR                    \
+        MONTH                   \
+        DAY                     \
+        name  ! LIST 1 CALL $QFNSYM ! \
+        \
+
+
+<system-variable> ! ROOT ! ::=
+        <system-var>       ! ALT NV$MAGNUM LIST 1 ! \
+        \
+
+
+<system-var> ::=
+        TODAY                   \
+        TIME                    \
+        TRU                     \
+        USER.NAME               \
+        INDIVIDUAL.ID           \
+        USER.ID                 \
+        WHO                     \
+        JOB.NUM                 \
+        PAGE.SIZE               \
+        TOP.MARGIN              \
+        BOTTOM.MARGIN           \
+        \
+
+
+<FIELD-def-start> ::=
+        FIELD        ! LIST 1 CALL $QSAP !       \
+        \
+
+<field-def> ::=
+        <FIELD-def-start> <field-decl-list>      \
+        \
+
+<field-decl> ::=
+        name AS <picture>  ! LIST 3 1 CALL $QDFLD ! \
+        \
+
+
+<field-decl-list> ::=
+        <field-decl>                             \
+        <field-decl-list> ','  <field-decl>      \
+        \
+
+<FUNCTION-start> ::=
+        FUNCTION           ! LIST 1 CALL $QSAP ! \
+        \
+
+<function-def> ::=
+        <FUNCTION-start> name '(' <dummy-variable-list> ')' '=' <expr>
+                                ! LIST 6 1 4 !                \
+        \
+
+
+<a-name> ! ROOT ! ::=
+        name        ! INSERT TV$DEFAULT LIST 2 1 CALL $QFLDF ! \
+        <field-decl>                                           \
+        \
+
+
+<a-name-list> ::=
+        <a-name>                                        \
+        <a-name-list> ',' <a-name>           ! LIST 3 1 ! \
+        \
+
+<dummy-variable-list> ::=
+        <a-name-list>                \
+        <null>                     \
+        \
+
+
+<picture> ! ROOT ! ::=
+        <unrooted-picture>      ! ALT NV$PIC !          \
+        \
+
+<unrooted-picture> ::=
+        <q-string>              ! INSERT TV$8PIC
+                                       LIST 2 1 CALL $QFPIC  ! \
+        DATE <q-string>         ! LIST 1 2 CALL $QFPIC       ! \
+        DATE                    ! INSERT TV$DATE MODID 1 TV$STRING
+                                       LIST 1 2 CALL $QFPIC  ! \
+        \
+
+
+<field-spec> ! ROOT ! ::=
+        <unrooted-field-spec>   ! ALT NV$FIELD LIST 1  CALL $QFLDF  !        \
+        \
+
+
+<unrooted-field-spec> ::=
+        name <of-option> relation-name   ! LIST 3 1 ! \
+        name                             ! INSERT TV$DEFAULT LIST 2 1 ! \
+        \
+
+<of-option> ::=
+        OF  \
+        '_' \
+        \
+
+
+<char-literal> ::=
+        <q-string>                           \
+        @CR          ! LIST 1 CALL $QFCLIT ! \
+        @FF          ! LIST 1 CALL $QFCLIT ! \
+        @integer     ! LIST 1 CALL $QFCLIT ! \
+        \
+        
+
+<name-string> ::=
+        name         ! LIST 1 CALL $QFSTR !  \
+        \
+
+
+<q-string> ::=
+        '' quoted-string ''     ! LIST 2 CALL $QFSTR !      \
+        '"' quoted-string '"'   ! LIST 2 CALL $QFSTR !      \
+        \
+
+
+<null> ::=
+        \
+        \
+
+<integer-value> ::=
+        integer         ! LIST 1 CALL $QFINT ! \
+        \
+
+<decimal-value> ::=
+        dec-number      ! LIST 1 CALL $QFDEC ! \
+        \
+
+<date-value> ::=
+        DATE <q-string> ! MODID 1 TV$DATE LIST 1 CALL $QFDAT ! \
+        \
+
+<week-day-value> ::=
+        ( SUNDAY    |
+          MONDAY    |
+          TUESDAY   |
+          WEDNESDAY |
+          THURSDAY  |
+          FRIDAY    |
+          SATURDAY    )   ! LIST 1 CALL $QWDAY ! \
+        \
+         
+
+<default> ::=
+        <null>          ! INSERT TV$DEFAULT !  \
+        \
+
+<TABLE-tables> ::=
+        TABLE                                  \
+        TABLES          ! MODID 1 TV$TABLE !   \
+        \
+
+<ALIAS-aliases> ::=
+        ALIAS                                  \
+        ALIASES         ! MODID 1 TV$ALIAS !   \
+        \
+
+
+<RELATION-relations> ::=
+        RELATION        \
+        RELATIONS       ! MODID 1 TV$RELATN !  \
+        \
+
+# ~ž
