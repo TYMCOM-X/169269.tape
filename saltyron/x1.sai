@@ -1,0 +1,69 @@
+begin "X1"
+
+define	safe = null;
+
+require 1 version;
+require 25 polling!interval;
+require 4096 system!pdl;
+require 1024 string!pdl;
+require 512 new!items;
+require 512 pnames;
+require processes;
+
+require "{}()" delimiters;
+define
+  ! = {comment},
+  bel = {(7&null)},
+  ht = {('10&null)},
+  lf = {('12&null)},
+  cr = {('15&null)},
+  esc = {('33&null)},
+  crlf = {('15&'12)},
+  forever = {while true},
+  never = {while false},
+  nothing = {},
+  upto = {step 1 until},
+  downto = {step -1 until},
+  ctrl (c) = {(((c) land '37)&null)},
+  bit (i) = {(1 lsh (35-(i)))};
+let
+  n!r = null!record,
+  r!p = record!pointer,
+  a!c = any!class;
+define
+  auxcli (port,e,funct) = {auxclr(port,memory[e],funct)};
+define
+  lh (i) = {((I) lsh -18)},
+  hl (i) = {((I) lsh 18)},
+  rh (i) = {((I) land '777777)},
+  hr (i) = {((I) land '777777)},
+  ucase (a) = {scanc(a,null,null,"K")};
+
+require "(SYS)RECORD.DEF" source!file;
+require "(SYS)PROCES.DEF" source!file;
+define	Sched	= {quick!code AOSLE NoPoll; SETZM NoPoll end};
+define	noSched	= {quick!code SOSL  NoPoll; SETOM NoPoll end};
+require "(SYS)GOGTAB.DEF" source!file;
+external integer array GogTab[0:endren];
+external integer !SKIP!;
+require "(SAILIB)TYMINT.DEF" source!file;
+
+require "COMMON.SAI" source!file;
+require "FRMOP.SAI" source!file;
+require "GETTAB.SAI" source!file;
+require "UTILTY.SAI" source!file;
+require "PISYS.SAI" source!file;
+require "SYMBOL.SAI" source!file;
+require "GLOBAL.SAI" source!file;
+require "ERRORS.SAI" source!file;
+require "PORTS.SAI" source!file;
+require "FRAMES.SAI" source!file;
+require "INFIX.SAI" source!file;
+require "UNARY.SAI" source!file;
+require "PRINTX.SAI" source!file;
+require "SCANER.SAI" source!file;
+require "EVAL.SAI" source!file;
+require "RUNTIME.SAI" source!file;
+require "MAIN.SAI" source!file;
+
+end "X1" $
