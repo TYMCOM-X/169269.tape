@@ -1,0 +1,636 @@
+[5i
+begin 	"CrshID" comment
+
+This program is intended to be an INTERIM crash analysis aid.  Its
+purpose is to study to what degree the crash analysis process may be
+automated.  When the study is complete, this program should be 
+revised and intigrated with the crash code in COMMON in order to
+provide a crash analysis tool which does not require special knowledge
+of things that are likely to change, and which is coded in a manner
+which may be maintained.  Note that there have been several hooks added
+to recent versions of the monitor to support this program.  As these
+versions of the monitor propogate and all crashes of older monitors
+are solved or discarded, this program may be cleaned up in many ways.
+;
+
+require "(SAILIB)SAIL.DEF" source!file;
+!get!definitions(GOGTAB);
+!get!module(EXTEND);
+let !define! = define, define = redefine;
+require "(MPL)UUOSYM.SAI" source!file;
+define !cnSID = '43;
+let define = !define!;
+require "(SAILIB)FRMRUN.REQ" source!file;
+require "CIDFRM.REQ" source!file;	! crash frame module;
+require "CIDSYM.REQ" source!file;	! symbol module;
+require "CIDSYS.REQ" source!file;	! crash systat module;
+
+require '100 version;
+require crlf&"License required: AC JL RF" message;
+
+define	GMT = '20;	! GMT time zone;
+define	Local = 0;	! Time zone code for user's local time zone;
+define	DECForm = 0;	! DEC formated date flag;
+define	DaysPast = '400000; ! Days past 1/1/64 date format flag;
+
+r!p (any!class) UfdTag;	! Handle for chanio to read UFD;
+
+external integer array GOGTAB[0:'77777];
+
+integer UfdChan,	! Channel for reading UFD;
+	UfdEof,		! EOF flag for UFD;
+	LogChan,	! Channel for writting log;
+	LogEof,		! EOF flag for log;
+	Chan,		! Channel for reading crash files;
+	Eof,		! EOF flag for crash files;
+	SpecCnt,	! FileSpec count;
+	SymPtr,		! Contents of DDTSYM;
+	CONFIG,		! address of CONFIG;
+	CPUtype,	! CPU type;
+	CH1,		! CH1 return address;
+	CH1adr,		! CH1 JSR address;
+	PPN,		! PPN of directory being searched;
+	Brk,		! Break character temp;
+	I,J,X;		! Garbage pits;
+integer SB1,SB2,SB3;	! some break tables;
+
+internal boolean !sym;		! /SYMBOLS switch;
+internal boolean !sys;		! /SYSTEM switch;
+internal boolean !ve;		! /VERBOSE switch;
+
+integer array UfdData [0:2];	! Array to hold filenames from UFD;
+
+string	CmdLine,	! Command line from RESCAN;
+	Switches,	! Switch part of command line;
+	Template;	! Template for UFD search;
+
+boolean	DET;		! Running detach (should do send to :37);
+boolean	!UT;		! set if no date and time in crash file;
+
+
+! following are fixed address of interest in the crash;
+
+define	DdtSym = '036;	! EDDT symbol table ptr setup by ONCE;
+define	JobSym = '116;	! Where to find symbols in monitor files;
+define	JobVer = '137;	! Pointer to CONFIG;
+define	JobCrs = '147;	! Pointer to Crashx;
+define	!CNCPU = '41;	! CPU type code index into CONFIG;
+define	Key620 = '150;	! Key620 location;
+define	EPT    = '2000;	! location of EPT (by convention);
+define	Key = '633751506262; ! Key620 healthy value;
+
+
+! special crash data locations;
+
+define	cnf.CRSDB = -2;		! xwd CRSDB,NUMTAB
+define	crs.PISTS = '0;		! CONI  PI,  (RDPI)	ILS3;
+define	crs.APRSTS = '1;	! CONI  APR, (RDAPR)    ILS3;
+define	crs.PAGDTI = '2;	! DATAI PAG, (RDUBR)    ILS3;
+define	crs.PAGCNI = '3;	! CONI  PAG, (RDEBR)    ILS3;
+define	crs.AIDSTS = '4;	! BLKI  APR, (APRID)    .LS.;
+define	crs.APRDTI = '5;	! DATAI APR,     	IL.3;
+define	crs.CRSHAC = '14;	! xwd EPT,CRSHAC;
+define	crs.SAV30 = '15;	! value of 30 saved here;
+define	crs.STOPCN = '16;	! count of times we tried to crash;
+define	crs.STOPPC = '17;	! real PC of first STOPCD we hit;
+
+
+! following is definition of records to hold file data in;
+
+record!class Spec (
+	record!pointer (Spec) Link;
+			! Pointer to next record in list;
+	string	Name;	! Name of file including PPN, etc;
+	integer Date;	! Creation date of crash file;
+	integer Time;	! Creation time of crash file;
+	integer	File);	! File name only of crash file;
+record!pointer (spec) SpecPtr;	! Pointer to a file spec record;
+record!pointer (spec) SpecHdr;	! Pointer to top of file specs;
+record!pointer (spec) CraSpec;	! Pointer to spec for current crash;
+
+define HelpMessage = {"
+Commands may be given on the command line with the call to CRSHID:
+	R CRSHID;<commands>
+Commands may be either ""?"" or a list of file specs.  The file
+specs may contain a directory and a file name list.  No extensions.
+If the file name is omited, ""CRA0##"" is used.  If no arguments
+are given, the default is ""(SYS)CRA0##"".
+
+Switches may be abbreviated to their point of uniqueness.
+Valid switches are:
+	/Detach  - forces ""(SYS)CRA0##/EVERY"", detaches and
+		sends output to the monitor development system.
+	/Everything - turn on all the frills.
+	/Fast    - don't get symbols.
+	/Quiet   - don't show wordy explanations.
+	/SYMbols - attempt to find symbols and use them.
+	/SYStems - list monitor data for the following files:
+		(SYS)SYSTEM,(SYS)BACKUP,(SYS)NEWMON,(SYS)OLDMON
+	/Update  - forces ""(SYS)CRA0##/EVERY"", sprouts a CRSHID, 
+		and sends output to the monitor development system.
+	/Verbose - show wordy explanations.
+	/Version - show the current version number.
+
+Output is sent to both TTY: and DSK:CRSHID.LOG.  If the /UPDATE switch
+is used, output goes to (M33:37)NOTICE.### where ### is the system 
+number which CRSHID was run on.
+"};
+
+!	Send file to development system ;
+
+integer array LogString [0:10];	! login string for CREAUX;
+simple procedure LogStrIni;
+begin
+    integer C,E;
+    open(C_getchan,"DSK",'17,0,0, 0,0,E);
+    lookup(C,"(SYS)CRSHID.DAT",E);
+    if E 
+	then LogString[0] _ cvasc("M33;")
+	else arryin(C,LogString[0],arrinfo(LogString,0));
+    release(C);
+end;
+require LogStrIni initialization;
+
+integer Port;			! port number of circuit (optomist);
+
+simple procedure SendM33 (string text);
+if DET then begin
+    auxclv (Port,0,!AXCBI);	! clear input buffer;
+    while length(text) 		! output all characters except lf;
+	do auxclv (Port,lop(text),!AXO8);
+    auxclv (Port,#cr,!AXO8);	! CR at end;
+end;
+
+
+!	SendFile ("filename")
+
+This routine should be called in order to setup output to port.  It
+will not return until a circuit is established.  Really.
+;
+procedure SendFile (string FileName);
+begin "SF"
+    integer Built,J,JobN,RetryCnt;
+    RetryCnt _ 0;
+    if calli(!xwd('33,'11),calli!GETTAB)=930 then begin "930"
+	while calli(!xwd(!CNSTS,!GTCNF),calli!GETTAB) land '400000
+	    do calli(15,calli!SLEEP);	! wait for un-shut if we are;
+	calli(60,'31);		! give SUP an extra minute;
+    end "930";
+    do begin "build"		! build the circuit;
+	Port _ calli (location(LogString[0]),calli!CREAUX);
+	Built _ !SKIP!;
+	if not Built then begin
+	  string X;
+	  X _ cvs(RetryCnt_RetryCnt+1);
+	  calli(cvsix("CRSHID"[1 for 6-length(X)]&X),calli!SETNAM);
+	  if Port=4   		! check error (if was one);
+	    then calli(!xwd(2,20),calli!HIBER)  ! wait 20 mins if down;
+	    else calli(!xwd(2,10),calli!HIBER); ! else wait 10 mins;
+	end;
+    end "build" until Built;	! loop until it works;
+    SendM33 (#cr&#cr&#cr&	! initialize the circuit;
+	"SET LOGOUT"& #cr&	! just in case;
+	"TTY LC"& #cr&		! might as well make it pretty;
+	"PDP"& #cr&		! so ^Z will work;
+	"COPY T,"& FileName);	! (SendM33 appends CR);
+end "SF";
+
+
+!	CloseCircuit
+
+Call this guy to zap the circuit after sending all the data.
+;
+simple procedure CloseCircuit;
+begin
+    SendM33 ( #ctrl("Z")& "LOGOUT"& #cr );
+    auxclv (Port,0,!AXLDE);
+    calli (!bit(8)*port+!xwd('141,300),calli!HIBER);
+    calli (Port,calli!ZAPCIR);
+end;
+
+preload!with
+    "-000-","-jan-","-feb-","-mar-","-apr-","-may-",
+    "-jun-","-jul-","-aug-","-sep-","-oct-","-nov-","-dec-";
+string array MONTH[0:12];
+
+internal string procedure cvDate( integer DECD );
+begin
+    integer A,B,Y,M,D;
+    string S;
+    D := DECD mod 31 + 1;
+    M := DECD % 31 mod 12 + 1;
+    Y := DECD % (31*12) + 64;
+    if DECD < 0 or Y > 94
+	then return( "??-???-??" );
+    getformat( A,B );
+    setformat( 2,0 );
+    S := cvs(D) & MONTH[M] & cvs(Y);
+    setformat( A,B );
+    return( S );
+end;
+
+internal string procedure cvTime( integer SECS );
+begin
+    integer A,B;
+    string S;
+    getformat( A,B );
+    S := cvs( SECS % 3600 ) &  ":";
+    setformat(-2,0);
+    S := S & cvs( SECS % 60 mod 60 ) & ":" &
+        cvs( SECS mod 60 );
+    setformat( A,B );
+    return( S );
+end;
+
+internal string procedure cvDayTime( integer D,T,Z(Local) );
+begin
+    cnvdtim (D, T, DaysPast+GMT, DECForm+Z );
+    return( cvDate( D ) & " " & cvTime( T ) );
+end;
+
+simple integer procedure GetLch;
+begin!code
+	SETO 1,;
+	uuo!GETLCH 1;
+end;
+
+string procedure Rescan;
+begin "Rescan"
+    string S;
+    if 0 = (GetLch land LC!ECS) then return (Null);
+    BackUp;
+    S _ inchwl;
+    scan (S,SB1,Brk);
+    return (S);
+end "Rescan";
+
+simple procedure LookupUFD (reference integer Chan, PPN, Eof);
+begin "lookupUFD"
+    own integer array L[0:3];
+    L[0] _ arrinfo(L,2);
+    L[1] _ !xwd(1,1);
+    L[2] _ PPN;
+    L[3] _ cvsix("UFD");
+    chnior(Chan, L[0], 4);
+    if !SKIP! then PPN _ L[2];
+    Eof _ not !SKIP!;
+end "lookupUFD";
+
+simple proe sbini;
+begin
+    setbreak(SB1_getbreak,";",null,"SINK");
+    setbreak(SB2_getbreak,",",null,"SINK");
+    setbreak(SB3_getbreak,"/",null,"RINK");
+end;
+require sbini initialization;
+
+!	BaseType
+
+Return base type description (from comments in base code sources).
+;
+preload!with
+"Normal- host going down -key not refreshed.",
+"Host crashing due to base crash.",
+"MIC error or MIC reject tring to read key.",
+"Read bad key from host.",
+"Bad data type or port number from host.",
+"Illogical data type from host.",
+"MIC busy trying to read host (IN10).",
+"Input ring processing time-out.",
+"MIC time-out error (sen 337).",
+"Parity error from MIC (sen 237).",
+"MIC busy for 232 cycles in addr portion of 'look'.",
+"Host told base to crash...this is a no-no!!",
+"MIC busy (look) from prior operation in 'look'.",
+"Overran block i/o table.",
+"Terminate block input req. is invalid.",
+"Base crash...power failure.",
+"Base crash...manual restart.",
+"Base crash....",
+"Base crash...GCI crash.",
+"Base crash...WCD crash.",
+"Base crash...WCI crash.",
+"Base crash...GCOL crash.",
+"Base crash...speed crash.",
+"Base crash...unidentified crash.",
+"Base crash....",
+"Base crash...WWI crash.",
+"Base crash...empty crash.",
+"Base crash...parity error.",
+"Base crash...bad 201 interrupt.",
+"Base crash....",
+"Base crash....",
+"Base crash....";
+string array BaseTypeStr[0:'37];
+
+simple string procedure BaseType (integer I);
+begin
+    if I > arrinfo(BaseTypeStr,2)
+	or I < arrinfo(BaseTypeStr,1)
+	then return("No message for base type "& cvos(I)& ".");
+    return (BaseTypeStr[i]);
+end;
+
+!	handle variations for different CPU;
+
+define cpu!! = 0;
+forlc cpu! = (KI,KL,KS,F3) 
+    doc { redefine cpu!! = cpu!! + 1; define cpu! = cpu!!; } endc
+	
+define CpuLstLen = 0;
+define CpuTypLst = {0};
+define CpuStsLst = {0};
+define CpuMsgLst = {null};
+define SD (A,B,C) = {
+	redefine CpuLstLen = CpuLstLen + 1;
+	redefine CpuTypLst = cvms(CpuTypLst) & {,A};
+	redefine CpuStsLst = cvms(CpuStsLst) & {,(1 lsh (35-B))};
+	redefine CpuMsgLst = cvms(CpuMsgLst) & {,"C"}};
+
+sd(KI,7,ManualMargins);
+sd(KI,8,MaintMode);
+sd(KI,9,PowerLow);
+sd(KI,19,Parity);
+sd(KI,22,PowerFail);
+sd(KI,28,IOPage);
+sd(KI,29,NXM);
+
+sd(KL,24,SBus);
+sd(KL,25,NoMemory);
+sd(KL,26,IOPage);
+sd(KL,27,MemBusParity);
+sd(KL,28,CacheParity);
+sd(KL,29,AdrParity);
+sd(KL,30,PowerFail);
+
+sd(KS,26,PowerFail);
+sd(KS,27,NXM);
+sd(KS,28,HardError);
+sd(KS,29,SoftError);
+
+preload!with CpuTypLst; 
+integer array CpuTyp[0:CpuLstLen];
+preload!with CpuStsLst; 
+integer array CpuSts[0:CpuLstLen];
+preload!with CpuMsgLst; 
+string array CpuMsg[0:CpuLstLen];
+
+procedure RunDDT;
+!
+	Run appropriate FILDDT for current crash.  Make
+	a new one if necessary.
+;
+begin	"RunDDT"
+    integer	SID;		! system identifier (serial number);
+    integer	FERR;		! frame error code;
+    integer	PERR;		! program error code;
+    string	FILDDT;		! filename of FILDDT;
+    string	MONITR;		! filename of monitor;
+    string	CMDS;		! commands for FILDDT;
+    integer	I;
+    if not CraSym then begin
+	print( "?no current crash"& crlf );
+	return;
+    end;
+    if not SYM:haveSym[CraSym] then begin
+	print( "?no symbols for current crash"& crlf );
+	return;
+    end;
+    SID := SYM:sysid[CraSym];
+    FILDDT := "(M33)F"&cv6str(SID lsh 6);
+    MONITR := SYM:source[CraSym][1 to inf-4];
+    if not equ( FILDDT, MONITR ) then begin "makeDDT"
+	print( "[creating new FILDDT - please wait]"&crlf );
+	CMDS := MONITR& "/S"& crlf& "/X";
+	FERR := FrmRun( "(SYS)FILDDT",F.CCL+F.SAVE,PERR,"DDT",CMDS,FILDDT );
+	if FERR then begin
+	    print( "?FrmRun error ",FERR,crlf );
+	    return;
+	end;
+	print( "[FILDDT created - proceeding]"&crlf );
+    end "makeDDT";
+    CMDS := "(SYS)"& cv6str(SPEC:file[CraSpec]);
+    FERR := FrmRun( FILDDT,F.CCL,PERR,"DDT",CMDS );
+end	"RunDDT";
+
+procedure Sort;
+if SpecCnt > 1 then begin "Bluble Sort"
+
+    record!pointer (spec) array Ptrs[1:SpecCnt];
+
+    SpecPtr _ SpecHdr;
+    for I := 1 upto SpecCnt do begin
+	Ptrs[i] := SpecPtr;
+	SpecPtr := spec:Link[SpecPtr];
+    end;
+
+    do begin
+	J := 0;
+	for i := 2 upto SpecCnt do 
+	    if spec:Date[Ptrs[i-1]] > spec:Date[Ptrs[i]]
+		or (spec:Date[Ptrs[i-1]] = spec:Date[Ptrs[i]]
+		and spec:Time[Ptrs[i-1]] > spec:Time[Ptrs[i]])
+		then begin
+		    Ptrs[i-1] swap Ptrs[i];
+		    J := J + 1;
+	        end;
+    end until J=0;
+
+    SpecHdr := Ptrs[1];
+    for i := 1 upto SpecCnt-1 do
+	spec:Link[Ptrs[i]] := Ptrs[i+1];
+    spec:Link[Ptrs[SpecCnt]] := null!record;
+
+end "Bluble Sort";
+
+procedure Directory( string FileSpecs );
+begin	"Directory"
+
+    if length(FileSpecs)=0 then FileSpecs := "(SYS)";
+    while length(FileSpecs) do begin "NextToken"
+	string Tok;
+	define BadTok (Msg) = {
+	    begin "BadTok"
+		print("?", Msg, crlf);
+		continue "NextToken";
+	    end "BadTok"
+	};
+
+	Tok := scan(FileSpecs,SB2,Brk);
+
+	Template := cv6str(cvfil(Tok,Brk,PPN));
+	if Brk then BadTok("Extension not expected: "&Tok);
+
+	if Template=0 then Template := "CRA0##";
+
+	LookupUFD (UfdChan, PPN, UfdEof);
+	if UfdEof then BadTok("Cant read UFD for "&Tok);
+
+	SpecHdr := null!record;
+	SpecCnt := 0;
+	UfdTag := iniufr (Template,"SAV",UfdChan,'12042,102);
+	while nxtufr (UfdData, UfdTag) do 
+	begin "NextFile"
+	    SpecPtr := new!record(Spec);
+	    spec:Name[SpecPtr] :=
+		cv6str(UfdData[0])
+		& "." & cv6str(UfdData[1])
+		& "[" & cvos(!lh(PPN))
+		& "," & cvos(!rh(PPN))
+		& "]";
+	    spec:Date[SpecPtr] := !lh(UfdData[2]);
+	    spec:Time[SpecPtr] := !rh(UfdData[2]);
+	    spec:File[SpecPtr] := UfdData[0];
+	    spec:Link[SpecPtr] := SpecHdr;
+	    SpecHdr := SpecPtr;
+	    SpecCnt := SpecCnt + 1;
+	end "NextFile";
+
+	close (UfdChan);
+
+    end "NextToken";
+
+end	"Directory";
+
+procedure PrintSpecs;
+!
+	Print fast file summary.
+;
+begin	"PrintSpecs"
+    r!p(SPEC) P;
+    P := SpecHdr;
+    while P do begin
+	print( cvxstr(SPEC:file[P]), "   ", 
+	    cvDayTime( SPEC:date[P], SPEC:time[P] ), crlf );
+	P := SPEC:link[P];
+    end;
+end	"PrintSpecs";
+
+procedure Setup( string S );
+begin	"Setup"
+    if length( S ) = 0 then begin
+	SpecPtr := if CraSpec
+	    then SPEC:link[CraSpec]
+	    else SpecHdr;
+    end else begin
+	SpecPtr := SpecHdr;
+	while SpecPtr do begin
+	    if ( cvsix( S ) = SPEC:file[SpecPtr] )
+	    or ( cvd( S ) = cvd( cv6str( SPEC:file[SpecPtr] lsh 18 )) )
+		then done;
+	    SpecPtr := SPEC:link[SpecPtr];
+	end;
+    end;
+    if SpecPtr
+	then begin
+	    CraSpec := SpecPtr;
+	    GetCrash( SPEC:name[SpecPtr] );
+	    GetSymbols( RPM(RPM(JobVer)+!CNSID) );
+	end
+	else print( "?no crash found ", S, crlf );
+end	"Setup";
+
+procedure OneLine;
+!
+	Print one line analysis summary.
+;
+begin	"OneLine"
+    integer CONFIG,I,CRSDB;
+
+!	check for something to do;
+    if not CraSpec then begin
+	print( "?no current crash",crlf );
+	return;
+    end;
+
+!	get table addresses;
+    CONFIG := !rh(RPM( JobVer ));
+    CRSDB := !lh(RPM( CONFIG-cnf.CRSDB ));
+
+!	print file name;
+    print( cvxstr( SPEC:file[CraSpec] ), "  " );
+
+!	print date and time of crash;
+    print( cvDayTime( RPM(CONFIG+!CNDAT), RPM(CONFIG+!CNTIM) % 60 ), "  " );
+
+!	print basic version information;
+    for I := CONFIG+!CNFG0 upto CONFIG+!CNFG0+4
+	do print( cvstr(RPM(I)) );
+    print( "  " );
+
+!	print hardware information;
+    print( "#", cvos( RPM(CONFIG+!CNSER) ), "[",
+	case RPM(CONFIG+!CNCPU) of ("??","KI","KL","KS","F3"),
+	"]  " );
+
+!	a little info about the crash;
+    begin
+	integer S30,L30,K620;
+	L30 := RPM( '30 );
+	S30 := RPM( CRSDB+crs.SAV30 );
+	K620 := RPM( KEY620 );
+	if S30
+	    then if L30 = S30
+		then print( "KEY620$16o/ ",
+		    cvos( ( K620 lsh -20 ) land '177777 ), ",",
+		    cvos( ( K620 lsh -04 ) land '177777 ), ",",
+		    cvos( ( K620 lsh  12 ) land '177777 ) )
+		else print( "SAV30[ ", cvos( S30 ) )
+ 	    else print( "StopPC/ ", cvSym( RPM( CRSDB+crs.StopPC )) );
+    end;
+ 
+    print( crlf );
+
+end	"OneLine";
+begin "Main"
+
+    ttyup( true );		! all input to upper case;
+    open (UfdChan:=getchan,"DSK",'17,0,0, 0,0,UfdEof);
+    CreFrm;			! create frame to get crashes in;
+
+    if !lh(calli(0,'34))=0 then begin "special stuff for detached job"
+	SendFile("NOTICE."&cvs(calli(!xwd(!CNSYS,!GTCNF),calli!GETTAB)));
+	Directory( "(SYS)CRA0##" );
+	Sort;
+	! analysis stuff goes here;
+	CloseCircuit;
+	calli( 1, calli!LOGOFF );
+    end;
+
+    print( "CRSHID v",cvos(memory[JobVer]),crlf&crlf );
+    Directory( "(SYS)CRA0##" );
+    print( "[", SpecCnt, " outstanding crashes]"& crlf );
+    Sort;
+    
+    while true do begin
+	string S;
+	integer C;
+	print( "#" );
+	C := lop( S := inchwl );
+	case C of begin
+	    ["?"] print( "One of:
+  D	run DDT on current crash
+  Gn	Get crash file and setup for analysis
+  L	list crashes and their status
+  S	Systat of system at time of crash
+  Q	Quit
+");
+	    ["D"] RunDdt;
+	    ["G"] begin
+		Setup( S );
+		OneLine;
+	    end;
+	    ["L"] PrintSpecs;
+	    ["S"] Systat( S );
+	    ["Q"] done;
+	    [else] print( "?unrecognized command, type ? for help"& crlf )
+	end;
+    end;
+
+    RelFrm;			! discard the crash frame;
+    setprint(null,"T");		! close output file (if any);
+
+end "Main";
+end "CrshID" $
+[4i
+ | JÓ
