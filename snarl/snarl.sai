@@ -1,0 +1,260 @@
+BEGIN "SNARL"
+
+REQUIRE 15000 SYSTEM!PDL;
+REQUIRE 25000 STRING!SPACE;
+REQUIRE 5000 STRING!PDL;
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndsn.sai" SOURCE!FILE;
+ck!sn
+REQUIRE "snsym.sai" SOURCE!FILE;
+elsec
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+endc
+REQUIRE "sndefs.sai" SOURCE!FILE;
+IFC debug THENC
+   EXTERNAL PROCEDURE bail;
+   REQUIRE "(sys)baipd8.rel" LOAD!MODULE;
+ENDC
+!get!module(<extend>);
+
+EXTERNAL INTEGER intrpt;			\ Interrupt flag location.;
+
+EXTERNAL PROCEDURE int!init;
+EXTERNAL PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match(true));
+EXTERNAL PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+EXTERNAL BOOLEAN PROCEDURE cmdstk;
+EXTERNAL STRING PROCEDURE getkey( INTEGER toknum );
+EXTERNAL SIMPLE PROCEDURE bailout;
+EXTERNAL PROCEDURE s!devi (STRING devnam(null); INTEGER densty(0));
+\   Global storage defined here in the main;
+
+PRESET!WITH 0;
+INTERNAL INTEGER ARRAY std!g[1:11];	\ Standard grammar set-up array;
+
+INTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];
+	\ For holding contents of whole tape records.;
+
+INTERNAL BOOLEAN quitsw;	\ Says when to quit SNARL.;
+INTERNAL INTEGER cmdtkn;	\ Token identifying current command;
+
+INTERNAL INTEGER oper!ppn;	\ Ppn of (SNARL) program operator;
+INTERNAL STRING oper!name;	\ User name of (SNARL) program operator;
+
+ck!sn
+INTERNAL INTEGER spr!sw,	\ Settable mode switches;
+   old!sw, sys!sw, rpr!sw,	\ All except ree!sw contain a token #;
+   dsk!sw, tty!sw, ree!sw;	\ Ree!sw contains the reel # value.;
+endc
+INTERNAL INTEGER
+   mtchan, mteof,	\ mag tape channel stuff;
+   mtstat,		\ sense data,,status bits;
+   mtdens,		\ currently set density;
+   mtrec,		\ physical record containing last complete file
+			\ processed;
+   mtwdpos,		\ word position of file in "mtrec";
+   mtpos,		\ number of last complete file processed;
+   mtibuf,		\ number of buffers for buffered input;
+   mtobuf,		\ number of buffers for buffered output;
+   mtppn,		\ ppn of last complete file accessed;
+   otchan,		\ channel of last previous device;
+   otdens,		\ density of last previous device;
+   tappfno,		\ current tape physical file number;
+   tapbloc,		\ current tape physical block number;
+   tapppn,		\ current tape ppn value;
+   tappos,		\ current tape file position;
+   ofdchan, ofdeof;	\ "cof" hardcopy device channel stuff;
+
+INTERNAL STRING mtdev,		\ mag tape device name;
+   mtuser,			\ user containing last file accessed;
+   mtfile,			\ name of last file accessed;
+   otdev,			\ name of last previous device;
+   offil,			\ "cof" output file name;
+   ofdev;			\ "cof" output device name;
+
+INTERNAL INTEGER look!size;	\ lookup block size used;
+INTERNAL INTEGER spec!size;	\ computed size of "specrec" array;
+
+INTERNAL STRING snstat;		\ the SNARL or DSNARL status vector.;
+ck!sn
+INTERNAL BOOLEAN stor!sw,	\ True if last file accessed was stored,
+				  false if retrieved;
+   new!sw,			\ True if NEW TAPE command just done;
+   app!sw;			\ True if APPEND command just done;
+endc
+
+INTERNAL BOOLEAN dskdev;	\ True if current mag tape device
+				  is really a disk;
+
+PRESET!WITH
+   "XXX", "HED", "DIR",		\ These are the symbolic names for;
+   "RCD", "LOK", "DAT",		\ the various logical record types;
+   "EMP", "EOF", "BOU",		\ found on SNARL tapes.  They are;
+   "EOU", "EOT", "CON",		\ used for printing the maps.;
+   "DUM", "UFD", "MFD";		
+INTERNAL STRING ARRAY headsymbols [1:15];
+PRESET!WITH
+   xxx, hed, dir, rcd, lok,	\ These are the corresponding numeric;
+   dat, emp, feo, bou, eou,	\ types which are put in "rcdmap" by;
+   eot, con, dum, ufd, mfd;	\ "s!bloc" which reads the tape blocks.;
+INTERNAL INTEGER ARRAY headers [1:15];
+\   Other storage used in the main;
+
+STRING str;
+INTEGER temp, curdat, curtim;
+SIMPLE PROCEDURE default;
+	\ Sets up defaults for many of the global parameters.;
+BEGIN
+   quitsw_false;
+ck!sn
+   ree!sw_1;
+   spr!sw_ (rpr!sw_!users);  old!sw_ (sys!sw_ !confirm);
+   dsk!sw_ !wide;  tty!sw_ !narrow;
+   ofdev_ getkey( !tty );  offil_ null;  setprint( null, "T" );
+endc
+   mtchan_ ofdchan_ mtrec_ -1;
+   mtfile_ mtdev_ otdev_ null;
+   cmdtkn_ mtstat_ mtdens_ mtpos_ mtibuf_ mtobuf_ 0;
+   look!size_ calli('21000016,'41);					\ Do GETTAB to get lookup size.;
+   if !skip! then look!size_ '40;					\ If the call fails, use default.;
+   spec!size_ num!tape!bufs*(look!size+5);
+END;
+STRING PROCEDURE version;
+	\ Retrieves the program version numbers and returns them as a
+printable string.;
+BEGIN
+   INTEGER ver,rel;
+   QUICK!CODE
+      hlrz '13,'137;
+      hrrz '14,'137;
+      movem '13,ver;
+      movem '14,rel;
+   END;
+   RETURN (cvs(ver)&"."&cvs(rel));
+END;
+INTERNAL STRING PROCEDURE pr!time (INTEGER time);
+	\ This procedure converts "time" expressed in seconds since
+midnight into a printable string expressing the time in hours and
+minutes.
+;
+BEGIN
+   INTEGER mins,hrs;  STRING tmpstr;
+   mins_ time/60;  hrs_ mins/60;  mins_ mins-(hrs*60);
+   setformat(-2,0);  tmpstr_ cvs(hrs);
+   tmpstr_tmpstr&":"&cvs(mins);  setformat(0,0);
+   RETURN (tmpstr);
+END;
+INTERNAL STRING PROCEDURE pr!date (INTEGER date);
+	\ This procedure converts "date" which should be in DEC date
+format to a printable string of the form DD MON YR.
+;
+RETURN (stdate(date,'1031));
+INTERNAL PROCEDURE curdt (REFERENCE INTEGER time,date);
+	\ This procedure returns the current time and date in the user's
+time zone.  "Time" is in seconds since midnight.  "Date" is in DEC date
+format.
+;
+BEGIN
+   INTEGER time1;
+   time1_ calli(0,'22);  date_ calli(0,'14);  time_ calli(0,'22);	\ Get time and date.  Compensate;
+   if time < time1 then date_ calli(0,'14);  time_ time/60;  return;	\ if midnight is crossed between calls.;
+END;
+INTERNAL STRING PROCEDURE pr!reel (INTEGER reelno);
+	\ Returns a string for printing the reel number value given in
+"reelno".
+;
+return (cvs((reelno lsh -18) land '777777) & "-" &
+   cvs(reelno land '777777));
+INTERNAL STRING PROCEDURE pr!ppn (INTEGER ppn);
+	\ Returns a string for printing the ppn value given in "ppn".;
+return ("[" & cvos((ppn lsh -18) land '777777) & "," &
+   cvos(ppn land '777777) & "]");
+INTERNAL STRING PROCEDURE pr!user( STRING username );
+	\ Takes a string and surrounds it with parentheses.;
+return( "(" & username & ")" );
+INTERNAL SIMPLE STRING PROCEDURE pad (STRING str;  INTEGER totlen);
+	\ This routine pads the string "str" to the desired length
+"totlen" and returns the resultant string.
+;
+BEGIN
+   INTEGER i,j;
+   IF (i_totlen-length(str)) > 0 THEN
+      FOR j_1 step 1 until i DO str_str&" ";
+   RETURN (str);
+END;
+INTERNAL BOOLEAN PROCEDURE checrec;
+	\ This routine checks the tape block read into the array,
+"tapblk", to see whether it is a complete check record (all words
+contain the check constant).
+;
+BEGIN
+   integer x;
+   for x_ 1 step 1 until tape!buf!size do
+      if tapblk[x] neq check!wd then return( false );
+   return( true );
+END;
+INTERNAL SIMPLE BOOLEAN PROCEDURE ab!cond;
+	\ This routine checks the system status vector "snstat" for
+abort requests.
+;
+BEGIN
+   integer ch;
+   if (ch_ snstat[1 for 1]) = "A" or ch = "S" then return (true)
+   else return (false);
+END;
+STRING PROCEDURE sysinfo;
+	\ This routine retrieves two words of system and monitor
+information and returns it as a printable string.;
+BEGIN
+   INTEGER wd1,wd2;
+   wd1_calli('11,'41);  wd2_calli('1000011,'41);
+   RETURN (cvstr(wd1)&cvstr(wd2));
+END;
+
+\ Main program starts here;
+
+REQUIRE default INITIALIZATION;
+ IFC debug THENC usererr(0,1,"Trying to BAIL","B");  ENDC
+	\ check user licenses;
+curdt(curtim,curdat);
+ck!sn print ("SNARL (V" & elsec print("DSNARL (V" & endc
+   version&") here at "&pr!time(curtim)
+   &" "&pr!date(curdat)&crlf);
+print ("SYSTEM "&sysinfo&crlf&crlf);
+if not cmdstk then quitsw_true;						\ Set up for command input;
+while mtchan<0 do
+BEGIN
+   print("DEVICE >>");  mtdev_ inchwl;
+   IF mtdev= null THEN IFC debug THENC DONE; ELSEC CONTINUE; ENDC;
+   s!devi(mtdev);
+END;
+oper!ppn_ calli( !xwd(<-1>,<!gtppn>), '41 );				\ Get ppn and user name of the;
+oper!name_ cv6str( calli( !xwd(<-1>,<!gtunm>), '41 ) );			\ operator running this program.;
+oper!name_ oper!name & cv6str( calli( !xwd(<-1>,<!gtun1>), '41) );
+if not !skip! then
+BEGIN
+   print( "Could not get system information." & crlf );
+   quitsw_ true;
+END;
+int!init;								\ Set up interrupts.;
+WHILE not quitsw DO BEGIN
+    print(crlf);
+   do!cmnd(false,true);
+   str_"Command aborted";						\ If top of status vector;
+   if ab!cond then							\ Check and report status;
+   BEGIN
+      lop(snstat);
+      if (temp_lop(snstat))="D" THEN					\ indicates an abort . . .;
+	 str_str&" due to a device error"
+      ELSE IF temp="H" THEN
+	 str_str&" due to a hung device";
+      print(str&"."&crlf);
+      bailout;
+   END
+   else if (temp_ lop(snstat)) = "C" then if length(snstat) then		\ If a completion . . .;
+      print("Command completed."&crlf);
+   poll;
+   snstat_null;								\ Clear the status vector.;
+   cmdset(std!g);							\ Set full command set for this user.;
+END;
+
+END "SNARL";
