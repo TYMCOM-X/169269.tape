@@ -1,0 +1,444 @@
+
+  COOP.MEM                                                  12/18/83
+  
+  
+  USE OF THE TERMINAL
+  
+  Much of the basic material is in the terminal owner's guide and the
+  XEXEC Reference Manual (for TYMCOM X).  The terminal identifier for
+  the HP 2621 is "a" - if you are logging in over an engine.  If you
+  are on NEXNET you just do a carriage return.
+  
+  Basic system to use is 930.  Co-op student is valid as TSUCOOP on 33,
+  36, 118 and, BUBBNET systems 94 and the VAX as well.
+  
+  TYMCOM-X
+  Prompt character for XEXEC is "-", for PDP is ".".  To change from one
+  to the other type pdp or xexec.  The different modes have slightly
+  different commands; for example, <esc> gets you out of programs in
+  XEXEC, ^C in PDP.  Deleting is also different, as follows:
+  
+                          XEXEC            PDP
+  
+      DELETE CHARACTER     ^A          ^Q or backspace
+      DELETE LINE          ^Q              ^U
+  
+  The Tymcom-X Section almost all use PDP mode, the rest of the known
+  Tymcom-X world mostly uses XEXEC.
+  
+  As a good rule, when in doubt on the terminal, in any of the various
+  programs, try typing "help" or "?"  and printing out the results.
+  Another thing to try is "<command>/?".  Sometimes there is also a "help
+  command.name" that gives further information.
+  
+  
+  
+  
+  EDITORS
+  
+  TYMCOM-X
+  There are three screen editors available.  Manuals are available for
+  TV-EDIT (ct1), VUE (ct4), and a guide for PEAK.
+  PEAK and VUE both have tutorials, which are in (SYSNEWS)PEAK.TUT 
+  and (SYSNEWS)VUE.TUT.
+  For line editor information, INFO on 930 has EDIT10 documentation,
+  Editor is in the XEXEC manual (and Editor manual).
+  
+  TOPS-20 and VAX
+  The screen editors on TOPS-20 are EMACS and PEAK, on the VAX only
+  EMACS is available.
+  
+  
+  TYMSHARE VG2
+  
+  Coffee room has coffee, and hot water for tea.
+  There is a small refrigerator in the room next to conference room 5.
+  
+  
+  
+HARDCOPY:
+  
+  SPOOL
+  
+  For hardcopy you have a number of options.  Long listings can be SPOOLed
+  from one of the 10's.  You have to telecopy files from 930 for them to 
+  be spooled.  Information on SPOOL is in the manual.  A hack exists, 
+  (mpl)spool that will read a spool.def file in your directory so you don't
+  have to type the answers to all those prompts each time.  You can copy
+  someone else's and correct the necessary information.
+  
+  Files can be spooled to CENTER on Bubb Road, and usually will be delivered
+  the next day.  Files can also be spooled to the print room in VG1 by
+  using node=1155 as an option.  They will be printed in the next day or
+  so depending on the load.  
+  
+  All spool requests are picked up in the print room on the shelf that is
+  marked SYSTECH.
+  
+  VAX and 118
+  
+  'PRINT <filename>' will print files on VAX or 118 on the printers in the
+  machine room.
+  
+  At present there is not a printer on Bubb 94.
+  
+  350
+  
+  At present, the next best bet is to print out shorter files on the 350
+  in the graphics lab.  Log into it as you do normally (terminal
+  identifier is "a" as on the 444).  There is a manual by the 350.  
+  
+  DIABLO PRINTER
+  
+  For letter quality printing, use the Diablo.  There are two Diablo
+  printers in the room opposite Conference Room 1.  One is hard wired, to
+  use the other dial 6001, turn on printer and modum, insert phone when
+  high pitched tone is heard.  
+  
+  The terminal identifier is "e".  To set margins, tabs, go LOCAL and
+  follow instructions on wall.  To see what you are typing more clearly,
+  set "Scroll" to on position.
+  
+  (MPL)TYPE AND (PUB)UNDER
+  
+  There are two good, useful printing programs on line, (mpl)type
+  and (pub)under.  Documentation and help files for (mpl)type are on
+  directory mpl, pub has a brief "help" text.  (pub)under is designed
+  to print out files created by the program pub--and is the only program
+  that will handle the underlining pub creates (control Xs) properly.
+  (pub)under will print a file, inserting form feeds (^l) before and
+  after.  Be sure to set "Top of Form" switch about three lines down
+  before running program.  Unfortunately (pub)under cannot handle tabs.
+  Under has the option of overstriking "n" number of times rather than
+  underlining; the switch for overstriking is /n.
+  
+  COPYING FILES FROM ONE SYSTEM TO ANOTHER
+  
+  To copy a file from one system to another, either use telecopy (see
+  manual) or run (spl)copy.  Telecopy has the advantage of enabling
+  copying either to or from system you are in, and renaming files.
+  
+  (spl)copy is primarily useful when copying a file to many systems.
+  It must be run from the directory from which the file is being copied
+  and requires ac license - if you are sending files to a directory other
+  than your own.
+  
+  To copy files to and from TOPS-20 use FTP20.
+  
+  TEMP CORE
+  
+  The program (sys)tc will display names of files in temp core. The
+  individual files can be listed by typing file name at the program prompt.
+  
+  MAILBOX
+  
+  To set up a mailbox, do the following:
+  
+  .ctest setmai mail.box
+  .ctest makini
+  
+  When you have set up a mailbox, all the mail you send or receive will
+  be saved in the file.  It can be read by the program MAIL.
+  
+  At time of logon, or whenever you get a system level prompt, "mail
+  waiting" will alert to mail on system.  At prompt, type "mail" to
+  receive mail.
+  
+  To send mail, type "send user name" and at the prompt "TYPE LETTER: "
+  type the text you want to send, ending with ^d.
+  
+  To send to more than one person, type user names separated by ":".
+  Be sure to indicate in the mail you send that it is going to more than
+  one person (perhaps list them within the letter you are sending).
+  To send to a group of people regularly, you can list their user names
+  in a file and send "@ file name".  Again it is good practice to be 
+  sure recipients of the letter understand it is a group memo.
+  
+  For information on the mailbox program type "r mail" and them at
+  the prompt "*" type "?".
+  
+  To send contents of a file type "@ file name" following the 
+  prompt "TYPE LETTER: ".  A ^B will prompt for file name to include
+  at that point of the letter you are typing.
+  
+  Command "postman" will review mail you have written and than has
+  not yet been received.  It will give you the opportunity to type
+  or cancel mail that has not been picked up.
+  
+  USER NAMES
+  
+  Within the section most use first names; Vivian and Greg their
+  last names (hiatt and matoka).  Mike uses his initials (mch).
+  The old convention was last name and first initial.
+  
+  PROGRAM DIRECTORIES
+  
+  There are library directories--mpl,spl,upl, "monitor program library"
+  (for section use), "system program library" (in house use), and "user
+  program library".  These contain useful programs and documentation.
+  
+  WHOIS
+  
+  There is a program (wrs)whois that will list employees of Tymshare
+  with their location and cost code.  You request a substring of the
+  name, or type "?" for more information on the program.
+  
+  NONAME
+  
+  To change any intial characteristics, run NONAME and then command
+  "CHA", which will list characteristics and prompt for changes.
+  DOCUMENTATION
+  
+  Basic documentation on-line can be found in (*6news) for user programs,
+  (sysnews) for internal programs and by running info on 930 for monitor
+  and specific section documentation.  Documentation for hacks is rather
+  spotty--looking the directory where the program lives is a good first
+  start.
+  
+  LICENSE
+  
+  To set license on Tymcom-X you can give the command 
+  
+  .o <license> <license><esc><oper password>
+  
+  or
+  
+  . o <license>...<license>
+  <oper name>
+  
+  .<oper password>
+  
+  There are groups of licenses that can be set; the group names are
+  "all" (which also can be set by o<esc>) which sets all your license,
+  and the following subgroups (you only get what you have):
+  
+  "most"    RC OP SY GD TD JL AC RA WF
+  "some"    RC SY RA WF
+  "read"    RC SY RA
+  
+  To disable license type "sete 0".  You can reduce a group of licenses
+  to one by "sete <license>" or "o <license>".
+  
+  RUNNING PROGRAMS
+  
+  The command "r <program>" will look on the directory (sys) for the program
+  with an extension .sav, .shr or .hgh.  To run a program on your directory
+  the command is "run <program>".
+   
+  HACKS AND SUCH
+  
+  There are some very useful hacks around.  One of the most userful is 
+  (spl)find that will prompt for strings to search for and files to
+  look in.  It has some very nice features which you can get a brief list of 
+  by a ? to the "Search in:" prompt.  To exit the program the command is ".q".
+  WEEKLY SPOOL MAINTENANCE
+  
+  Once a week, in the morning log in as sppoper on :36.
+  
+  .r (mpl)mhx
+  
+  hosts:@spool.cmd
+  commands:  
+  @clean        ;"clean.cmd" contains "run spfix <cr> clean <cr> pending <cr>
+  ^D            ; quit <cr>"
+  record?y
+  output file: clean.rpt
+  detach: n
+  
+  After it is completed run spmhx, (turn on printer for pending informat  
+  .ru spmhx
+  Input File: clean.rpt
+  Output File:  pend.rpt
+  Scanning CLEAN.RPT.
+      .
+      .
+      .
+  End of SAIL execution
+  
+  .
+  
+  
+  Late in the afternoon, or the next morning:
+  
+  .r (mpl)mhx
+  hosts:    ; host numbers of systems which were reported as having
+            ; requests in PROC or TAPE states
+  commands:
+  run spfix
+  pend
+  quit
+  ^D
+  record?n (turn on printer)
+  
+  If the same job is still "stuck" in PROC or TAPE state, log into that
+  system as sppoper, run spfix and charge off using command "charge".
+  
+       .r (spl)taux;: system number
+       .run spfix
+       *charge
+          .
+          .
+       *quit
+       .k
+  
+  NOTE:  If "charge" reports a record missing, continue anyway.  If it reports
+  differences in page counts, generally choose the maximum.
+  
+  Give pend.rpt and list of old requests to SPOOL maintainer.
+  SPOOL MAINTENANCE
+  
+  MONTHLY:
+  
+  At end of month log into :36 and run an mhx job to all systems to do repair:
+  
+  .r (mpl)mhx
+  hosts: @spool.cmd
+  commands (end with control d)
+  run spfix
+  repair
+  compare     (omit the 2nd time)
+  quit
+  spool   ; this is to check to see if spfix has renamed SPOOL back to sys
+  quit
+  ^d
+  record?y
+  file?repair.rpt
+  detach?n
+  
+  Then run spmhx, file name repair.rpt, to get a list of systems on which
+  repair was not done (turn on printer).
+  
+  Any systems that were not done can be done individually later.
+  
+  NOTE:  If SPOOL cannot be run after running spfix on a system, the
+  message "SPOOL MAINTENANCE IN PROGRESS.  PLEASE TRY AGAIN IN 30
+  MINUTES" will be printed.  In that case log into that system as
+  sppoper, set all your license, check to see if there is an
+  (sppoper)spool.sav, and then rename as follows:
+  
+  .rename (sppoper)fakspo.sav=(sys)spool.sav
+  .rename (sys)spool.sav=(sppoper)spool.sav
+  
+  Inform the SPOOL maintainer about this!
+  
+  It is normal to have all record reported bad by "repair" if SPOOL has
+  not been used.
+  
+  NOTE:  If there is a crash, ^C out and do the following:
+         .close
+         .r (spl)taux;: system number
+         .o sy
+          tsucoop
+         .oper password
+         .sys     (find detached job of SPPOPER)
+         .k job#
+         .k     (get back to 36)
+  
+  ACCOUNTING FILE MAINTENANCE - MONTHLY
+  
+  At end of month from (sppoper:36) send an mhx job to run spfix,
+  command "unproc" to check for unprocessed bcharge and rcharg requests. 
+  
+  .r (mpl)mhx
+  hosts: @spool.cmd
+  commands:
+  run spfix
+  unproc
+  quit
+  ^d
+  record?y
+  file name: unproc.rpt
+  detach: n
+  
+  
+  Print unproc.rpt and give to Lois.
+  
+  MONTHLY NODPRI AND PRIADR CHECK:
+  
+  Every month, also run mhx and do cksums on nodpri and priadr,
+  (this can be included in the end of month, or last day routines).
+  
+  .r (mpl)mhx
+  hosts:@nodpri.cmd
+  commands:
+  o rf
+  oper name
+  oper pasword
+  r cksum
+  (spool)nodpri
+  (spool)priadr
+  
+  ^d
+  record?y
+  file name: nodpri.rpt
+  detach?n
+  
+  
+  When completed print nodpri.rpt.
+  If discrepencies are discovered, there are a couple of alternatives:
+  
+     1.  Just telecopy over the latest and most common copy to systems
+         lacking it.  This can be done using (spl)copy.  If system 36
+         is bad, login to another system.
+  
+         . o all
+          oper name
+         .oper password
+         .gf spool
+         .r (spl)copy
+         file(s):nodpri,priadr
+         copy to user name:spool
+         to systems:...       ; to those systems which have discrepencies
+         supercedes previous version?y
+  
+             
+     2.  Do procedure as follows to get new nodpri:
+  
+            a.  log in to 8
+            b.  set license
+            c.  command copy
+            d.  from file:  (spool)nodpri
+            e.  to:  nodpri
+            f.  command telecopy
+            g.  mode receive binary fill=right
+            h.  mode transmitt binary fill=right
+            i.  (username)nodpri,:39
+            j.  log into 39
+            l.  run (sppoper)fixmap
+            m.  file name nodpri
+            n.  file out:  nodpri.out
+            o.  r cksum on nodpri.out and (spool)nodpri
+            p.  to find differences (if any)
+                1)  if you haven't done so, run (sppoper)spnode, out file 
+                    spnode.out
+                2)  disable spool (when free)
+                3)  rename (spool)nodpri to nodpri.bak (in case you have to
+                     reverse yourself)
+                4)  rename nodpri.out on your directory to (spool)nodpri
+                5)  r (sppoper)spnode, out file spnode.new
+                6)  differences, output to t, compare two files
+            q.  then copy around latest version (if all right)  using (mpl) copy
+            r.  be sure to check next day (using cksum, and an mhx job) to be
+                  sure everything got moved all right.
+  
+  NOTE:
+  
+  Printer and Node locations are maintained on system 8, and changed or
+  printed by program 1pnupd.  Validations maintains this data base:
+  person to contact is Gael Venn, x7081, in case of problems.
+  
+  
+  WEEKLY MTS MAINTENANCE
+  
+  Every Thursday afternoon, log in as tsucoop on :36 and
+  
+  .gf tymxmts
+  .ftmagnum
+  :do backup.all
+      .
+      .
+      .
+  :q
+  .k
+  
+     e@Wa
