@@ -1,0 +1,319 @@
+.left margin 7;.right margin 72
+I.  General information
+.skip 2
+A.  Intended program use
+.skip 1
+MTDUMP is designed to be used as a general purpose
+magnetic tape dump program.  The motive for creating it
+is the need for a diagnostic tool to use in debugging
+the FSTAR program.  It may eventually be used to examine unknown
+tapes in order to do some sleuthing to find the format.
+.skip 2
+B.  References
+.page
+II.  Operating characteristics
+.skip 2
+A.  Command overview
+.skip 1;.fill
+MTDUMP will read tapes and dump records according to operating
+modes which may be set by the user.  The commands relating to
+operating modes are as follows:
+.skip 1;.nofill
+PROMPT          Displays and sets switches interactively.
+OPTIONS         Displays current global values.
+INPUT           Resets input device name and characteristics.
+OUTPUT          Resets output device and file.
+FORMAT          Sets the report type to be used.
+SYMBOLICS       Sets up the character type for analysis.
+.skip 1
+Commands relating to tape positioning are the following:
+.skip 1
+REWIND          Rewinds the tape on the current input device.
+ADVANCE         Advances the tape over records and files.
+BACKSPACE       Backspaces the tape over records and files.
+SKIP            Skips to logical end of tape.
+.skip 1
+One command is used to obtain information about a tape.
+.skip 1
+DUMP            Reads the tape and dumps out a report.
+.skip 1
+The remaining commands:
+.skip 1
+HELP            Types out operating instructions.
+?               Shortened form of HELP.
+QUIT            Exit from the program.
+.skip 2
+B.  Getting started
+.skip 1
+.fill
+From the EXEC level, type "R MTDUMP" to start the program.  MTDUMP
+will type a short heading and proceed directly to the prompt
+dialog (as if the user had typed the PROMPT command).  When
+the values have been supplied, the program will type the
+prompt character "*" to indicate it is ready for the next
+command.
+.page
+III.  Command formats
+.skip 1
+In the command descriptions in this document, the following
+conventions will be observed.  Upper case letters will denote
+commands and key words that should be typed exactly as they
+appear.  Lower case phrases enclosed by "< >"
+will denote variable information.  Quantities enclosed in
+brackets "[ ]" are optional parameters.  Choices will appear
+as a column or will be described separately in the text.  Keywords
+may be abbreviated to the least number of characters which still
+assures uniqueness.
+.skip 2
+A.  Mode manipulation commands
+.skip 1
+The operating modes and selection of devices are controlled
+by the user.  The values may be entered individually with the
+appropriate commands or interactively.  Certain values have
+defaults which are in effect when the program is started.  Others,
+such as the current device values are left unassigned until the
+user sets them.  An attempt to do a tape dump with any device
+unassigned will cause the program to object strongly.
+.skip 2
+1.  OPTIONS
+.skip 1
+This command allows the user to display all
+current modes (or options).
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       OPTIONS                                                 |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1
+Example:  *OPTIONS
+           TAPE INPUT:  FTA2  9 TRACK  ODD PARITY  6250 BPI
+           OUTPUT FILE:  MTDUMP.TMP
+           REPORT SIZE:  LARGE
+           ECHO TO TTY:  YES
+           ANALYSIS:  OCTAL FSTAR
+.skip 2;.fill
+2.  PROMPT
+.skip 1
+The PROMPT command displays current options and allows the
+user to change the values (where choices are possible).
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       PROMPT                                                  |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.nofill
+.test page 10
+Example:  *PROMPT
+           TAPE INPUT:  FTA0  __FTA2
+             DENSITY(6250,1600):  6250
+             PARITY:  ODD
+             TRACKS:  9
+          OUTPUT TO FILE?  Y
+          FILE NAME:  MTDUMP.TMP
+          REPORT SIZE:  TTY  __LARGE
+          ECHO TO TTY:  YES  __NO
+          SYMBOLIC MODE:  OCTAL  __
+          FSTAR TAPE:  YES __
+.skip 1;.fill
+To leave a value the same, a carriage return is typed.  For
+more information on the possible values for each answer,
+see the descriptions of the individual mode setting
+commands.
+.skip 2
+3.  INPUT
+.skip 1
+The INPUT command is for resetting the input device and
+its characteristics.
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       INPUT [device name] [density] [parity]                  |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.SKIP 1;.FILL
+The user may input all the values if sure of them.  The program
+will prompt for values not supplied where there is a choice
+to be made.  The command name only causes the device
+characteristics to be displayed.
+.skip 2
+4.  OUTPUT
+.skip 1
+To set up the output for the dump:
+.skip 1
+.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       OUTPUT [TTY] [file name]                                |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+The command name by itself displays the current values.  Use
+of this command clears the old values and resets to the values
+given.
+.skip 2
+5.  FORMAT
+.skip 1
+This command sets the report size to the type of paper to be
+used for displaying.
+.skip 1;.nofill
+.test page 10
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       FORMAT [STATISTICS]                                     |
+|              [TTY]                                            |
+|              [LARGE]                                          |
+|                                                               |
+|       where STATISTICS = statistics only (any size paper)     |
+|             TTY = full dump on TTY size paper         |
+|             LARGE = full dump on large (132 column) paper     |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+Use of the FORMAT command without a parameter displays
+the current value.
+.skip 2
+6.  SYMBOLICS
+.skip 1
+To set up the proper analysis mode for the input tape:
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       SYMBOLICS [<character set type> [FSTAR]]                |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+The command word alone causes the current values to be
+displayed.
+.skip 1
+At present, the only character set defined is OCTAL which
+causes a dump to show whole file words as octal values.  At
+a future time, the program should be extendable to
+various character sets and formats.  The notation FSTAR would
+indicate interpretation of the various logical record types
+for symbolic reporting of any meaningful data, and octal
+reporting of non-symbolic information.
+.skip 2
+B.  Positioning commands
+.skip 2
+1.  REWIND
+.skip 1
+To rewind the tape on the current input device:
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       REWIND                                                  |
+|                                                          |
+|______________________________________________________________________________________________________________________________|
+.skip 2
+2.  ADVANCE
+.skip 1
+To advance over the specified number of file marks and records:
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       ADVANCE [[<number>]FILES] [[<number>]RECORDS]           |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1
+When a file and record count are both supplied, the file
+advance is done first.  The numbers default to 1.
+.skip 2
+3.  BACKSPACE
+.skip 1
+To backspace the tape:
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       BACKSPACE [[<number>]FILES] [[<number>]RECORDS]         |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+When both a file and record count are supplied, the file backspace
+is done first.  The numbers default to 1.
+.skip 2
+4.  SKIP
+.skip 1
+To skip to logical end of tape (where defined):
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       SKIP                                                    |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+The definition of the logical end depends upon the type
+of tape being searched.  If there is no clear definition,
+the SKIP will terminate at the physical end of tape.
+.skip 2
+C.  Dumping command
+.skip 1
+The DUMP command is the one which does the actual work of
+reading the tape and reporting the contents according to
+the user's specificaiions.
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       DUMP [<number>FILES] [<number>RECORDS]                  |
+|                 [ALL]                                         |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+If file and record counts are both specified, MTDUMP will dump the
+number of records specified from each file that it dumps.  It
+will dump from the number of files specified starting with
+the current positioning.  Note that this is a different use
+of file and record counts than that used with the ADVANCE and
+BACKSPACE commands.
+.skip 2
+D.  Miscellaneous commands
+.skip 2
+1.  HELP
+.skip 1
+To get a brief set of operating instructions for MTDUMP:
+.skip 1
+.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       HELP                                                    |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 1;.fill
+Will not be implemented initially.
+.skip 2
+2.  ?
+.skip 1
+This command is a shortened form of HELP listing commands
+without explanations.
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       ?                                                       |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+.skip 2;.fill
+3.  QUIT
+.skip 1
+To exit from the program:
+.skip 1;.nofill
+.TEST PAGE 5
+__________________________________________________________________________________________________________________________________
+|                                                               |
+|       QUIT                                                    |
+|                                                               |
+|______________________________________________________________________________________________________________________________|
+ _Nk›
