@@ -1,0 +1,2489 @@
+.AP
+.LM 10
+.RM 70
+.NNM
+.FG 1
+.S 15
+.C 80
+CO-OP BACKUP PROCEDURES MANUAL
+.S
+.C 80
+SOURCE FILE:  BCK.RND
+.S
+.C 80
+JUNE 13, 1982
+.PG
+.LM 13
+.RM 71
+.P -3,0
+.FG 1
+.S 7
+.C 80
+TABLE OF CONTENTS
+.S 3
+ CHANGING#THIS#MANUAL##...................................###1
+.S 
+ SYSTEM#930#BACKUP#PROCEDURES##############################
+INCREMENTAL#BACKUP-MANUAL#METHOD##....................###2
+INCREMENTAL#BACKUP-COMMAND#FILE#METHOD##..............###9
+ALLFILES#BACKUP##.....................................##15
+BACKUP#CHECKS##.......................................##23
+MAIL##................................................##24
+CONTROL#CHARACTERS#AND#COMMANDS##.....................##25
+BRINGING#UP#SYSTEM#930##..............................##26
+CONTACTS##............................................##27
+.S
+ SYSTEM#54B#BACKUP#PROCEDURES##############################
+INCREMENTAL#BACKUP##..................................##28
+ALLFILES#BACKUP##.....................................##31
+MAIL##................................................##32
+CONTROL#CHARACTERS#AND#COMMANDS##.....................##33
+BRINGING#UP#SYSTEM#54B##..............................##34
+CONTACTS##............................................##35
+.S
+ OFFICE-4#BACKUP#PROCEDURES################################
+INCREMENTAL#BACKUP##..................................##36
+SAVASS#BACKUP##.......................................##41
+ALLFILES#BACKUP##.....................................##44
+BACKUP#CHECK##........................................##49
+RESTORATION#OF#A#SINGLE#FILE##........................##50
+CONTROL#CHARACTERS#AND#COMMANDS##.....................##53
+BRINGING#UP#OFFICE-4##................................##57
+CONTACTS##............................................##58
+.NM 1
+.NST
+.PG
+.RM 70
+.LM 10
+.P 4,0
+.FG 1
+.S 6
+.C 80
+CHANGING#THIS#MANUAL
+.S 3
+ A copy of this manual (BCK.RND) can be found on system 930 in (TSUCOOP),
+along with the version of RUNOFF it was created in.  At the present time,
+the same version of RUNOFF is in (UPL), and can be implemented by the command
+GO#(UPL)RUNOFF.
+.NST
+.PG
+.LM 15
+.P -5,1
+.FG 1
+.ST ####930 INCREMENTAL BACKUP-MANUAL METHOD
+.S 6
+.C 80
+SYSTEM 930 BACKUP PROCEDURES
+.S 3
+ INCREMENTAL BACKUP-MANUAL METHOD
+.S 2
+ I.###Check the density on the tape drive to make sure that it
+is set at 1600 BPI.
+ II.##Select the appropriate incremental tape from the tape
+cabinet.  The tape selected will either be a new tape (i.e., one that is not
+already a part of the backup library) or the oldest incremental tape in the
+backup library.
+ III.#Place a write ring (generally black or yellow) in the
+back of the tape reel.
+ IV.##Mount and thread the tape on the tape drive.
+ V.###Push the LOAD button, wait until the tape reel stops
+moving and then push the ON LINE button.
+.LM 24
+.P -4,0
+.S
+ **NOTE 1**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again.  Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step V.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before 'DEVICE:'
+appears on the terminal.
+.LM 15
+.P -5,1
+ VI.#The terminal session now begins.
+.LM 24
+.P -4,0
+.S
+ **NOTE 4**########################################
+Use a hard copy terminal.
+ **NOTE 5**########################################
+If the message 'PLEASE#SEE#YOUR#REPRESENTATIVE ...TROUBLE#LOGGING#IN' is
+displayed on the terminal, enter a carriage return and 'PLEASE#LOG#IN:'
+should appear.
+ **NOTE 6**########################################
+If a '.' or '-' prompt is the last entry on the terminal when it is time to do
+the backup, type
+.S
+K (C.R.)
+.S
+and proceed with the backup procedure.
+ **NOTE 7**########################################
+If there is a problem during the backup process, be sure to save the
+tape(s) on which files were written before the problem occurred and label the
+tape reel(s) appropriately.  The tape(s) needs to be saved because a change
+bit associated with a file is reset as the file is stored and if the backup is
+started again, the files stored during the first dump will not be stored
+during the second dump (i.e., the files are lost).
+.LM 15
+.P -5,1
+ PLEASE#LOG#IN:#^&CALSTATE:930;(PASSWORD)#(C.R.)\&
+.LM 24
+.P -4,0
+.S
+ **NOTE 8**########################################
+A second semi-colon may or may not appear after typing the semi-colon
+following the system number.  This all depends on whether a local
+path or a network path to the system is being used.
+ **NOTE 9**########################################
+The password is not echoed.
+.LM 15
+.P -5,1
+ PROJ#CODE:#^&(C.R.)\&
+.LM 24
+.P -4,0
+.S
+ **NOTE 10**#######################################
+If 'SHUTPROJ' appears instead of 'PROJ', it is alright to continue with the
+backup process.
+.LM 15
+.P -5,0
+ TYMSHARE...
+.PG
+ -^&O_ _OP_ _WF_ _SY_ _GD#(C.R.)\&
+.LM 24
+.P-4,0
+.S
+ **NOTE 11**#######################################
+The licenses (these are the two letter symbols following 'O') can be listed
+in any order.
+.S
+.LM 15
+.P -5,0
+ ^&CALSTATE#(C.R.)\&
+ -^&(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+.S
+ **NOTE 12**#######################################
+The password is not echoed.
+.LM 15
+.P -5,0
+ -^&R_ _TITO#(C.R.)\&
+ TITO...
+ SYSTEM#C930-P034/
+ DEVICE:#^&MTA0#(C.R.)\&
+ TRACKS:#9
+ DENSITY(1600,800):#^&1600#(C.R.)\&
+ TAPE NOT WRITE PROTECTED
+.LM 24
+.P -4,0
+.S
+ **NOTE 13**#######################################
+It is important that this statement appears because it means that a write ring
+has been inserted into the tape reel.  If the statement 'TAPE WRITE PROTECTED'
+had appeared, it would have meant that the tape reel did not have a write ring
+and the tape could not be written on.
+.LM 15
+.P -5,0
+.S
+ *^&NEW_ _TAPE#(C.R.)\&
+ ARE#YOU#SURE?^&Y#(C.R.)\&
+ *^&STORE_ _ALL_ _CHANGED#(C.R.)\&
+ TAPE NUMBER 1...
+  .
+  .
+  .
+.LM 24
+.P -4,0
+.S
+ **NOTE 14**#######################################
+At this point the user names that have files that have been changed, and the
+number of files dumped for each user name are listed.
+.S
+e.g., (CALSTATE)  1 FILES.
+ **NOTE 15**#######################################
+If the end of the tape has been reached before the backup has been completed,
+the following message will appear:
+.S
+MOUNT NEXT TAPE##############################
+CONTINUE ON DEVICE:
+.S
+.PG
+The following steps should be taken:
+.LM 32
+ 1.##Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely).
+ 2.##Remove the tape from the tape drive, remove the write ring from the reel
+and label the tape reel appropriately.
+ 3.##Repeat steps II-IV.
+ 4.##Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 40
+ **NOTE 16**#######################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 17**#######################
+The small light near the read/write head should be shining on the load point.
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again. Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step 4.
+.S
+.LM 32
+ 5.##Type
+.S
+MTA0 (C.R.)
+.S
+in response to 'CONTINUE ON DEVICE:' and the statement 'TAPE NUMBER...'
+will appear.  The tape number will correspond to the tape's position in
+the backup set.
+.S
+.LM 15
+.P -5,0
+ ##.
+ ##.
+ ##.
+.S
+ LAST FILE AT POS...
+ STORE COMPLETE,...FILES.
+ *^&REW#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 18**#######################################
+It will take anywhere from a few seconds to a couple of minutes for the tape
+to rewind and the next '*' prompt to appear.
+.S
+.LM 15
+.P -5,0
+ *^&COF_ _DDMMDD.INC#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 19**#######################################
+DDMMDD refers to DAY OF WEEK-MONTH-DAY.  The DAY OF WEEK utilizes the first
+two letters of the calendar day.
+.S
+e.g., TU0218.INC
+ **NOTE 20**#######################################
+If a backup was dumped onto tape but a directory file was not created, TITO
+can be instructed to create just a directory file.  It is not necessary that
+the tape reel have a write ring when creating this file.  The terminal
+session is the same as this one (step VI) except the following commands and
+responses should be eliminated:
+.S
+.P 0,0
+ NEW TAPE (C.R.)
+ Y (C.R.)
+ STORE ALL CHANGED (C.R.)
+ REW (C.R.)
+.S
+The first command after entering TITO (when the '*' p first appears)
+should be
+.S
+COF DDMMDD.INC (C.R.)
+.S
+The date in the name of the directory file (the file name is the 'DDMMDD.INC'
+portion of the above command) should correspond to the date the backup was
+dumped, not the date the directory file was created.
+.S
+NEW#FILE#^&(C.R.)\&
+.P -4,0
+ **NOTE 21**#######################################
+It is important that this statement appears because it means that the file
+created in the command 'COF DDMMDD.INC (C.R.)' does not already exist.
+.S
+.LM 15
+.P -5,0
+ *^&DIR_ _ALL#(C.R.)\&
+ INPUT#TAPE#POS#RANGE:#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 22**#######################################
+If the backup required more than one tape, the tapes should be remounted in
+the same sequence in which they were written in order to create the directory
+file.  When the directory has been completed for a tape and another has yet
+to be mounted, the following message will appear:
+.PG
+MOUNT NEXT TAPE##############################
+CONTINUE ON DEVICE:
+.S
+The following steps should be taken:
+.S
+.LM 32
+ 1.##Push the ON LINE button, then the REWIND button (allow the tape to
+unloadd completely).
+ 2.##Remove the tape from the tape drive and remove the write ring from the
+reel if it had not already been removed prior to creating the directory file.
+ 3.##Mount and thread the next tape in the backup sequence on the tape drive.
+ 4.##Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 40
+ **NOTE 23**#######################
+The READ and SELECT lights should be lit.  The WRITE ENABLE light will be lit
+if the tape reel has a write ring, but it will not be lit if the write ring
+has been removed.
+ **NOTE 24**#######################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again. Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step 4.
+.S
+.LM 32
+ 5.##Type
+.S
+MTA0 (C.R.)
+.S
+in response to 'CONTINUE ON DEVICE:'. The statement 'INPUT TAPE POS RANGE:'
+will appear and then type "(C.R.)" in response to it.
+.S
+.LM 40
+ **NOTE 25**#######################
+If a file has been split between two tapes, the user name, file name and
+starting block number in the message printed just before 'MOUNT NEXT
+TAPE...CONTINUE ON DEVICE:...' should match the user name, file name and
+starting block number in the message printed just after 'INPUT TAPE POS
+RANGE:...'.  This is a good check to make sure the tapes have been mounted
+in the proper order.  If a tape has been mounted in the wrong order, there
+will be a message indicating this printed just after 'INPUT TAPE POS
+RANGE:...'.
+.S
+.LM 15
+.P -5,0
+ LOGICAL EOT--NO SAVE SETS FOLLOW.
+.S
+ TOTAL...FILES PROCESSED.
+.S
+ *^&UNL#(C.R.)\&
+ *^&QUIT#(C.R.)\&
+.S
+ EXIT
+.S
+.LM 24
+.P -4,0
+ **NOTE 26**#######################################
+There is a delay at this point for the next '-' prompt to appear while the
+tape rewinds.
+.S 2
+.LM 15
+.P -5,0
+ -^&DELETE#XXXXXX.INC\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 27**#######################################
+XXXXXX refers to the file that was assosciated with the tape that was just
+written over.
+.S
+.LM 16
+.P -6,0
+ -^&EXIT#(C.R.)\&
+.S 2
+ VII.##Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the 930 BACKUP LOG and save the
+hard copy of the terminal session.
+.NST
+.P -5,0
+.LM 15
+.FG 1
+.ST ####930 INCREMENTAL BACKUP-COMMAND FILE METHOD
+.S 4
+ INCREMENTAL BACKUP-COMMAND FILE METHOD
+.S 2
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate incremental tape from the tape cabinet.  The tape
+selected will either be a new tape (i.e., one that is not already a part of
+the backup library) or the oldest incremental tape in the backup library.
+.S
+ III.#Place a write ring (generally black or yellow) in the back of the tape
+reel.
+.S
+ IV.##Mount and thread the tape on the tape drive.
+.S
+ V.###Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button, then the REWIND button (allow the tape to
+unloadd completely), thread the tape on the tape drive and repeat step V.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before typing
+.S
+RUN#(QASYS)COM1;(CALSTATE)INC.CMD#(C.R.)
+.S
+on the terminal.
+.S
+.LM 15
+.P -5,0
+ VI.#The terminal session now begins.
+.LM 24
+.P -4,0
+ **NOTE 4**########################################
+Use a hard copy terminal.
+ **NOTE 5**########################################
+If the message 'PLEASE#SEE#YOUR#REPRESENTATIVE ...TROUBLE#LOGGING#IN' is
+displayed on the terminal, enter a carriage return and 'PLEASE#LOG#IN:'
+should appear.
+ **NOTE 6**########################################
+If a '.' or '-' prompt is the last entry on the terminal when it is time to do
+the backup, type
+.S
+K (C.R.)
+.S
+and proceed with the backup procedure.
+ **NOTE 7**########################################
+If there is a  problem during the backup process, be sure to save the
+tape(s) on which files were written before the problem occurred and label the
+tape reel(s) appropriately.  The tape(s) needs to be saved because a change
+bit associated with a file is reset as the file is stored and if the backup is
+started again, the files stored during the first dump will not be stored
+during the second dump (i.e., the files are lost).
+.S
+.LM 15
+.P -5,0
+ PLEASE#LOG#IN:#^&CALSTATE:930;(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 8**########################################
+A second semi-colon may or may not appear after typing the semi-colon
+following the system number.  This all depends on whether a local path or a
+network path to the system is being used.
+ **NOTE 9**########################################
+The password is not echoed.
+.S
+.LM 15
+.P -5,0
+ PROJ#CODE:#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 10**#######################################
+If 'SHUTPROJ' appears instead of 'PROJ', it is alright to continue with the
+backup process.
+.S
+.LM 15
+.P -5,0
+ TYMSHARE...
+.S
+ -^&O_ _OP_ _WF_ _SY_ _GD#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 11**#######################################
+The licenses (these are the two letter symbols following 'O') can be listed in
+any order.
+ **NOTE 12**#######################################
+License must be set before attempting to modify the command file INC.CMD.
+.LM 15
+.P -5,0
+ -^&CALSTATE#(C.R.)\&
+ -^&(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 13**#######################################
+The password is not echoed.
+.S
+.LM 15
+.P -5,0
+ -^&MOD_ _INC.CMD#(C.R.)\&
+ ...CHARS
+ *^&8E#(C.R.)\&
+ COF TU0218.INC
+.S
+.LM 24
+.P -4,0
+ **NOTE 14**#######################################
+This is an example of the eighth command in the command file INC.CMD.  It is
+the only command in the file that requires editing and that must be done each
+day before the backup is run.
+.S
+.LM 15
+.P -5,0
+ ^&COF_DDMMDD.INC#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 15**#######################################
+DDMMDD refers to DAY OF WEEK-MONTH-DAY.  The DAY OF WEEK utilizes the first
+two letters of the calendar day.
+.S
+e.g., WE0219.INC
+.S
+.LM 15
+.P -5,0
+ *^&EX#(C.R.)\&
+ INC.CMD
+ ...CHARS
+.S
+ -^&RUN_ _(QASYS)COM1;(CALSTATE)INC.CMD#(C.R.)\&
+.S 2
+ EXIT
+.S
+ -
+.S
+.LM 24
+.P -4,0
+ **NOTE 16**#######################################
+The INC.CMD commands are not echoed in response to TITO's prompts.
+.S
+.LM 15
+.P -5,0
+ TITO...
+ SYSTEM C930-P034/
+ DEVICE: TRACKS: 9
+ DENSITY(1600,800): TAPE NOT WRITE PROTECTED
+.PG
+.LM 24
+.P -4,0
+ **NOTE 17**#######################################
+It is important that the statement 'TAPE NOT WRITE PROTECTED' appears because
+it means that a write ring has been inserted into the tape reel.  If the
+statement 'TAPE WRITE PROTECTED' had appeared, it would have meant that the
+tape reel did not have a write ring and the tape could not be written on.
+.S
+.LM 15
+.P -5,0
+ *ARE YOU SURE?*
+.S
+ TAPE NUMBER 1...
+ .
+ .
+ .
+.S
+.LM 24
+.P -4,0
+ **NOTE 18**#######################################
+At this point the user names that have files that have been changed,
+and the number of files dumped for each user name are listed.
+.S
+e.g., (CALSTATE)  1 FILES.
+ **NOTE 19**#######################################
+If the end of the tape has been reached before the backup has been completed,
+the following message will appear:
+.S
+.LM 28
+ MOUNT NEXT TAPE
+ CONTINUE ON DEVICE: CAN'T ACCESS TAPE DEVICE
+ CONTINUE ON DEVICE: CAN'T ACCESS TAPE DEVICE
+ ##.
+ ##.
+ ##.
+ CONTINUE ON DEVICE:
+.S
+.LM 24
+The following steps should be taken:
+.LM 32
+ 1.##Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely).
+ 2.##Remove the tape from the tape drive, remove the write ring from the reel
+and label the tape reel appropriately.
+ 3.##Repeat steps II-IV.
+ 4.##Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 40
+ **NOTE 20**#######################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+.PG
+ **NOTE 21**#######################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point, gently tap the photocell
+and try loading the tape again. Push the ON LINE button, then the REWIND
+button (allow the tape to unload completely), thread the tape on the tape
+drive and repeat step 4.
+.S
+.LM 32
+ 5.##From this point on in the backup process, the commands must be entered by
+the operator because the commands in INC.CMD have been exhausted.  Refer to
+the terminal session (step VI) of the manual incremental backup procedure for
+930 and continue with step 4 of NOTE 15.
+.S
+.LM 15
+.P -5,0
+ ##.
+ ##.
+ ##.
+ LAST FILE AT POS...
+ STORE COMPLETE,...FILES.
+.S
+ **NEW FILE *INPUT TAPE POS RANGE: LOGICAL EOT--NO SAVE SETS FOLLOW.
+.S
+.LM 24
+.P -4,0
+ **NOTE 22**#######################################
+It is important that the statement 'NEW FILE' appears because it means that
+the file created in the INC.CMD command 'COF DDMMDD.INC (C.R.)' does not
+already exist.
+.S
+.LM 15
+.P -5,0
+ TOTAL...FILES PROCESSED.
+.S
+ **
+ EXIT
+.S
+ -^&DELETE XXXXXX.INC\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 23**#######################################
+XXXXXX refers to the file that was assosciated with the tape that was just
+written over.
+.PG
+.S 2
+.LM 16
+.P -6,0
+ VII.##Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the 930 BACKUP LOG and save the
+hard copy of the terminal session.
+.NST
+.PG
+.LM 15
+.P -5,0
+.FG 1
+.S 4
+ALLFILES BACKUP
+.S 2
+.ST ####930 ALLFILES BACKUP
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate set of allfiles tapes from the tape cabinet.  The
+tapes selected will either be new tapes (i.e., ones that are not already a
+part of the backup library) or the oldest set of allfiles tapes in the backup
+library.
+.S
+ III.#Place a write ring (generally black or yellow) in the back of the first
+tape reel of the allfiles set.
+.S
+ IV.##Mount and thread the tape on the tape drive.
+.S
+ V.###Push the LOAD button and wait until the tape reel stops moving, then
+push the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to properly detect the load point, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again.  Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step V.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before 'DEVICE:'
+appears on the terminal.
+.S
+.LM 15
+.P -5,0
+ VI.#The terminal session now begins.
+.S
+.LM 24
+.P -4,0
+ **NOTE 4**########################################
+Use a hard copy terminal.
+.PG
+ **NOTE 5**########################################
+If the message 'PLEASE#SEE#YOUR#REPRESENTATIVE ...TROUBLE#LOGGING#IN' is
+displayed on the terminal, enter a carriage return and 'PLEASE#LOG#IN:'
+should appear.
+ **NOTE 6**########################################
+If a '.' or '-' prompt is the last entry on the terminal when it is time to do
+the backup, type
+.S
+K (C.R.)
+.S
+and proceed with the backup procedure.
+ **NOTE 7**########################################
+If there is a problem during the backup process, the backup can be
+restarted with the tape following the last completed tape of the backup set.
+The terminal session for the restart is the same as this one (step VI) except
+the command 'STORE ALL (C.R.)' should be replaced with
+.S
+STORE#ALL#STARTING#WITH#(user#name)file#name
+<starting#block#number><partial#checksum> (C.R.)
+.S
+The starting block number and partial checksum are needed only if the last file
+on the last completed tape of the set was being continued on the tape where the
+problem occurred.
+.S 2
+.LM 15
+.P -5,0
+ PLEASE#LOG#IN:#^&CALSTATE:930;(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 8**########################################
+A second semi-colon may or may not appear after typing the semi-colon
+following the system number.  This all depends on whether a local path
+or a network path to the sytem is being used.
+ **NOTE 9**########################################
+The password is not echoed.
+.S
+.LM 15
+.P -5,0
+ PROJ#CODE:#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 10**#######################################
+If 'SHUTPROJ' appears instead of 'PROJ', it is alright to continue with the
+backup process.
+.S
+.LM 15
+.P -5,0
+ TYMSHARE...
+.PG
+ -^&O_ _OP_ _WF_ _SY_ _GD#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 11**#######################################
+The licenses (these are the two letter symbols following 'O') can be listed in
+any order.
+.S
+.LM 15
+.P -5,0
+ ^&CALSTATE#(C.R.)\&
+.S
+ -^&(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 12**#######################################
+The password is not echoed.
+.S
+.LM 15
+.P -5,0
+ -^&R_ _TITO#(C.R.)\&
+.S
+ TITO...
+ SYSTEM#C930-P034/
+ DEVICE:#^&MTA0#(C.R.)\&
+ TRACKS:#9
+ DENSITY(1600,800):#^&1600#(C.R.)\&
+ TAPE NOT WRITE PROTECTED
+.S
+.LM 24
+.P -4,0
+ **NOTE 13**#######################################
+It is important that this statement appears because it means that a write
+ring has been inserted into the tape reel.  If the statement 'TAPE WRITE
+PROTECTED' had appeared, it would have meant that the tape reel did not have
+a write ring and the tape could not be written on.
+.S
+.LM 15
+.P -5,0
+ *^&NEW_ _TAPE#(C.R.)\&
+ ARE#YOU#SURE?^&Y#(C.R.)\&
+ *^&STORE_ _ALL#(C.R.)\&
+.S
+ TAPE NUMBER 1...
+ ##.
+ ##.
+ ##.
+.S
+.LM 24
+.P -4,0
+ **NOTE 14**#######################################
+At this point all of the user names and the number of files dumped for each
+user name are listed.
+.S
+e.g., (CALSTATE)  97 FILES.
+ **NOTE 15**#######################################
+If the statement 'ERROR WRITING ... CONTINUE OK?' appears at any time during
+the backup process, type
+.S
+Y (c.r.)
+.PG
+ **NOTE 16**#######################################
+When the end of a tape has been reached before the backup has been completed,
+the following message will appear:
+.S
+ ####MOUNT NEXT TAPE
+ ####CONTINUE ON DEVICE:
+.S
+The following steps should be taken:
+.S
+.LM 32
+ 1.##Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely).
+ 2.##Remove the tape from the tape drive,remove the write ring from the reel
+and label the tape reel appropriately.
+ 3.##Place a write ring (generally black or yellow) in the back of the next
+tape of the allfiles set.
+ 4.##Mount and thread the tape on the tape drive.
+ 5.##Push the LOAD button, wait until the tape reel stops moving and then
+push the ON LINE button.
+.S
+.LM 40
+ **NOTE 17**#######################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 18**#######################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point, gently tap the photocell
+and try loading the tape again.  Push the ON LINE button and then the REWIND
+button (allow the tape to unload completely), thread the tape on the tape
+drive and repeat step 5.
+.S
+.LM 32
+ 6.##Type
+.S
+MTA0 (C.R.)
+.S
+in response to 'CONTINUE ON DEVICE:' and the statement 'TAPE NUMBER...'
+will appear.  The tape number will correspond to the tape's position in
+the backup set.
+.S
+.LM 15
+.P -5,0
+.PG
+ ##.
+ ##.
+ ##.
+ LAST FILE AT POS...
+ STORE COMPLETE,...FILES.
+ *^&REW#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 19**#######################################
+It will take anywhere from a few seconds to a couple of minutes for the tape
+to rewind and the next '*' prompt to appear.
+ **NOTE 20**#######################################
+If a directory is not going to be created during this terminal session,
+skip to the command
+.S
+*QUIT (C.R.)
+.S
+.LM 15
+.P -5,0
+ *^&COF_ _DDMMDD.ALL#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 21**#######################################
+DDMMDD refers to DAY OF WEEK-MONTH-DAY.  The DAY OF WEEK utilizes the first
+two letters of the calendar day.
+.S
+e.g., SU0223.ALL
+ **NOTE 22**#######################################
+If a backup was dumped onto tape but a directory file was not created, TITO
+can be instructed to create just a directory file.  It is not necessary that
+the tape reel have a write ring when creating this file.  The terminal session
+is the same as this one (step VI) except the following commands and responses
+should be eliminated:
+.S
+ ####NEW TAPE(C.R.)
+ ####Y (C.R.)
+ ####STORE ALL (C.R.)
+ ####REW (C.R.)
+.S
+.LM 24
+The first command after entering TITO (when the '*' prompt first appears)
+should be
+.S
+COF DDMMDD.ALL (C.R.)
+.S
+The date in the name of the directory file (the file name is the 'DDMMDD.ALL'
+portion of the above command) should correspond to the date the backup was
+dumped, not the date the directory file was created.
+.S
+.LM 15
+.P -5,0
+ NEW#FILE#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 23**#######################################
+It is important that this statement appears because it means that the file
+created in the command 'COF DDMMDD.ALL (C.R.)' does not already exist.
+.S
+.LM 15
+.P -5,0
+ *^&DIR_ _ALL#(C.R.)\&
+ INPUT#TAPE#POS#RANGE:#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 24**#######################################
+The tapes should be remounted in the same sequence in which they were written
+in order to create the directory file.  When the directory has been completed
+for a tape and another has yet to be mounted, the following message will
+appear:
+.S
+ ####MOUNT NEXT TAPE
+ ####CONTINUE ON DEVICE:
+.S
+The following steps should be taken:
+.S
+.LM 32
+ 1.##Push the ON LINE button and then the REWIND button (allow the tape to
+unload completely).
+ 2.##Remove the tape from the tape drive and remove the write ring from the
+reel if it had not already been removed prior to creating the directory file.
+ 3.##Mount and thread the next tape in the backup sequence on the tape drive.
+ 4.##Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 40
+ **NOTE 25**#######################
+The READ and SELECT lights should be lit.  The WRITE ENABLE light will be lit
+if the tape reel has a write ring, it will not be lit if the write ring has
+been removed.
+ **NOTE 26**#######################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step 4.
+.S
+.LM 32
+ 5.##Type
+.S
+MTAO (C.R.)
+.S
+in response to 'CONTINUE ON DEVICE:'. The statement 'INPUT TAPE POS RANGE:'
+will appear and then type "(C.R.)" in response to it.
+.S
+.LM 40
+ **NOTE 27**#######################
+If a file has been split between two tapes, the user name, file name and
+starting block number in the message printed just before 'MOUNT NEXT
+TAPE...CONTINUE ON DEVICE:...' should match the user name, file name and
+starting block number in the message printed just after 'INPUT TAPE POS
+RANGE:...'.  This is a good check to make sure the tapes have been mounted in
+the proper order.  If a tape has been mounted in the wrong order, there will
+be a message indicating this printed just after 'INPUT TAPE POS RANGE:...'.
+.S
+.LM 15
+.P -5,0
+ LOGICAL EOT--NO SAVE SETS FOLLOW.
+.S
+ TOTAL...FILES PROCESSED.
+.S
+ *^&UNL#(C.R.)\&
+ *^&QUIT#(C.R.)\&
+.S
+EXIT
+.S
+.LM 24
+.P -4,0
+ **NOTE 28**#######################################
+There is a delay at this point for the next '-' prompt to appear while the
+tape rewinds.
+.S
+.LM 15
+.P -5,0
+ -^&DELETE#XXXXXX.ALL\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 29**#######################################
+XXXXXX refers to the file that was assosciated with the tapes that were just
+written over.
+.S
+.LM 16
+.P -6,0
+ -^&EXIT#(C.R.)\&
+.S 2
+ VII.##Push the ON LINE button and then the REWIND button (allow the tape to
+unload completely).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the 930 BACKUP LOG and save the
+hard copy of the terminal session.
+.NST
+.PG
+.FG 1
+.LM 10
+.P 0,0
+.S 4
+BACKUP CHECKS
+.S 2
+.ST ####930 BACKUP CHECKS
+.P 4,0
+ The following checks can be made to make sure that the backup went well:
+.LM 18
+.P -4,1
+.LS
+.LE
+The number of files stored during the dump (the number of files stored is
+given in the statement 'STORE COMPLETE,...FILES') should be the same as the
+number of files processed while creating the directory file (the number of
+files processed is given in the statement 'TOTAL...FILES PROCESSED.').
+Occasionally the number of files processed is greater than the number of files
+stored, but there is nothing to be alarmed about if this should happen.  If
+the number of files processed is less than the number of files stored, report
+this situation to an individual listed in the section CONTACTS.
+.LE
+Check the CALSTATE directory for the directory file created (this is the
+file created by the statement 'COF#DDMMDD.INC#(C.R.)' or
+'COF#DDMMDD.ALL#(C.R.)', where DDMMDD.INC or DDMMDD.ALL is the directory file
+name) and examine the information regarding this file.  Important information
+to note is whether the file has actually been created and the number of pages
+making up the file (the number of pages is typically greater than one).
+.S
+i.e., At the XEXEC level ('-' prompt) the following can be typed in order to
+get the directory for a given file:
+.S
+.P 0,0
+ ####DIR DDMMDD.INC (C.R.)
+ ####or
+ ####DIR DDMMDD.ALL (C.R.)
+.S
+Examine the terminal session printout for error messages appearing during
+the actual dumping process and during the creation of the directory file.
+Report these messages to an individual listed in the section CONTACTS.
+.S
+.LT
+     e.g., ERROR IN READING FILE:...
+           ...TOO LITTLE DATA ON TAPE.
+.EL
+.ELS
+.LM 10
+.P 4,0
+.NST
+.PG
+.FG 1
+.S 4
+930 MAIL
+.S 2
+ If an allfiles was not done or will not be done at the regular time, or no
+incrementals were done for two days, send a letter as follows.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+If you have not already done so, set OP license.
+ **NOTE 2**#########################################
+Use upper case for all commands.
+.S
+.LM 10
+.P 0,0
+ -^&R#LETTER (C.R.)\&
+ @^&DISPLAY (C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 3**#########################################
+The current messages will be typed out.
+.S
+.LM 10
+.P 0,0
+ @^&SEND (C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 4**########################################
+Use a number not currently being used.
+ **NOTE 5**########################################
+It may take several minutes to get the next prompt.
+.S
+.LM 10
+.P 0,0
+ HOW MANY DAYS? ^&number (C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 6**########################################
+If you are sending a message indicating that an allfiles was not done, send
+it for 7 days.
+.S
+.LM 10
+.P 0,0
+ TYPE LETTER: ^&type your message, ending with a CONTROL-D\&
+ @^&DISPLAY (C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 7**########################################
+Check your message to be sure it is correct.  If it isn't, remove it with
+the command
+.S
+.P 0,0
+ @^&REMOVE (C.R.)\&
+ TYPE LETTER NOS. (N1,N2...): ^&number (C.R.)\&
+.S
+.LM 10
+.P 0,0
+ @^&Q (C.R.)\&
+.NST
+.PG
+.FG 1
+.S 4
+930 CONTROL CHARACTERS AND COMMANDS
+.P 4,1
+.S 2
+ Two useful control characters to be aware of are control-A and control-Q.
+Control-A deletes the previous character typed and control-Q deletes the
+current line of input and waits for the user to reenter the line.
+ There are three manuals that can be consulted for a description of other
+control characters and commands available in XEXEC, EDITOR and TITO.  These
+manuals are:
+.S
+.LS
+.LM 20
+ XEXEC REFERENCE MANUAL
+ EDITOR REFERENCE MANUAL
+ TITO USER'S GUIDE
+.ELS
+.NST
+.PG
+.FG 1
+.S 4
+BRINGING UP SYSTEM 930
+.S 2
+ If system 930 should crash, the system should be booted up.  It is
+recommended that if the operator is unfamiliar with the boot procedures
+he/she should have an individual listed in the section CONTACTS demonstrate
+these procedures.
+.NST
+.PG
+.FG 1
+.S 4
+930 CONTACTS
+.S 2
+
+ Contact one of the individuals mentioned below when having trouble with the
+system or if there is a problem or question about the backup procedures.
+These individuals should be contacted in the order in which they are listed.
+.S
+ #################HOME PHONE#########WORK EXT.
+.P 0,0
+.S
+ Adele Newman#########415/969-4438########6232
+ Carl Baltrunas#######415/961-1082########7257
+ Todd Corenson########408/358-2196########7432
+ Darren Price#########415/321-6514########6589
+.NST
+.PG
+.FG 1
+.S 6
+.C 80
+SYSTEM 54B BACKUP PROCEDURES
+.LM 15
+.P -5,0
+.ST ####54B INCREMENTAL BACKUP
+.S 3
+54B INCREMENTAL BACKUP
+.S 2
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The 1600 BPI button should be lit.
+.S
+.LM 15
+.P -5,0
+ II.##Place a write ring (generally black or yellow) in the back of the
+appropriate tape reel.
+.S
+ III.#Mount and thread the tape on the tape drive.
+.S
+ IV.##Push the LOAD/RESET button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again.  Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step IV.
+ **NOTE 3**########################################
+The LOAD/RESET, ON LINE and 1600 BPI buttons should be lit.  The ON LINE
+button lights up automatically when the load point is reached; however, the
+tape drive will occasionally run past the load point and rewind back to the
+load point and the operator will have to push the ON LINE button on when this
+happens.
+.S
+.LM 15
+.P -5,0
+ V.###The terminal session now begins.
+.S
+.LM 24
+.P -4,0
+ **NOTE 4**########################################
+Use a hard copy terminal.
+.PG
+ **NOTE 5**########################################
+If at any time you tun into trouble a '?' will give the various alternatives
+to the command, and 'HELP' will give you a full explanation of DUMPER.
+.S
+.LM 10
+.P 0,0
+ ^&(CONRTOL-C)\&
+ @^&LOG TSUCOOP (PASSWORD) (C.R.)\&
+ Job . . .
+.S
+.LM 24
+.P -4,0
+ **NOTE 6**########################################
+The password is not echoed.
+.S
+.LM 10
+.P 0,0
+ @^&ENABLE (C.R.)\&
+ $^&INFORMATION STRUCTURE * (C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 7**########################################
+If you are not listed as a user for any structure, type
+.S
+ ####MOUNT STRUCTURE structurename: (C.R.)
+.S
+.LM 10
+.P 0,0
+ $^&DUMPER (C.R.)\&
+ DUMPER>^&TAPE MTA0: (C.R.)\&
+ DUMPER>^&SET BLOCK 8 (.R.)\&
+ DUMPER>^&SSNAME MMM-DD-INCREMENTAL (C.R.)\&
+ DUMPER>^&LIST MMM-DD-INCREMENTAL (C.R.)\&
+ DUMPER>^&SAVE /INCREMENTAL:1 PS:,OAD: (C.R.)\&
+ DUMPER TAPE # 1 . . .
+.S
+.LM 24
+.P -4,0
+ **NOTE 8**########################################
+MMM refers to the first three letters of the month.  DD refers to the day.
+ **NOTE 9**########################################
+CONTROL-E will abort a command when in DUMPER.
+ **NOTE 10**#######################################
+When the end of a tape has been reached before the backup has been completed,
+you will be asked what filespec to continue on.  The following steps should be
+taken.
+.S
+.LS
+.LE
+Push the ON LINE button, then the REWIND button (allow the tape to unload
+completely).
+.LE
+Remove the tape from the tape drive and remove the write ring from the reel.
+.LE
+Place a write ring (generally black or yellow in the back of the next tape
+of the allfiles set.
+.LE
+Mount and thread the tape on the tape drive.
+.LE
+Push the LOAD button, wait until the tape reel stops moving, then push the
+ON LINE button.
+.PG
+.LM 32
+ **NOTE 11**###############################
+The READ, SELECT, and WRITE ENABLE lights should be lit.
+ **NOTE 12**###############################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears up the problem) and try loading the tape
+again.  Push the ON LINE button, then the REWIND button (allow the tape to
+unload completely), thread the tape on the tape drive and repeat step 5.
+.S
+.LM 24
+.LE
+Type 
+.S
+MTA0: (C.R.)
+.S
+in response to the request for the unit to continue on.
+.ELS
+.LM 10
+.P 0,0
+ ##.
+ ##.
+ ##.
+ DUMPER>^&UNL\&
+ DUMPER>^&QUIT\&
+ $^&LOGOUT\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 13**########################################
+If you are logged in through BUBBNET, type a CONTROL-C and another LOGOUT.
+.S
+.LM 15
+.P -5,0
+.S
+ VI.##Remove the tape from the tape drive and remove the write ring from the
+reel.
+.NST
+.PG
+.FG
+.S 4
+.ST ####54B ALLFILES BACKUP
+ ALLFILES BACKUP
+.S 2
+.P 4,0
+ For the full backup, follow the procedure for the incremental backup, with
+the following changes:
+.S
+.LS
+.LE
+Change SSNAME#MMM-DD-INCREMENTAL to################
+SSNAME#MMM-DD-FULL
+.LE
+Change LIST#MMM-DD-INCREMENTAL to LIST#MMM-DD-FULL
+.LE
+Change SAVE#/INCREMENTAL:1#PS:,PS2:#to#############
+SAVE#/FULL-INCREMENTAL#PS:,OAD:
+.ELS
+.NST
+.PG
+.FG 1
+.LM 10
+.P 0,0
+.S 4
+MAIL
+.S 2
+.P 4,1
+ If a backup was not done but should have been, send mail to SYSTEM, with
+the command MS#SEND#<C.R.>.  You will be prompted for the message.
+.NST
+.PG
+.FG 1
+.P 0,0
+.S 4
+CONTROL CHARACTERS AND COMMANDS
+.S 2
+CONTROL CHARACTERS
+.P 4,1
+.S 2
+ Two useful control characters to be aware of are control-U and control-W.
+Control-U deletes the line just typed, and control-w deletes the word just
+typed.  To delete a single character, use the delete or rubout key.
+.S 2
+COMMANDS
+.S 2
+ If you wish to type a comment, type a semicolon at the beginning of the line.
+ When typing commands, typing an (ESCAPE) after part of the command will
+complete the command for you.  A bell will ring if there are not enough
+characters to make the command unique.
+ The following are valid commands.  (A '?' at the '@' prompt will give the
+following list.  A '?' after a given command (i.e. systat ?) will give you
+the next alternative in the command.)
+.S
+.LT
+ACCESS      ADVISE        APPEND       ARCHIVE      ASSIGN
+ATTACH      BACKSPACE     BREAK        BUILD        CANCEL
+CLOSE       COMPILE       CONNECT      CONTINUE     COPY
+CREATE      CREF          CSAVE        DAYTIME      DDT
+DEASSIGN    DEBUG         DEFINE       DELETE       DEPOSIT
+DETACH      DIRECTORY     DISABLE      DISCARD      DISMOUNT
+EDIT        ENABLE        END-ACCESS   EOF          EXAMINE
+EXECUTE     EXPUNGE       FDIRECTORY   FORK         GET
+HELP        INFORMATION   LOAD         LOGIN        LOGOUT
+MERGE       MODIFY        MOUNT        PLOT         POP
+PRINT       PUNCH         PUSH         R            RECEIVE
+REENTER     REFUSE        REMARK       RENAME       RESET
+RETRIEVE    REWIND        RUN          SAVE         SET
+SKIP        START         SUBMIT       SYSTAT       TAKE
+TALK        TDIRECTORY    TERMINAL     TRANSLATE    TYPE
+UNATTACH    UNDELETE      UNLOAD       VDIRECTORY
+.EL
+.NST
+.PG
+.FG 1
+.S 4
+BRINGING UP SYSTEM 54B
+.S 2
+ If system 54B is down, or goes down when doing a backup, wait a few minutes
+and try again.  It should automatically restart.
+.NST
+.PG
+.FG 1
+.P 4,1
+.S 4
+CONTACTS
+.S 2
+ Contact Stan Derry when having trouble with the system or if there is a
+problem or question about the backup procedures.  His work extension is
+6163, and his home phone is (408)227-1864.
+.NST
+.PG
+.FG 1
+.ST ####OFFICE-4 INCREMENTAL BACKUP
+.S 6
+.C 80
+OFFICE-4 BACKUP PROCEDURES
+.S 3
+INCREMENTAL BACKUP
+.LM 15
+.P -5,0
+.S 2
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate incremental tape from the tape cabinet.  The
+tape selected will either be a new tape (i.e., one that is not already a part
+of the backup library) or the oldest incremental tape in the backup library.
+.S
+ III.#Place a write ring (generally black or yellow) in the back of the tape
+reel.
+.S
+ IV.##Mount and thread the tape on the tape drive.
+.S
+ V.###Push the LOAD button, wait until the tape reel stops moving, then push
+the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step V.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before 'TYPE MAG TAPE
+UNIT NUMBER:' appears on the console.
+.S
+.LM 10
+VI.##The terminal session now begins.
+.S
+.LM 24
+ **NOTE 4**########################################
+If the console does not respond to anything typed at the keyboard, do the
+following:
+.S
+.LM 28
+.LS
+.LE
+Make sure the console is plugged into the system.  The connection should be
+inserted into the right hand plug as you look down the back of the console
+from above.
+.LE
+Check to see if the system is down.
+.LE
+Turn the console off and then turn it back on (the switch is located at the
+back of the console).
+.ELS
+.LM 24
+.P -4,0
+ **NOTE 5**########################################
+If a '@' or '!' prompt is the last entry on the console when it is time to do
+the backup, type
+.S
+KK (C.R.)
+.S
+and proceed with the backup procedure.
+ **NOTE 6**#######################################
+.LM 24
+If there is some problem during the execution of DUMPER, type "(CONTROL)-C"
+several times and a '!' prompt should appear.  If a '@' prompt appears instead,
+type
+.S
+ENA (C.R.)
+.S
+and the '!' prompt will appear.  There is no need to save the tape(s) that has
+already been written on because a change bit associated with a file is not
+reset until all of the changed files have been dumped.
+.S
+.LM 10
+^&(CONTROL)-C\&###################################
+WELCOME#TO#AUGMENT#SERVICE#FROM#OFFICE-4#########
+@^&OPER_ _(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 7**########################################
+The password is not echoed.
+.S
+.LM 10
+.P 0,0
+ (ACCOUNT)#^&(C.R.)\&
+ JOB...
+ PREVIOUS LOGIN:...
+.PG
+ @
+.LT
+@; THIS COMMAND FILE WILL RUN AT LOGIN TO SET TERMINAL TYPE CORRECTLY.
+.EL
+ @TE LA30
+ @ENA
+ !REF A
+.LM 24
+.P -4,0
+ **NOTE 8**########################################
+If the message 'YOU HAVE NEW MAIL' appears amongst the above message, set
+freeze as follows:
+.S
+FREEZE (ESCAPE)(ESCAPE)
+.S
+(This enables the use of control-S and control-q for stopping and continuing
+info listed on the terminal.)  Then type commands as follows:
+.S
+MSG (C.R.)####################################
+T (message number)(C.R.)
+.S
+Use control-S to freeze output, and control-q to continue output as needed.
+.S
+.LM 10
+.P 0,0
+ !^&DUMPER#(C.R.)\&
+.S
+ MINI-DUMPER...
+.S
+ DUMP,#LOAD,#CHECK,#OR#SINGLE?#&D
+ DUMP#WHOLE#DISK?#&Y
+ INCREMENTAL#DUMP?#&Y
+ TYPE#IDENTIFICATION#INFO:#^&INCRE-DUMP.DD-MMM-YY#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 9**########################################
+DD-MMM-YY refers to DAY-MONTH-YEAR.  The MONTH utilizes the first three
+letters of the name of the month.
+.S
+e.g., INCRE-DUMP.02-FEB-81
+.S
+.LM 10
+.P 0,0
+ TYPE#MAG#TAPE#UNIT#NUMBER:#&0
+.S 2
+ MINI-DUMP TAPE #1...
+ ##.
+ ##.
+ ##.
+.S
+.LM 24
+.P -4,0
+ **NOTE 10**#######################################
+At this point all of the user names and the number of pages written for each
+user name are listed.
+.PG
+.LM 32
+ #####.
+ #####.
+ #####.
+ ###FPOOLE##########NO FILES
+ ###MISC10###########1 PAGES
+ ###LIB10###########NO FILES
+ ###PROGSUP#########NO FILES
+.LM 24
+ **NOTE 11**#######################################
+If the end of the tape has been reached before the backup has been completed,
+the following message will appear:
+.S
+MOUNT NEXT TAPE###############################
+TYPE MAG TAPE UNIT NUMBER:
+.S
+The following steps should be taken:
+.S
+.LS
+.LE
+Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload).
+.LE
+Remove the tape from the tape drive, remove the write ring from the reel and
+label the tape reel appropriately.
+.LE
+Repeat steps II-IV.
+.LE
+Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.S
+.LM 32
+ **NOTE 12**###############################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 13**###############################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step 4.
+.S
+.LM 24
+.LE
+Type "0" in response to 'TYPE MAG TAPE UNIT NUMBER:' and the statement
+'MINI-DUMP TAPE #...' will appear.  The tape number will correspond to the
+tape's position in the backup set.
+.ELS
+.PG
+.LM 10
+.P 0,0
+.S
+ ###.
+ ###.
+ ###.
+ DUMPER ONE....
+ APPROPRIATE NAME.
+.S
+ DONE.
+ !^&REN#(ESCAPE)#<UTI#(ESCAPE)#MINI-DUMP#(ESCAPE)\&...(TO#BE)
+ **^&<UTILITY>INCRE-DUMP.DD-MMM-YY#(C.R.)\&#[NEW#FILE]#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 14**#######################################
+The information in 'INCRE-DUMP.DD-MMM-YY' is the same as that typed in
+response to the statement 'TYPE IDENTIFICATION INFO:'.
+ **NOTE 15**#######################################
+It is alright if this line overflows (indicated by **).
+ **NOTE 16**#######################################
+It is important that the statement '[NEW FILE]' appears because it means that
+the renamed directory file does not already exist.
+ **NOTE 17**#######################################
+The directory file is created as the files are being dumped; therefore, the
+creation of the directory file is not a separate process as with the backup
+for system 930.
+.S
+.LM 16
+.P -6,0
+ !^&KK#(C.R.)\&
+ #BYE.
+.S 2
+ VII.##Push the ON LINE button and then the REWIND button (allow the tape to
+unload completely).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the OFFICE-4 SYSTEM LOG
+(located next to the system console) and the OFFICE-4 BACKUP LOG.
+.NST
+.PG
+.FG 1
+.ST ####OFFICE-4 SAVASS BACKUP
+.S 4
+.LM 10
+.P 0,0
+ SAVASS BACKUP
+.S 2
+.P 4,0
+ Execute the command file SAVASS.OF4 before each allfiles backup.  Important
+information about the directory of OFFICE-4 is dumped during the execution of
+this command file.
+.S
+.LM 15
+.P -5,0
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate savass tape from the tape cabinet. The tape
+selected will either be a new tape (i.e., one that is not already a part of
+the backup library) or the oldest savass tape in the backup library.  There
+should be a savass tape associated with each set of allfiles tapes.
+.S
+ III.#Place a write ring (generally black or yellow) in the back of the tape
+reel.
+.S
+ IV.##Mount and thread the tape on the tape drive.
+.S
+ V.###Push the LOAD button, wait until the tape reel stops moving, then push
+the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step V.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before 'TYPE MAG TAPE
+UNIT NUMBER:' appears on the console.
+.PG
+.LM 10
+VI.##The terminal session now begins.
+.S
+.LM 24
+ **NOTE 4**########################################
+If the console does not respond to anything typed at the keyboard, do the
+following:
+.S
+.LS
+.LE
+Make sure the console is plugged into the system.  The connection should be
+inserted into the right hand plug as you look down the back of the console
+from above.
+.LE
+Check to see if the system is down.
+.LE
+Turn the console off and then turn it back on (the switch is located at the
+back of the console).
+.ELS
+ **NOTE 5**########################################
+If a '@' or '!' prompt is the last entry on the console when it is time to do
+the backup, type
+.S
+KK (C.R.)
+.S
+and proceed with the backup procedure.
+.S 2
+.LM 10
+.P 0,0
+ ^&(CONTROL)-C\&
+ WELCOME#TO#AUGMENT#SERVICE#FROM#OFFICE-4
+ @^&OPER_ _(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 6**########################################
+The password is not echoed.
+.S
+.LM 10
+.P 0,0
+ (ACCOUNT)#^&(C.R.)\&
+ #JOB...
+ #PREVIOUS LOGIN:...
+.S
+ @
+ @; THIS COMMAND FILE WILL RUN AT LOGIN TO SET TERMINAL TYPE CORRECTLY.
+ @TE LA30
+ @ENA
+ !REF A
+ !^&ASSIGN#MTA0:<C.R.>\&
+ !^&RUNFIL#(C.R.)\&
+.S
+ COMMANDS#FROM#FILE:#^&SAVASS.OF4#(C.R.)\&
+.S
+ WELCOME TO AUGMENT SERVICE FROM OFFICE-4
+ ##.
+ ##.
+ ##.
+ FINISHED.
+ !^&KK#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 7**########################################
+'KK (C.R.)' need not be typed because the allfiles backup can be initiated at
+this point.  The only commands and responses in the allfiles backup terminal
+session that need to be eliminated are those that follow:
+.S
+.LS
+.LE
+(CONTROL)-C
+.LE
+OPER (PASSWORD) (C.R.)
+.LE
+(C.R.)
+.ELS
+The first command of the allfiles backup terminal session would be
+.S
+DUMPER (C.R.)
+.S
+.LM 16
+.P -6,0
+ BYE.
+.S 2
+ VII.##Push the ON LINE button and then the REWIND button (allow the tape to
+unload completely).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the OFFICE-4 SYSTEM LOG (located
+next to the system console) and the OFFICE-4 BACKUP LOG.
+.NST
+.PG
+.FG 1
+.ST ####OFFICE-4 ALLFILES BACKUP
+.S 4
+.LM 10
+ALLFILES BACKUP
+.S 2
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+A SAVASS should be done before the allfiles backup.
+.S
+.LM 15
+.P -5,0
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate set of allfiles tapes from the tape cabinet.  The
+tapes selected will either be new tapes (i.e., ones that are not already a
+part of the backup library) or the oldest set of allfiles tapes in the backup
+library.
+.S
+ III.#Place a write ring (generally black or yellow) in the back of the first
+tape reel of the allfiles set.
+.S
+ IV.##Mount and thread the tape on the tape drive.
+ V.###Push the LOAD button, wait until the tape reel stops moving, then push
+the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 2**########################################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 3**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step V.
+ **NOTE 4**########################################
+If the operator has already logged on the system and has begun the backup
+process, all of the above steps (I-V) must be completed before 'TYPE MAG
+TAPE UNIT NUMBER:' appears on the console.
+.S
+.LM 10
+VI.##The terminal session now begins.
+.S
+.LM 24
+ **NOTE 5**########################################
+If the console does not respond to anything typed at the keyboard, do the
+following:
+.S
+.LS
+.LE
+Make sure the console is plugged into the system.  The connection should be
+inserted into the right hand plug as you look down the back of the console
+from above.
+.LE
+Check to see if the system is down.
+.LE
+Turn the console off and then turn it back on (the switch is located at the
+back of the console).
+.ELS
+ **NOTE 6**########################################
+If a '@' or '!' prompt is the last entry on the console when it is time to do
+the backup, type
+.S
+KK (C.R.)
+.S
+and proceed with the backup procedure.
+ **NOTE 7**########################################
+If there is some problem during the execution of DUMPER, type "(CONTROL)-C"
+several times and a '!' prompt should appear.  If a '@' prompt appears
+instead, type
+.S
+ENA (C.R.)
+.S
+and the '!' prompt will appear.
+.S 2
+.LM 10
+.P 0,0
+ ^&(CONTROL)-C\&
+ WELCOME#TO#AUGMENT#SERVICE#FROM#OFFICE-4
+ @^&OPER_ _(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 8**########################################
+The password is not echoed.
+.S
+.LM 10
+.P 0,0
+ (ACCOUNT)#^&(C.R.)\&
+ #JOB...
+ #PREVIOUS LOGIN:...
+.S
+ @
+ @; THIS COMMAND FILE WILL RUN AT LOGIN TO SET TERMINAL TYPE CORRECTLY.
+ @TE LA30
+ @ENA
+ !REF A
+ !^&DUMPER#(C.R.)\&
+.S
+ MINI-DUMP...
+.S
+ DUMP,#LOAD,#CHECK,#OR#SINGLE?#&D
+ DUMP#WHOLE#DISK?#&Y
+ INCREMENTAL#DUMP?#&N
+ *****   OPERATORS:...
+ ##.
+ ##.
+ ##.
+ DUMP#HIGHEST#VERSIONS#ONLY?#&N
+ TYPE#IDENTIFICATION#INFO:#^&FULL-DUMP.DD-MMM-YY#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 9**########################################
+DD-MMM-YY refers to DAY-MONTH-YEAR.  The MONTH utilizes the first three
+letters of the name of the month.
+.S
+e.g., FULL-DUMP.07-FEB-81
+.S 2
+.LM 10
+.P 0,0
+ TYPE#MAG#TAPE#UNIT#NUMBER:#&0
+.S
+ MINI-DUMP TAPE #1
+ ##.
+ ##.
+ ##.
+.LM 24
+.P -4,0
+ **NOTE 10**#######################################
+At this point all of the user names and the number of pages written for each
+user name are listed.
+.S
+.LM 32
+.P 0,0
+ ##.
+ ##.
+ ##.
+ FPOOLE##############100 PAGES
+ MISC10###############47 PAGES
+ LIB10###############113 PAGES
+ PROGSUP##############83 PAGES
+.LM 24
+.P -4,0
+ **NOTE 11**#######################################
+If the tape runs off the end of the reel, thread it back on the reel, checking
+to be sure it is wound in the correct direction, then push the rewind button.
+Check the tape by typing
+.S
+DUMPER######################################
+L,D,C,S
+.S
+When the first username is listed, control-C out of the program, and restart
+it from the first username listed on the bad tape, as follows:
+.PG
+.LM 32
+.P 0,0
+ !^&DUMPER (C.R.)\&
+ DUMP, LOAD, CHECK, OR SINGLE? ^&D (C.R.)\&
+ DUMP WHOLE DISK? ^&N\&
+ SPECIFIC USERS? ^&N\&
+ START WITH USER: ^&(username)\&
+ STARTING TAPE NO.: ^&(tape #)\&
+ DUMP HIGHEST VERSIONS ONLY? ^&N\&
+ TYPE IDENTIFICATION INFO: ^&(same as before)\&
+.LM 24
+.P -4,0
+ **NOTE 12**#######################################
+When the end of a tape has been reached before the backup has been completed,
+the following message will appear:
+.S
+MOUNT NEXT TAPE##############################
+TYPE MAG TAPE UNIT NUMBER:
+.S
+The following steps should be taken:
+.S
+.LS
+.LE
+Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload).
+.LE
+Remove the tape from the tape drive, remove the write ring from the reel and
+label the tape reel appropriately.
+.LE
+Place a write ring (generally black or yellow) in the back of the next tape
+reel of the allfiles set.
+.LE
+Mount and thread the tape on the tape drive.
+.LE
+Push the LOAD button, wait until the tape reel stops moving and then push
+the ON LINE button.
+.LM 32
+.S
+ **NOTE 13**###############################
+The READ, SELECT and WRITE ENABLE lights should be lit.
+ **NOTE 14**###############################
+The small light near the read/write head should be shining on the load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again. Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step 5.
+.LM 24
+.PG
+.LE
+Type "0" in response to 'TYPE MAG TAPE UNIT NUMBER:' and the statement 'MINI-
+DUMP TAPE #...' will appear.  The tape number will correspond to the tape's
+position in the backup set.
+.ELS
+.S
+.LM 10
+.P 0,0
+ ##.
+ ##.
+ ##.
+ DUMPER DONE....
+ APPROPRIATE NAME.
+.S
+ DONE.
+ !^&REN#(ESCAPE)#<UTI#(ESCAPE)#MINI-DUMP#(ESCAPE)\&...(TO#BE)
+ **^&<UTILITY>FULL-DUMP.DD-MMM-YY#(C.R.)\&#[NEW#FILE]#^&(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 15**#######################################
+The information in 'FULL-DUMP.DD-MMM-YY' is the same as that typed in response
+to the statement 'TYPE IDENTIFICATION INFO:'.
+ **NOTE 16**#######################################
+It is alright if this line overflows (indicated by **).
+ **NOTE 17**#######################################
+It is important that the statement '[NEW FILE]' appears because it means that
+the renamed directory file does not already exist.
+ **NOTE 18**#######################################
+The directory file is created as the files are being dumped; therefore, the
+creation of the directory file is not a separate process as with the backup
+for system 930.
+ **NOTE 19**#######################################
+If you make a mistake while renaming, type a control-C and begin again.
+.S
+.LM 16
+.P -6,0
+ !^&KK#(C.R.)\&
+ #BYE.
+.S 2
+ VII.##Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload).
+.S
+ VIII.#Remove the tape from the tape drive, remove the write ring from the
+reel, label the tape reel appropriately and return it to the cabinet.
+.S
+ IX.###Enter the appropriate information into the OFFICE-4 SYSTEM LOG (located
+next to the system console) and the OFFICE-4 BACKUP LOG.
+.NST
+.PG
+.FG 1
+.LM 10
+.P 0,0
+.S 4
+ BACKUP CHECK
+.P 4,0
+.S 2
+ The following check can be made to make sure that the backup went well:
+.S
+.LS
+Check the UTILITY directory to make sure that the directory file has been
+created and properly renamed#in#the#statement#########
+'REN...<UTILITY>INCRE-DUMP.DD-MMM-YY'#or
+'REN...<UTILITY>FULL-DUMP.DD-MMM-YY'############
+(<UTILITY>INCRE-DUMP.DD-MMM-YY#or <UTILITY>FULL-DUMP.DD-MMM-YY
+is the directory file name).
+.S
+i.e., At the '!' prompt the following can be typed in order to get the UTILITY
+directory:
+.S
+DIR <UTI (ESCAPE KEY) (C.R.)
+.ELS
+.NST
+.PG
+.LM 15
+.P -5,0
+.FG 1
+.S 4
+RESTORATION OF A SINGLE FILE
+.ST ####OFFICE-4 RESTORATION OF A SINGLE FILE
+.S 2
+ I.###Check the density on the tape drive to make sure that it is set at 1600
+BPI.
+.S
+ II.##Select the appropriate allfiles or incremental tape (this is the tape on
+which the desired file can be found) from the tape cabinet.
+.S
+ III.#Mount and thread the tape on the tape drive.
+.S
+ IV.##Push the LOAD button, wait until the tape reel stops moving, then push
+the ON LINE button.
+.S
+.LM 24
+.P -4,0
+ **NOTE 1**########################################
+The READ and SELECT lights should be lit.
+ **NOTE 2**########################################
+The small light near the read/write head should be shining on a silver metal
+strip on the tape marking the beginning of the usable portion of the tape.
+The tape is now said to be at load point.
+.S
+If the tape drive is unable to detect the load point properly, gently tap the
+photocell (this generally clears the problem up) and try loading the tape
+again.  Push the ON LINE button and then the REWIND button (allow the tape to
+completely unload), thread the tape on the tape drive and repeat step IV.
+ **NOTE 3**########################################
+If the operator has already logged on the system and has begun the
+restoration process, all of the above steps (I-IV) must be completed before
+'TYPE MAG TAPE UNIT NUMBER:' appears on the console.
+.S
+.LM 10
+V.###The terminal session now begins.
+.S
+.LM 24
+ **NOTE 4**########################################
+If the console does not respond to anything typed at the keyboard, do the
+following:
+.PG
+.LS
+.LE
+Make sure the console is plugged into the system.  The connection should be
+inserted into the right hand plug as you look down the back of the console
+from above.
+.LE
+Check to see if the system is down.
+.LE
+Turn the console off and then turn it back on (the switch is located at the
+back of the console).
+.ELS
+.LM 24
+ **NOTE 5**########################################
+If a '@' or '!' prompt is the last entry on the console when it is time to do
+the restoration, type
+.S
+KK (C.R.)
+.S
+and proceed with the restoration procedure.
+.S 2
+.LM 10
+.P 0,0
+ ^&(CONTROL)-C\&
+ WELCOME#TO#AUGMENT#SERVICE#FROM#OFFICE-4
+ @^&OPER_ _(PASSWORD)#(C.R.)\&
+.S
+.LM 24
+.P -4,0
+ **NOTE 6**########################################
+The password is not echoed.
+.S
+.LM 10
+.P 0,0
+ (ACCOUNT)#^&(C.R.)\&
+ #JOB...
+ #PREVIOUS LOGIN:...
+.S
+ @
+ @; THIS COMMAND FILE WILL RUN AT LOGIN TO SET TERMINAL TYPE CORRECTLY.
+ @TE LA30
+ @ENA
+ !REF A
+ !^&DUMPER#(C.R.)\&
+.S
+ MINI-DUMPER...
+.S
+ DUMP,#LOAD,#CHECK,#OR#SINGLE?#&S
+ TYPE#MAG#TAPE#UNIT#NUMBER:#&0
+.S
+.RM 80
+ COPY#^&<user_ _name>file_ _name.extension;version#(C.R.)\&
+ #TO#^&<user_ _name>file_ _name.extension;version#(C.R.)\&#[...]#^&(C.R.)\&
+.RM 70
+.S
+ COPY#^&(CONTROL)-C\&
+ !^&KK#(C.R.)\&
+ #BYE.
+.PG
+.LM 16
+.P -6,0
+ VI.###Push the ON LINE button, then the REWIND button.  Wait until the tape
+stops moving, then push the REWIND button again (allow the tape to unload
+completely).
+.S
+ VII.##Remove the tape from the tape drive and return it to the cabinet.
+.NST
+.PG
+.FG 1
+.LM 10
+.P 0,0
+.ST ####OFFICE-4 CONTROL CHARACTERS AND COMMANDS
+.S 4
+ CONTROL CHARACTERS AND COMMANDS
+.S 2
+ CONTROL CHARACTERS
+.S 2
+.LS
+.LE
+Control-A deletes the previous character.
+.LE
+Control-C is equivalent to escape.
+.LE
+Control-T will display the load on the system and will not interrupt the
+backup process if typed during the execution of DUMPER.
+.S
+e.g., HALT AT 450054  LOAD 9.68  USED 0:00:10.8 IN 0:05:43
+.ELS
+.S 2
+ COMMANDS
+.S 2
+.LS
+.LE
+CD [user name] (C.R.)
+.S
+This command accesses the directory of the user named.
+.S
+.LE
+DIR [<user name>] (C.R.)
+.S
+This command lists all of the files in the user's directory.
+.S
+.LE
+VD [<user name>] (C.R.)
+.S
+This command lists all of the files in the user's directory along with some
+descriptive information (i.e., number of pages, date written, date last read,
+author, etc.).  This is referred to as the verbose directory.
+.S
+.LE
+SY (C.R.)
+.S
+This command displays information about the status of the system.
+.S
+.LE
+COPY#[<user#name>]file#name#(ESCAPE)... <ARCPRINTER>file#name (C.R.)#(C.R.)
+.S
+This command will copy the first file named to the user name ARCPRINTER and a
+hard copy of the file will be spooled off.
+.PG
+.LE
+DEL file list (C.R.)
+.S
+This command creates a delete list containing the file(s) listed.  It is best
+to specify the file name, extension and version of a file to be deleted and if
+more than one file is listed, the files should be separated by a space.  It is
+alright if the file list automatically overflows to following lines.
+.S
+.LE
+UNDEL file list (C.R.)
+.S
+This command removes the file(s) listed from the delete list.  It is best to
+specify the file name, extension and version of a file to be removed and if
+more than one file is listed, the files should be separated by a space.  It is
+alright if the file list automatically overflows to following lines.
+.S
+.LE
+EXP (C.R.)
+.S
+This command expunges (deletes) the file(s) on the delete list.  If a delete
+list is created but it is not expunged before logging out, the file(s) on the
+list will automatically be expunged upon logging out.
+.S
+.LE
+@DIR,#(C.R.)#################################
+@@DE#(C.R.)#########################################
+@@#(C.R.)
+.S
+This series of commands lists the file(s) on the delete list.
+.S
+.LE
+FREEZE (ESCAPE) (ESCAPE)
+.S
+This command enables the use of control-S and control-Q for stopping and
+continuing info listed on the terminal.
+.S
+.LE
+ENA (C.R.)
+.S
+This command moves the user into the enabled mode ('!' prompt) where DUMPER
+can be run.
+.S
+.LM 24
+.P -4,0
+ **NOTE 4**########################################
+This mode gives the user a lot of power...BE CAREFUL!
+.LM 14
+.P 0,0
+.S
+.LE
+DIS (C.R.)
+.S
+This command moves the user from the enabled mode ('!' prompt) to the
+disenabled mode ('@' prompt).  Use the disenabled mode whenever possible.
+.PG
+.LE
+MSG (C.R.)
+.S
+This command enters the user into the message system.
+.S
+.LM 24
+.P -4,0
+ **NOTE 5**########################################
+'<-' is the prompt while in the message system.
+.LM 18
+.P 0,0
+.S
+.LS
+.LE
+S (C.R.)
+.S
+ This command enables the user to create and send a message.
+.S
+ e.g.,#<-&SNDMSG##[CONFIRM]#^&(C.R.)\&#YES
+.LM 24
+ ####.
+ ####.
+ ####.
+ ####.
+ TO:^&...(C.R.)\&
+.S
+ CC:^&...(C.R.)\&
+.S
+ SUBJECT:^&...(C.R.)\&
+.S
+ MESSAGE:
+ ###.
+ ###.
+ ###.
+ ^&(CONTROL)-Z\&
+.S
+.LM 32
+.P -4,0
+ **NOTE 6**################################
+This gets the message ready to send.
+.S
+.LM 24
+.P 0,0
+ Q,S,?,CARRIAGE-RETURN:#^&(C.R.)\&
+.S
+.LM 32
+.P -4,0
+ **NOTE 7**################################
+A carriage return sends the message.
+.LM 24
+.P 0,0
+.S
+ <-&QUIT##[CONFIRM]#^&(C.R.)\&#YES
+ ##GOOD-BYE.
+ @
+.LM 22
+.P 0,0
+.PG
+.LE
+T (message number) (C.R.)
+.S
+This command enables the user to read the message corresponding to the
+number listed.
+.S
+e.g.,#&TYPE#&2#^&(C.R.)\&
+.LM 22
+ (MSG  # 2,...
+ DATE:...
+ FROM:...
+ SUBJECT:...
+ TO:...
+ CC:...
+ ##.
+ ##.
+ ##.
+ <-&QUIT##[CONFIRM]#^&(C.R.)\&#YES
+ ##GOOD-BYE.
+ @
+.LM 22
+.S
+.LE
+N (C.R.)
+.S
+This command allows the user to read the next message.
+.S
+.LE
+B (C.R.)
+.S
+This command allows the user to read the previous message.
+.S
+.LE
+Q (C.R.)
+.S
+This command exits the user from the message system.
+.S
+e.g.,#<-&QUIT##[CONFIRM]#^&(C.R.)\&#YES
+.LM 24
+ ##GOOD-BYE.
+ @
+.ELS
+.ELS
+.NST
+.PG
+.FG 1
+.LM 10
+.S 5
+BRINGING UP OFFICE-4
+.P 4,0
+.S 2
+ If OFFICE-4 should crash, contact one of the individuals listed in the
+section CONTACTS.
+.NST
+.PG
+.FG 1
+.S 5
+CONTACTS
+.S 2
+ Contact one of the individuals mentioned below when having trouble with the
+system or if there is a problem or question about the backup procedures.
+.S
+.LT
+			HOME PHONE       WORK EXT.
+
+Phil French		(415)361-1545    6893
+(sys. programmer)
+Robert Lieberman	(415)856-9495    6654
+(department mgr.)
+Israel Torres   	738-1182	 6894
+(tech. analyst)
+Ellen Carter				 6895
+(sys. programmer)
+Steve Kudlak				 6102
+(2PM-Midnight)
+
+.EL
+ If none of the above are available, contact anyone from the Office Automation
+System Group.
+.PG
+H9eŽ
