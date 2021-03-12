@@ -1,0 +1,51 @@
+To prepare a new monitor transmittal M:  (see (mpl)monxmt.mem for
+standard procedure)
+
+Be sure there is enough disk space (you will need at least 5000 pages)
+before you begin.
+
+Usually all files in (osb) are deleted (del *.*), after writing to tape
+if a backup is needed.  Since (osb) contains K sources, and L sources are
+in (osp), I would probably leave the K sources in (osb) and write the L
+sources to tape.
+
+Delete *.mac, *.rel, *.sav from osp except for cnfnxx.mac files.
+
+Copy all monitor source modules from m33 to osp (copy @monedp.cmd from m33).
+
+Edit access.msg on m33 to protect confxx.mac and monxx.cmd until
+after transmittal.
+
+Rename moned.xmt to monedl.xmt.
+
+Run (m33)moned from osp.  (This will take quite a while.)  MONED will
+edit all the cnfnxx.mac files, load and save all the monitors.  It also
+will checksum all the monitor files, and write a log file and a xmt
+file.  Read moned.log file and check for and correct any error messages
+(marked by either ?  or error).  If you have had to correct errors, run
+moned from osp again.
+
+Fill out transmittal form, attach hard copy of moned.xmt, add by hand
+the checksum of moned.xmt.  Summary of changes in non-technical language
+should be also included with transmittal.  If any special instructions
+need to be followed by operations before bring up the new monitor, or
+before dropping back to the previous monitor prepare a memo with such
+instructions.  This includes specification of any new system programs
+that need to be put up simultaneously with (or ahead of) the new
+version of the monitor.  Since L was never transmitted, check L
+transmittal to be sure any necessary instructions are given.
+
+Give transmittal to your manager for signature and then to Software
+Distribution.
+
+If changes have been made to this version of the monitor that necessitate
+a memo being sent to area tech managers, operations, or other parties, make
+sure memo is written and distributed.
+
+Once you receive mail from Software Distribution saying the monitor is
+archived, delete part of the access message on m33 freezing the confxx.mac and
+monxx.cmd files.
+
+Ordinarily fiche are made of the monitor sources.  A copy of the fiche is 
+sent to SLIGOS.  To produce fiche files see (mpl)mfiche.mem.  It is wise
+to wait until after the monitors have been built and transmitted.
