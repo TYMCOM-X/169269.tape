@@ -1,0 +1,177 @@
+
+
+
+
+                            **************************
+                            * THE SYSTECH NEWSLETTER *
+                            **************************
+
+          An Information Exchange for Systems Technology Division Members
+
+       Number 1                                                December 1981
+       ---------------------------------------------------------------------
+
+
+                               A NEWSLETTER IS BORN!
+
+       The first item of news must of course be this newsletter!  It has
+       been created as a means of getting information to and from you, the
+       members of the Systems Technology Division.  We hope to distribute a
+       new one every two or three months.  You'll receive a printed copy of
+       each newsletter unless you request otherwise.  You can also look at
+       the most recent one online in any of the following ways:
+
+           TYMCOM-370 inhouse users can give the command "DOC SYSTECH".
+
+           TYMCOM-X/XX users can look at (SYSNEWS)SYSTEC.INF.
+
+           AUGMENT users can look at the source in <OFFICE-6, SYSTECH,
+           SYSTECH-NEWS,>.
+
+       The fact that this newsletter is not meant for public consumption has
+       inspired an extension to the DOC facility whereby customers and
+       inhouse users have access to different files.  A customer giving the
+       command "DOC SYSTECH" will not find any information under that name.
+
+       Please let us know what you would like to see included in the
+       newsletter, specifically and in general, and give us feedback on what
+       we're doing.  The person to contact is Caroline Rose, via interoffice
+       mail (VG2-B02), telephone (x6511), AUGMENT system mail (ROSE@OF6), or
+       TYMCOM-X mail (CD:33 or CD:930).
+
+
+                              PROCEDURE ANNOUNCEMENTS
+
+       In addition to Software Announcements, the Systems Technology Divi-
+       sion will soon be distributing Procedure Announcements.  The first
+       one will announce the new Project Request Procedures, for requesting,
+       reviewing, approving, and communicating the status of all project re-
+       quests directed to the Systems Technology Division.  A copy of the
+       related documentation and forms will be attached to the announcement.
+
+       The list of persons within the Systems Technology Division who will
+       receive Procedure Announcements is the same as for Software Announce-
+       ments; in the future it will include all managers.
+
+
+                       ORGANIZATIONAL CHANGES:  A NEW CHART
+
+       Do you learn about organizational changes from rumor, overheard
+       conversations, deletions from the Tymshare telephone directory, and
+       the like?  Have you given up all hope of ever locating an up-to-date
+       organization chart?  Well, here's some good news:  The organization
+       chart for the Systems Technology Division is being updated and dis-
+       tributed to all managers within the Division.  Anyone else in the Di-
+       vision who wants one will be able to get a copy from Ellen Imhof.
+       AUGMENT users:  We are also attempting to maintain an up-to-date
+       chart in <OFFICE-6, SYSTECH, ORG-CHART,>.
+
+       One of the changes you will notice is that there is now a Documenta-
+       tion Support Unit in the Systems Services Section.  That's where this
+       newsletter is coming from, and that's why so much of what follows
+       here is on the subject of documentation.  As the rest of you let us
+       know what you would like to have included in the newsletter, its
+       scope will expand.
+
+
+                              DOCUMENTATION PROJECTS
+
+       The Documentation Support Unit is working on a software announcement
+       and online documentation file for the UNDELETE command on the TYMCOM-
+       X.  The following announcements have been started but are on hold
+       until further notice:  on the TYMCOM-370, CMS Tape Label Processing
+       Support, TAPEUTIL enhancements, TAPE enhancements, and CMS Release 6;
+       on the TYMCOM-X, TELECOPY enhancements.
+
+       The Micronet/11 Internal Specification is nearly completed, and manu-
+       als for VS3780 and SLIDES are in progress.
+
+       Be sure to call on the Documentation Support Unit whenever there is a
+       Systems Technology Division product that needs announcing or docu-
+       menting, or when you want someone to review or edit something you
+       have written yourself.
+
+
+                           TYMCOM-X ONLINE DOCUMENTATION
+
+       A fair amount of effort has been spent lately on straightening out
+       the TYMCOM-X and TYMCOM-XX online documentation.  The main documenta-
+       tion directories are currently *6NEWS and SYSNEWS.  Obsolete informa-
+       tion is gradually being cleaned out of them.  Soon the contents of
+       these directories will be made the same on all TYMCOM-X's and XX's.
+
+       Few people are aware of which files belong in which of these direc-
+       tories, and how the files should be named.  (Some are not aware of
+       the directories at all!)  The current rules may be found in
+       (SYSNEWS)DOCFIL.DOC.  The key points are:
+
+           Files in *6NEWS should contain documentation of interest to cus-
+           tomers.  Files containing inhouse-only documentation belong in
+           the SYSNEWS directory.
+
+           A documentation file should have the program name as its name and
+           usually the extension DOC (for complete documentation) or INF
+           (for news about updates).
+
+       The DOCFIL.DOC file also tells what documentation the programmer is
+       expected to transmit along with a program, and contains other useful
+       information on the subject of documentation files.  The TYMCOM-X de-
+       velopment staff is encouraged to read this file and direct any com-
+       ments or questions to Caroline Rose.
+
+       If you currently have any source files for the documentation that is
+       in either *6NEWS or SYSNEWS, please let Caroline know.  She will ar-
+       range to have the files archived if they have not been archived al-
+       ready, and you can then delete the files.  Also tell her if you know
+       of a documentation file outside of *6NEWS and SYSNEWS that is for a
+       program in SYS.
+
+       We plan to replace the *6NEWS and SYSNEWS directories the future with
+       the SYSDOC and INTDOC directories, respectively.  INTDOC will contain
+       inhouse-only documentation and will be located only on machines where
+       inhouse users are validated.  There will also be directories named
+       FTSYSDOC and UPLDOC, to contain documentation for customers about
+       programs in FTSYS and UPL.  More on this later.  Feel free to
+       comment.
+
+
+                          TYMCOM-370 ONLINE DOCUMENTATION
+
+       TYMCOM-370 programmers, when you transmit documentation to be read
+       with the DOC facility, please transmit the SCRIPT file along with the
+       MEMO file, so that someone else besides you will be able to edit the
+       file.  The SCRIPT file you transmit and any future versions of it
+       will be archived.  When you want to make changes to the most recent
+       SCRIPT file for a particular subject, you should ask that it be re-
+       trieved for you from the archives.  This will ensure that if a writer
+       has edited the file, you will get the edited rather than the origi-
+       nally transmitted version.
+
+       Also, remember to specify if the documentation being transmitted is
+       meant to be read by inhouse people only, or if the text processing
+       program used is SCRIPT/VS rather than UWSCRIPT.
+
+
+                              NEWS FOR AUGMENT USERS
+
+       AUGMENT users who try to get printed copy at a Tymshare 444 terminal
+       may have problems if the only documentation they have is what they
+       get through the AUGMENT LOCATOR (Jump to Locator command) or the
+       printed version of it available through the Office Automation Divi-
+       sion.  If you are having problems, try disabling the ENQ/ACK
+       handshake by setting strap e.  Also note that if you type NETC or
+       NETV, you must type <CTRL-R> at that time.  (It does not suffice to
+       type it when you subsequently log in.)  After giving the Print com-
+       mand, you may have to type a character (say, a space) before printing
+       will begin and before it will proceed after every screenful; however,
+       typing several characters at once will make typing a character after
+       every subsequent screenful unnecessary.  If you don't get back to
+       command level when the output is done, try typing a character one
+       more time.
+
+       If you are interested in transferring files between AUGMENT and
+       TYMCOM computers, you might take a look at <OFFICE-6, SYSTECH,
+       TYMCOM-TRANSFER,>.  This file discusses not only the FTP10X program
+       for doing the transfer, but also how you can get formatted AUGMENT
+       output to look the same when it is spooled on a TYMCOM system.
+ 
