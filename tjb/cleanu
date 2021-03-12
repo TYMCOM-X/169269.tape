@@ -1,0 +1,2 @@
+SETE 0
+DEL *.BAK,*.REL,*.VUE,*.FIN,###TEL.*,###PEA.*
