@@ -1,0 +1,181 @@
+
+
+
+DATE:           9 April 1980
+
+TO:             Mike Hinckley
+
+FROM:           Adele Gadol
+
+SUBJECT:        STATUS REPORT, 1ST QUARTER 1980
+
+
+
+
+The following tasks were performed during the first quarter of 1980.
+
+
+PRODUCT/TASK                            DAYS            COMP. DATE
+============                            ====            ==========
+
+SNARL/WHERE,NEW TAPE,STORE              13.6             1/30/80
+DSNARL/skeleton with TTY dump commands   6               2/15/80
+TAPELIB/testing system                   3               3/03/80
+TAPELIB/bug fixing project               9.6               2Q
+TAPELIB/maintenance and "fires"         11.3               NA
+TAPELIB/other                            3.2               NA
+other "fires" and maintenance             .6               NA
+FORMAT program                           1.4               NA
+-/scheduling and planning                2                 NA
+-/teamwork                               2.5               NA
+-/holidays and vacation                  2                 NA
+-/miscellaneous                          9.8               NA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   1
+
+
+
+                                SUMMARY                                
+
+
+
+     This quarter reflects the time which finally had to be spent on the
+tape library software to clean  up the TRP numbering problem,  which has
+been anticipated  and put off  for a long  time.  The installation  of a
+testing system in order  to check the solution should  help considerably
+to debug fixes in the future  and should allow me to reduce the  work on
+this system to  a background task while  not dropping it  completely.  A
+few more  fixes are planned  along with some  data base  maintenance and
+auditing tools.
+
+
+
+
+                                 DETAIL                                 
+
+
+
+SNARL/WHERE,NEW_TAPE,STORE:    These  commands   were  coded   with  the
+     exception of continuation tape  handling which will be  done later.
+     They are ready for a debugging pass.
+
+DSNARL/skeleton_with_TTY_dump_commands:   For   this  project,   it  was
+     necessary to get the  DSNARL grammar specified and to  put together
+     the main program and  the complete parser.  The  following commands
+     were implemented:   ?, REWIND, UNLOAD,  QUIT, INDICES,  BLOCK, MAP,
+     and T.  They are ready for a debugging pass.
+
+TAPELIB/testing_system:   A  completely  separate  tape  library  system
+     running from username (ADELE) was put in place.  All the  10's that
+     I can get at have satellites.  940 satellites are on systems  2, 8,
+     and 14, and  370 satellites are  on 41, 46,  47, and 48.   The same
+     370's  which  have  satellites  can  also  be  updated.    The  940
+     satellites, called 1tapelib,  and the programs UPDATE,  TAPTAP, and
+     TAPSLV are set up  with compilation switches to allow  selection of
+     test or production  version.  A COM  command file is  on (ADELE:36)
+     for the purpose  of copying the files  from the official  system to
+     the test system for debugging.
+
+TAPELIB/bug_fixing_project:  The main reason for tackling tapelib was to
+     correct  a boundary  problem  which will  cause the  system  to get
+     tangled  when  the  highest  numbered position  in  a  set  of rack
+     positions (rack numbers  in a center  with the same  prefix letter)
+     reaches 10000.  Valley Forge  is getting close to this  limit.  The
+     software to fix this problem is being tested on the tapelib testing
+     system and should be installed on the real system early in  2Q.  In
+     addition, the long existing inconsistencies in the storage of TID's
+     on the  370's and  a working  HISTORY command  are also  in testing
+     stage.  These fixes  should be installed  for general use  early in
+     2Q.  The 370 data bases must be refreshed with TID's reformatted at
+     the same time.
+
+
+
+                                   2
+
+
+
+     There are a few other problems I would like to continue working on.
+     One is the bug in ACCEPT  and TAPELIB on the 370's which  can allow
+     garbled information to get  through and later appear in  the UPDATE
+     transactions, causing backlogs.  I am at a disadvantage in  the 370
+     environment through lack of experience.
+
+TAPELIB/maintenance_and_"fires":   The  amount  of  time  spent  on this
+     category  is  roughly  double  the  "normal"  rate  that  has  been
+     experienced  during  the  previous  several  quarters.   There  are
+     several major reasons for  this.  One of them concerns  some public
+     relations  work involved  with finding  the reason  that  FOCUS was
+     removed from V43 and getting the problem solved.  It was ultimately
+     re-installed, allowing me to re-install TAPELIB on V43 (updating to
+     43 had to be disabled while FOCUS was unavailable).
+
+     Another concerns TYMNET.  Network problems not only  contributed to
+     backlogs of UPDATE transactions for the 370's but also  made fixing
+     the  problems difficult  and  time-consuming.  During  the  week of
+     March  3, a  backlog developed.   It was  during this  time  that I
+     discovered  that (PJ)  was starting  the UPDATE  program  only once
+     every  two hours.   I  had not  been notified  of  this intentional
+     change to (PJ) and had  to make calls to the appropriate  people in
+     order to get the situation changed.  UPDATE is now being started on
+     a 15-minute schedule.  Furthermore, network flakiness  impacted the
+     operators doing data  entry to the  tape library resulting  in more
+     phone calls which I had to handle.
+
+     In addition, I was  attempting some training sessions  for Faramarz
+     in  conjunction with  the firefighting.   This slowed  the progress
+     somewhat.
+
+TAPELIB/other:  This was mainly the preparation for and the  training of
+     Faramarz  on  the tape  library  software.  The  goal  was  to have
+     Faramarz take over the day-to-day chores and perhaps  contribute to
+     the set of programs used to maintain the system.  The training time
+     and other guidance was spent,  but the goal was not reached  due to
+     his leaving the company.
+
+other_"fires"_and_maintenance:  This concerns a TITO fire  researched in
+     conjunction with two members of the MAGNUM group.
+
+FORMAT_program:  I  spent some  time converting  this program  for cross
+     referencing  sources  to  Tymcom-X.   Mike   Hinckley  subsequently
+     completed some bug fixing to make the program usable.
+
+-/miscellaneous:   This  time  includes  interviews,  moving,  and  some
+     general organizational tasks taken on during network down time.
+
+
+
+
+
+
+
+
+
+                                   3
+
