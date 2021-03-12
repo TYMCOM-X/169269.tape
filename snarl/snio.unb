@@ -1,0 +1,271 @@
+ENTRY;
+BEGIN "SNIO"
+require processes;
+REQUIRE "sndsn.sai" SOURCE!FILE;
+ck!sn
+REQUIRE "snsym.sai" SOURCE!FILE;
+elsec
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+endc
+REQUIRE "sndefs.sai" SOURCE!FILE;
+REQUIRE "(sailib)tymint.def" SOURCE!FILE;
+
+EXTERNAL STRING snstat;				\ SNARL or DSNARL status vector.;
+
+EXTERNAL INTEGER mtchan, mteof,			\ mag tape channel stuff.;
+   mtstat,					\ sense data,,status bits;
+   mtdens,					\ currently set density;
+   mtrec,					\ Number of last physical tape record accessed.;
+   mtpos,					\ Position of last file accessed.;
+   mtibuf,					\ number of buffers for buffered input;
+   mtobuf;					\ number of buffers for buffered output;
+EXTERNAL STRING mtdev;				\ mag tape device name;
+
+EXTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];
+
+ITEM intpro;					\ For sprouting interrupt process "intpro";
+ITEM io!itm;					\ For sprouting I/O processes;
+INTEGER ARRAY trpvct[0:7];			\ Interrupt trap vector;
+PRESET!WITH
+ck!sn
+   !spri!c, !p!fmt, !rpri!c, !wher!c,
+endc
+   !help!c, !cmdwd,
+   !qmrk!c, !abor!c, !cont!c;
+INTEGER ARRAY attn!g[1:9];			\ Keyboard interrupt time command;
+
+INTEGER tape!word!count;			\ Keeps track of position in the physical tape record.;
+
+EXTERNAL BOOLEAN PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+EXTERNAL PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match(true));
+ifc false thenc
+\  ck!sn INTERNAL PROCEDURE tapout (INTEGER channel, rcdtyp, count,
+   offset(1);  INTEGER ARRAY tapbuf);
+	\ This procedure outputs an array of information to tape.  It
+keeps track of the word counts with respect to the physical tape record
+boundaries and puts out record headers or dummy records where they are
+appropriate.
+	"Channel" is the tape channel.  "Rcdtyp" is the logical record
+type.  The "count" parameter is the size of the data array (in words
+including the record marker) to be output.  "Taprcd" marks the beginning
+of a buffer of data to be written.
+;
+BEGIN
+   INTEGER i, j;
+
+PROCEDURE new!rec;
+BEGIN
+   wordout(channel,rcd+4);  wordout(channel,(mtrec_ mtrec+1));
+   wordout(channel,mtpos);  wordout(channel,0);				\ This should be PPN;
+   tape!word!count_ 4;  return;
+END;
+
+   if tape!word!count = 0 then new!rec;
+   if (i_ tape!buf!size-tape!word!count) < count then			\ If there is not enough room;
+   BEGIN								\ to put the logical record in;
+      if rcdtyp=dat and i > 1 then					\ the current physical record . . .;
+      BEGIN								\ Break up a data record into;
+	 wordout(channel,rcdtyp+i);					\ two parts.;
+	 arryout(channel,tapbuf[offset],i-1);
+	 new!rec;
+	 wordout(channel,rcdtyp+count-i+1);
+	 arryout(channel,tapbuf[offset+i-1],(j_ count-i));
+	 tape!word!count_ tape!word!count + j + 1;
+      END
+      else BEGIN
+	 wordout(channel,dum+i);					\ If not a data record,;
+	 arryout(channel,tapbuf[offset],i-1);				\ then finish the current;
+	 new!rec;							\ physical record with a dummy;
+	 wordout(channel,rcdtyp+count);					\ record, and put the desired;
+	 arryout(channel,tapbuf[offset],count-1);			\ record in the next physical record.;
+	 tape!word!count_ tape!word!count + count;
+      END;
+   END
+   else BEGIN								\ If there is room, then;
+      wordout(channel,rcdtyp+count);					\ output the logical record.;
+      arryout(channel,tapbuf[offset],count-1);
+      tape!word!count_ tape!word!count + count;
+   END;
+   if rcdtyp=eot and (i_ tape!buf!size-tape!word!count) > 0 then
+   BEGIN
+      wordout(channel,dum+i);  arryout(channel,tapblk[1],i-1);
+      tape!word!count_ 0;
+   END;
+   if tape!word!count = tape!buf!size then tape!word!count_ 0;
+   return;
+END;
+endc
+ck!sn
+INTERNAL PROCEDURE tapout (INTEGER channel, rcdtyp, count,
+   offset(1);  INTEGER ARRAY tapbuf);
+BEGIN
+   INTEGER i,j,k;
+
+PROCEDURE new!rec;
+BEGIN
+   tapblk[1]_ rcd+4;  tapblk[2]_ (mtrec_ mtrec+1);
+   tapblk[3]_ mtpos;  tapblk[4]_ 0;
+   tape!word!count_ 4;  return;
+END;
+
+   if tape!word!count = 0 then new!rec;
+   if (i_ tape!buf!size-tape!word!count) < count then
+   BEGIN
+      if rcdtyp=dat and i > 1 then
+      BEGIN
+	 tapblk[tape!word!count+1]_ rcdtyp+i;
+	 for k_ 1 step 1 until (i-1) do
+	    tapblk[k+tape!word!count+1]_ tapbuf[offset+k-1];
+	 arryout(channel,tapblk[1],tape!buf!size);  new!rec;
+	 tapblk[tape!word!count+1]_ rcdtyp+count-i+1;
+	 j_ count-i;
+	 for k_ 1 step 1 until j do
+	    tapblk[k+tape!word!count+1]_ tapbuf[k+offset+i-2];
+	 tape!word!count_ tape!word!count + j + 1;
+      END
+      else BEGIN
+	 tapblk[tape!word!count+1]_ dum+i;
+	 for k_ 1 step 1 until (i-1) do
+	    tapblk[k+tape!word!count+1]_ tapbuf[offset+k-1];
+	 arryout(channel,tapblk[1],tape!buf!size);  new!rec;
+	 tapblk[tape!word!count+1]_ rcdtyp+count;			\ record, and put the desired;
+	 for k_ 1 step 1 until (count-1) do
+	    tapblk[k+tape!word!count+1]_ tapbuf[k+offset-1];
+	 tape!word!count_ tape!word!count + count;
+      END;
+   END
+   else BEGIN								\ If there is room, then;
+      tapblk[tape!word!count+1]_ rcdtyp+count;				\ output the logical record.;
+      for k_ 1 step 1 until (count-1) do
+	 tapblk[k+tape!word!count+1]_ tapbuf[k+offset-1];
+      tape!word!count_ tape!word!count + count;
+   END;
+   if rcdtyp=eot and (i_ tape!buf!size-tape!word!count) > 0 then
+   BEGIN
+      tapblk[tape!word!count+1]_ dum+i;
+      arryout(channel,tapblk[1],tape!buf!size);
+      tape!word!count_ 0;
+   END;
+   if tape!word!count = tape!buf!size then
+   BEGIN
+      tape!word!count_ 0;  arryout(channel,tapblk[1],tape!buf!size);
+   END;
+   return;
+END;
+endc
+ck!sn INTERNAL PROCEDURE to!begin;
+	\ This routine initializes variables so that "tapout" will start
+a new physical record when called by "s!sto";
+tape!word!count_ 0;
+endc
+ck!sn INTERNAL PROCEDURE to!end;
+\  *** more to come ***;
+return;
+endc
+PROCEDURE i!attn;
+	\ This deferred interrupt procedure is executed when a keyboard
+interrupt is detected.;
+BEGIN
+   IF snstat[1 for 1]="A" or snstat[1 for 1]="K" THEN RETURN;		\ Ignore if already aborting;
+   snstat_"K"&snstat;
+   RETURN;
+END;
+
+
+PROCEDURE i!hung;
+	\ This deferred interrupt procedure is executed when a hung
+device condition is detected.;
+BEGIN
+   IF snstat[1 for 1]="H" THEN RETURN;					\ Ignore if already aborting;
+   snstat_"H"&snstat;
+   RETURN;
+END;
+
+
+PROCEDURE i!mag;
+	\ This deferred interrupt procedure is executed when a device
+error condition is detected.;
+BEGIN
+   IF snstat[1 for 1]="D" THEN RETURN;					\ Ignore if already aborting;
+   snstat_"D"&snstat;
+   RETURN;
+END;
+
+
+INTERNAL PROCEDURE i!kybd;
+	\ This procedure can be called from other routines in SNARL to
+check for and service a keyboard interrupt.  If one has occurred (and
+is marked on the SNARL status vector, then the user is prompted for one
+of the interrupt-time commands, which is then executed.;
+BEGIN
+   BOOLEAN cmdok;
+   IF snstat[1 for 1] neq "K" THEN RETURN;
+   cmdok_lop(snstat);
+   cmdset(attn!g,false);  cmdok_false;
+   WHILE not cmdok DO BEGIN
+      print(">");  cmdok_do!cmnd;
+   END;
+   RETURN;
+END;
+
+
+PROCEDURE i!time;
+	\ This procedure is invoked to make notification of time!out
+interrupts.;
+BEGIN
+   calli(0,settim);  terminate(io!itm);
+   snstat_ "T" & snstat;  return;
+END;
+INTERNAL PROCEDURE int!init;
+	\ This routine sets up the SAIL deferred interrupt handling
+required by SNARL;
+BEGIN
+   intset(intpro,0);
+   trpvct[1]_(-1 lsh 18)+location(i!attn);
+   trpvct[3]_(-1 lsh 18)+location(i!hung);
+   trpvct[5]_(-1 lsh 18)+location(i!mag);
+   trpvct[7]_(-1 lsh 18)+location(i!time);
+   trpvct[0]_(trpvct[2]_(trpvct[4]_(trpvct[6]_2)));
+   intmap(tinass(-1,cause!tty!escape,ch!attn),dfrint,
+      (-2 lsh 18)+location(trpvct[0]));
+   enable(tinass(-1,cause!tty!escape,ch!attn));
+   intmap(intass(cause!hung,ch!hung),dfrint,
+      (-2 lsh 18)+location(trpvct[2]));
+   enable(intass(cause!hung,ch!hung));
+   intmap(intass(cause!deverr,ch!mag),dfrint,
+      (-2 lsh 18)+location(trpvct[4]));
+   enable(intass(cause!deverr,ch!mag));
+   intmap(intass(cause!timer,ch!time),dfrint,
+      (-2 lsh 18)+location(trpvct[6]));
+   enable(intass(cause!timer,ch!time));
+   RETURN;
+END;
+INTERNAL BOOLEAN PROCEDURE set!tape!bufs (INTEGER direction);
+	\ This procedure initializes or re-initializes the tape channel
+for buffered data transfers.  The "direction" should be either "I" for
+input or "O" for output.;
+BEGIN
+   release(mtchan);
+   IF direction = "O" THEN
+      open(mtchan,mtdev,binary!mode,(mtibuf_0),
+	 (mtobuf_ (tape!buf!size lsh 18)+num!tape!bufs),
+	 mteof,mteof,mteof)
+   ELSE IF direction = "I" THEN
+      open(mtchan,mtdev,binary!mode,
+	 (mtibuf_ (tape!buf!size lsh 18)+num!tape!bufs),(mtobuf_0),
+	 mteof,mteof,mteof)
+   ELSE return (false);
+   IF mteof neq 0 THEN
+      BEGIN
+	 print("Cannot initialize device " & mtdev & " for " &
+	    (if direction="O" then "output." else "input.") & crlf);
+	 return (false);
+      END;
+   lookup(mtchan,"snarl.tap",mteof);
+   if direction="O" then enter(mtchan,"snarl.tap",mteof);
+   return (true);
+END;
+
+
+END "SNIO";
+    
