@@ -1,0 +1,301 @@
+SNARL/DSNARL schedule and test plans                    November 25 1980
+
+
+
+
+                             Project_Phases                             
+
+
+
+     Phase_I/Preliminary_internal_test_version:    This  is   a  limited     
+version of SNARL which would provide enough features for personal use as
+an  archiving tool  but  not enough  capability as  an  operations tool.
+However, it would  be worthwhile to get  a small number of  people using
+the product at this point in order to get bugs out and  collect feedback
+on its  performance.  As more  features are added  during Phase  II, the
+test version which is being used could be updated.
+
+     Phase_II/Field_test_version:    This  version   will   have  enough     
+capability so that  operations could use it  on a test basis.   It would
+probably be  run in parallel  with TITO for  daily backups on  a lightly
+loaded system.   File recoveries could  be accomplished with  SNARL with
+TITO available in emergencies.  As more features are added  during Phase
+III, the version which is in field test could be updated.
+
+     Phase_III/Full_production_version:   Upon completion  of acceptance     
+testing by operations, this version will be generally adopted.
+
+     Phase_IV/Futures:   A  set  of  enhancements  could  be   done,  as     
+documented in the "SNARL External Specifications" which could  make this
+product much more powerful.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   1
+SNARL/DSNARL schedule and test plans                    November 25 1980
+
+
+
+
+------------------------------ Phase I ---------------------------------
+
+(A)  Complete first pass on  DSNARL external design.  In  this document,
+     the descriptions of the  tape examination features should  be quite
+     complete; some  of the  others may  be much  less detailed  at this
+     point.  The document will  be ready to distribute for  comments (at
+     least among PDP10/SPP group).
+             (TARGET:  July 6)  (COMPLETED:  July 10)
+
+(B)  Complete the internal specifications for SNARL.
+             (TARGET:  July 24)  (COMPLETED:  September 14)
+
+(C)  Recode and debug TABGEN using the parser described for SNARL.  This
+     step has carryover into step  (D) since there is a set  of standard
+     routines  which  will  be  common to  both.   Some  of  the program
+     specific routines will be similar.
+             TARGET:  October 23)  (COMPLETED:  October 31)
+
+(D)  Implementation  will proceed  on SNARL  with the  front-end command
+     parser.  The entire grammar  and command files will  be implemented
+     along  with  intermediate routines  which  will  "parameterize" the
+     information  in the  parse tree.   Instead of  calling  the command
+     handlers, the intermediate  routines will report  their information
+     for the  purpose of testing.   (Later on, the  actual calls  can be
+     added.)
+             (TARGET:  October 31)  (COMPLETED:  November 15)
+
+(E)  Debug step (D).
+             (TARGET:  November 7)  (COMPLETED:  November 20)
+
+(F)  Implement and debug QUIT, the mode setting commands, ?, REWIND, and
+     UNLOAD.  Set up  SNARL so that a  substitute disk file may  be used
+     for tape during initial debugging.
+             (TARGET:  December 5)  (COMPLETED:  December 6)
+
+(G)  Implement  WHERE, STORE,  and NEW  TAPE commands.   This  step will
+     include  commands  and  handling  for  user  aborts  but   not  for
+     continuation tapes (which will be treated as an error abort at this
+     time).
+             (TARGET:  January 14, 1980)  (COMPLETED:  January 30, 1980)
+
+(H)  Do a quick internal  specification for the dump functions  (on TTY)
+     of DSNARL and implement a  skeleton DSNARL with REWIND and  the TTY
+     dump functions.
+             (TARGET:  January 30)  (COMPLETED:  February 15)
+
+(I)  Debug steps (G) and (H).
+             (TARGET:  June 5)  (COMPLETED:  June 18)
+
+(J)  Implement DIRECTORY.
+             (TARGET:  June 16)  (COMPLETED:  July 8)
+
+
+
+                                   2
+SNARL/DSNARL schedule and test plans                    November 25 1980
+
+
+
+
+(K)  Implement RETRIEVE, and GET.
+             (TARGET:  August 4)  (COMPLETED:  August 5)
+
+(L)  Debug everything coded so  far.  Implement and debug  any necessary
+     DSNARL changes resulting from SNARL debugging.  Debug user aborts.
+             (TARGET:  September 26)  (COMPLETED:  October 6)
+
+(M)  Get the SNARL documentation  up to date, particularly  the internal
+     documentation.  Starting with  the next project,  the documentation
+     will be kept in parallel with the development.
+             (TARGET:  September 29)  (COMPLETED:  November 3)
+
+(N)  Implement and debug CUT AFTER, APPEND, and COF.
+             (TARGET:  November 19)  (COMPLETED:
+
+(O)  Specify, implement, and debug a DSNARL function which  will compare
+     the contents and lookup blocks of sets of files.
+             (TARGET:  December 15)  (COMPLETED:
+
+(P)  Test the  current product  in preparation  for release  for limited
+     internal  use.  Update  the external  documentation, and  prepare a
+     memo defining the usable portions.  At this point, a  release could
+     me made for limited internal use.  Since the  continuation features
+     would not be usable, this  version could not be used  by operations
+     unless a responsible person would be willing to do  some individual
+     testing and provide feedback.
+             (TARGET:  January 7)  (COMPLETED:
+
+----------------------------- Phase II ---------------------------------
+
+(Q)  Implement the  continuation tape  handling commands  and associated
+     changes to the file transfer commands.
+             (TARGET:  January 19)  (COMPLETED:
+
+(R)  Debug step (Q).
+             (TARGET:  January 30)  (COMPLETED:
+
+(S)  Implement and debug TRANSLATE and UNTRANSLATE.
+             (TARGET:  February 12)  (COMPLETED:
+
+(T)  Implement and debug  DEVICE, TID, LOG,  and UNLOG.  At  this point,
+     the product should  be usable by  operations and could  be released
+     for internal testing.  It could  not, of course, be put  to general
+     use before a period of  acceptance testing is complete.  I  need to
+     work out a plan with operations for the conversion to SNARL.
+             (TARGET:  March 4)  (COMPLETED:
+
+---------------------------- Phase III ---------------------------------
+
+(U)  Specify and implement the ability to handle tape ranges  along with
+     other selection criteria within the RETRIEVE class of commands.
+
+
+
+                                   3
+SNARL/DSNARL schedule and test plans                    November 25 1980
+
+
+
+
+(V)  Implement  and debug  the  remaining help  and  program information
+     commands.
+
+(W)  Design externals and  internals for tape verification  and recovery
+     features of DSNARL.
+
+(X)  Implement tape verification and recovery features of DSNARL.
+
+----------------------------- Phase IV ---------------------------------
+
+(Y)  Futures . . .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   4
+SNARL/DSNARL schedule and test plans                    November 25 1980
+
+
+
+
+                         SCHEDULE                         
+
+              Target          Completion      Steps                              
+
+----------------------------- Phase I ----------------------------------
+                July 6          July 10         (A)
+                July 24         September 14    (B)
+                October 23      October 31      (C)
+                October 31      November 15     (D)
+                November 7      November 20     (E)
+                December 5      December 6      (F)
+     1980       January 14      January 30      (G)
+                January 30      February 15     (H)
+                June 5          June 18         (I)
+                June 16         July 8          (J)
+                August 4        August 5        (K)
+                September 26    October 6       (L)
+                September 29    November 3      (M)
+                November 19                     (N)
+                December 15                     (O)
+     1981       January 7                       (P)
+----------------------------- Phase II ---------------------------------
+                January 19                      (Q)
+                January 30                      (R)
+                February 12                     (S)
+                March 4                         (T)
+
+
+
+
+                               SLIPPAGES                               
+
+     The delay  between items  (H) and  (I) was  due to  firefighting on
+TAPELIB aggravated by network flakiness.  Also, several months was spent
+on TAPELIB to improve its general reliability and resistance  to network
+problems.
+
+     Slippage on (L) occurred as  a resu encounters with  tricky or
+undocumented tape device characteristics which were time  consuming both
+to discover and deal with.
+
+     Potential_schedule_disturbances_to_be_dealt_with:   The  amount  of     
+management  time I  am spending  must be  watched closely.   The project
+management time for SNARL will increase predictably as soon as  SNARL is
+in  internal test.   A project  management class  (1 week)  is  a strong
+possibility for 1Q81.
+
+
+
+
+
+
+
+
+                                   5
+    6 	3¶
