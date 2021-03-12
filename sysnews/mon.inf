@@ -1,0 +1,1381 @@
+************
+               MONITOR       34/J
+
+        CLOSING A FILE NO LONGER UPDATES THE ACCESS DATE IF THE FILE
+        WAS NOT BEING ACCESSED.
+
+        BAD SATS NOW CAUSE THE SYSTEM TO DO A FULL DSKCLN.
+
+        FRMOP FUNCTION TO READ EFFECTIVE RIGHTS NOW RETURNS RIGHTS
+        INSTEAD OF ZERO.
+
+        DATUUO NOW DOES CONVERSION FROM 1 WORD (SECONDS PAST 0000 1/1/64)
+        TO DEC FORMAT CORRECTLY.
+
+
+*************
+                MONITOR       34/H
+
+        FILE SYSTEM BUG FIXED.
+
+        CONSOLE TELETYPE BUG FIXED.
+
+        VARIOUS F3 FIXES.
+
+        ENTER AND RENAME REQUIRING LICENSE TO CLEAR BITS.
+
+        DSKCLN BUG FIXED.
+
+        AN UNREPORTED PROBLEM WITH CLUB FIXED THAT COULD HAVE HAVE
+        CAUSED A CONCURRENCY PROBLEM.
+
+        IL STATE BUG HAS BEEN FIXED.
+
+        BUG FIXED IN BLOCK OUTPUT.
+
+        CLUB FIX TO HELP STOP PROGRAMMER ERROR PROBLEM.
+
+        CLUB FIX TO DETERMINE WHO HAS LOCK.
+
+        2020 LINE PRINTER BUG FIXED.
+
+        FIXED A SCHEDULAR PROBLEM REPORTED BY PARIS.
+
+        PORTS ON SYSTEM 37 AND 54 INCREASED TO 127.
+
+        DSKCLN WARNING MESSAGE CHANGED TO MAKE SURE OPERATOR IS AWARE
+        THAT ALL FILES WILL BE ERASED.
+
+        CHANGED KI CODE TO GIVE BETTER HARDWARE INFORMATION FOR C.E.
+
+        
+
+        A SWITCH MAY BE SET ON A PORT THAT CAUSES THE BACKSPACE
+        CHARACTER TO BE RECOGNIZED AS THE DELETE CHARACTER. THIS
+        IS IN ADDITION TO THE CONTROL-A. THE COMMAND IS:
+                 TTY BSD
+                 TTY NOBSD
+
+
+**************
+                 MONITOR       34/G
+
+        Fixed KS Block I/O bug.  Added some BIO debug code to make it
+        easier to see what's going on during BIO or after a crash.
+
+        Added call to PAGWAK in BLTULP to wake jobs waiting for
+        DIO on a pg to go to zero.
+
+        Inserted call to RELRIB before doing SETACH in DLTTCI
+        routine to insure that RIB is released.
+
+        Added test in GOZAP to STOPCD if port being zapped is > RPORTN.
+    
+        New UUO RLSLDB - release spare LDB, to be used by LOGOUT
+        to release the SLDB so that alt log progs don't tie things up and
+        to speed killing jobs in general.
+
+        New DAYTIM UUO returns secs past 1/1/64 - good for computing
+        elapsed time, etc.  Also added 1 word format to the DATUUO UUO.
+
+        Add routine to type "Unit XXXX Hung" to operator whenever
+        a hung disk condition is detected.
+
+**********
+                MONITOR         34/F
+
+
+        BUG FIXES AND ALTERATIONS:
+
+        Termination of block output now cancels pending blocks.
+
+        RETACH fixed.
+
+        .AXBS mode equivalent to TTY BACKSPACE command.
+
+        Incoming aux circuits now always apply backpressure.
+
+        Super read with error followed by super write no longer keeps
+        page mapped read only.
+
+        Closing a closed file no longer executes close code twice.
+
+        Truncate bounds checking fixed.
+
+        Club data base rearranged to improve space utilization.
+
+        GET and SAVE for big files now works.
+
+        Club user scheduling improved.
+
+        GET, RUN, SAVE no longer fetch username from AC0,1 if ppn
+        field .ne. 0.
+
+        .AXSYB, .AXSOB, .AXHNG now do not skip.
+
+        New INITIA line added.
+
+        Page aging routine called less often to reduce monitor overhead.
+        Erroneous entry into terminal satisfied (TS) state prevented.
+
+
+        ENHANCEMENTS:
+
+        AUXCAL function '73, .AXTRN, to read/set terminal characteristics by
+        number implemented.
+
+        AUXCAL function '74, .ACTCP, to read terminal characteristics from
+        a pty implemented.
+
+        TINASS event and matching POLPRT bit for terminal characteristics
+        modification at other end of pty implemented.
+
+        AUXCAL function '75, .AXNZP, read/set no-zap bit implemented.
+
+        Fast block I/O for pty's inserted.
+
+        Maintenance of a job state change queue as an optional debugging
+        aid added.
+
+        TATTLE and CREAUX stream records; LOGINN UUO directly written stream
+        records implemented.
+
+        Support for new CRSHID automatic crash analysis facility added.
+
+
+        2020 FIXES AND ENHANCEMENTS:
+
+        RM driver bug fixed.
+
+        RM/RP primitive driver.
+
+        KMC support.
+
+        pty block output fixed.
+
+        Multiple DR host search.
+
+        LP20 translation improvement.
+
+        Soft error detection fixed.
+
+        UBA page table translation recording.
+
+        CREAUX node selection capability.
+
+        Capability to declare node down and up for down-line loading.
+**********
+                MONITOR         34/E
+
+
+        1)      A file with RIB error can now be deleted.  The LOOKUP
+        will return error 6 and a RENAME to 0 following the failing
+        LOOKUP will delete the file.
+
+        2)      Bugfixes in the file deletion, close and trucate UUO's.
+
+        3)      Fast auto-restart.  DSKCLN v.33 required.
+
+        4)      For KS2020 systems only, the monitor supports LPT vertical
+        format control.
+**********
+                MONITOR         34/D
+
+
+        1) Numerous bug fixes.
+
+        2) New TINASS interrupt causes: Yellow ball received (9) and
+        gobbler received (10).
+
+        3) New AUXCAL (70) sends orange ball.
+
+        4) New POLPRT bits, IB7 yellow ball seen and IB8 character
+        gobbler seen.
+
+        5) new GETTAB data.
+                Table 11; New item 36 "XWD SAV30,NUMTAB" (addresses).
+                Table 12; Item 40 "SYSUID" (latest UID).
+                          ITEM 41 "THSTIM" (uptime of latest SCNSER run).
+                          Item 42 "MXTIM" (all time max of UPTIME-THSTIM).
+
+        6) Ability to set job license via SETLIC UUO restricted.  Job
+        license can now only be set via OPER program.
+**********
+                MONITOR         P034/C
+
+
+                
+        Fixes bug in KL-10 cache-handling which had led to problems
+        on SLIGOS' KL-10.
+
+        Bugfices to XOF/XON  and CLUBS code.
+
+        Bugfixes to code which handles terminal on LOGOUT.  Fixes
+        "PORT CAPACITY EXCEEDED" situation found with P034/B.
+
+        New AUXCAL function 67.
+
+        Fix to PCB code to allow handling of up to 63 SAT and 63 RIB
+        PCB's (up from 15 & 7) on systems that need it.
+
+        Bugfix to code which shuts down system on HANGUP.  Fixes HUNG-
+        APR situation seen with P034/B.
+**********
+        MONITOR         P034/B
+
+
+
+        Some messages changed. Particularly "JOB SETUP/SAVED", now comes
+        out "<FILENAME> SETUP/SAVED".
+
+        Virtual PEEK/POKE UUO, CALLI-125.
+
+        SETE/SETLIC UUO'S modified to allow caller to set job license over
+        aux circuit if process has WC.
+
+        KS2020 support added. Monitor now runs on KI, KL, KS2020 processors.
+**********
+        MONITOR         34/A
+
+
+        Bug fixes.
+
+        48 Channels.
+
+        Reference bit trapping implemented.*
+
+        New UUO's for reading page fault info.*
+
+        ILLMEM REF messages changed slightly.
+
+        Gettab table 20, item 16, now returns length of longest meaningful
+                lookup block.
+
+        Tru component checkpoint record generated by new EXCHARGE FN 6.
+
+**********
+        MONITOR         P033/LA
+
+
+                EVICT UUO
+        New Calli-134 relivers a "notice to quit" interrupt to any
+        other job enabled for it.  Any job enables it by using new
+        INTASS type 13.  Designed to allow database systems to close
+        up shop gracefully before system is shut down.  new system
+        program TAKEIT fires the new interrupt before hanging system.
+
+                SNOOPY FACILITY
+        New features added at request of SLIGOS for APL.
+
+                BLOCK I/O
+        Entirely new mechanism to allocate buffers for block I/o.
+        Eliminates design errors in previous code.
+
+                LOWER CASE TERMINALS
+        New feature enables "downshifting" of output.  TTY NO UCO com-
+        mand (no uppercase output) causes everything to be shifted
+        to lowercase.  This is desirable for APL-type terminals which
+        use uppercase alphabetics for APL characters.  New AUXCAL 65
+        reads and sets the flag.
+                
+                TALK COMMAND
+        The talk command no longer forces everything to uppercase
+        alphabetics.  It is transparent as to case.
+
+                BUGS
+        Numerous bugs have been fixed, some of which have caused crashes.
+**********
+        MONITOR         P033/JA
+
+        BLOCK OUTPUT FIXED TO WORK FOR 940'S
+
+        BUG FIXES & PARAMETER TWEAKS IN MONITOR WORKING SET CODE
+
+        VARIOUS INTERNAL BUG FIXES
+
+        BLOCK I/O BF WAIT BUG FIXED AGAIN
+
+        SKPINL IN IMAGE MODE SKIPS IF THERE ANY CHARS AT ALL
+
+        SET ADDRESS BREAK UUO
+**********
+        MONITOR         P033/HA
+
+        FIX SO BLOCK OUTPUT WORKS TO 940'S.
+
+        BUGS FIXED AND PARAMETERS TWEAKED IN MONITOR WORKING SET CODE.
+
+        INTERNAL BUG FIXES.
+    BLOCK I/O 'BF' WAIT FIXED.
+**********
+MONITOR         P033/GA
+
+
+		Summary of Changes to P033/GA
+
+
+I. Performance improvements:
+	A. TTOUT2 was changed to improve throughput for buffered
+		mode terminal output.
+	B. Added high/low water marks for TTY output so jobs will
+		wake up earlier to refil their output buffer.
+		The defaults are different for high and low speeds.
+
+II. New features/UUOs:
+	A. Auxcal '63 will set/clear 'stay-in-deferred-echo-mode'
+		bit which will make type-ahead work always.
+	B. The monitor command 'TTY DEF'/'TTY NO DEF' set and clear
+		'stay-in-deferred-echo-mode' as II.A. above.
+	C. The GETLCH ttcall now returns bit 2 indicating that a
+		command line is available for RESCAN.
+	D. The SETALP and LOGOFF UUO's were added to support the
+		Alternate-Logout-Facility.  (See the YAMM.)
+	E. Auxcal '64 identical to Auxcal '32 except it sets the
+		port's image state as needed imediately.
+	F. 'TTY RXE'/'TTY NO RXE' set and clear reverse-x-enable
+		for ^S/^Q stalling output to terminal.
+
+III. Bug fixes:
+	A. "E" and "VERSION" commands now wait for I/O.
+	B. SNDBIO can skip return - fixed at SCNOUT.
+	C. Character lost code fixed.
+	D. Ac stack overflow checked for properly.
+	E. TINASL bug fixed to make HIBER work better.
+**********
+MONITOR      P033/EA
+
+        Fixed bug where if slot was active but as yet unreferenced,
+
+and then referenced with a write violation, SETSHR got called and 
+
+zeroed PGYATB.  Any time lmap slot and pgy tables are changed to-
+
+gether, slot must be stored.
+
+        Moved the TLZ S, IOSRIB in RENAME code to after possible call
+
+to DLTTRC so that truncating renames won't die in DIRBLK because
+
+IOSRIB was set by DLTTRC causing DIRBLK to call MAPXCH erroneously.
+
+        Added reverse backpressure to CTYSIM (^C and ^S work).
+
+        Made arbitrary host numbers on CONFIG work.  Still have to 
+
+figure out how to make monitor generation system handle 3 digit
+
+host numbers.  Changed max in change system to 255 decimal.
+
+        Made reverse backpressure XON/XOFF work like network - two
+
+^S or ^Q will send ^S or ^Q to program (the first one starts or 
+
+stops output.
+**********
+MONITOR        P033/DA
+
+
+New MWS adjustment code
+
+Removed "EXCEEDING QUOTA OR DISK FULL" message, now just sets IOBKTL.
+
+CALLI-124: put stream royalty record
+
+CALLI-125: continue UUO, puts command port in user mode
+
+Various bug fixes
+**********
+MONITOR       P033/CA
+
+
+BLTPAG UUO
+
+PAGFLT bugfix
+
+"PORT CAPACITY EXCEEDED" printed instead of "JOB C.E." when that is
+wrong.
+
+added oper msgs "DISK SPACE LESS THAN 100 PAGES" and "DISK FULL,
+PLEASE TAKE CORRECTIVE ACTION"
+
+fixes to let jobs login and run when disk space is 0.
+
+club-delete bugfix.
+**********
+MONITOR         P033/BA
+
+
+VARIOUS BUG FIXES:  SPT FREECORE
+                    CLUB FREECORE
+                    CLUB STATUS BITS
+**********
+MONITOR      P033/AA
+
+
+
+FTRUNC UUO now allows EOF to be placed in any existing file page.
+Pages after EOF are destroyed.
+
+P.I.D. mechanism.
+
+Recognizes the DO command as one which invokes RPG.  RPG release to
+follow.
+
+Various bug fixes.
+
+Recognizes 16 disk units for C33 and C39.
+
+Multiple clubs per job.
+
+RCMAX made constant 177k.
+**********
+MONITOR   P033/Y
+
+USER WITH WF STATUS CAN NOW SET/CLEAR "FILE PPN = CREATOR JOB PPN" BIT.
+
+ MONITOR WORKING SET SIZE NOW COMPUTED BY MONITOR FOR JOBS
+NOT CONTROLLING THEIR USER WORKING SETS.
+
+CODE TO GET AROUND KL MICROCODE BUG IN HANDLING PAGE FAULTS DURING
+THE TRAP 1 INSTRUCTION.
+
+'.JBPFW' REMOVED (PAGE FAIL WORD).  '.GETPFW'(CALLI-121)
+ADDED TO RETRIEVE THE LAST PAGE FAIL WORD FOR THE JOB.
+
+'ILL MEM REF' TRAPPING NO LONGER CATCHES PAGE I/O ERRORS
+OR HARD PAGE FAILS.
+
+'ILL MEM REF' TRAPPING NOW CATCHES USER ADDRESS BREAKS.
+
+'ADRBRK' COMMAND ADDED TO SET ADDRESS BREAKS.
+
+'SET' NOW TAKES ABBREVIATIONS OF ITS ARGUMENTS.
+
+DEFAULT OF 'SIPQTA' NOW 8.
+
+I/O RELATED CACHE BUGS FIXED.
+
+NEW ERROR MESSAGE "TOO MANY PAGES LOCKED - CAN'T HANDLE FAULT
+FOR PAGE XXX AT USER XXXXXX".
+
+'MWSLIM' NOW MIN 'VPMAX,USRMAX'.
+
+'EXIT UUO' FORCES A LOGOUT IF JOB HAS 'LOGOUT' OR 'TIMEOUT' SET.
+NOT IF IT HAS 'CONTINUE' OR 'DETACH'.
+
+'ATTACH' SUPPRESSES ITS NORMAL EXIT ON ITS CALLER IF BIT 16 IS SET.
+ 
+FIXED BAD LINE POINTER INITIALIZATION IN 'SCNSER'.
+
+'.JBCST' (JOB DATA AREA WORD '136) ADDED AT REQUEST OF THE 
+LANGUAGE GROUP.
+*********
+MONITOR  P033/W
+
+ADDED KL-10 SUPPORT
+
+ADDED SNOOP FACILITY FOR MONITOR ANALYSIS
+
+MANY BUG FIXES
+
+ADDED "NO ATTACH" UUO'S AND COMMANDS
+
+BURROUGHS 1200 BAUD TERMINAL SUPPORT
+
+CONTINUE-ON-DISCONNECT
+
+CHT ENLARGED TO SPEED SEARCHING
+
+TRPSET UUO.
+
+BITPOR UUO.
+
+IMAGE MODE PORT I/O FIX TEMPORILY WITHDRAWN
+SO VARIOUS PROGRAMS (SLVSUP, BIONIC) CAN BE
+FIXED FIRST.
+(1 MONTH NOTICE)
+
+*********
+MONITOR VER P032/U
+
+1) COMCON FIXED TO GET OPNOTICE/MAIL DISTINCTION RIGHT AND AVOID CRASHES
+   WHEN SENDING ERROR MESSAGES TO DETACHED JOBS.
+
+2) COMMOD FIXED TO PERMIT KATAKANA MODE DISK FILES.
+
+*********
+MONITOR VER P033/U
+
+1) TTY MODE TIMEOUTS NOW OCCUR ONLY IF DATA MODE = IMAGE (10) .
+
+2) BLOCK OUTPUT AND CLRBFO NOW INTERACT CORRECTLY.
+
+3) "PORT STATUS PRESENT" SOFTWARE INTERRUPT NOW HAPPENS IMMEDIATELY
+   IF THERE IS AN UNREAD PORT STATUS MESSAGE AT THE TIME THE TINASS IS
+   DONE.
+
+4) "PORT STATUS SEEN" GETLCH BIT IS NOW SET IF AN UNREAD PORT
+   STATUS MESSAGE IS PRESENT.
+
+5) TIMER INTERRUPTS NO LONGER LOST DURING BLOCK INPUT WAIT.
+
+6) DEFERRED ECHO OF BACKSPACE NOW WORKS WHEN "REMOTE BACKSPACE ECHO" IS 
+   SET.
+
+7) POLPRT UUO (CALLI -115) ADDED.
+
+8) FTASER PATCHED SO CONTROLLERS WITH NEITHER NZRI FEATURE DON'T COUGH
+   WHEN GIVEN A TIE COMMAND.
+
+9) KATAKANA DISK I/O NOW LEGAL (DATA MODE 2)
+
+10) FIXED BUG CAUSING CRASHES WHEN ATTEMPTING TO OUTPUT ERROR
+    MESSAGES TO DETACHED JOB.
+
+11) FIXED BUG WHICH REFERENCED THE WRONG JOB WHEN DECIDING WHETHER
+    "MAIL" OR "OPNOTICE" WAITING.
+
+12) FIXED REMAP BUGS
+
+13) TERMINAL ID CODE RATHER THAN NODE # USED IN DISTINGUISHING
+    INCOMING AUX CIRCUITS FROM TERMINALS,  IN PREPARATION FOR TYMNET 2
+
+14) FIXED BUG CAUSING PORTS TO GET STUCK IN KATAKANA MODE.
+
+15) PARITY ERROR CODE FIXES
+
+16) .CHVRB (VALIDATE RIB) CHANIO FUNCTION ENHANCED FOR MAGNUM AND 
+    ONTYM
+*********
+MONITOR P033/T
+
+1) STANDARD BUFFER RING (OUTPUT) :=4 , LIKE INPUT
+
+2) Xcharg 5 function and transaction records, type 17
+
+3) context page saver on crashes - checks HGHBLK
+
+4) LOGOUT/KJOB/EXIT commands - JBTLIM zapped
+
+5) DSKCLN: fix for clobbering pages due to bad SATS - special
+   fake disk addr.
+
+6) SCNSER : attach UUO now can specify user/command state
+   of port after attach
+
+7) NO-ATTACH feature (PVNOAT bit JBTPRV)
+
+8) "sleep forever" bug when system chunk list runs out.
+
+9) Chunk allocation dynamic at load-system time.
+*********
+MONITOR P033/S
+
+1) STANDARD NUMBER OF BUFFERS CHANGED TO 4
+
+2) NEW FTRUNC CHANIO FUNCTION ADDED
+
+3) DIO BUG IN FTASER FIXED
+
+4) BAD RIB RING BUFFER BUG FIXED
+
+5) FFIFP BUG FIXED - WOULD NOT WORK UNLESS CHANNEL WAS OPEN
+   FOR WRITE.
+*********
+MONITOR P033/R
+
+1) CLUBS implemented.
+
+2) Reversed ONCE-time options for operations (e.g. MANUAL & READ ONLY)
+
+3) Old bug catcher removed from MAPIO.
+
+4) Bug catchers added to SWAP in hopes of catching remove m-bit bug.
+
+5) Bug fix to COW code,  now sets user IOT.
+
+6) Bug fix to KILUPT,  catches exec per process pages still mapped.
+
+7) Bug fix to CORE1 that now crashes system if UUO gets a
+   page fault on EPT or context page.
+
+8) New module KISYM as part of KL work.
+
+9) Increased no. of ports and TDBS for aux circuits from
+   64 to 256  & 10 to 255 respectively for C30.
+***********
+MONITOR P033/Q
+
+1) FIXED CLOBBERED SCNSER MODULE (BROKEN IN PO33/P)
+
+2) FURTHER CHANGES TO "CLUB" CODE (INACCESSIBLE)
+***********
+MONITOR P033/P
+
+1) NEW "CLUBS" CODE - BUT NOT EXECUTABLE YET.  
+
+2) DATE & TIME, GMT, PRINTED ON CTY WHENEVER SYSTEMS COMES DOWN.
+
+3) BUG IN TRAPPING ILL MEM REFS FIXED.
+
+4) EXEC PDL MADE LARGER TO CURE PDL OVERFLOW CRASHES
+***********
+MONITOR     P033/N
+
+1.  New UUO to find 1st free hole, 1st free "real" page, in a file
+2.  Fix to "SAVE" code
+3.  XCHARG bug fix
+4.  SEGCON does extended lookups
+5.  User parity errors are recoverable again
+6.  Disk I/O error recovery and reporting installed in VALPAG & VREMOV
+7.  VPGSTS returns ref bit for non-existent page
+8.  VREPLC copies state of no-error bit
+9.  New monitor message for write violaton instead of "ill mem ref"
+10. Monitor error message concering failing references now print out page number
+11. New bits in VPGSTS UUO- ignore error bit(set/clear by PERSET)
+12. Hardware configuration for C37 changed to include 6 disk drives
+13. "Fixed area" code taken out, new code put in its place to crash if up in
+    manual mode & an attempt is made to write pages to the disk which are not
+    "super" writes
+14. "NODSKCLN" option added to monitor, disables check for writing pages 
+    mentioned above (for debugging only)
+15. New bit added to VREMOV, only settable by the monitor, disables error
+    logging
+16. Fix made to save AC code (crash save) not to use ending BLT pointer
+    while PI is on (PI's now turned off here)
+17. Context page swap errors crash system in more direct way
+18. Bug in SETUUO function fixed (set/clear were reversed)
+19. Bad SAT bug catcher taken out
+20. SIPQTA changed from 45 to 1
+***********
+MONITOR  P032/S
+
+1) FIXED BUG CAUSING CRASHES WEHN HANGING DETACHED JOBS
+
+2) MADE FRCINP AUXCAL MASK CHARACTERS TO 8 BITS
+
+3) HOMEND MOVED SO AS NOT TO WIPE HOU HOMRET
+   AND HOMRSN
+
+4) QUANTUM RUN TIME FOR Q1-Q2 REQUEUE BACK TO 5 TICKS
+
+5) NO LONGER CRASHES ON DSKCLR TO BAD ADDRESS,   FOLLOWED BY
+   ANOTHER UUO TO A BAD ADDRESS
+*************
+MONITOR P033/M
+
+1) FIX HANGUUO SO J DOESNT GET CHANGED ON HANG DETACHED JOB ENABLED FOR 
+   OUTPUT READY TRAP.
+
+2) MASK ALL CHANS TO 8 BITS IN "STUFF INPUT BUFFER" AUXCAL
+
+3) ADDED LXLDSS PORT STS MSG REC'D BIT.
+
+4) "FIXED AREA" STUFF -- ALLOCATION OUT OF FIXED AREA BEFORE DSKCLN
+   FINISHES.
+
+5) FIND FIRST FREE FILE PAGE KERNAL IN -- CAN'T DISPATCH TO IT.
+
+******
+6) FIXED AREA TURNED OFF,  BUT HOM BLOCK LOCATIONS FOR ARE PRESERVED.
+*************
+MONITOR     P033/K
+
+1.  Bugs in truncating rename fixed.
+2.  LOOKUP-RENAME SEQUENCE formerly causing system crash fixed.
+3.  Super pages no longer removed from core hash table in VREMOV.
+4.  Bug in SWPENQ which caused core page lists to be wrong fixed.
+5.  Write in copy-on-write page when disk is full no longer crashes system.
+6.  New gettab entry - item 37, table 12.  USRMAX- total number of physical
+    memory pages available for users.
+7.  Took out DIOWQ, DSQ.
+*************
+MONITOR     P032/R
+
+Bug in PCBFLT fixed.
+SETE UUO changed
+Monitors for H31 and H32 have 16 BPAS.
+*************
+MONITOR     P033/J
+
+Improvements to SAT bad code.
+"Virgin" file pages - attempt to start them in without calling swapper.
+Preparation for disk output error recovery.
+SIMCRE bug catcher installed - temporary.
+No mapping charge during GET or runseg for files with XC license.
+Monitors for H31 and H32 have 16 BPAS.
+*************
+MONITOR     P033/H
+
+Internal changes only.  Changes do not affect user.
+*************
+MONITOR P033/G
+
+BUG FIX IN PCBFLT - WRITE LOCK NEW.
+
+KILFIL - BETTER ERROR RECOVERY ON RIB ERRORS - NEW BIT SET IN UFD RIB,
+        UFD ENTRY ON RIB ERRORS.
+
+BUG FIXED IN DELETING RENAME THAT CAUSED DATA FROM OLD FILE TO 
+        APPEAR AFTER FRESH LOOKUP AND INPUT.
+
+USETO SETS UP "S" PROPERLY.
+
+UPT SAVER IN CRASH CODE FIXED.
+
+LOGIN WHEN DISK FULL FIXED.
+
+CTEST NO LONGER A VALID COMMAND IN JAPANESE MODE.
+
+SIM10 NOW PICKS UP DEVIOS AFTER DOING UUOS AND SIM10 NO LONGER DOES
+        PERSTS UUO.
+
+BUG IN SETE UUO FIXED
+
+Q.R.T. FOR PQ1 TO PQ2 SET AT 3 TIMS (1/12 SEC) - KEEPS DISK I/O
+        BOUND JOBS FROM TAKING OVER THE SYSTEM.
+************
+MONITOR P032/Q
+
+IMPLEMENT "PAGING" TYPE STREAM ACCOUNTING WITH ZEROES FOR "PAGING"
+TRU COMPONENTS.
+************
+MONITOR  P033/F
+
+1) ACTSER CHANGES FOR NEW ACCOUNTING
+2) SCNSER NOW ALLOWS REFLECTING GREEN AND YELLOW BALLS IN BLOCK I/O
+3) HARDWARE ERRORS ON RIB NO LONGER STOPPED.
+4) MULTIPLE LOOKUPS REMOVED
+5) CRASH CODE UPT SAVER FIXED TO WORK CORRECTLY.
+6) HELLO COMMAND ALLOWED IN SUDS MODE
+7) ERROR STATISTICS ADDED TO SCNSER TO CATCH NETWORK PROBLEMS
+8) NEW MAGNUM UUO FN 5,  TO RETURN # OF UPDATE CHANNELS,
+   & # OF MAX WRITE PAGES.
+9) UUOCON FIXED TO INCREMENT PGYDIO PROPERLY.
+10) UFDUUO UFD LOCKING FIXED 
+************
+MONITOR     P033/E
+
+1.  Fixed  bug in appending to files.
+2.  Crash while running magtape fixed.
+3.  New privileged UUO to return disk pointer for a virtual page.
+4.  Buffered and dumped disk statistics being kept again.
+5.  Use of buffered or dump mode with simultaneous update  fixed.
+6.  Extended enter truncation of multilevel file fixed.
+7.  MAGNUM UUO function to report updaters now reports if any writers for
+    the file exist rather than if any single update mode channels exist.
+8.  Unused blocks after EOF and before end of page are cleared on truncating
+    RENAME or ENTER.
+9.  Locations added to SCNSER to record network errors.
+10. Bug involving updating files with multiple ribs fixed.
+************
+MONITOR      P033/C
+
+Fixes bug in rename across directories.
+************
+MONITOR     P033/B
+
+1.  Fixes bug in Remove which wiped out LMAP slot.
+2.  Fix to Sat I/O free resource queue.
+3.  Fix to muliple users of one file bug that caused crashes when save 
+    tapes were made.
+4.  PGYUSE bug that brought down C33 three times is fixed.
+************
+MONITOR     P033
+
+The P033 release of the TYMCOM-X monitor  introduces  a  complete,  user
+controlled paging facility.  The user can control his address space page
+by page, declare a set of pages in  his  address  space  to  be  in  his
+"working  set", map pages from files into his address space, and trap on
+references to pages not in his working set.
+
+P033 is compatible with  P032  and  earlier  monitors  except  for  some
+aspects  of sharable writable high segment function.  However, there are
+some user observable differences  between  P033  and  earlier  monitors,
+which are outlined below.
+
+     1.  Gettabs for high segments will fail return, since the system no
+         longer  keeps  information  about high segments.  high segments
+         are just pages mapped into the  user's  address  space  from  a
+         .HGH,  .SHR,  or  .SWR  file (see below for information on .SWR
+         files).
+
+     2.  The RUN UUO,  RUN  command  and  the  GET  command  remove  the
+         previous  contents  of  the  caller's address space following a
+         successful lookup of the first file in the file search sequence
+         (.SHR,  .HGH,  .SAV,  .SWR).  In P032 and earlier monitors, the
+         job's low segment was not removed until  completely  connecting
+         to  the  new  high  segment.   This  allowed programs to obtain
+         certain error codes from a RUN UUO issued from the low  segment
+         which  are  no  longer  available.  In P033, only the "file not
+         found" error can be returned from the RUN UUO.  All other error
+         conditions  (I/O error, for example) will cause a monitor error
+         message and stop the job.
+
+     3.   RUNSEG and GETSEG UUOs  remove  the  old  hiseg  after  having
+         successfully  looked  up the new hiseg.  Therefore, errors such
+         as "transmission error"  and  "not  enough  core"  can  not  be
+         returned to the program if the GETSEG or RUNSEG was issued from
+         the old hiseg.  These errors can be returned to the program  if
+         the call was issued from the loseg.
+
+     4.  REMAP UUOs issued from a position above  the  point  which  the
+         REMAP  will  cause  to be the new end of low segment will cause
+         the error message "REMAP UUO failure, VM space mangled".
+
+     5.  The CORE UUO will  allow  a  low  segment  of  256K.   Monitors
+         previous to P033 only allowed 255K.
+
+     6.  Sharable writable high segments work  differently  under  P033.
+         sharable writable high segment programs must be run from a file
+         with the extension ".SWR (Sharable WRitable)".  It is no longer
+         possible  to expand sharable writable high segments with a CORE
+         UUO.  The data format of a .SWR file is identical  to  that  of
+         .SHR  files, so it is only necessary to rename a .SHR file to a
+         .SWR file in order to allow the program to continue to sharably
+         write into itself.
+
+         An important difference between  sharable  writable  hisegs  in
+         P033  and  those in earlier monitors is that there is no longer
+         any "swapping copy" of the modified high  segment.   Thus,  any
+         changes   made   to   the  sharable  writable  hiseg  are  made
+         permanently to the .SWR file.
+
+         Another important  difference  concerns  the  conditions  under
+         which  the  program  is  allowed to write enable a high segment
+         that originated from a .SWR file.  A program can write enable a
+         sharable  writable  hiseg if and only if it had write access to
+         the .SWR file at the time the high segment became part  of  the
+         address space.  This is in contrast to the monitors previous to
+         P033, which always allowed a program to write enable its  hiseg
+         if the user hadn't "meddled" (performed a start command with an
+         argument, for example) with the hiseg.
+
+     7.  A program running with a hiseg obtained from  a  .HGH  or  .SHR
+         file  is  always  allowed  to  write  enable and write into its
+         hiseg.  Such modifications are not visible to any other user of
+         the  hiseg,  and do not cause any change whatsoever to the .HGH
+         or .SHR file.  Writing into such a hiseg causes the job to  get
+         its  own private writable page, containing the same data as the
+         original hiseg page, into which  it  then  writes.   Note  that
+         there  is no longer any difference between .HGH and .SHR files.
+         In both cases, the hiseg is shared page by page, private copies
+         of  the  pages  being  created for a writer when he writes into
+         that page.
+
+     8.  The RESET  UUO  in  P033  will  not  reset  the  current  hiseg
+         protection  back  to  read only as was done in P032 and earlier
+         monitors.
+
+     9.  Under P033, a licensed two segment program that originated from
+         a  hiseg file and a .LOW file must have the desired license set
+         on both the hiseg file and the .LOW file.  If the licenses  are
+         different  on the two files, only those licenses common to both
+         will be considered in setting process license.
+
+    10.  Disk I/O under P033 is no longer  address  checked  before  the
+         transfer begins.  Expect the same behavior from disk I/O as you
+         would from terminal I/O when illegal addresses are encountered.
+
+    11.  During buffered output to disk, the user is not guaranteed that
+         data  he is writing is actually written onto the disk until the
+         channel is closed or released.
+
+    12.  The monitor error message that results from an attempt  to  run
+         an inaccessible or non-existent file has been changed.  Instead
+         of "foo.sav not found", P033 will print "foo not found."
+
+    13.  The CORE command  without  an  argument  now  prints  out  some
+         additional information.  Example:  
+
+                18:6+12/512 PAGES
+                VIR. CORE LEFT=11750
+
+         The first number is the total number of existent pages  in  the
+         address  space.   The  "6+12" represents the loseg size (6) and
+         the hiseg size (12).  The number after the slash is  the  total
+         number  of existent pages that the job is allowed to have.  The
+         number reported after "Vir.  Core Left" is the total number  of
+         free disk pages on the system.
+
+    14.  Users  can  now  have  address  spaces  larger  than  available
+         physical  memory.   The  limit on the size of the address space
+         found in the LUD entry for a user still determines the  maximum
+         size the user can be.
+
+    15.  Arguments to the CORE command can now be followed by  either  a
+         "K"  or a "P", representing a request to interpret the argument
+         as either units of 1024 words or 512 words, respectively.
+
+    16.  The number of TRUs accrued for certain monitor  operations  may
+         be  different  than in P032.  For example, the charge for a run
+         operation was formerly dependent on whether or not  a  copy  of
+         the  high  segment existed on the swapping space.  However, the
+         majority of the charges should remain comparable  to  those  of
+         P032.
+
+***********
+MONITOR  P032/P
+
+1. FIXED COMCON BUG AFFECTING SUDS COMMANDS
+
+2. ADDED INTERNAL ERROR RECORDING TO SCNSER
+
+3. MODIFIED SCNSER TO REFLECT GREEN & YELLOW BALLS
+   WHEN IN BLOCK INPUT WAIT
+
+************
+MONITOR     P031
+
+P031  introduces  5   new  UUO's,  new  Project-Code   Facility,  and
+accounting totally thru the "Stream" mechanism.
+UUO CHPJC (Change Project Code) is CALLI AC,-61.
+UUO PUTSAR (Put Stream Accounting Record) is CALLI AC,-62.
+The GETTAB UUO has three new items:
+        -44: returns in AC,AC+1 the double-precision microcycles
+        -45: returns in AC,AC+1 the d.p. TRU's
+        -46: returns in AC,AC+1 the d.p. kilo-core-microcycles
+
+In  addition,  Restricted  Command  Mode  is  now  restricted  to the
+following commands:  EXIT LOGOUT DETACH CONTINUE BYE HALT  (^C) KJOB,
+the null  command (just a  CR), and the  following commands  from the
+"forced command  table" in  SCNSER which  the user  may not  type but
+which are required for monitor stability:  .LOGIN .FCONT INITIA.
+
+The monitor command MODIFY,  formerly unavailable in PDP-10  mode, is
+now available in both XEXEC and PDP-10 modes.
+
+REASSIGN UUO DOES NOT PERFORM  A RELEASE OF THE REASSIGNED  DEVICE IF
+THE CALLER IS REASSIGNING IT TO HIMSELF AND HAS IT INITTED ALREADY.
+
+LOGINN,  LOGOUT, and  CHKPNT all  write records  into the  stream via
+PUTSAR.  The "FACT" file no longer exists.  All accounting data is in
+the "stream  files", (UN1)MMDDYY.SAT.  CHKPNT  is the only  writer of
+.SAT files; if it cannot  update any given MMDDYY.SAT, it  creates an
+alternate MMDDYY.S01.  No alternates past MMDDYY.S77 will be created.
+MMDDYY is the GMT date.
+
+
+
+
+                              CHPJC UUO
+
+
+CALL:   MOVEI AC,BLOCK  ;POINT AT DATA AREA
+        HRLI AC,1       ;TO SET PJC FROM BLOCK &PRESERVE PJCVFY
+        HRLI AC,3       ;TO SET BOTH PJC & PJCVFY FROM BLOCK
+        CHPJC AC,
+         ERR RTN        ;WILL NEVER HAPPEN ON READ CALL
+        OK RTN          ;AC PRESERVED, BLOCK CHANGED
+
+BLOCK:  WORD 0: PROJECT-CODE CHARS 1-5, BITS 0-34
+        WORD 1: CHARS 6-10, BITS 0-34
+        WORD 2: BITS 0-13, CHARS 11 & 12
+                BITS 14-34 ZERO
+                BIT 35  RETURN PJCVFY HERE ON ALL CALLS
+                        IGNORE THIS ON SET CALL, USE ON SET BOTH
+
+
+LICENSE:        No license required to read PJC
+                XC or WPJ license required to set PJC if PJCVFY=1
+                No license required to set PJC and
+                 PJCVFY if PJCVFY=0.
+ERROR RETURN: On SET or SET BOTH, error return if no license
+
+The function of PJCVFY is to  require setters of PJC to be XC  or WPJ
+licensed,  as  some sort  of  assurance  that the  new  PJC  has been
+verified properly.  If a user is not subject to verification,  do not
+set  this  bit.   If  you do,  subsequent  setters  will  need  to be
+licensed.  The current state of PJCVFY is returned with the PJC  on a
+read call.
+
+READ  function:   AC/ 0,,BLOCK.   Returns current  PJC and  PJCVFY in
+Block. AC preserved.
+
+SET   function:   AC/1,,BLOCK.  Set  PJC  from Block,  do  not change
+PJCVFY.  Return previous PJC and PJCVFY in Block. AC preserved.
+
+SET  BOTH function:   AC/3,,BLOCK.  Set  PJC and  PJCVFY  from Block.
+Return previous PJC and PJCVFY in Block. AC preserved.
+
+
+
+
+                             PUTSAR UUO
+
+CALL:   MOVEI AC,HEADER         ;POINT AT RECORD HEADER WORD
+        PUTSAR AC,
+         ERROR RTN              ;AC=ERROR CODE
+        OK RETURN
+
+HEADER: BYTE (9)RECORDTYPE (21)0 (6)RECORDLENGTH
+BODY:   AS MANY WORDS AS RECORDLENGTH REQUIRES
+        (RECORDLENGTH INCLUDES THE HEADER WORD)
+
+ERROR CODES:
+        0:  ACT DEVICE BUFFER FULL, NO JOB HAS INITTED THE
+                DEVICE. THE SYSTEM IS RUNNING FOR FREE; ALL
+                STEPS HAVE BEEN TAKEN TO REMEDY SITUATION,
+                AND NONE WORKED. OPERATOR DEASSIGNED ACT DEVICE.
+        1:  NO LICENSE TO WRITE THIS RECORDTYPE
+        2:  RECORDLENGTH IS WRONG FOR THIS RECORDTYPE
+        3:  RECORDTYPE IS BAD
+
+RECORDTYPES:
+        21: LOGIN RECORD--REQUIRES JL LICENSE
+        22: CHKPNT REC  -- "       "
+        23: LOGOUT REC  -- "       "
+        24: UPTIME REC --  "       "
+
+No  further recordtypes  defined at  present. If  others  are defined
+later, they must be  .le. 377 in order  not to foul up  CHKPNT, which
+uses  types .ge.  400 for  error and  control info  put in  SAT file.
+THE MONITOR WILL DATE-STAMP ALL PUTSAR RECORDS; THEREFORE THEY MUST NOT
+RESIDE IN A READ-ONLY PAGE.
+
+
+
+
+                    Extended LOOKUP ENTER RENAME
+
+Three new words exist in extended UUO blocks:  words (octal) 35,36,37
+contain the file's  Project-Code, format identical to  that described
+above for  CHPJC UUO.   PJCVFY is  meaningless.  The  following rules
+apply when doing an extended UUO with these new arguments:
+1.  A Write-Files-Licensed user may set them on ENTER RENAME
+        They will be returned on LOOKUP. ON CREATION OF
+        ANY FILE, THE WF-LICENSED USER MAY SPECIFY THE
+        PJC IN HIS ENTER BLOCK.
+2.  A Write-Project-Licensed user may set them on RENAME or on
+        any Update-mode ENTER.  They will be returned on a
+        Create-mode ENTER and on LOOKUPs.  At Creation,
+        the current session PJC is placed in the RIB and
+        returned to the user.
+3.  A user without WF or WPJ may not set these values.  They
+        will be returned on ENTER LOOKUP. Attempts to change
+        them with RENAME will result in no change.
+        At creation of a file, the current session PJC is
+        placed in the RIB and returned to the user.
+
+
+
+
+            EXTENDED LOOKUP BLOCK FORMAT, WORDS 35,36,37
+DATA FILES ONLY (NOT UFD'S):
+        WORD 35         5 ASCII CHARACTERS BEGINNING BIT 0
+        WORD 36         "   "       "        "
+        WORD 37         2 ASCII CHARS, BITS 0-13
+                        BINARY ZEROS   BITS 14-34
+                        BIT 35=1 IF THIS PJC VERIFIED
+
+UFD'S ONLY:
+        WORD 35         0 OR PPN
+        WORD 36         0 OR FILENAME IN SIXBIT
+        WORD 37 BITS 0-17: 0 OR EXTENSION IN SIXBIT
+                BIT 18=1 IF PROJECT-CODE ACCOUNTING THIS USER
+                BITS 34-35: USER'S PJC CLASS CODE
+
+In UFD lookup blocks, the PPN/filename/ext/class code found
+in words 35-37 are used by LOGINN and (SYS)PROJEC.SAV to
+determine what type of PJC verification to enforce, if any:
+
+CLASS 0:        (NO VERIFICATION REQUIRED)
+        WORD 35: 0
+        WORD 36: 0
+        WORD 37: BITS 0-17:     0
+                 BIT 18   :     1 OR 0
+                 BITS 34,5:     0
+CLASS 1:        (VERIFY BY CUSTOMER'S PROGRAM)
+        WORD 35: PPN FOR RUN UUO
+        WORD 36: FILENAME FOR RUN UUO
+        WORD 37: BITS 0-17:     0
+                BIT 18:         1 OR 0
+                BIT 34-35:      01
+CLASS 2:        (VERIFY BY (SYS)PROJEC.SAV)
+        WORD 35: PPN FOR LOOKUP
+        WORD 36: FILENAME FOR LOOKUP
+        WORD 37: BITS 0-17:     EXTENSION FOR LOOKUP
+                 BIT 18:        1 OR 0
+                 BIT 34-35:     10 (BINARY)
+
+
+
+
+                      XCHARG UUO NEW FUNCTION 4
+
+XCHARG  UUO  now will  perform  a reset  of  selected  TRU components
+accepting component values directly  from the caller.  XC  license is
+required.    Component  values   offered  must   lie  in   the  range
+(Saved,Current).  Component values  lying outside this range  will be
+ignored  and  an error  return  given.  This  UUO  also  performs the
+equivalent of  XCHARG function  0 as  it executes  successfully.  The
+call is:
+CALL:   MOVE AC,[-LENGTH,,BLOCK]        ;ARGUMENT BLOCK
+        XCHARG AC,
+         ERROR RTN, AC=ERROR CODE
+        OK RTN, AC PRESERVED, BLOCK READ
+
+BLOCK:  EXP 4   ;SPECIFY FUNCTION 4
+        EXP BITMASK     ;1's for components to be reset
+        ....
+        TABLE SPACE FOR COMPONENTS
+        ....
+
+ERROR RETURNS:  AC bits 33-35 contain:
+0: NO LICENSE 
+1: NO PREVIOUS SAVE (XCHARG FUNCTION 0) DONE
+2: SYSTEM RUNNING WITHOUT ACCOUNTING..CANNOT WRITE XCHARG RECORD
+3: BAD COMPONENT: AC BITS 0-32 = MASK OF BAD COMPONENTS
+4: BAD BLOCK LENGTH IN AC LEFT HALF.
+5: BAD BITMASK..EXTRANEOUS BITS AS DETERMINED BY COUNT
+
+BLOCK LENGTH RESTRICTIONS: 4 .LE. LENGTH .LE. 24 OCTAL
+
+BITMASK RESTRICTIONS:
+        BIT 0 SIGNIFIES THE 1st COMPONENT, etc.
+        IF ANY BITS PAST BIT (COUNT-2) =1, ERROR RETURN
+
+
+CALCULATION PERFORMED, FOR EACH COMPONENT WHOSE
+BITMASK BIT=1:
+        "IF CURRENT .GE. USER .GE. SAVED VALUES THEN 
+                CURRENT:=SAVED:=USER VALUE
+        ELSE NO CHANGE TO CURRENT & SAVED, REPORT ERROR"
+FOR EACH COMPONENT WHOSE BITMASK BIT=0:  NO CHANGE TO
+        CURRENT OR SAVED VALUES.
+
+When XCHARG function 4 gives a failure return code of 3 in  AC 33-35,
+bits 0-32 of  AC contain 1's wherever  a bad component  was detected.
+That component was not touched by the XCHARG.
+
+DOUBLE-PRECISION VALUES: NOTE:  The 1st bit of a pair of bits  in the
+bitmask which signify a  double-precision component is the  one which
+XCHARG tests.  If the 1st bit is 0, both will be considered 0, and if
+it is 1, both will be assumed to be 1.  No error is generated  if the
+bits do not have the same value.
+
+The components and their meanings:
+
+BITMASK       COMPONENT NAME & MEANING          LOC IN BLOCK
+BIT NO.
+
+0:      JBTCPU  HI-ORDER Micro-cycles*size      BLOCK+2
+1:      JBTKCT  LOW-ORDER  "   "                BLOCK+3
+2:      JBTCP2  HI-ORDER Micro-cycles           BLOCK+4
+3:      JBTCMP  LOW-ORDER  "  "                 BLOCK+5
+4:      JBTELP  ELAPSED TIME*SIZE               BLOCK+6
+5:      JBTBCS  BREAK CHARS*SIZE                BLOCK+7
+6:      JBTCIN  CHARS IN                        BLOCK+10
+7:      JBTCOT  CHARS OUT                       BLOCK+11
+8:      JBTBET  BLOCK I/O ELAPSED TIME          BLOCK+12
+9:      JBTBIO  BLOCK I/O CHARS XFERRED         BLOCK+13
+10:     JBTSER  ENTERS & RENAMES*SIZE           BLOCK+14
+11:     JBTSLK  LOOKUPS*SIZE                    BLOCK+15
+12:     JBTSIN  DISK BLOCKS READ*SIZE           BLOCK+16
+13:     JBTSOT  DISK BLOCKS WRITTEN*SIZE        BLOCK+17
+14:     JBTERN  ENTERS & RENAMES                BLOCK+20
+15:     JBTDLK  LOOKUPS                         BLOCK+21
+16:     JBTRCT  DISK BLOCKS READ                BLOCK+22
+17:     JBTWCT  DISK BLOCKS WRITTEN             BLOCK+23
+
+
+Proper use  of new XCHARG  function 4:  the  user should first  do an
+XCHARG function 0, SAVE  CHARGES.  He should then read  saved charges
+into one  array, read  current charges into  a second  array, perform
+whatever calcualtion is appropriate  to derive a value  between these
+two limits for components of interest, and then do an XCHARG function
+4 with a bitmask whose 1's signify the components of  interest.  Note
+that function  4 requires  each component  to be  in its  proper word
+position in the  argument block, as  indicated in the  section above.
+This  is  achieved  by  specifying a  bitmask  of  777777,,0  (all 18
+components)  in the  "Read Saved"  and "Read  Current"  functions and
+doing the calculations in place in the "Read Saved" array.
+
+
+
+
+                         The CHKPNT WATCHDOG
+
+Since all accounting is now done via the stream mechanism, it becomes
+vital  that CHKPNT  run  at all  times.   If CHKPNT  does  not answer
+requests to empty the ACT device buffer, the system grinds to  a halt
+as  more &  more processes  go  into wait  for space  to  write their
+records to the ACT device.
+
+A Watchdog  has been  installed in  the monitor  which runs  once per
+minute and checks to be sure the ACT device is being serviced.  A new
+bit in the STATES word records the status of stream activity; the bit
+is called STMDED, and is 1 if the Watchdog has decided that CHKPNT is
+dead for any reason.
+Here is what the Watchdog does:
+1. If the system is open for timesharing (not restarting,
+        Shut, or Super-shut) and yet no job has the
+        ACT device initted, then the message
+          "SYSTEM UN-SHUT WITHOUT ACCOUNTING
+           LOG IN TO 'OPER' AND 'R CHKPNT'  "
+        is written on the operator TTY and console
+        CTY, the CTY bell is set to ringing, and the ACT
+        device Unhappy Bit in ALR620 is set.
+   In normal operation the ACT device is kept assigned
+   by console to the CHKPNT job at all times, even
+   when CHKPNT does a RELEASE UUO and/or EXIT to the monitor.
+   Thus this message will appear only if: 1) someone
+   hangs the CHKPNT job; 2) someone attaches to the job and
+   logs it out; or 3) someone attaches to the job
+   and enters the DEASSIGN ACT command.
+2. If the job (CHKPNT) to which ACT is assigned has hit an
+        error condition which set JERR in JBTSTS, then
+        the message
+         "CHKPNT PROGRAM FATAL ERROR.
+          'R CHKPNT' AFTER ATTACHING TO JOB <XX> "
+        is send to operator TTY and console CTY (or just
+        to CTY if no operator TTY), the CTY bell is set
+        ringing, the stream mechanism is declared DEAD by
+        setting the STMDED bit in STATES, and the system
+        is SHUT.
+
+Note that the system is SHUT in case 2, because the ACT-owner  job is
+not runable and the ACT  buffer will quickly fill up.  New  users are
+prevented from logging in.  However an operator (with  shut override)
+can log into OPER (which attaches him to the CHKPNT JOB),  and re-run
+CHKPNT, which un-shuts the system as it re-initializes.
+
+CHKPNT will  also clear  the STMDED  bit when  it is  un-shutting the
+system.  Before CHKPNT  re-initializes and  begins servicing  the ACT
+device,  the  system  will  appear hung  to  all  users  except those
+(normally OPER) which  log in after this  state has been  reached and
+whose AUN  matches that of  the CHKPNT job.   Any OPER job  which was
+trying to access the ACT  device to write a record before  the STMDED
+bit went on will also appear hung.
+
+
+
+
+
+                      Changes to LOGINN, LOGOUT
+
+These have  been changed  in two  areas:  all  references to  the old
+APPEND package,  which implemented writing  to the "FACT"  files, are
+removed,  and  a  call  to PUTSAR  is  substituted.   If  PUTSAR fail
+returns, they write  a message on  the operator terminal  via SETUUO.
+For this they have been  given OP license.  PUTSAR FAIL CODE  0 MEANS
+SYSTEM IS  UP FOR  FREE. OTHERWISE  IF CHKPNT  IS DEAD,  PUTSAR WAITS
+UNTIL IT  IS REVIVED BEFORE  SUCCESS/FAIL RETURNING TO  LOGOUT.  This
+ties up  a job number  even though  the user may  hang up  his phone.
+When CHKPNT is  re-initialized, LOGOUT will  write its record  to the
+stream, then give up the job slot and circuit via the LOGOUT UUO.
+
+The second area of change is in LOGINN and implements  the validation
+of  Project-Codes  on Login.   Please  refer to  the  section "Design
+Notes, PJC Facility" if the following is unclear:
+
+1. Before running any Init  file designated by the LUD,  LOGINN first
+checks the 3 locations in the user's UFD RIB which contain info about
+his classification for PJC's.  These cells are in the extended lookup
+block left after Loginn has run its routine UFDSET.
+
+2.  If the cells indicate a class 0 user (no validation), LOGINN goes
+ahead & RUN's any init file, or else just exits.
+
+3.  If  a Class 1  user is indicated,  the PPN/FN in  the cells  is a
+program to run which will do validation.  In most cases this  will be
+a custom program written by the field or by the customer Acct. Super.
+LOGINN  RUN's this  program  at entry+1,  passing  to it  a  bunch of
+registers full of dandy  info, such as the  name of the INIT  file to
+run once PJC validation is finished.  LOGINN sets  Restricted Command
+Mode and the indicated  PPN/FN as the Restricted  Command File,before
+the RUN.
+
+4.  If a Class 2 user is indicated, the PPN/FN point to a hash table.
+LOGINN does a RUN(entry+1) on (SYS)PROJEC, passing a register-load of
+stuff including this PPN/FN.  PROJEC looks in this file for  the PJC.
+PROJEC is  the RCF and  user is  in RCM, analagously  to class  1. JL
+LICENSE IS PASSED BY  LOGINN TO (SYS)PROJEC, ONLY; IT  IS IMMEDIATELY
+THROWN AWAY.  IF A USER PROGRAM DOES RUN UUO, ENTRY+1 ON (SYS)PROJEC,
+JL WILL BE MISSING, AND THE PROGRAM EXITS WITH A MESSAGE.
+
+
+
+
+                     Design Notes, PJC Facility
+
+These  are intended  as casual  design notes  and  overall philosophy
+description.  Relevant reading: TYMCOM-X Project-Code Facility Users'
+Guide, and VALID: TYMCOM-X Account-Supervisor Project-Code Facility.
+
+The facility is  secure against all  users without WPJ  license.  The
+VALID program must  have WF and  ST (structure) license.   It reduces
+license to  WPJ and  ST at initialization.   The PROJEC  program must
+also have WF,  and it lowers license  to WPJ.  This  technique allows
+these files to  exercise WPJ rights in  the callers' GAN  even though
+they reside in SYS.
+
+VALID  needs ST  to do  UFD interlocking.   Monitor  changes (CHKWRT,
+FILFND) allow WPJ-licensed caller to RENAME UFD's, which is how VALID
+records class info in the user's UFD.  VALID requires its  callers to
+have ACCT SUP status or TYMSHARE PROPRIETARY status.
+
+PROJEC needs WPJ in order to change PJC for users whose PJCVFY=1, and
+to be able to change PJC in a file RIB via extended RENAME.
+
+All user hash tables in  PROJ.COD files need WPJ license  not because
+it is exercised but as a certification of validity to PROJEC that the
+(unlicensed) user has  not written on the  file. (Such a  write would
+destroy the license.)
+
+The hash tables are set up  by VALID with a variable number  of pages
+depending on how  many codes are  to be hashed  in.  The code  uses a
+"Load Factor" of  67%--it will choose a  number of pages to  use such
+that the absolute maximum  capacity times load factor is  .ge. number
+of  entries to  be made.   Typically users  will have  a  1-page hash
+table.   Entries are  3 words.   Words 0,1,2  of the  table  have the
+following  info:  number  of  pages of  table, number  of  entries in
+table, and the prime number used in putting them in.
+
+The  hash is  essentially D.  Knuth, Vol  3 p521,  algorithm  D, with
+provision  for  3-word  entries.   Open  addressing  with  collisions
+resolved by secondary hash.  Collisions don't seem to happen  much in
+testing,  and  more than  2  secondary probes  are  rarely necessary,
+especially with  the load factor  at 67%.  The  load factor  could be
+changed by redifining a symbol in VALID.
+
+If applications ever  come up requiring  capacities in excess  of 650
+entries in  a table, another  entry can be  added to PRMTAB  in VALID
+using prime=largest prime .le. (number of pages times ^d512  all over
+3).
+
+PROJEC looks up proffered PJC's  in these hash tables using  the same
+algorithm by which they were put there, except PROJEC  never modifies
+the hash table.   PROJEC reads page  0 of the  hash table to  get the
+control info which tells it  how many more pages to read,  what prime
+to use in hashing, and when to conclude that the proffered PJC is not
+there (Rare case if table were precisely full).
+
+PROJEC runs in RCM with  itself as RCF and escape  interrupt enabled,
+when run  by LOGINN.   The user is  thus unable  to exit  the program
+except by  giving a  valid PJC, logging  off, or  hanging up.   If he
+hangs up, DETACH is a  legal RCM command, so the monitor  will detach
+or disconnect him.  Under some error conditions, PROJEC will initiate
+a logout, only if run by LOGINN.  Similar conditions arising during a
+regular user-initiated run just exit to the system.
+
+Whereas LOGINN is responsible for noticing whether a user is  class 1
+or 2 and running PROJEC only for class 2, PROJEC must notice  this on
+a user-initiated RUN.  So if a class 1 user types .PROJECT  BLAH BLAH
+the system goes thru 2 steps to get him to the proper  program: first
+run PROJEC, which in turn runs the program pointed to in his UFD RIB,
+presumably a  custom-validation program written  by his  Acct. Super.
+and residing in the A.S.  directory.
+
+Such customer-written validation  programs (lets call  them SUPERV)
+may  be written  in  FORTRAN.  To  give SUPERV's  the  flexibility to
+accept register-loads  of arguments from  LOGINN, etc., we  provide a
+MACRO driver program which is loaded before the FORTRAN  main program
+and which  calls it  after saving info.   The driver  is also  a main
+program.  Trickery with the  Loader command string enables  loading 2
+mains.
+
+We presume that SUPERV's will want to mimic the external  behavior of
+PROJEC as much as possible to reduce confusion.  We do not  place any
+restrictions on how they validate a PJC, however.
+    -@:+Ò
