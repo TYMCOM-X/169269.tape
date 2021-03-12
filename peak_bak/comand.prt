@@ -1,0 +1,598 @@
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 24-1
+     Prt: 02-Jul-84  09:20                                 Expand Command Tables
+
+     
+     ! Build the symbolic command access tables
+     ;
+       require " [Expanding Command Tables]
+     " message;
+     
+       define $CC = 0, $CN = {preload!with }, $CA = {};
+     
+       define $Cmd( N, A ) = {
+         redefine $CC = $CC + 1;
+         redefine $CN = cvms( $CN ) & {N, };
+         redefine $CA = cvms( $CA ) & {SymCmdA[}& cvms($CC) &{] := location(A);|
+                                                                         ->| };|
+       }; |1|
+     
+         ! setting the argument ;
+     
+         $Cmd( "Argument",                   C!Arg );
+     
+         ! moving around ;
+     
+         $Cmd( "Up",                         C!MoveUp );
+         $Cmd( "Down",                       C!MoveDown );
+         $Cmd( "Forward",                    C!MoveF );
+         $Cmd( "Backward",                   C!MoveB );
+         $Cmd( "Forward Token",              C!MovTokenF );
+         $Cmd( "Backward Token",             C!MovTokenB );
+         $Cmd( "Beginning of Line",          C!MoveBOL );
+         $Cmd( "End of Line",                C!MoveEOL );
+         $Cmd( "Forward Window",             C!NextScreen );
+         $Cmd( "Backward Window",            C!PriorScreen );
+         $Cmd( "Top of Window",              C!MovTOS );
+         $Cmd( "Bottom of Window",           C!MovBOS );
+         $Cmd( "Top of Page",                C!MovBOP );
+         $Cmd( "Bottom of Page",             C!MovEOP );
+         $Cmd( "Top of Buffer",              C!MovBOB );
+         $Cmd( "Bottom of Buffer",           C!MovEOB );
+         $Cmd( "Line to Top of Window",      C!LineTOS );
+         $Cmd( "Scroll Window Up",           C!ScrollUp );
+         $Cmd( "Scroll Window Down",         C!ScrollDown );
+     
+         ! deleting stuff ;
+     
+         $Cmd( "Delete",                     C!DelF );
+         $Cmd( "Delete Backward",            C!DelB );
+         $Cmd( "Delete Token Forward",       C!DelTokenF );
+         $Cmd( "Delete Token Backward",      C!DelTokenB );
+         $Cmd( "Kill Line",                  C!DelEOL );
+         $Cmd( "Set Append Kill",            C!SetAppendKill );
+         $Cmd( "Kill Partial Line",          C!DelToEOL );
+         $Cmd( "Delete Whitespace Forward",  C!DelWhiteF );
+         $Cmd( "Delete Whitespace Backward", C!DelWhiteB );
+     
+         ! inserting stuff ;
+     
+         $Cmd( "Insert",                     C!Insert );
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 24-2
+     Prt: 02-Jul-84  09:20                                 Expand Command Tables
+
+         $Cmd( "Insert CRLF",                C!InsertCRLF );
+         $Cmd( "Insert TAB",                 C!InsertTAB );
+         $Cmd( "Quote",                      C!Quote );
+         $Cmd( "Column Insert",              C!InsStrtoCol );
+         $Cmd( "Insert Octal",               C!InsertOctal );
+     
+         ! manipulation of lines ;
+     
+         $Cmd( "Open Line",                  C!Open );
+         $Cmd( "Open Line With Indent",      C!IndentDown );
+         $Cmd( "Indent Column Down",         C!ColumnDown );
+         $Cmd( "Indent Line Down",           C!IndentDown );
+         $Cmd( "Indent Line Up",             C!IndentUp );
+         $Cmd( "Center Line",                C!Center );
+         $Cmd( "Right Justify Line",         C!RightJustify );
+         $Cmd( "Indent Line",                C!AddIndent );
+         $Cmd( "Unindent Line",              C!UnIndent );
+     
+         ! other manipulations ;
+     
+         $Cmd( "Toggle Case",                C!Toggle );
+         $Cmd( "Token UC",                   C!TokenUC );
+         $Cmd( "Token LC",                   C!TokenLC );
+         $Cmd( "Toggle Token",               C!TokenToggle );
+         $Cmd( "Capitalize Token",           C!CapitalizeToken );
+         $Cmd( "Transpose",                  C!Twiddle );
+         $Cmd( "Up Paragraph",               C!BckHalfPara );
+         $Cmd( "Down Paragraph",             C!FwdHalfPara );
+         $Cmd( "Fill Line",                  C!FillLine );
+         $Cmd( "Fill Paragraph",             C!FillPara );
+         $Cmd( "Fill to End of Paragraph",   C!FillToEOP );
+         $Cmd( "Set Left Margin",            C!SetLM );
+         $Cmd( "Set Right Margin",           C!SetRM );
+         $Cmd( "Force Left Margin",          C!ForceLeftMargin );
+         $Cmd( "Goto Column",                C!GotoColumn );
+         $Cmd( "Show Column",                C!ShowColumn );
+         $Cmd( "Show Octal",                 C!ShowOctal );
+     
+         ! searching ;
+     
+         $Cmd( "Search",                     C!FSearch );
+         $Cmd( "Copy to Search",             C!CopyToSearch );
+         $Cmd( "Search Again",               C!RFSearch );
+         $Cmd( "Show Search String",         C!ShowSearch );
+         $Cmd( "Reverse Search",             C!RSearch );
+         $Cmd( "Reverse Search Again",       C!RRSearch );
+         $Cmd( "Change",                     C!ChangeString );
+         $Cmd( "Query Change",               C!QueryChange );
+         $Cmd( "Repeat Query Change",        C!RepeatQChange );
+         $Cmd( "Multiple Search",            C!MSearch );
+         $Cmd( "Match Parens",               C!MatchDelim );
+         $Cmd( "Special Search",             C!MovSpecF );
+         $Cmd( "Reverse Special Search",     C!MovSpecB );
+     
+         ! marks and region commands ;
+     
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 24-3
+     Prt: 02-Jul-84  09:20                                 Expand Command Tables
+
+         $Cmd( "Set Mark",                   C!SetMark );
+         $Cmd( "Clear Mark",                 C!ClearMark );
+         $Cmd( "Swap Mark",                  C!SwapPM );
+         $Cmd( "Goto Mark",                  C!GotoMark );
+         $Cmd( "Copy Region",                C!Copy );
+         $Cmd( "Wipe Region",                C!Wipe );
+         $Cmd( "Insert Kill Buffer",         C!Yank );
+         $Cmd( "Indent Region",              C!IndentRegion );
+         $Cmd( "Unindent Region",            C!UnindentRegion );
+     
+         ! Window Manipulations ;
+     
+         $Cmd( "Split Window",               C!W2 );
+         $Cmd( "Unsplit Window",             C!W1 );
+         $Cmd( "Switch Windows",             C!WSwitch );
+         $Cmd( "Grow Window",                C!WGrow );
+         $Cmd( "Window Bar",                 C!WBar );
+         $Cmd( "Refresh Window",             C!Refresh );
+     
+         ! Buffer manipulations ;
+     
+         $Cmd( "New Buffer",                 C!NewBuffer );
+         $Cmd( "Delete Buffer",              C!KillBuffer );
+         $Cmd( "Next Buffer",                C!NextBuffer );
+         $Cmd( "Last Buffer",                C!LastBuffer );
+         $Cmd( "Lock Buffer",                C!Lock );
+         $Cmd( "Unlock Buffer",              C!UnLock );
+         $Cmd( "UnModify Buffer",            C!UnModify );
+     
+         ! Reading/Writing Files ;
+     
+         $Cmd( "Read File",                  C!ReadFile );
+         $Cmd( "Insert File",                C!InsertFile );
+         $Cmd( "Write File",                 C!WriteFile );
+         $Cmd( "Command File",               C!CmdFile );
+         $Cmd( "Finish",                     C!Finish );
+         $Cmd( "Finish to RPG",              C!RunRPG );
+         $Cmd( "Checkpoint",                 C!Checkpoint );
+         $Cmd( "Recover Checkpoint",         C!UnCheckPoint );
+         $Cmd( "Recover CheckPoint File",    C!RecoverCheckPointFile );
+         $Cmd( "Safe Exit",                  C!SafeExit );
+         $Cmd( "Exit",                       C!Exit );
+     
+         ! mode stuff ;
+     
+         $Cmd( "Text Mode",                  C!TextMode );
+         $Cmd( "Normal Mode",                C!NormalMode );
+         $Cmd( "Toggle Wrap Flag",           C!ToggleWrap );
+         $Cmd( "Toggle Overwrite Flag",      C!OverWrite );
+     
+         ! variable, macro and key binding stuff ;
+     
+         $Cmd( "Bind Variable",              C!AssignVar );
+         $Cmd( "Query Variable",             C!QueryVar );
+         $Cmd( "Bind Function",              C!ReBind );
+         $Cmd( "Query Function",             C!QueryKey );
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 24-4
+     Prt: 02-Jul-84  09:20                                 Expand Command Tables
+
+         $Cmd( "Execute Function",           C!SymDispatch );
+         $Cmd( "UnBind Key",                 C!UnBindKey );
+         $Cmd( "Define Macro",               C!ReadMacro );
+         $Cmd( "Define Macro by Example",    C!MacroByExample );
+         $Cmd( "Bind Macro",                 C!BindMacro );
+         $Cmd( "Name Macro",                 C!NameMacro );
+         $Cmd( "UnName Macro",               C!UnNameMacro );
+         $Cmd( "Push Binding",               C!PushBinding );
+         $Cmd( "Pop Binding",                C!PopBinding         $Cmd( "Execute Macro",              C!ExecLastMacro );
+     
+         ! manipulating the character table ;
+     
+         $Cmd( "Is Number",                  C!SetNum );
+         $Cmd( "Not Number",                 C!ClearNum );
+         $Cmd( "Is Token",                   C!SetToken );
+         $Cmd( "Not Token",                  C!ClearToken );
+         $Cmd( "Is Delim",                   C!SetDelim );
+         $Cmd( "Not Delim",                  C!ClearDelim );
+         $Cmd( "Is Special",                 C!SetSpecial );
+         $Cmd( "Not Special",                C!ClearSpecial );
+     
+         ! misc. ;
+     
+         $Cmd( "Delete NULLs",               C!DelNULLs );
+         $Cmd( "XOFF Synch",                 C!XOFFSynch );
+         $Cmd( "Nothing",                    C!Ignore );
+         $Cmd( "Frame Push",                 C!PushFrame );
+         $Cmd( "Beep",                       T!Bell );
+         $Cmd( "Help",                       C!Help );
+         $Cmd( "Abort Command",              C!Err );
+         $Cmd( "Start Comment",              C!Comment );
+         $Cmd( "Start Message",              C!MsgText );
+         $Cmd( "Date Time Message",          C!DateTimeMsg );
+         $Cmd( "Insert Information String",  C!EnvironStr );
+         $Cmd( "Increment Char",             C!IncrChar );
+         $Cmd( "Decrement Char",             C!DecrChar );
+         $Cmd( "Set Terminal Type",          C!SetTermType );
+     
+         ifcr TymcomX thenc
+           $Cmd( "CreAux",                   C!CreAux );
+           $Cmd( "Set CreAux Esc Char",      C!SetCreEsc );
+         endc
+     
+       ! finish up the macro ;
+     
+       redefine $CN = cvms( $CN ) &
+         {NULL; safe string array SymCmd[ 1 : $CC + 1 ]; }; |1|
+     
+       ! expand the name table ;
+     
+       $CN
+     
+       ! allocate the address table ;
+     
+       safe integer array SymCmdA[ 1 : $CC ];
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 25-1
+     Prt: 02-Jul-84  09:20                                    Rtn InitSymCmdAddr
+
+     
+     
+     procedure InitSymCmdAddr;
+       begin |2|
+         $CA
+       end; |2|
+     
+     require InitSymCmdAddr initialization;
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 26-1
+     Prt: 02-Jul-84  09:20                                Expand Variable Tables
+
+     
+     ! Now do the symbolic variable access stuff
+     ;
+     
+       require " [Expanding Variable Tables]
+     " message;
+     
+       define $VC = 0, $VN = {preload!with }, $VA = {};
+     
+       define $Var( N, A ) = {
+         redefine $VC = $VC + 1;
+         redefine $VN = cvms( $VN ) & {N, };
+         redefine $VA = cvms( $VA ) & {SymVarA[}& cvms($VC) &{] := location(A);|
+                                                                         ->| };|
+       }; |1|
+     
+         $Var( ".Debug",             C!Debug );
+         $Var( ".Cmd",               C!Cmd );
+         $Var( ".LastCmd",           C!LastCmd );
+         $Var( ".Arg",               C!ArgV );
+         $Var( ".ScreenWidth",       T!Width );
+         $Var( ".ExitToRPG",         F!RPGFlag );
+         $Var( ".MetaPrefix",        C!MetaPrefix );
+         $Var( ".XMetaPrefix",       C!XMetaPrefix );
+         $Var( ".Box",               W!BoxP );
+         $Var( ".StickyColumn",      C!StickyColumn );
+     
+         $Var( "Multiplier",         C!ArgMultiplier );
+         $Var( "WrapLongLines",      G!WrapP );
+         $Var( "BreakPageOnFF",      G!FFBreak );
+         $Var( "EscapeAs$",          G!ESCF );
+         $Var( "OverWriteOnInsert",  G!OverWriteP );
+         $Var( "UseTabs",            C!UseTabs );
+         $Var( "TabWidth",           C!TABWidth );
+         $Var( "IndentWidth",        C!IndentUnitWidth );
+         $Var( "LeftMargin",         C!LeftMargin );
+         $Var( "RightMargin",        C!RightMargin );
+         $Var( "ExactCaseMatch",     G!CaseMatch );
+         $Var( "CRAsCtl",            G!CRCtl );
+         $Var( "JournalMacro",       C!JournalMacro );
+         $Var( "JournalFile",        C!JournalFile );
+         $Var( "JournalCommand",     C!JournalCommand );
+         $Var( "SwapPMRegion",       C!SPMRegion);
+         $Var( "VariableFill",       C!VFMode);
+     
+         $Var( "CheckpointInterval", C!CheckPointInterval );
+     
+       redefine $VN = cvms( $VN ) &
+         { NULL; safe string array SymVar[ 1 : $VC + 1 ]; }; |1|
+     
+       $VN
+     
+       safe integer array SymVarA[ 1 : $VC ];
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 27-1
+     Prt: 02-Jul-84  09:20                                       Rtn InitVarLocs
+
+     
+     
+     procedure InitVarLocs;
+       begin |2|
+         $VA
+       end; |2|
+     
+     require InitVarLocs initialization;
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 28-1
+     Prt: 02-Jul-84  09:20                                        Rtn SymCmdAddr
+
+     
+     ! Routine to return the address of a function given its name.
+     ! Two types of address are returned:
+     !        0 ,, Addr of Routine in Command Tables  (or)
+     !     Flag ,, Record Pointer to Keyboard Macro
+     ;
+     
+     integer procedure SymCmdAddr( string Cmd );
+       begin "addr" |2|
+         integer I, Index;
+         record!pointer (Macro) Idx, Ptr;
+     
+         Index := 0;
+     
+         ! Start with zero index "*unknown*" := 0        ;
+         ! If we find a partial match -- then            ;
+         !   If an exact match,                          ;
+         !     then return the address                   ;
+         !     else If non-zero-index [previous match]   ;
+         !            then return "*ambigious*" := -1    ;
+         !            else set index for match           ;
+         ! If Index is non-zero, then return the address ;
+         !   else return 0                               ;
+     
+         Ptr_ C!MacroNames;
+         while ( Ptr_ Macro:Next[ Ptr ] ) do
+           if ( kequ( Cmd, Macro:Name[ Ptr ][1 for length( Cmd )] )) then
+     
+             if ( kequ( Cmd, Macro:Name[ Ptr ] )) then
+               return( Macro:Id[ Ptr ] )
+             else if ( Idx ) then
+                    if ( kequ( Macro:Name[ Ptr ], Macro:Name[ Idx ] )) then
+                    else return( -1 )
+                  else
+                    Idx_ Ptr;
+     
+         if ( Idx ) then
+           Index_ Macro:Id[ Idx ];
+     
+         for I := 1 upto $CC do
+           if ( kequ( Cmd, SymCmd[ I ][1 for length( Cmd )] )) then
+     
+             if ( kequ( Cmd, SymCmd[ I ] )) then
+               return( SymCmdA[ I ] )
+             else if ( Index ) then
+                    if ( lh( Index ) = C!MacroPointer ) then
+                      if ( kequ(SymCmd[I], Macro:Name[ Idx ] )) then
+                      else return( -1 )
+                    else return( -1 )
+                  else
+                    Index := I;
+     
+         return( if Index then
+                   if ( lh( Index ) = C!MacroPointer ) then
+                     Index
+                   else
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 28-2
+     Prt: 02-Jul-84  09:20                                        Rtn SymCmdAddr
+
+                     SymCmdA[ Index ]
+                 else 0 );
+     
+       end "addr"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 29-1
+     Prt: 02-Jul-84  09:20                                        Rtn SymVarAddr
+
+     
+     ! Given a variable name, return it's address.
+     ;
+     
+     integer procedure SymVarAddr( string Sym );
+       begin "val" |2|
+         integer I, Index;
+     
+         Index := 0;
+     
+         ! Start with zero index "*unknown*" := 0        ;
+         ! If we find a partial match -- then            ;
+         !   If an exact match,                          ;
+         !     then return the address                   ;
+         !     else If non-zero-index [previous match]   ;
+         !            then return "*ambigious*" := -1    ;
+         !            else set index for match           ;
+         ! If Index is non-zero, then return the address ;
+         !   else return 0                               ;
+     
+         for I := 1 upto $VC do
+           if ( kequ( Sym, SymVar[ I ][1 for length( Sym )] )) then
+     
+             if ( kequ( Sym, SymVar[ I ] )) then
+               return( SymVarA[ I ] )
+             else if ( Index ) then
+                    return( -1 )
+                  else
+                    Index := I;
+     
+         return( if Index then SymVarA[ Index ] else 0 );
+     
+       end "val"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 30-1
+     Prt: 02-Jul-84  09:20                                        Rtn SymCmdName
+
+     
+     ! Given an address, figure out what routine it is.
+     ! Two types of address are deciphered:
+     !        0 ,, Addr of Routine in Command Tables  (or)
+     !     Flag ,, Record Pointer to Keyboard Macro
+     ;
+     
+     string procedure SymCmdName( integer Addr );
+       begin "name" |2|
+         integer I;
+         record!pointer (Macro) Ptr;
+     
+         if ( lh( Addr ) = C!MacroPointer ) then
+           begin "macro name pointer" |3|
+     
+             Ptr_ C!MacroNames;
+             while ( Ptr_ Macro:Next[ Ptr ] ) do
+               if ( Macro:Id[ Ptr ] = Addr ) then
+                 return( Macro:Name[ Ptr ] & " (Macro)" );
+     
+             Ptr_ C!MacroStack;
+             while ( Ptr_ Macro:Next[ Ptr ] ) do
+               if ( Macro:Id[ Ptr ] = Addr ) then
+                 return( if length( Macro:Name[ Ptr ] ) then
+                           Macro:Name[ Ptr ] & " (Macro)"
+                         else """Un-named"" (Macro)" );
+     
+           end "macro name pointer" |3|
+     
+           else
+             for I := 1 upto $CC do
+               if ( SymCmdA[ I ] = Addr ) then return( SymCmd[ I ] );
+     
+         return( NULL );
+     
+       end "name"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 31-1
+     Prt: 02-Jul-84  09:20                                        Rtn SymVarName
+
+     
+     ! Given an address, figure out what variable it is.
+     ;
+     
+     string procedure SymVarName( integer Addr);
+       begin "name" |2|
+         integer I;
+     
+         for I := 1 upto $VC do
+           if ( SymVarA[ I ] = Addr ) then return( SymVar[ I ] );
+     
+         return( NULL );
+     
+       end "name"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 32-1
+     Prt: 02-Jul-84  09:20                                            Rtn C!Loop
+
+     
+     ! C!Loop - the main command dispatch lives here.  "Meta" and "XMeta"
+     ! commands are formed by routine C!GetCMD. ;
+     
+     internal recursive procedure C!Loop;
+     begin "command loop" |2|
+       integer
+         Cmd;
+     
+       W!NewS;
+     
+       forever do
+       begin "loop" |3|
+         Cmd _ C!GetCMD;
+     
+         if (Cmd < 0) then
+           done "loop";
+     
+         Dispatch(Cmd);
+     
+         if (C!Quit) then
+           done "loop";
+       end "loop"; |3|
+     end "command loop"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 33-1
+     Prt: 02-Jul-84  09:20                                            Rtn C!File
+
+     
+     ! C!File - take commands from a file ;
+     ;
+     
+     simple boolean procedure C!File (string F);
+     begin "cmd file" |2|
+       ifcr TymcomX thenc
+         if ( not F!Lookup( F )) then return( false );
+     
+         C!CmdFileP := true;         ! now taking commands from file ;
+         C!Loop;                     ! take the commands ;
+         C!CmdFileP := false;        ! done with file ;
+         F!Release;                  ! release the file ;
+         C!Quit := false;            ! keep us in the command loop ;
+     
+         return( true );             ! return success ;
+       endc
+     
+       ifcr Tops20 thenc
+         CF!Chan _ openfile(F, "ROE");
+     
+           ! Try opening the command file.
+           ;
+     
+         if (!skip!) then
+           return(false);
+     
+           ! Could not open the command file.
+           ;
+     
+         set(C!CmdFileP);
+     
+           ! Now taking commands from file.
+           ;
+     
+         C!Loop;
+     
+           ! Take the commands.
+           ;
+     
+         clear(C!CmdFileP);
+     
+           ! Done with file.
+           ;
+     
+         cfile(CF!Chan);
+     
+           ! Release the file.
+           ;
+     
+         clear(C!Quit);
+     
+           ! Keep us in the command loop.
+           ;
+     
+         return(true);
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 33-2
+     Prt: 02-Jul-84  09:20                                            Rtn C!File
+
+     
+           ! Return success.
+           ;
+       endc
+     end "cmd file"; |2|
+     Cre: 27-Jun-84  11:21  (PEAK)COMAND.SAI                           Page 34-1
+     Prt: 02-Jul-84  09:20                                             Rtn C!Ini
+
+     
+     ! C!Ini - read initialization file.
+     ;
+     
+     internal procedure C!INI;
+       begin |2|
+         string IniFileName;
+     
+         ifcr TymcomX thenc
+           IniFileName _ "(" & C!UserName & ")" & DED!Alias & ".INI";
+         endc
+     
+         ifcr Tops20 thenc
+           ifcr false thenc
+             IniFileName _ "PS:<" & C!UserName & ">" & DED!Alias & ".INI";
+           elsec
+             IniFileName _ "PS:[" & C!UserName & "]" & "FtPeak.Ini";
+           endc
+         endc
+     
+         if (not C!File(IniFileName)) then
+           W!Msg("No " & IniFileName)
+         else
+           W!Msg(null);
+       end; |2|
+     end "DED - Command module"; |1|
+     
+     
+     ! **************************  End Comand.Sai  *************************** ;
+   _@t{
