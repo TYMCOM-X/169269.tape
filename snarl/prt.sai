@@ -1,0 +1,645 @@
+define  !  = "COMMENT";
+define  !! = "COMMENT";
+!! title Module Prt ;
+! *************************************************************************
+************************************+**************************************
+*                                                                         *
+*                                                                         *
+*                                  Prt                                    *
+*                                                                         *
+*                                                                         *
+************************************+**************************************
+
+
+	PRT is a filter for text files which creates in the GFD'd
+	directory a .LST file capable of being handled intelligently
+	by half-bright printer-spooler programs like LPQ.
+
+
+---------------------------------------------------------------------------
+			*****  Edit History  *****
+---------------------------------------------------------------------------
+
+
+	Version 1.00
+	(15-March-82:  kmd)
+
+	  Author:  Ken Dawson.
+	  Implement the basic program.
+
+
+---------------------------------------------------------------------------
+
+
+	Append mode.
+
+	Interpretation of control-characters.
+
+	Print-routine for Files.Da data structures.
+
+	Wrap-around processing.
+
+	Append to x.LST if more than 1 x.y is referenced.
+
+	Read SWITCH.INI file on setup.
+	  Default size & mode processing, default output file.
+
+	Bring date stuff from EXTEND into our date module.
+
+	Conditional inclusion of Brktbl by Files.
+
+	Support command-file mode (@filename).
+
+	Output directly to the terminal makes the TI.Switch make sense.
+
+	Switches.
+
+	(Module - Routine - Subroutine - Data Abstraction)
+	title-handling.
+
+	  (Routine - Major - Minor) page numbering.
+
+	Brktbl.Da s/b inside this module.
+
+	Detecting the presence of a TI by the  network address of the
+	terminal.
+
+	Wildcarding in filespecs.
+	  See (Sailib)Iniufr.
+	  See also (Ks2020:118)Lptspl.Sai.
+
+	Error module containing an interface to other DAs, like Files.
+
+
+**************************************************************************;
+
+
+begin "Outer Block"
+  require "(Ken)Sail.Hdr" source!file;
+
+  !version(!ver(0, 1), !edit('56));	! Module Version Number;
+
+  !get!module(EXTEND);			! For some Date stuff;
+
+  define  FATAL     = 0;	!  Fatal      error-class designator;
+  define  NON.FATAL = 1;	!  Non-fatal  error-class designator;
+
+  require "Util.Req"  source!file;
+  require "Brktbl.Da" source!file;
+  require "Date.Da"   source!file;
+  require "Files.Da"  source!file;
+
+
+! ************************************************************************;
+!! title Rtn Copy.Text ;
+! =========================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                             Rtn Copy.Text                               =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+==========================================================================;
+
+
+  procedure Copy.Text (r!p ($File)  Src, Dst);
+  begin "Copy.Text"
+    define  TW = <8>;				! Tab width;
+    define  LM = <Blanks(Left.Margin)>;		! Left.Margin;
+
+    define  Diff = <((lnot length(Line) land (TW - 1)) + 1)>;
+
+      ! This hack utilizes the fact that the normal tab width is 8.
+	It will work for any tab width which is a power of 2, but will
+	not work for others;
+
+
+    own string  Line;
+    own string  Line1;
+    own string  Title.Str;
+    own string  Title.Chr;
+    own integer Page.Count;
+    own integer SbPage.Count;
+    own integer PhPage.Count;
+    own integer Line.Count;
+    own string  Cr.Date;
+    own string  Pr.Date;
+    own boolean FF.Flag;
+    own boolean TOP;				! Top Of Page;
+    own boolean TI.Switch;
+    own boolean Title.Switch;
+    own boolean Wrap.Switch;
+    own integer Brk;				! For use with "scan";
+    own integer Page.Length;
+    own integer Header.Length;
+    own integer Trailer.Length;
+    own integer Form.Length;
+    own integer Form.Width;
+    own integer Page.Width;
+    own integer Left.Margin;
+    own integer Right.Margin;
+    own integer Top.Margin;
+    own integer Bottom.Margin;
+
+
+! ========================================================================;
+!! title SubRtn Title.Line ;
+! =========================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                           SubRtn Title.Line                             =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+==========================================================================;
+
+
+  boolean procedure Title.Line;
+  begin "Title.Line"
+    integer Brk;
+    string  Tmp;
+
+    Title.Chr _ null;
+
+    if (equ(Line[1 for 1], "!")) then
+    begin
+      Tmp _ Line;
+  
+      if (Starts.With(Tmp _ scan(Tmp, Blk.Tbl, Brk), "!title")) then
+      begin
+	Title.Chr _ "!";
+	return(true);
+      end
+      else
+	if (Starts.With(Tmp, "!!title")) then
+	begin
+	  Title.Chr _ "!!";
+	  return(true);
+	end;
+    end
+    else
+      return(false);
+  end "Title.Line";
+
+
+! ==================================+======================================
+==========================================================================;
+!! title SubRtn Top.Of.Page ;
+! =========================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                           SubRtn Top.Of.Page                            =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+==========================================================================;
+
+
+  string procedure Top.Of.Page (boolean Foot.Sw);
+  begin "Top.Of.Page"
+    own integer I;
+    own string  Left.Text;
+    own string  Right.Text;
+    own string  Line1;
+
+    Line1 _ ff;
+
+    for I _ 1 upto (Top.Margin) do
+      Line1 _ Line1 & crlf;
+
+    Right.Text _ "Page " & cvs(Page.Count) & "-" & cvs(SbPage.Count);
+
+    if (PhPage.Count neq Page.Count) then
+      Right.Text _ Right.Text & ":" & cvs(PhPage.Count);
+
+    Left.Text _ Cr.Date & $$Full.name(Src);
+
+    I _ Page.Width - (length(Left.Text) + length(Right.Text));
+    Line1 _ Line1 & LM & Left.Text & Blanks(I) & Right.Text & crlf;
+
+
+    Right.Text _ Title.Str;
+    Left.Text  _ Pr.Date;
+
+    Right.Text _ Right.Text[1 for (Page.Width - length(Left.Text))];
+
+    I _ Page.Width - (length(Left.Text) + length(Right.Text));
+    Line1 _ Line1 & LM & Left.Text & Blanks(I) & Right.Text & crlf2;
+
+    return(Line1);
+  end "Top.Of.Page";
+
+
+! ==================================+======================================
+==========================================================================;
+!! title SubRtn Handle.Title ;
+! =========================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                          SubRtn Handle.Title                            =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+==========================================================================;
+
+
+  procedure Handle.Title;
+  begin "Handle.Title"
+    Title.Str _ Line;
+    scan(Title.Str, Skp.Tbl, Brk);
+    scan(Title.Str, Skp.Tbl, Brk);
+
+    while ((Title.Str[inf for 1] = sp) or
+	(Title.Str[inf for 1] = ";")) do
+      Title.Str _ Title.Str[1 for (inf - 1)];
+
+    if (equ(Title.Chr, "!!")) then
+      Line _ null;
+  end "Handle.Title";
+
+
+! ==================================+======================================
+==========================================================================;
+!! title SubRtn Get.Line ;
+! ====================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                             SubRtn Get.Line                             =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+	! <<  Will loop when buffer overflow causes break, not
+	      terminating until lf is found.  Cr is discarded.
+
+
+==========================================================================;
+
+
+  simple boolean procedure Get.Line;
+  begin "Get.Line"
+    Line _ null;
+    reset(FF.Flag);
+  
+    while (true) do
+    begin
+      Line _ Line & input($$Chan(Src), Cpy.Tbl);
+  
+      if ($$Eof(Src)) then
+	return(false);
+  
+      if ($$Brchr(Src) = ht) then
+	Line _ Line & Blanks(Diff)
+      else if ($$Brchr(Src) = ff) then
+	set(FF.Flag)
+      else if ($$Brchr(Src) = lf) then
+      begin
+	Inc(Line.Count);
+	done;
+      end;
+    end;
+
+    return(true);
+  end "Get.Line";
+
+
+! ==================================+======================================
+==========================================================================;
+!! title SubRtn Wrap.Around ;
+! =========================================================================
+====================================+======================================
+=                                                                         =
+=                                                                         =
+=                           SubRtn Wrap.Around                            =
+=                                                                         =
+=                                                                         =
+====================================+======================================
+
+
+==========================================================================;
+
+
+  string procedure Wrap.Around (reference string Line);
+  begin "Wrap.Around"
+    string Indent;
+    string  Line1;
+    string  LMargin;
+    string  RMargin;
+    integer I;
+    integer Tmp;
+
+    LMargin _ Blanks(Left.Margin - 1) & "|";
+    RMargin _ "|";
+
+    Line1  _ Line[1 for Page.Width] & "|" & crlf;
+    Line   _ Line[(Page.Width + 1) to inf];
+    Tmp    _ Page.Width - (Indent.Width(Line1) + 6);
+    Indent _ "<-" & Blanks(Page.Width - (Tmp + 5)) & "->|";
+
+    while (length(Line)) do
+    begin
+      Inc(Line.Count);
+
+      if (Line.Count > Page.length) then
+      begin
+	Inc(SbPage.Count);
+	Line1 _ Line1 & Top.Of.Page(false);
+	Line.Count _ 1;
+      end;
+
+      if (length(Line) > Tmp) then
+      begin
+	Line1 _ Line1 &
+	    LMargin &
+	    Indent &
+	    Line[1 for Tmp] &
+	    RMargin &
+	    crlf;
+	Line  _ Line[Tmp + 1 to inf];
+      end
+      else
+      begin
+	Line1 _ Line1 &
+	    LMargin &
+	    "<-" &
+	    Blanks(Page.Width - (length(Line) + 5)) &
+	    "->|" &
+	    Line &
+	    RMargin;
+
+
+	Line  _ null;
+      end;
+    end;
+
+    return(Line1);
+  end "Wrap.Around";
+
+
+! ==================================+======================================
+==========================================================================;
+!! title Body Copy.Text;
+! ========================================================================;
+
+
+    set(TI.Switch);
+    set(Wrap.Switch);
+    Title.Str       _ null;
+
+    Form.Width      _ 132;
+    Form.Length     _ 66;
+    Header.Length   _ 3;
+
+    Trailer.Length  _ 0;
+    Left.Margin     _ 4;
+    Right.Margin    _ 6;
+    Top.Margin      _ 3;
+    Bottom.Margin   _ 3;
+
+    if (TI.Switch) then
+      Inc(Bottom.Margin);
+
+    Page.Width _ Form.Width - (Left.Margin + Right.Margin);
+
+    Cr.Date _ "CRE: " & $$Cr.Date(Src) & "  ";
+    Pr.Date _ "PRT: " & DateTimeString & "  ";
+
+    Page.Length _ Form.Length -
+	(Header.Length + Trailer.Length + Top.Margin + Bottom.Margin);
+
+    reset(Title.Switch);
+    Page.Count   _ 1;
+    SbPage.Count _ 1;
+    PhPage.Count _ 1;
+    Line.Count   _ 0;
+
+
+! ------------------------------------------------------------------------;
+
+	      ! <<  Can this be done with a USETI?;
+
+    begin
+      integer I;
+
+      I _ 1;
+      Line1 _ null;
+
+      while (I <= 3) do
+      begin
+	Get.Line;
+
+	  ! <<  What if Get.Line returns false here?;
+
+	if (length(Line)) then
+	begin
+	  Inc(I);
+
+	  if (Title.Line) then
+	  begin
+	    set(Title.Switch);
+	    Handle.Title;
+	  end;
+	end;
+
+	if (FF.Flag) then
+	  Inc(PhPage.Count);
+
+	Line1 _ Line1 & LM &
+		    (if (Wrap.Switch and length(Line) > Page.Width) then
+		      (Wrap.Around(Line) & crlf)
+		    else
+		      (Line & crlf));
+
+	if (Title.Switch) then
+	  done;
+      end;
+    end;
+
+    reset(FF.Flag);
+    cprint($$Chan(Dst), Top.Of.Page(false), Line1);
+
+
+! ------------------------------------------------------------------------;
+
+
+    while (true) do
+    begin "Main Loop"
+      if (not Get.Line) then
+	done "Main Loop";
+
+      if (Title.Switch) then
+      begin
+	if (Title.Line) then
+	begin
+	  Handle.Title;
+	  Inc(Page.Count);
+	  SbPage.Count _ 1;
+	  set(TOP);
+	end
+	else
+	  if (FF.Flag) then
+	  begin
+	    Inc(SbPage.Count);
+	    set(TOP);
+	  end;
+      end
+      else
+	if (FF.Flag) then
+	begin
+	  Inc(Page.Count);
+	  SbPage.Count _ 1;
+	  set(TOP);
+	end;
+    
+      if (not TOP and Line.Count > Page.Length) then
+      begin
+	Inc(SbPage.Count);
+	set(TOP);
+      end;
+    
+      if (TOP) then
+      begin
+	if (FF.Flag) then
+	  Inc(PhPage.Count);
+
+	cprint($$Chan(dst), Top.Of.Page(true));
+	reset(TOP);
+	Line.Count _ 1;
+      end;
+
+      if (Wrap.Switch and
+	  length(Line) > Page.Width) then
+	cprint($$Chan(Dst), LM, Wrap.Around(Line), crlf)
+      else
+	cprint($$Chan(Dst), LM, Line, crlf)
+    end "Main Loop";
+
+
+! ------------------------------------------------------------------------;
+
+
+    if (TI.Switch) then
+      cprint($$Chan(Dst), ff);
+  end "Copy.Text";
+
+
+! ==================================+======================================
+==========================================================================;
+r!p ($File)  Dest;
+r!p ($File)  Src;
+boolean procedure oneFile( string inName );
+begin
+if ($$Eof(Src _ Open.File(InName, T.INPUT))) then
+  begin	boolean stopNow;
+    print(crlf & "*** trouble on file """, inName, """. ");
+    stopNow_ (F.Error(Src) = FATAL);
+    Close.File(Src);
+    return( stopNow );
+  end;
+print(crlf & " processing """, inName, """. ");
+Copy.Text(Src, Dest);
+Close.File(Src);
+return( false );
+end;
+string simple procedure Name.from.block( integer array lkBuf );
+return(	(if lkBuf[-2] then cv6str(lkbuf[-2]) & ":" else null)
+	& (if lkBuf[-4] 
+	   then "(" & cv6str(lkbuf[-4]) & cv6str(lkbuf[-3]) & ")"
+	   else null)
+	& cv6str( lkBuf[0] ) & "." & cv6str( lkBuf[1] ) 
+	& (if lkBuf[-1] and not lkBuf[-4]
+	   then "[" & cvos(lkBuf[-1] lsh -18) & "," 
+			& cvos(lkBuf[-1] land (-1 lsh -18)) & "]" 
+	   else null) );
+boolean simple procedure wildFile( integer array lkBuf );
+return( oneFile( Name.from.block( lkBuf ) ) );
+integer sep,hasWild;
+simple procedure make.breaks;
+begin
+  setbreak(sep_getbreak, 
+	",+&" & crlf & #ff, 
+	",+&" & crlf & #ff & #sp & #ht,
+	"TINS");
+  setbreak(hasWild_ getbreak, "#*", null, "IS" );
+end;
+require make.breaks initialization;
+
+boolean recursive procedure fileList( string textLine );
+begin	string aSpec;
+while length(aSpec_ scan(textLine,sep,!skip!))
+    do if aSpec = "@"
+	 then begin
+	      end
+	 else begin	string sTemp;
+			integer brk;
+		scan( sTemp_ aSpec, hasWild, brk );
+		if brk
+		 then redUfd( wildFile, aSpec, "#*" )
+		 else if oneFile( aSpec ) then return(true);
+	       end;
+       end;
+return(false);
+end;
+!! title Mainline Code;
+! **********************************+**************************************
+*                                                                         *
+*                                                                         *
+*                             Mainline Code                               *
+*                                                                         *
+*                                                                         *
+************************************+*************************************;
+
+
+  begin "Mainline Code"
+    string  InFile;
+    string  OutFile;
+    integer Brk;
+    !get!module(extend);
+	! that is for REDUFD;
+
+    ttyup(true);
+    Setup.Brktbls;
+    do begin
+	InFile_ scan( InFile_ Prompt.User("Files: "), blk.tbl, brk);
+	OutFile_ scan( InFile, Ass.Tbl, Brk);
+	if Brk=0 then
+	  begin InFile_ OutFile; OutFile _ "list.lst" end;
+
+	if ($$Eof(Dest _ Open.File(OutFile, T.OUTPUT)))
+	and (F.Error(Dest) = FATAL) then usererr(0,0,"Fatal error");
+       end
+     until not $$Eof(Dest);
+
+    if length(inFile) then redufd( aFile, inFile, "#*" );
+
+    while length(InFile_ scan(InFile_ Prompt.User("Files: "), 
+				Blk.Tbl, Brk))
+    and not Starts.With(InFile, "/Q")
+	do redufd( aFile, inFile, "#*" );
+
+    Close.File(ALL.FILES);
+    print($$Full.Name(Dest), " created.", crlf, crlf);
+
+    Release.Brktbls;
+    exit;
+  end "Mainline Code";
+end "Outer Block";
+
+
+! **********************************+**************************************
+**************************************************************************;
+    O ~H
