@@ -1,0 +1,15 @@
+BEGIN
+require "MYLIB.SAI" source!file;
+blanklines(2);
+Str_"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+print(str&crlf);
+While Length(Str) do
+begin "looper"
+  s_lop(str);
+  loop(length(Str))
+    print(" ");
+  print(s&#cr);
+end "looper";
+blanklines(2);
+
+end;
