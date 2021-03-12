@@ -1,0 +1,424 @@
+begin "init"
+
+require "{}()" delimiters;
+define
+  ! = {comment},
+  nl = {'15&'12},
+  upto = {step 1 until};
+define
+  lh (i) = {((I) lsh -18)},
+  rh (i) = {((I) land '777777)},
+  EXIT = {call(0,"EXIT")};
+external boolean !SKIP!;
+
+integer node!number, I, V;
+string term!type, state!codes;
+
+preload!with
+  cvsix( "DSK" ),
+  cvsix( "REMIND" ),
+  0,
+  0,
+  '3346701,
+  0;
+integer array RunBlock[ 0:5 ];
+!	!bit
+;
+
+define
+  !bit (X) = {(1 lsh (35-(X)))};
+
+
+!	GetTab (Index,Table)
+
+	Does a gettab for index I into table T.
+;
+
+simple integer procedure GetTab (integer Index,Table);
+start!code
+	SETOM !SKIP!;
+	HRL 1,Index;
+	HRR 1,Table;
+	CALLI 1,'41;
+	  SETZM !SKIP!;
+end;	
+
+!	Setlch (Port,Value,(BitNo))
+
+	Changes the specified bit in the SETLCH word.  Other
+	bits remain unchanged.  If BitNo is omited, whole word
+	is implied.
+;
+
+simple procedure SetLch (integer Port,Value,BitNo(-1));
+begin "SetLch"
+    own integer T,PTR;
+    if BitNo < 0 
+	then PTR _ point(36,T,35)
+	else PTR _ point(1,T,BitNo);
+    start!code
+    	define GETLCH = '051300000000;
+	define SETLCH = '051340000000;
+    	MOVE 1,port;
+    	MOVEM 1,T;
+    	GETLCH T;
+    	MOVE 1,value;
+    	DPB 1,PTR;
+    	SETLCH T;
+    end;
+end "SetLch";
+
+!	Functions for user to get information about terminal
+;
+
+define	States 		= {gettab('17,'11)};
+
+simple string procedure State!Name;
+case States lsh -15 land 7 of begin "state!name"
+    [0] return("answered");
+    [1] return("restricted");
+    [2][3][6][7] return("super-shut");
+    [4] return("shut");
+    [5] return("restricted + shut");
+    else return(cvos(STATES)) 
+end "state!name";
+
+simple string procedure HardWare;
+  begin "HardWare"
+    integer BLTresult, PUSHresult;
+    start!code 
+      setz; 
+      blt; 
+      hrrzm BLTresult;			! 0=KI/F3, 1=non-KI/F3;
+      movei -1;
+      push;
+      hlrzs;
+      movem PUSHresult;			! 1=non-F3, 2=F3;
+    end;
+    return(case BLTresult of (		! BLT resolves KI/F3 vs KL/KS;
+      (if PUSHresult-1			! PUSH resolves KI vs F3;
+	  then "F3"			! KI adds 1,,1;
+	else "KI-10" ),			! KI adds seperately;
+      (if gettab('20,'11) land '70000	! serial resolves KL vs KS;
+	  then "KS-10" 			! KS is ['10000:'70000];
+	  else "KL-10")));		! KL is [?:''07777];
+  end "HardWare";
+
+simple string procedure SoftWare;
+return (  cvastr(gettab('0,'11))
+	& cvastr(gettab('1,'11))
+	& cvastr(gettab('2,'11))
+	& cvastr(gettab('3,'11))
+	& cvastr(gettab('4,'11)));
+!	Parse ("filespec",@Name,@Ext,@PPN)
+
+	Scans the filespec and breaks it into Name, Ext and PPN.
+	If a username is given, it is converted to a PPN.
+;
+
+procedure Parse (
+	string 	File;
+	reference integer 
+		Name,
+		Ext,
+		PPN );
+begin "Parse"
+    Name _ cvfil (File, Ext, PPN);
+    if PPN = 0 then PPN _ calli(0,'24);	! GETPPN;
+    if lh(PPN) = 0 then begin "UserName"
+	integer array LKB[0:3];		! block for extended lookup;
+	integer Chan,Eof;
+	LKB[0] _ arrinfo(LKB,2);	! size of LKB;
+	LKB[1] _ calli('16,'41);	! MFD PPN;
+	LKB[2] _ PPN;			! addr of SIXBIT user name;
+	LKB[3] _ cvsix("UFD");		! extension;
+	open (Chan_getchan, "DSK", '17,0,0, 0,0,Eof);
+	if Eof then return;		! very, very ill;
+	chnior (Chan, LKB[0], 4);	! lookup UFD to get PPN;
+	release (Chan);			! don't need the channel;
+	PPN _ LKB[2];			! save real PPN for user;
+    end "UserName";
+end "Parse";
+!	SetAlp sets alternate logout program name in monitor
+
+	SetAlp (File)
+		or
+	SetAlp
+;
+
+simple boolean procedure SetALP (string File(null));
+begin "SetALP"
+    own integer array Foo[0:2];
+    if length(File)
+	then Parse (File, Foo[2], Foo[0], Foo[1])
+	else begin
+	    Foo[2] _ calli('777777000003,'41);	! JBTNAM;
+	    Foo[1] _ calli(-'25,'41);		! JBTFPN;
+	end;
+    Foo[0] _ cvsix("DSK");
+    calli (location(Foo[0]),-'127);	! tell monitor what to run;
+    return (!SKIP!);			! fails if one already set;
+end "SetALP";
+!	auto LF, duplex and deffered echo mode ;
+
+define	BSD		= {auxclv(-1,1,'77)},
+	DEF		= {auxclv(-1,1,'63)};
+
+!	width and free CRLF ;
+
+define 	Width (x) 	= {auxclv(-1,x,'27)},
+	No!CRLF 	= {setlch(-1,1,10)};
+
+!	scope characteristics ;
+
+define 	Rev!XON 	= {auxclv(-1,1,'55)},
+	BackSpace	= {auxclv(-1,1,'57)},
+	Erase		= {auxclv(-1,1,'62)},
+ 	LC 		= {setlch(-1,1,13)};
+
+!	VT FF HT parameters ;
+
+define 	Tabs 		= {setlch(-1,1,14)},
+	Forms		= {setlch(-1,1,17)};
+!	delay!in!ms _ Response!Time
+
+	Return time in mS for round trip message through network
+;
+
+simple integer procedure RESPONSE!TIME; 
+begin "RT"
+    integer Start;
+    calli('40000000,'72);
+    Start _ call(0,"MSTIME");
+    calli('40000000,'72);
+    return(call(0,"MSTIME")-Start);
+end "RT";
+!	routines to set up TMPCOR file for RPG
+
+	RPGini	("file")
+	RPGini	
+;
+
+record!class RPGrec (
+	record!pointer(any!class) Link;
+	integer w1,w2,w3,w4,w5,w6,w7,w8,w9 );
+
+integer array		     RPGhdrs[1:8];
+record!pointer(RPGrec) array RPGrecs[1:8];
+record!pointer(RPGrec) RT!;
+!	CTest
+
+	Create the RPG temp file
+;
+
+procedure RPGini (string file(null));
+begin "CTEST"
+   integer array desc[0:1];
+   integer array TmpBuf[0:511];
+   integer I,BufPtr,WC;
+   if length(file)=0 then begin "fromCore"
+    BufPtr _ 0;
+    for I _ arrinfo(RPGrecs,1) upto arrinfo(RPGrecs,2) do 
+      if RPGhdrs[i] then begin
+	RT! _ RPGrecs[i];
+	WC _ case i of (0,4,7,4,0,1,8,6,3);
+	TmpBuf[BufPtr]_RPGhdrs[i]; BufPtr_BufPtr+1;
+	while RT! do begin
+	    arrblt ( TmpBuf[BufPtr], RPGrec:w1[rt!], WC );
+	    BufPtr _ BufPtr + WC;
+	    RT! _ RPGrec:link[rt!];
+	end;
+      end;
+   end "fromCore"
+   else begin "fromDisk"
+	integer Ch,Eof;
+	open (Ch_getchan,"DSK",'14,2,0, 0,0,Eof);
+	lookup (ch,file,eof);
+     	if eof then usererr(eof,2,"?file "&file&" not found","C");
+	arryin (Ch,TmpBuf[0],arrinfo(TmpBuf,0));
+	if not eof then usererr(0,0,"?file "&file&" too big","C");
+	BufPtr _ rh(EOF);
+	release (Ch);
+   end "fromDisk";
+   desc[0]_cvsix("RPG");
+   desc[1]_(-bufptr lsh 18)+location(tmpbuf[0])-1;
+   call((3 lsh 18)+location(desc[0]),"tmpcor");
+   if not !SKIP! then begin "dsk"
+      integer Ch,Eof;
+      string  F;
+      ch _ getchan;
+      open(ch,"DSK",'14,0,1, 0,0,EoF);
+      F _ ("000"&cvs(call(0,"PJOB")))[inf-2 to inf]&"RPG.TMP";
+      enter(ch,F,EoF);
+      if EoF then usererr(Eof,2,"can't enter "&F,"C");
+      arryout(Ch,tmpbuf[0],bufptr);
+      release(Ch);
+   end "dsk";
+end "CTEST";
+!	special routines for "normal" terminal characteristics;
+
+simple procedure istrou (string S);
+  while length(S) do ioneou (lop (S));
+
+simple procedure TabSet ( 
+	string 	!Clr,!Set;
+	integer	!Wid(73) );
+begin
+    integer I;
+    tabs;
+    ioneou ('15);
+    istrou (!Clr);
+    for I _ 2 step 1 until !Wid do begin
+	ioneou ('40);
+	if I mod 8 = 1 then istrou (!Set);
+    end;
+    ioneou ('15);
+end;
+    
+define	Scope (l,w) = { begin
+	forms;
+ 	bsd;
+	backspace;
+	erase;
+	def;
+	width(w);
+	rev!xon;
+end };
+
+define Tym!444 = { begin	! HP-2621A;
+    scope(48,80);
+    tabset ('33&"3",'33&"1",79);
+end };
+simple procedure Look!Around;
+  begin
+    string username, program;
+    integer frame, state, maxjob, status;
+    boolean found!one, this!one;
+
+    maxjob := gettab( '20, '12 );	! largest possible frame number ;
+    found!one := false;
+    for frame := 1 upto maxjob do
+      begin
+	status := gettab(frame,'0);
+	if status land !bit(3) then
+	  begin
+	    this!one := false;
+	    username := cv6str( gettab(frame,-18) ) &
+			cv6str( gettab(frame,-17) );
+	    if kequ( username, "SDUNHAM" ) then
+	      begin
+		found!one := this!one := true;
+		username := "Sheila is";
+	      end
+	    else if kequ( username, "TJB" ) and frame neq call(0,"PJOB") then
+	      begin
+		found!one := this!one := true;
+		username := "You are";
+	      end;
+	    if this!one then
+	      begin
+		program := cv6str( gettab(frame,3) );
+		state := (status lsh -21) land '37;
+		print( "[", username, " here.  Job ", frame,
+		       ", running ", program, " in " );
+		if state then
+		  print( state!codes[ (state*2+1) for 2 ] )
+		else
+		  print( "^C" );
+		print( " state.]", NL );
+	      end;
+	  end;
+      end;
+    if found!one then
+      print( NL );
+  end;
+state!codes := NULL;
+I := 0;
+while ( true ) do
+  begin "get state codes"
+    V := gettab( I, '25 );
+    if ( not !skip! ) then done "get state codes";
+    state!codes := state!codes & cvxstr( V );
+    I := I + 1;
+  end "get state codes";
+
+setalp( "(MPL)ZEN" ); rpgini( "(TJB)RPG.INI" );
+LC; no!crlf;
+
+node!number := GetTab(-1,-'24);
+start!code "xlate"
+  move 0,node!number;
+  setz 1,;
+  lsh 0,-8;
+  rotc 0,-6;
+  lsh 0,-2;
+  andi 0,'77;
+  rotc 0,6;
+  movem 0,node!number;
+end "xlate";
+
+if node!number = '554 or node!number = '552 or node!number = '2243 or
+   node!number = '2201 or node!number = '2202 then
+  begin
+    scope( 24, 80 );
+    term!type := "VT100";
+  end
+else ! if node!number = '441 or node!number = '2037 or node!number = '773 then;
+  begin
+    ttyup( true );
+    print( NL, "Terminal type (444, 350, H19, VT100, other)? ");
+    if (kequ( term!type := inchwl, "" )) then
+      term!type := "VT100";
+    case term!type of
+      begin
+	["4"]
+	  begin
+	   444;
+	    term!type := "HP2621";
+	  end;
+	["3"]
+	  begin
+	    scope(24,80);
+	    tabset('33&"[2g",'33&"H",79);
+	    term!type := "TYM350";
+	  end;
+	["H"] ["h"]
+	  begin
+	    scope(24,80);
+	    term!type := "H19";
+	  end;
+	["V"] ["v"]
+	  begin
+	    scope(24,80);
+	    term!type := "VT100";
+	  end;
+	[else]
+	  begin
+	    scope(24,80);
+	  end
+      end;
+  end;
+! else;
+!   begin;
+!     scope(24,80);
+!     term!type := "H19";
+!   end;
+auxclv( -1, cvsix( term!type ), '100 );
+
+if ( kequ( term!type, "H19" ) or kequ( term!type, "HP2621" ) ) then
+  print( '33&'110&'33&'112 )
+else if ( kequ( term!type, "VT100" ) ) then
+  print( '33&"[H"&'33&"[2J" );
+print( "[ ", SoftWare, " (", HardWare, ") ]", NL );
+print( "    ~ ", State!Name, " ~", NL );
+print( "Response time: ", Response!Time, " ms.", NL, NL );
+print( ".TTY CLASS ", term!type, NL, NL );
+
+! if ( kequ( term!type, "HP2621" ) or kequ( term!type, "VT100" ) ) then
+!   Look!Around;
+
+print( "Reminders:", NL, "==========", NL );
+calli( '1000000 + location( RunBlock[ 0 ] ), '35 );
+
+end "init"
+  Pnï
