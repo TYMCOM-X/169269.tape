@@ -1,0 +1,4 @@
+snarl,sncli,snpars,modes,snmisc,snhelp,				;
+   tapcom,snio,ftrans,(adele)tdplib/lib,			;
+   /save:snarl
+
