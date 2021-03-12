@@ -1,0 +1,111 @@
+
+
+		  TYMCOM-X TRANSMITTAL TRACKING DATA BASE
+
+    This is a MAGNUM data base that is used for keeping track of transmittals.
+The data base resides on TSUCOOP:930, the schema is TRANS.TRACK.  There are
+two procedures in the system:  TTS is an interactive procedure for entering,
+modifying, deleting, and displaying transmittal information; and TTS.REPORT
+which writes a full report of all transmittals.
+
+TTS.REPORT
+    To produce a report, run FTMAGNUM from TSUCOOP:930.  If TRANS.TRACK does
+not appear as the default schema, use the command 'SCHEMA TRANS.TRACK'.
+'RUN TTS.REPORT' will then run the the report writing procedure.  The user
+will be requested to enter the report file name; this may be any file name or
+'terminal'.  Respond to any other questions that may appear, and the report is
+written.
+
+TTS
+    To use this procedure, run FTMAGNUM from TSUCOOP:930.  If TRANS.TRACK does
+not appear as the default schema, use the comand 'SCHEMA TRANS.TRACK'.  
+'RUN TTS' will begin execution of the procedure; the prompt 'TTS>' should
+appear.  The valid commands at this point are:  Enter, Complete, Modify, 
+Delete, Testing, List, Outstanding, Help, and Quit; each command will be
+discussed further.  Each of the commands may be abbreviated with the first
+character.
+    Most of the commands require a transmittal number to execute.  If no 
+transmittal number is included with the command, TTS will try to use the most
+recent, successfully accessed transmittal.  If there is no valid transmittal
+number available to TTS, the user will be prompted for one.  Three items to
+note:  one, the Enter command requires a non-existent transmittal and
+therefore ignores any recently accessed transmittal; two, the Delete command
+clears the number of the most recent access; and three, the Help and 
+Outstanding commands do not change the number of the most recent access.
+
+TTS commands:
+
+HELP -- syntax:  H[elp]
+    function:  Displays a list of valid commands with brief descriptions.
+
+QUIT -- syntax: Q[uit]
+    function:  Exits TTS.
+
+ENTER -- syntax:  E[nter] [transmittal number]
+    function:  Creates the transmittal and records the initial information.
+    operation:  If the transmittal number is omitted, the user is prompted for
+      one.  The number is checked to ensure that it does not already exist.  
+      At the 'Enter Transmittal Number...' prompt a carriage return will 
+      return the user to the 'TTS>' prompt.  After the transmittal number has
+      been accepted, the user will be requested for the name of the software
+      product, product version, the system type on which the software is used,
+      the programmer's last name, the date of the transmittal, and whether or
+      not the transmittal is archive only.  None of the items may be left 
+      blank.  A request for another transmittal number will then appear.  If
+      another transmittal is to be entered, give its number, otherwise just
+      return.
+
+COMPLETE -- syntax:  C[omplete] [transmittal number]
+    function:  To complete the transmittal information.
+    operation:  A "complete" transmittal is one that is either archive
+      only and has an archive date or represents installed software and has an
+      archive date, installation date, and memo date.  Upon execution the user
+      will be requested for the information to complete the transmittal.  If
+      the information is not known, a carriage return will leave the field
+      blank.  At the request for another transmittal number, enter the number
+      of another transmittal to complete, or just return to return to 'TTS>'.
+
+DELETE -- syntax:  D[elete] [transmittal number]
+    function:  Delete a transmittal and any associated testings.
+    operation:  If the transmittal number is omitted and no recent one exists,
+      it is requested.  If the transmittal exists, its basic information is
+      displayed and conformation requested.  If the responce begins with "y"
+      the transmittal and any associated testings are deleted.  Enter another
+      transmittal number to delete or a carriage return to return to 'TTS>'.
+
+MODIFY -- syntax:  M[odify] [transmittal number]
+    function:  Allows changes to all transmittal information except for 
+      testings.
+    operation:  A transmittal number is requested if not included with the
+      command and a recently accessed number is not available.  At the 
+      'Field to Change...' prompt the user has several options.  Entering
+      'help' will display the valid field names and other options.  Entering
+      'abort' will stop all previously entered but unkept changes for a
+      transmittal, a carriage return keeps the changes, both return the user
+      to the transmittal number request prompt.  Return at the transmittal
+      number request to return to 'TTS>'.
+
+TESTINGS -- syntax:  T[esting] [transmittal number]
+    function:  Enter, modify, and delete testing information.
+    operation:  A transmittal number is requested if not included with the 
+      command and a number from the most recent access is not available.  At
+      the 'Test System...' prompt, entering 'help' will display instructions
+      on how to create a new testing record, modify an existing testing, or
+      delete a testing.  When finished with a transmittal just return at the
+      'Test System...' prompt.  Return at the transmittal number request to
+      return to 'TTS>'.
+
+LIST -- syntax:  L[ist] [transmittal number or product name]
+    function:  Displays all the information of the transmittal specified or
+      all transmittals for product named.
+    operation:  If neither a transmittal number or product name is included
+      with the command, the transmittal of most recent access will be used.
+      The last transmittal displayed becomes the most recently accessed.
+
+OUTSTANDING -- syntax:  O[utstanding]
+    function:  Displays all outstanding transmittals.
+      An outstanding transmittal is one that is not complete.  Or simply, if
+      it is archive only it lacks an archive date; or if not archive only, it
+      lacks at least one of the following:  archive date, installation date,
+      or memo date.
+
