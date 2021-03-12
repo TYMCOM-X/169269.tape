@@ -1,0 +1,239 @@
+{LF}	::= 12
+{COM}	::= ","
+{Q}	::= 77
+{CLN}	::= ":"
+{UNDER}	::= 137
+{DASH}	::= "-"
+{DOT}	::= "."
+{EQ}	::= "="
+{LBRKT}	::= "["
+{RBRKT}	::= "]"
+
+<command> "Extra input in command."
+	::= <statement> {LF}
+
+<statement>
+	::= <dump_c>
+	::= <indi_c>
+	::= <bloc_c>
+	::= <map_c>
+	::= <type_c>
+	::= <rewi_c>
+	::= <unlo_c>
+	::= <devi_c>
+	::= <help_c>
+	::= <qmrk_c>
+	::= <inst_c>
+	::= <grip_c>
+	::= <news_c>
+	::= <diff_c>
+	::= <log_c>
+	::= <unlg_c>
+	::= <comm_c>
+	::= <quit_c>
+	::= <stop_c>
+	::= <cont_c>
+	::= <go_c>
+	::= <abor_c>
+	::= <qchk_c>
+
+<dump_c> "Illegal command word."
+	::= 'DUMP'
+
+<indi_c> "Illegal command word."
+	::= 'INDICES' <indval>
+
+<indval> "Illegal index type."
+	::= 'OCTAL'
+	::= 'DECIMAL'
+
+<bloc_c> "Illegal command word."
+	::= 'BLOCK' <bloval>
+
+<bloval> "Illegal block value."
+	::= 'NEXT'
+	::= 'PREVIOUS'
+	::= 'LAST'
+	::= <blonum>
+
+<blonum> [INTSAV]
+	::= {integer}
+
+<map_c> "Illegal command word."
+	::= 'MAP'
+
+<type_c> "Illegal command word."
+	::= <trange> 'T' <mode>
+	::= <trange> 'T'
+	::= 'T' <mode>
+	::= 'T'
+
+<trange> [rngchk] "Bad range expression."
+	::= <word1> {cln} <word2>
+	::= <row> {com} <column>
+
+<word1> [INTSAV]
+	::= {integer}
+
+<word2> [INTSAV]
+	::= {integer}
+
+<row> [INTSAV]
+	::= {integer}
+
+<column> [INTSAV]
+	::= {integer}
+
+<mode>
+	::= 'OCTAL'
+	::= 'DECIMAL'
+	::= 'SIXBIT'
+	::= 'ASCII'
+	::= 'HED'
+	::= 'DIR'
+	::= 'RCD'
+	::= 'LOK'
+	::= 'DAT'
+	::= 'EMP'
+	::= 'DUM'
+	::= 'BOU'
+	::= 'EOU'
+	::= 'DEFAULT'
+
+<rewi_c> "Illegal command word."
+	::= 'REWIND' <rwopt>
+	::= 'REWIND'
+
+<rwopt>
+	::= 'WAIT'
+
+<unlo_c> "Illegal command word."
+	::= 'UNLOAD' <rwopt>
+	::= 'UNLOAD'
+
+<devi_c> "Illegal command word."
+	::= 'DEVICE' <dvnam> <dens>
+	::= 'DEVICE' <dvnam>
+	::= 'DEVICE'
+
+<dvnam> [STRSAV] "Not a mag-tape device name."
+	::= {identifier}
+
+<dens> [INTSAV] "Expected a mag-tape density."
+	::= {integer}
+
+<help_c> "Illegal command word."
+	::= 'HELP' <cmdwd>
+	::= 'HELP'
+
+<qmrk_c> "Illegal command word."
+	::= {Q} <cmdwd>
+	::= {Q}
+
+<cmdwd> "Expected a command word."
+	::= 'DUMP'
+	::= 'INDICES'
+	::= 'BLOCK'
+	::= 'MAP'
+	::= 'T'
+	::= 'REWIND'
+	::= 'UNLOAD'
+	::= 'DEVICE'
+	::= 'HELP'
+	::= {Q}
+	::= 'INSTRUCTIONS'
+	::= 'GRIPE'
+	::= 'NEWS'
+	::= 'DIFFERENCES'
+	::= 'LOG'
+	::= 'UNLOG'
+	::= 'COMMENT'
+	::= 'QUIT'
+	::= 'STOP'
+	::= 'CONTINUE'
+	::= 'GO'
+	::= 'ABORT'
+
+<inst_c> "Illegal command word."
+	::= 'INSTRUCTIONS'
+
+<grip_c> "Illegal command word."
+	::= 'GRIPE'
+
+<news_c> "Illegal command word."
+	::= 'NEWS'
+
+<diff_c> "Illegal command word."
+	::= 'DIFFERENCES' <set1> {COM} <set2>
+
+<set1>	"Need a user or user and file name."
+	::= <user> <filnm>
+	::= <user>
+	::= <filnm>
+
+<set2>	"Need a user or user and file name."
+	::= <user> <filnm>
+	::= <user>
+	::= <filnm>
+
+<log_c> "Illegal command word."
+	::= 'LOG' <fildes> 'ERRORS'
+	::= 'LOG' <fildes>
+
+<fildes> "Need a user or ppn and file name."
+	::= <usrdes> <filnm>
+	::= <filnm>
+
+<usrdes> "Need a PPN or user name."
+	::= <ppn>
+	::= <user>
+
+<ppn> [PPNSAV]
+	::= {LBRKT} <ppnpc> {COM} <ppnpc> {RBRKT}
+
+<ppnpc> [HOCTSV]
+	::= {integer}
+
+<user> [STRSAV]
+	::= {usrnam}
+
+<filnm>
+	::= <fname> {DOT} <fext>
+	::= <fname> {DOT}
+	::= <fname>
+
+<fname> [STRSAV]
+	::= {filpc}
+	::= {identifier}
+	::= {integer}
+
+<fext>
+	::= <fname>
+
+<unlg_c> "Illegal command word."
+	::= 'UNLOG'
+
+<comm_c> "Illegal command word."
+	::= 'COMMENT' {text}
+
+<quit_c> "Illegal command word."
+	::= 'QUIT'
+
+<stop_c> "Illegal command word."
+	::= 'STOP'
+
+<cont_c> "Illegal command word."
+	::= 'CONTINUE'
+
+<go_c> "Illegal command word."
+	::= 'GO'
+
+<abor_c> "Illegal command word."
+	::= 'ABORT'
+
+<qchk_c> "Illegal command word."
+	::= 'QCHECK'
+
+<yes_or_no>
+	::= 'YES'
+	::= 'NO'
