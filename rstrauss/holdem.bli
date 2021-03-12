@@ -1,0 +1,719 @@
+MODULE HOLDEM(DOLLAR,STACK)=
+
+BEGIN
+
+OWN DECK[52],SHOW[10],BEST[50],RANK[7],SUIT[7],TEMP,COUNT,S,PLAYER;
+OWN CARD[52],RN,PRINT,ANS,SPLIT,WINNER,VALUE,TOPHAND;
+OWN ADX,BDX,CDX,FLOPRANK[5],PLAYRANK[2],FLOPSUIT[5],PLAYSUIT[2];
+OWN HANDINDEX[10],HANDTOTAL[169],INDEX,NUMBERHANDS;
+OWN POSSIBLEFLUSH,SUITED,RAISE,HANDS[10],BET;
+
+MACHOP TTCALL =#51,
+       MUL =#224,
+       CALLI =#47;
+
+BIND NUMCARDS=52;
+BIND DEBUG=1;
+
+MACRO   INC= (REGISTER Q; TTCALL(4,Q);.Q)&,
+        INCW= (REGISTER Q; TTCALL(0,Q); .Q)&,
+        MSTIME= (REGISTER Q; CALLI(Q,#23);.Q)&,
+        OUTC(Z)= (REGISTER Q; Q := (Z); TTCALL(1,Q))&,
+        OUTSA(Z)= TTCALL(3,Z)&,
+        OUTCARD(Z)=OUTSA(.CARDRANK[Z])&,
+        OUTS(Z)= OUTSA(PLIT ASCIZ Z)&,
+        OUTP(Z)= TTCALL(3,PLIT ASCIZ Z)&,
+        CRLFP = TTCALL(3,PLIT ASCIZ '?M?J?0?0')&,
+        OUTSR(Z)= (OUTS(Z);CRLF)&,
+        OUTM(C,N)= DECR I FROM (N)-1 TO 0 DO OUTC(C)&,
+        CR= OUTC(#15)&, LF= OUTC(#12)&, NULL= OUTC(0)&,
+        CRLF= OUTS('?M?J?0?0')&,
+        TAB= OUTC(#11)&;
+
+MACRO PTR(X)=(PLIT ASCIZ X)&;
+
+MACRO TRY(Q$)=(IF .SHOW[.PLAYER]<27,9> EQL 0 THEN Q$())&;
+
+BIND SUITEDOFFSET= PLIT(0,77,75,72,68,63,57,50,42,33,23,12,0);
+
+BIND NONSUITEDOFFSET = PLIT(168,166,163,159,154,148,141,133,124,114,103,91,78);
+
+BIND OPENER = PLIT(0,0,1,2,2,4,4,4,4,4,4,0,0);
+BIND PLAYRAISED = PLIT(
+1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,
+0,0,0,0,0,1,1,1,1,1,
+0,0,0,0,0,1,1,1,1,
+0,0,0,0,0,1,1,1,
+0,0,0,0,0,1,1,
+0,0,0,0,0,1,
+0,0,0,0,0,
+0,0,0,0,
+0,0,0,
+0,0,
+0,
+0,0,0,0,0,0,0,0,1,1,1,1,1,
+0,0,0,0,0,0,0,0,1,1,1,1,
+0,0,0,0,0,0,0,0,1,1,1,
+0,0,0,0,0,0,0,0,1,1,
+0,0,0,0,0,0,0,0,1,
+0,0,0,0,0,0,0,1,
+0,0,0,0,0,0,1,
+0,0,0,0,0,1,
+0,0,0,0,0,
+0,0,0,0,
+0,0,0,
+0,0,
+0);
+
+BIND CARDRANK=
+   PLIT(PTR('2 '),
+        PTR('3 '),
+        PTR('4 '),
+        PTR('5 '),
+        PTR('6 '),
+        PTR('7 '),
+        PTR('8 '),
+        PTR('9 '),
+        PTR('10'),
+        PTR('J '),
+        PTR('Q '),
+        PTR('K '),
+        PTR('A '));
+
+BIND CARDSUIT= PLIT(
+   PTR('S  '),
+   PTR('H  '),
+   PTR('D  '),
+   PTR('C  '));
+
+BIND BESTHAND= PLIT(
+   PTR('STRAIGHT FLUSH  '),
+   PTR('FOUR OF A KIND  '),
+   PTR('FULL HOUSE  '),
+   PTR('FLUSH  '),
+   PTR('STRAIGHT  '),
+   PTR('THREE OF A KIND  '),
+   PTR('TWO PAIR  '),
+   PTR('ONE PAIR  '),
+   PTR('HIGH CARD  '));
+
+ROUTINE OUTN(NUM,BASE,REQD)=
+    BEGIN OWN N,B,RD,T;
+        ROUTINE XN=
+            BEGIN LOCAL R;
+                IF .N EQL 0 THEN RETURN OUTM("0",.RD-.T);
+                R := .N MOD .B; N := .N/.B; T := .T+1; XN();
+                OUTC(.R+"0")
+            END;
+
+        IF .NUM LSS 0 THEN OUTC("-");
+        B := .BASE; RD := .REQD; T := 0; N := ABS(.NUM); XN()
+     END;
+
+MACRO   OUTD(Z)= OUTN(Z,10,1)&,
+        BOUTD(Z)=IF NOT DEBUG THEN .VREG ELSE (IF .PRINT THEN OUTD(Z))&,
+        OUTO(Z)= OUTN(Z,8,1)&,
+        OUTDR(Z,N)= OUTN(Z,10,N)&,
+        OUTOR(Z,N)= OUTN(Z,8,N)&;
+
+
+STRUCTURE A10BY5[M,N]=
+        (.A10BY5+.M*5+.N)<0,36>;
+
+MAP A10BY5 BEST;
+
+MACRO RANDOM(N)=
+BEGIN REGISTER AC[2];
+        AC := RN := (.RN^23+.RN^14+.RN^2+.RN+1) AND (1^35-1);
+        MUL(AC,N<0,0>)
+END&;
+
+ROUTINE RAND(N)= RANDOM(N);
+
+ROUTINE SHUFFLE(N)=
+BEGIN REGISTER K,T;
+        MACHOP EXCH=#250;
+        DECR J FROM .N-1 TO 0
+           DO
+              BEGIN
+              K := RAND(NUMCARDS);
+              T := .CARD[.K];
+              EXCH(T,CARD[.J]);
+              CARD[.K] := .T
+              END
+END;
+
+
+
+ROUTINE PRINTSTATS=
+
+  BEGIN
+
+  OUTS('NUMBER OF HANDS: ');
+  OUTD(.NUMBERHANDS); CRLF; CRLF;
+
+  DECR I FROM 8 TO 0
+    DO
+      BEGIN
+      OUTD(.HANDS[.I]);
+      OUTS('   ');
+      OUTSA(.BESTHAND[8-.I]);
+      CRLF
+      END;
+  CRLF; CRLF;
+
+  OUTS('SUITED PAIRS'); CRLF; CRLF;
+
+  DECR I FROM 12 TO 1
+    DO DECR J FROM .I-1 TO 0
+      DO
+        BEGIN
+        INDEX := .SUITEDOFFSET[.I]+.J;
+        OUTSA(.CARDRANK[.I]);
+        OUTS(', ');
+        OUTSA(.CARDRANK[.J]);
+        OUTS('  ');
+        OUTD(.HANDTOTAL[.INDEX]<0,18>);
+        OUTS('   ');
+        OUTD(.HANDTOTAL[.INDEX]<18,18>);
+        OUTS('    ');
+        OUTN(1000*.HANDTOTAL[.INDEX]<18,18>/.HANDTOTAL[.INDEX]<0,18>,10,3);
+        CRLF
+        END;
+
+  CRLF; CRLF;
+
+  OUTS('NONSUITED PAIRS'); CRLF; CRLF;
+
+  DECR I FROM 12 TO 0
+    DO DECR J FROM .I TO 0
+      DO
+        BEGIN
+        INDEX := .NONSUITEDOFFSET[.I]+.J;
+        OUTSA(.CARDRANK[.I]);
+        OUTS(', ');
+        OUTSA(.CARDRANK[.J]);
+        OUTS('  ');
+        OUTD(.HANDTOTAL[.INDEX]<0,18>);
+        OUTS('   ');
+        OUTD(.HANDTOTAL[.INDEX]<18,18>);
+        OUTS('    ');
+        OUTN(1000*.HANDTOTAL[.INDEX]<18,18>/.HANDTOTAL[.INDEX]<0,18>,10,3);
+        CRLF
+        END
+  END;
+ROUTINE SHOWCARD(N)=
+
+  BEGIN
+
+  OUTSA(.CARDRANK[.N/4]);
+  OUTSA(.CARDSUIT[.N MOD 4])
+
+  END;
+
+MACRO ADD(A$$,B$$)=(A$$ := .A$$ + B$$)&;
+
+MACRO ADDONE(A$$)=(A$$ := .A$$+1)&;
+
+MACRO MERGE(A,B,C,M,N)=
+
+  BEGIN
+  LABEL LOOP;
+
+  ADX := BDX := CDX := 0;
+
+LOOP:
+  WHILE TRUE DO
+    BEGIN
+    IF .A[.ADX] GTR .B[.BDX]
+      THEN
+        BEGIN
+        C[.CDX] := .A[.ADX];
+        IF .ADX EQL M-1
+          THEN
+            BEGIN
+            INCR I FROM .BDX TO N-1
+              DO C[CDX := .CDX+1] := .B[.I];
+            LEAVE LOOP
+            END;
+        ADX := .ADX + 1
+        END
+      ELSE
+        BEGIN
+        C[.CDX] := .B[.BDX];
+        IF .BDX EQL N-1
+          THEN
+            BEGIN
+            INCR I FROM .ADX TO M-1
+              DO C[CDX := .CDX+1] := .A[.I];
+            LEAVE LOOP
+            END;
+        BDX := .BDX + 1
+        END;
+    CDX := .CDX + 1
+    END
+  END&;
+
+MACRO SORT(A,N)=
+
+INCR I FROM 0 TO N-2
+  DO DECR J FROM N-2 TO .I
+    DO IF .A[.J] LSS .A[.J+1]
+      THEN
+        BEGIN
+        TEMP := .A[.J];
+        A[.J] := .A[.J+1];
+        A[.J+1] := .TEMP
+        END&;
+
+
+ROUTINE STFLUSH=
+
+  BEGIN
+
+  COUNT := 0;
+
+  INCR I FROM 0 TO 5
+    DO IF .SUIT[.I] EQL .SUIT[.I+1] + 1
+      THEN
+        BEGIN
+        BEST[.PLAYER,.COUNT] := .SUIT[.I]<0,18>;
+        IF .COUNT EQL 2 AND .SUIT[.I+1]<0,18> EQL 0
+          THEN INCR J FROM 0 TO .I-1
+            DO IF .SUIT[.J] EQL .SUIT[.I+1]<18,18>^18+12
+              THEN
+                BEGIN
+                BEST[.PLAYER,3] := 0;
+                BEST[.PLAYER,4] := 12;
+                SHOW[.PLAYER]<27,9> := 8;
+                RETURN
+                END;
+        IF .COUNT EQL 3
+          THEN
+            BEGIN
+            BEST[.PLAYER,4] := .SUIT[.I+1]<0,18>;
+            SHOW[.PLAYER]<27,9> := 8;
+            RETURN
+            END;
+        COUNT := .COUNT + 1
+        END
+      ELSE COUNT := 0
+  END;
+
+
+ROUTINE FOURKIND=
+
+  BEGIN
+
+  COUNT := 0;
+
+  INCR I FROM 0 TO 5
+    DO IF .RANK[.I] EQL .RANK[.I+1]
+      THEN
+        BEGIN
+        BEST[.PLAYER,.COUNT] := .RANK[.I];
+        IF .COUNT EQL 2
+          THEN
+            BEGIN
+            BEST[.PLAYER,3] := .RANK[.I+1];
+            SHOW[.PLAYER]<27,9> := 7;
+            INCR J FROM 0 TO 4
+              DO IF .RANK[.J] NEQ .BEST[.PLAYER,0]
+                 THEN (BEST[.PLAYER,4] := .RANK[.J]; RETURN)
+            END;
+        COUNT := .COUNT + 1
+        END
+      ELSE COUNT := 0
+  END;
+
+
+ROUTINE FULLHOUSE=
+
+  BEGIN
+
+  INCR I FROM 0 TO 4
+    DO IF .RANK[.I] EQL .RANK[.I+1] AND .RANK[.I] EQL .RANK[.I+2]
+      THEN
+        BEGIN
+        BEST[.PLAYER,0] := .RANK[.I];
+        BEST[.PLAYER,1] := .RANK[.I+1];
+        BEST[.PLAYER,2] := .RANK[.I+2];
+        INCR J FROM 0 TO 5
+          DO IF .RANK[.J] EQL .RANK[.J+1] AND .RANK[.J] NEQ .BEST[.PLAYER,0]
+            THEN
+              BEGIN
+              BEST[.PLAYER,3] := BEST[.PLAYER,4] := .RANK[.J];
+              SHOW[.PLAYER]<27,9> := 6;
+              RETURN
+              END;
+        RETURN
+        END
+  END;
+
+
+ROUTINE FLUSH=
+
+  BEGIN
+
+  COUNT := 0;
+
+  INCR I FROM 0 TO 5
+    DO IF .SUIT[.I]<18,18> EQL .SUIT[.I+1]<18,18>
+      THEN
+        BEGIN
+        BEST[.PLAYER,.COUNT] := .SUIT[.I]<0,18>;
+        IF .COUNT EQL 3
+          THEN
+            BEGIN
+            BEST[.PLAYER,4] := .SUIT[.I+1]<0,18>;
+            SHOW[.PLAYER]<27,9> := 5;
+            RETURN
+            END;
+        COUNT := .COUNT + 1
+        END
+      ELSE COUNT := 0
+  END;
+
+
+ROUTINE STRAIGHT=
+
+  BEGIN
+
+  COUNT := 0;
+
+  INCR I FROM 0 TO 5
+    DO SELECT .RANK[.I] - .RANK[.I+1] OF
+      NSET
+
+0:      .VREG;
+
+1:      BEGIN
+        BEST[.PLAYER,.COUNT] := .RANK[.I];
+        IF .COUNT EQL 2 AND .RANK[.I+1] EQL 0
+          THEN INCR J FROM 0 TO .I-1
+            DO IF .RANK[.J] EQL 12
+              THEN
+                BEGIN
+                BEST[.PLAYER,3] := 0;
+                BEST[.PLAYER,4] := 12;
+                SHOW[.PLAYER]<27,9> := 4;
+                RETURN
+                END;
+        IF .COUNT EQL 3
+          THEN
+            BEGIN
+            BEST[.PLAYER,4] := .RANK[.I+1];
+            SHOW[.PLAYER]<27,9> := 4;
+            RETURN
+            END;
+        COUNT := .COUNT + 1
+        END;
+
+OTHERWISE:  COUNT := 0;
+
+      TESN
+  END;
+
+
+ROUTINE THREEKIND=
+
+  BEGIN
+NCR I FROM 0 TO 4
+    DO IF .RANK[.I] EQL .RANK[.I+1] AND .RANK[.I] EQL .RANK[.I+2]
+      THEN
+        BEGIN
+        BEST[.PLAYER,0] := .RANK[.I];
+        BEST[.PLAYER,1] := .RANK[.I+1];
+        BEST[.PLAYER,2] := .RANK[.I+2];
+        SHOW[.PLAYER]<27,9> := 3;
+        COUNT := 3;
+        INCR J FROM 0 TO 4
+          DO IF .RANK[.J] NEQ .BEST[.PLAYER,0]
+            THEN
+              BEGIN
+              BEST[.PLAYER,.COUNT] := .RANK[.J];
+              IF .COUNT EQL 4
+                THEN RETURN;
+              COUNT := .COUNT + 1
+              END
+        END
+  END;
+
+
+ROUTINE TWOPAIR=
+
+  BEGIN
+
+  INCR I FROM 0 TO 5
+    DO IF .RANK[.I] EQL .RANK[.I+1]
+      THEN
+        BEGIN
+        BEST[.PLAYER,0] := BEST[.PLAYER,1] := .RANK[.I];
+        INCR J FROM .I+2 TO 5
+          DO IF .RANK[.J] EQL .RANK[.J+1]
+            THEN
+              BEGIN
+              BEST[.PLAYER,2] := BEST[.PLAYER,3] := .RANK[.J];
+              SHOW[.PLAYER]<27,9> := 2;
+              INCR K FROM 0 TO 4
+                DO IF .RANK[.K] NEQ .BEST[.PLAYER,0] AND
+                      .RANK[.K] NEQ .BEST[.PLAYER,2]
+                  THEN (BEST[.PLAYER,4] := .RANK[.K]; RETURN)
+              END;
+        RETURN
+        END;
+  END;
+
+
+ROUTINE ONEPAIR=
+
+  BEGIN
+
+  INCR I FROM 0 TO 5
+    DO IF .RANK[.I] EQL .RANK[.I+1]
+      THEN
+        BEGIN
+        BEST[.PLAYER,0] := BEST[.PLAYER,1] := .RANK[.I];
+        SHOW[.PLAYER]<27,9> := 1;
+        COUNT := 2;
+        INCR J FROM 0 TO 4
+          DO IF .RANK[.J] NEQ .BEST[.PLAYER,0]
+            THEN
+              BEGIN
+              BEST[.PLAYER,.COUNT] := .RANK[.J];
+              IF .COUNT EQL 4
+                THEN RETURN;
+              COUNT := .COUNT + 1
+              END
+        END
+  END;
+
+
+ROUTINE HIGHCARD=
+
+  BEGIN
+
+  INCR I FROM 0 TO 4
+    DO BEST[.PLAYER,.I] := .RANK[.I];
+
+  SHOW[.PLAYER]<27,9> := 0
+  END;
+
+
+ROUTINE DEAL=
+
+  BEGIN
+
+  LABEL CKFLUSH;
+
+  SHUFFLE(52);
+
+     %
+
+
+  INCR I FROM 0 TO 9
+    DO
+      BEGIN
+      OUTD(.I+1);
+      OUTS(': ');
+      SHOWCARD(.CARD[.I*2]);
+      SHOWCARD(.CARD[.I*2+1]);
+      IF .I EQL 4 THEN CRLF
+      END;
+
+  CRLF; CRLF;
+
+  OUTS('  FLOP: ');
+  INCR I FROM 0 TO 4
+    DO SHOWCARD(.CARD[20+.I]);
+  CRLF; CRLF;
+
+    %
+
+
+  INCR J FROM 0 TO 4
+    DO
+      BEGIN
+      FLOPSUIT[.J] := FLOPRANK[.J] := .CARD[.J+20]/4;
+      FLOPSUIT[.J]<18,18> := .CARD[.J+20] MOD 4
+      END;
+
+  SORT(FLOPRANK,5);
+  SORT(FLOPSUIT,5);
+
+  POSSIBLEFLUSH := FALSE;
+CKFLUSH:
+  INCR I FROM 0 TO 2
+    DO IF .FLOPSUIT[.I]<18,18> EQL .FLOPSUIT[.I+1]<18,18>
+      AND .FLOPSUIT[.I]<18,18> EQL .FLOPSUIT[.I+2]<18,18>
+      THEN (POSSIBLEFLUSH := TRUE; LEAVE CKFLUSH);
+
+   RAISE := 0;
+
+  INCR I FROM 0 TO 9
+    DO
+      BEGIN
+      SHOW[.I] := 0;
+      SPLIT := 0;
+      PLAYER := .I;
+      PLAYSUIT[0] := PLAYRANK[0] := .CARD[.I*2]/4;
+      PLAYSUIT[0]<18,18> := .CARD[.I*2] MOD 4;
+      PLAYSUIT[1] := PLAYRANK[1] := .CARD[.I*2+1]/4;
+      PLAYSUIT[1]<18,18> := .CARD[.I*2+1] MOD 4;
+
+      IF .PLAYSUIT[1] GTR .PLAYSUIT[0]
+        THEN
+          BEGIN
+          TEMP := .PLAYSUIT[0];
+          PLAYSUIT[0] := .PLAYSUIT[1];
+          PLAYSUIT[1] := .TEMP
+          END;
+
+      IF .PLAYRANK[1] GTR .PLAYRANK[0]
+        THEN
+          BEGIN
+          TEMP := .PLAYRANK[0];
+          PLAYRANK[0] := .PLAYRANK[1];
+          PLAYRANK[1] := .TEMP
+          END;
+
+      SUITED := FALSE;
+      IF .PLAYSUIT[0]<18,18> EQL .PLAYSUIT[1]<18,18>
+        THEN SUITED := TRUE;
+
+      INDEX := (IF .SUITED NEQ FALSE
+                  THEN .SUITEDOFFSET[.PLAYRANK[0]]+.PLAYRANK[1]
+                  ELSE .NONSUITEDOFFSET[.PLAYRANK[0]]+.PLAYRANK[1]);
+      HANDINDEX[.I] := .INDEX;
+
+      IF .SUITED EQL FALSE AND .I LSS 8 AND
+         .OPENER[.PLAYRANK[0]] GTR .PLAYRANK[1]
+      THEN SHOW[.PLAYER] := 0
+      ELSE
+      IF .RAISE NEQ FALSE
+      AND .PLAYRAISED[.INDEX] EQL FALSE
+      THEN SHOW[.PLAYER] := 0
+      ELSE
+      BEGIN
+
+      MERGE(FLOPRANK,PLAYRANK,RANK,5,2);
+      IF .POSSIBLEFLUSH
+        THEN MERGE(FLOPSUIT,PLAYSUIT,SUIT,5,2);
+
+      IF .POSSIBLEFLUSH THEN TRY(STFLUSH);
+      TRY(FOURKIND);
+      TRY(FULLHOUSE);
+      IF .POSSIBLEFLUSH THEN TRY(FLUSH);
+      TRY(STRAIGHT);
+      TRY(THREEKIND);
+      TRY(TWOPAIR);
+      TRY(ONEPAIR);
+      TRY(HIGHCARD);
+
+      VALUE := 0;
+      INCR J FROM 0 TO 4
+        DO VALUE := (.VALUE*13)+.BEST[.I,.J];
+      SHOW[.PLAYER]<0,27> := .VALUE;
+
+
+     %
+
+      OUTD(.I+1);
+      OUTS(': ');
+      OUTSA(.BESTHAND[8-.SHOW[.I]<27,9>]);
+      CRLF;
+      OUTS('    ');
+      INCR J FROM 0 TO 4
+        DO OUTSA(.CARDRANK[.BEST[.I,.J]]);
+      CRLF;
+      CRLF;
+
+     %
+
+
+      IF .SUITED NEQ FALSE
+        THEN IF .PLAYRANK[1] GEQ 10
+          THEN RAISE := 1
+          ELSE .VREG
+        ELSE IF .PLAYRANK[0] EQL .PLAYRANK[1]
+          THEN IF .PLAYRANK[0] GEQ 8
+            THEN RAISE := 1;
+
+      END;
+      END;
+
+  WINNER := 1;
+  TOPHAND := .SHOW[0];
+  INCR I FROM 1 TO 9
+    DO IF .SHOW[.I] GTR .TOPHAND
+      THEN
+        BEGIN
+        WINNER := .I + 1;
+        TOPHAND := .SHOW[.I];
+        SPLIT := 0
+        END
+      ELSE IF .SHOW[.I] EQL .TOPHAND
+        THEN SPLIT := 1;
+
+     %
+
+
+  IF .SPLIT EQL 0
+    THEN
+      BEGIN
+      OUTS('WINNER IS NO. ');
+      OUTD(.WINNER);
+      OUTS('  ');
+      OUTSA(.BESTHAND[8-.SHOW[.WINNER-1]<27,9>]);
+      CRLF; CRLF;
+      END
+    ELSE
+      BEGIN
+      OUTS('SPLIT POT: ');
+      INCR I FROM 0 TO 9
+        DO IF .SHOW[.I] EQL .TOPHAND
+          THEN (OUTD(.I+1); OUTS('  '));
+      CRLF; CRLF;
+      END;
+
+     %
+
+
+  IF .SPLIT EQL FALSE
+    THEN
+      BEGIN
+      BET := 0;
+      INCR I FROM 0 TO 9
+        DO IF .SHOW[.I] NEQ 0
+          THEN (ADD(HANDTOTAL[.HANDINDEX[.I]],.RAISE+1); BET:=.BET+1);
+      ADD(HANDTOTAL[.HANDINDEX[.WINNER-1]]<18,18>,.BET*(.RAISE+1));
+      ADDONE(HANDS[.SHOW[.WINNER-1]<27,9>]);
+      ADDONE(NUMBERHANDS)
+      END;
+
+  END;
+
+RN := 314159261;
+
+INCR I FROM 0 TO 51 DO CARD[.I] := .I;
+
+
+   %
+
+DO
+  BEGIN
+  DEAL();
+  OUTS('AGAIN?? ')
+  END
+  UNTIL (ANS := INC; INC; INC; .ANS NEQ "Y");
+
+     %
+
+INCR I FROM 0 TO 5359
+  DO DEAL();
+
+PRINTSTATS();
+
+END ELUDOM
+    . \Å
