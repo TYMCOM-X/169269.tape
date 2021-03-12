@@ -1,0 +1,228 @@
+                                MEMO
+
+
+
+Date:           April 25, 1984
+
+
+To:             TYMCOM-X Support Group
+
+From:           Dave Sutton
+
+
+
+Craig Fletcher has asked me to write down some notes concerning the
+management of the TYMCOM-X operating system and supporting software.
+I thought I would direct this memo to everyone in the group so that
+this information could be general knowledge, and thus make it easier
+for members of the group to pick up the different pieces of what I
+have been doing.  What you read below is not going to be a systematic
+or complete analysis of anything- especially not TYMCOM-X.  Rather it
+is a list of practical nibbles of information that will save you time
+and trouble over finding them out for yourself.
+
+First I would like to tell you how much I have enjoyed working with all
+of you.  You have been supportive even when things did not go well,
+and that is the acid test for having people that you can depend on!
+Thanks a bundle for your help, and may a head crash never destroy your MFD!!!
+                        MEMO(Page 2)
+
+
+PEOPLE YOU SHOULD KNOW
+
+Below is an incomplete list of people who can help you get things done,
+ie they are knowledgable and effective in the areas described.  These
+areas do not necessarily correspond to their job titles- since an
+approved table of organization seldom describes how a company
+actually runs.  None of them belongs to a BB & BB Social Club.
+
+TYMCOM-X Internals
+
+        Bill Soley      71-6210
+        Bill is the one to talk to when you have a difficult problem
+        with the monitor or the supporting utilities.  He is one of
+        the architects of TYMCOM-X and not only can he explain how it
+        works but how it came to be.  You will find him adding an
+        enhancement to the monitor when the mood strikes him, and my
+        advice is to welcome his help.  Fact is, he's forgotten more
+        about TYMCOM-X than you will ever know.
+
+Cupertino Data Center
+
+        Gary Perez      71-6681
+        Gary is the manager of operations at the Cupertino data center
+        and is in close touch with everything that happens there.  Keep
+        him informed of what you are doing, and you will find him very
+        cooperative and helpful.
+
+        Sue Pal         71-7705
+        Sue is the day shift supervisor at Cupertino, and she will call you
+        with various operational problems.
+
+        Steve Carothers 71-7705
+        If you get a call from Steve it spells T.R.O.U.B.L.E!  He is the
+        graveyard shift supervisor at Cupertino , and as I'm sure you
+        already know it is a physical law that all catastrophes occur
+        between midnight and 5 AM.
+
+        Bill Richardson 71-7177
+        Bill is in charge of hardware maintenance.  He is an importance
+        source of information when you suspect a hardware caused crash.
+
+        Osman Guven     71-7705
+        Osman is the guy who is on call at all hours when a hardware problem
+        occurs.  He is interested in learning about the TYMCOM-X operating
+        system, and will cooperate with you in isolating the cause of a
+        problem if you will explain to him how the software works along
+        the way.
+                        MEMO(Page 3)
+
+
+
+
+Fremont Data Center
+
+        Rick Daniels    116-73-595
+        Rick is the only one at Fremont who knows anything about 10's.
+        The rest of the people there think DEC is a division of IBM-
+        which keeps Rick busy trying to avert catastrophes.  He does
+        a good job because they don't occur often.
+
+Dallas Data Center
+
+        Tom Marconi     (713)785-3100
+        Tom is manager of operations in Dallas.  None of the operators
+        seem to know very much, so it is best to talk to Tom if there
+        is a problem.  System 56 in Dallas is the one with a heavy
+        MAGNUM load, and you will get a call from Tom whenever it
+        crashes.
+
+Valley Forge Data Center
+
+        Pat Knorr       (215)666-9660
+        I'm not sure what Pat's title is at Valley Forge.  She is the
+        one who calls with problems, and she is the one to contact
+        if you want to do something to a Valley Forge system.
+
+        Ray Donahue     (215)666-9660
+        Ray is in charge of hardware support in the East.  He seems to
+        keep things running pretty smoothly at Valley Forge, but I
+        have not had much luck in making contact with him.
+
+Applications Contacts
+
+        Stan Derry      71-6163
+        If you have a problem with MAGNUM, contact Stan and he
+        will point you in the right direction.
+
+        Roy Roskilly    117-5319
+        Roy was the manager of the project that developed the
+        TYMSHARE order entry system.  Software problems with
+        system 56 in Dallas are brought about by the interaction
+        of errors in the order entry MAGNUM relation files and
+        the MAGNUM relation/file locking mechanisms.  The problems
+        have gone away temporarily because Roy has cleaned up the
+        order entry relation files- of course this does not fix
+        MAGNUM's and TYMCOM-X's  inability to handle these errors.
+
+        Guy Bristow     113-36
+        Guy is the contact for the Rainier Bank KS system.
+
+        Ken Brinton     St Louis Office of TYMSHARE
+        Ken is the contact for the Mallinckrodt KS system.
+                        MEMO(Page 4)
+
+
+ROOT DOCUMENTS & DATA
+
+Run INFO on system 930 for an introduction to the world of
+TYMCOM-X.  Read as many *.DOC AND *.MEM in the directories
+M33, SPL and MPL on 930 as you can stand.  This documentation
+is not complete, so you will have to recognize the black
+holes for yourself.  Be careful of these, as you may find
+they will suck you into another universe from which there is
+no return.
+
+Above all, depend on Lois!!!  She is the keeper of the keys
+to all the secret passageways(ie handy dandy hacks) that
+will turn you into a wizard to the uninitiated.  If you are
+sufficiently driven, you may want to record more of this
+into the INFO data base so that it will not be lost.
+
+The only two ultimate sources for how TYMCOM-X operates are
+the microfiche(for the K monitor) and the source code in
+M33(for the Lnn monitor).  Understanding what is happening
+from these documents requires you to use your active
+intelligence.  There is plenty of "clever" code here, so
+don't get bogged down in minor logical errors.
+
+
+
+COMPUTERS & FILES
+
+System 930 at Valley Green is the repository for the TYMCOM-X
+software.  It is backed up to TITO tapes on a daily basis, but
+having an alternative system(plug for system 896) ought to make
+the members of the TYMCOM-X support group sleep easier.  Major
+directories are:
+
+        M33     Current Lnn sources for TYMCOM-X.  Also sources for
+                many utilities & hacks.
+
+        OSP     Contains sources for an obsolete M monitor.  Will be
+                replaced by final Lnn monitor when a new monitor is
+                distributed.
+
+        OSB     Contains sources for the currently distributed K
+                monitor
+
+        KS2020  Contains software particular to the KS systems.
+
+        KL10    Contains microcode.
+                                MEMO(Page 5)
+
+
+PROCEDURES
+
+These have been documented in the *.MEM and *.DOC files by Lois Lindley.
+If you need help in using the procedures for patching monitors or
+installing monitors, get Lois's help.  In the process of showing you
+how to do it, you will pick up a lot of techniques from Lois that will
+make your job easier.
+
+Analyzing crashes is an important part of maintaining the TYMCOM-X
+monitor.  The NOTICE.* files on M33 contain the preliminary information
+for identifying the nature of the crashes, and you should check these
+files for patterns.  Don't be misled by this information, though,
+because CRSHID does not identify all crashes correctly.  You can
+log on to the system and analyze a particular crash using FILDDT.
+I'm sure you will agree that this requires a substantial amount of
+prior knowledge and experience, and is beyond the scope of this memo.
+
+
+
+STATUS
+
+The new monitor P034/L21 has been installed on systems 26, 29, 33, 36,
+39, AND 169.  The rest of the systems are running with patched K
+monitors.  The systems with the new monitors should be watched
+closely and their crashes analyzed.  Just recently I have put together
+a summary of relevant crashes, and I noticed that MIC-induced
+crashes occur regularly on KI systems but are not reported on
+KL systems.  Some of the crashes on KL systems are caused either by
+a base deposit in location 30 or 2000 ticks occurring without the
+base/host buffers being serviced.  The latter happens because
+I installed a patch in the monitor itself to crash the system
+when this condition occurs.  An interesting observation is that
+the return PC at the location CH1 is trashed by the MIC, and
+this relates to the observation above that CRSHID only reports
+MIC errors on KI processors.  What I suspect is that the
+interface between the MIC and KL memory has a problem.  A solution
+to this problembe found most easily by putting together
+a team of a TYMCOM-X expert and a hardware engineer to investigate
+what is happening at this interface.
+
+Another cause of multiple crashes appears to be a bug in the
+"use count" for PCB pages.  Since these crashes occur infrequently,
+the bug(s) is(are) most likely in the code that handles I/O
+errors. 7U.¯
