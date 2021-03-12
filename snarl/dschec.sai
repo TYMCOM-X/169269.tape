@@ -1,0 +1,323 @@
+ENTRY;
+BEGIN "DSCHEC"
+
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndefs.sai" SOURCE!FILE;
+\  Global storage defined elsewhere;
+
+external integer look!size;		\ lookup block size;
+\  Global and local storage for this module;
+\  External procedures;
+
+external string procedure pr!user( string user );
+external string procedure pr!ppn( integer ppn );
+external simple record!pointer (any!class) procedure iniufr(
+   string name, extension;  integer channel, bits(0), size(102) );
+external simple boolean procedure nxtufr( integer array data;
+   record!pointer (any!class) record );
+external simple procedure relchan( reference integer channel;
+   integer closebits(0) );
+external procedure i!kybd;
+external simple boolean procedure ab!cond;
+PROCEDURE diflin( integer index, word1, word2 );
+	\ This procedure puts out a line of the "differences"
+summary.
+;
+BEGIN
+   setformat( 12, 0 );  print( cvos(index) & "/  " );
+   setformat( 6, 0 );
+   print( cvos(!lh(<word1>)) & " " & cvos(!rh(<word1>)) &
+      "    " & cvos(!lh(<word2>)) & " " & cvos(!rh(<word2>)) & crlf );
+   setformat( 0, 0 );  return;
+END;
+PROCEDURE lokcom( reference integer array look1, look2 );
+	\ This procedure compares two lookup blocks and reports their
+differences.  The words which contain the username and PPN of the file
+owner are ignored.
+;
+BEGIN
+   boolean differ;
+   integer ub, lb1, ub1, lb2, ub2, word1, word2, x;
+   differ_ false;
+   lb1_ arrinfo( look1, 1);  ub1_ arrinfo( look1, 2 );
+   lb2_ arrinfo( look2, 1);  ub2_ arrinfo( look2, 2 );
+   for x_ !rbnam step 1 until !rbaut do
+      if (word1_ look1[lb1+x]) neq (word2_ look2[lb2+x]) then
+      BEGIN
+	 differ_ true;  diflin( x, word1, word2 );
+      END;
+   ub_ (ub1-lb1) min (ub2-lb2);
+   for x_ !rbtru step 1 until ub do
+   BEGIN
+      word1_ (if (lb1+x) leq ub1 then look1[lb1+x] else 0);
+      word2_ (if (lb2+x) leq ub2 then look2[lb2+x] else 0);
+      if word1 neq word2 then
+      BEGIN
+	 differ_ true;  diflin( x, word1, word2 );
+      END;
+   END;
+   if differ then print( #ht & "Lookup blocks differ." & crlf )
+   else print( #ht & "Lookup blocks are equivalent." & crlf );
+   print( #ht, ub, " words were compared." & crlf );
+   return;
+END;
+INTEGER PROCEDURE loklud (STRING username);
+	\ This procedure looks up the "username" in the LUD and returns
+the corresponding PPN.  A zero is returned if the lookup failed.;
+
+BEGIN
+   INTEGER ludchan, ludeof,		\ For opening the LUD;
+      huname, hloc,			\ Hashed username and search location;
+      un1, un2,				\ first and second halves of "username";
+      curppn, i;
+   INTEGER ARRAY ludent[1:'200];	\ for holding LUD blocks;
+   LABEL hash, rnd, rnd1, rnd2, big, c, d, e;
+
+   un1_ cvsix(username[1 for 6]);
+   un2_ cvsix(username[7 for 6]);
+
+   start!code								\ This start!code section is;
+		jrst	hash;						\ the hasher for the LUD;
+	rnd:	add	4,6;
+		rotc	6,-18;
+		movei	1,5;
+	rnd1:	move	8,4(2);
+		mul	8,big;
+		addm	9,5(2);
+		aoje	2,rnd2;
+		movni	2,1;
+		trne	4,1;
+		skipl	5;
+		movei	2,0;
+		exch	3,5;
+	rnd2:	sojg	1,rnd1;
+		jrst	@'13;
+
+	c:	'555555555555;
+	d:	'361275431652;
+	e:	'612754316523;
+	big:	5*5*5*5*5*5*5*5*5*5*5*5*5*5*5;
+
+	hash:	move	6,un1;
+		move	7,un2;
+		movei	2,0;
+		move	3,c;
+		move	4,d;
+		move	5,e;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		xor	5,4;
+		move	6,5;
+		tlz	6,'400000;
+		idivi	6,887;
+		addi	7,1;
+		xor	3,5;
+		move	6,3;
+		movem	6,huname;
+		movem	7,hloc;
+   END;
+
+   open((ludchan_ getchan),"dsk",'760016,0,0,ludeof,ludeof,ludeof);
+   if ludeof neq 0 then
+   BEGIN
+      print("Cannot initialize disk for LUD lookup." & crlf);
+      return (0);
+   END;
+   lookup(ludchan,"LUD.SYS[1,4]",ludeof);
+   if ludeof neq 0 then
+   BEGIN
+      print("Cannot open the LUD." & crlf);
+      return (0);
+   END;
+   curppn_ -1;
+   while curppn neq 0 do
+   BEGIN "find user"
+      useti(ludchan,hloc);
+      arryin(ludchan,ludent[1],'200);
+      for i_ 1 step '11 until '167 DO
+      BEGIN "block search";
+	 curppn_ ludent[i];
+	 if curppn = 0 then done "find user";
+	 if huname = ludent[i+4] then done "find user";
+	 if curppn < 0 then
+	 BEGIN
+	    hloc_ !rh( <curppn> );  done "block search";
+	 END;
+      END "block search";
+   END "find user";
+   return (curppn);
+END;
+INTERNAL PROCEDURE s!diff( STRING user1, file1, ext1,
+   user2, file2, ext2 );
+	\ This procedure will compare two files or equivalently named
+files from two directories.
+	"User1" and "user2" are the two usernames from which files will
+be taken for comparison.  They must both be specified (not null).
+	"File1" and "file2" are file names to compare.  This does not
+include the extension portion, and only six characters of these are
+used.  If "file1" is not null then "file2" must not be null.  If these
+are null, then a directory search will be done.  All files in "user1"
+and "user2" which have equivalent names will be compared with each
+other.
+;
+BEGIN
+
+   integer ufdchan, ufdeof,	\ UFD channel stuff;
+      ppn1, ppn2,		\ PPN's corres. to user1 and user2;
+      fchan1, feof1,		\ file channel stuff;
+      fchan2, feof2,		\ file channel stuff;
+      word1, word2;		\ for word comparisons;
+
+   string spec1, spec2;		\ file spec. strings for "lookup";
+
+   integer array namarr[0:1],	\ for retrieving UFD info.;
+      look1[0:look!size],	\ first lookup block;
+      look2[0:look!size];	\ second lookup block;
+
+   r!p (any!class) urp;		\ for scanning UFD's;
+SIMPLE PROCEDURE difclean;
+BEGIN
+   relchan( ufdchan );  relchan( fchan1 );
+   relchan( fchan2 );  return;
+END;
+
+CLEANUP difclean;
+PROCEDURE comp!contents;
+	\ This procedure does a simple binary comparison of the current
+two files being considered by "s!diff".  It stops listing beyond 20
+differences.
+;
+BEGIN
+   integer wdcnt, differ;
+   wdcnt_ differ_ 0;
+   while true do
+   BEGIN "compare contents"
+      poll;  i!kybd;  if ab!cond then return;
+      word1_ wordin( fchan1 );  word2_ wordin( fchan2 );
+      if feof1 and feof2 then done;
+      wdcnt_ wdcnt + 1;
+      if (word1 neq word2) then
+	 if (differ < 20) then
+	 BEGIN
+	    differ_ differ + 1;  diflin( wdcnt, word1, word2);
+	 END
+	 else done "compare contents";
+   END "compare contents";
+   if differ then print( #ht & "File contents differ." & crlf)
+   else print( #ht & "File contents are the same." & crlf);
+   return;
+END;
+\  Body of "s!diff" begins here;
+
+   ufdchan_ fchan1_ fchan2_ -1;
+   if length( user1 ) then if ( ppn1_ loklud(user1) ) = 0 then
+   BEGIN
+      print( "User " & pr!user(user1) & " is not valid." & crlf );
+      return;
+   END;
+   if length( user2 ) then if ( ppn2_ loklud(user2) ) = 0 then
+   BEGIN
+      print( "User " & pr!user(user2) & " is not valid." & crlf );
+      return;
+   END;
+   open( (fchan1_ getchan), "dsk", binary!mode, 1, 0, feof1, feof1,
+      feof1 );
+   if feof1 neq 0 then
+   BEGIN
+      print( "Cannot initialize disk for file lookup." & crlf );
+      return;
+   END;
+   open( (fchan2_ getchan), "dsk", binary!mode, 1, 0, feof2, feof2,
+      feof2 );
+   if feof2 neq 0 then
+   BEGIN
+      print( "Cannot initialize disk for file lookup." & crlf );
+      return;
+   END;
+   look1[0]_ look2[0]_ look!size;
+   if length( file1 ) = 0 then
+   BEGIN
+      open( (ufdchan_ getchan), "dsk", binary!mode, 1, 0,
+	 ufdeof, ufdeof, ufdeof );
+      if ufdeof neq 0 then
+      BEGIN
+	 print( "Cannot initialize disk for UFD lookup." & crlf );
+	 return;
+      END;
+      lookup( ufdchan, '1&cvxstr(ppn1)&".UFD[1,1]", ufdeof );
+      if ufdeof then
+      BEGIN
+	 print( "Cannot open UFD for user " & pr!user(user1) &
+	    "   [" & pr!ppn(ppn1) & "]." & crlf );
+	 return;
+      END;
+      urp_ iniufr( "*", "*", ufdchan );
+      while nxtufr( namarr, urp ) do
+      BEGIN "search loop"
+	 poll;  i!kybd;  if ab!cond then return;
+	 spec1_ pr!user(user1) & cv6str(namarr[0]) &
+	    "." & cv6str(namarr[1]);
+	 lookup( fchan1, spec1, feof1 );
+	 if feof1 then
+	 BEGIN
+	    print( "Cannot open file " & spec1 & crlf );
+	    close( fchan1 );  continue "search loop";
+	 END;
+	 look1[1]_ ppn1;  look1[2]_ namarr[0];
+	 look1[3]_ namarr[1];  chnior( fchan1, look1[0], !chlk );
+	 spec2_ pr!user(user2) & cv6str(namarr[0]) &
+	    "." & cv6str(namarr[1]);
+	 lookup( fchan2, spec2, feof2 );
+	 if feof2 then
+	 BEGIN
+	    print( "Cannot open file " & spec2 & crlf );
+	    close( fchan2 );  continue "search loop";
+	 END
+	 else print( cv6str(namarr[0]) & "." &cv6str(namarr[1])
+	    & crlf );
+	 look2[1]_ ppn2;  look2[2]_ namarr[0];
+	 look2[3]_ namarr[1];  chnior( fchan2, look2[0], !chlk );
+	 lokcom( look1, look2 );
+	 comp!contents;
+	 if ab!cond then return;
+      END "search loop";
+   END
+   else BEGIN
+      spec1_ (if length(user1) then pr!user(user1) else null) &
+	 file1 & "." & ext1;
+      lookup( fchan1, spec1, feof1 );
+      if feof1 then
+      BEGIN
+	 print( "Cannot open file " & spec1 & crlf );
+	 close( fchan1 );  return;
+      END;
+      look1[1]_ ppn1;  look1[2]_ cvsix(file1);
+      look1[3]_ cvsix(ext1);  chnior( fchan1, look1[0], !chlk );
+      spec2_ (if lenser2) then pr!user(user2) else null) &
+	 file2 & "." & ext2;
+      lookup( fchan2, spec2, feof2 );
+      if feof2 then
+      BEGIN
+	 print( "Cannot open file " & spec2 & crlf );
+	 close( fchan2 );  return;
+      END;
+      look2[1]_ ppn2;  look2[2]_ cvsix(file2);
+      look2[3]_ cvsix(ext2);  chnior( fchan2, look2[0], !chlk );
+      lokcom( look1, look2 );
+      comp!contents;
+   END;
+   return;
+END;
+INTERNAL PROCEDURE s!qchk;
+BEGIN
+   print( "This command is not yet implemented." );
+   return;
+END;
+
+
+END "DSCHEC";
+
+   1jNE
