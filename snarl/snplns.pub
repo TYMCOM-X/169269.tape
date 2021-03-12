@@ -1,0 +1,288 @@
+.StandardSpacing_1;
+.Memo;
+.Page Frame 60 High 72 Wide;
+.Area Text Lines 6 to 57;
+.Title Area Heading Lines 1 to 5
+.Title Area Footing Line 60;
+.Place Text;
+.UnderlineBetween (~~,~);
+.Indent 5;
+.MarginHeadings_true;
+.Device TTY;
+.Single Space;
+.Preface 1;
+.Every Heading (SNARL/DSNARL schedule and test plans,,{Month} {Day} {Year});
+.Skip to Column 1;
+.Begin Center;
+
+
+
+~~Project_Phases~
+
+
+.End;
+	~~Phase_I/Preliminary_internal_test_version~:  This is a limited
+version of SNARL which would provide enough features for personal use
+as an archiving tool but not enough capability as an operations
+tool.  However, it would be worthwhile to get a small number of people
+using the product at this point in order to get bugs out and collect
+feedback on its performance.  As more features are added during Phase II,
+the test version which is being used could be updated.
+	~~Phase_II/Field_test_version~:  This version will have enough
+capability so that operations could use it on a test basis.  It would
+probably be run in parallel with TITO for daily backups on a lightly
+loaded system.  File recoveries could be accomplished with SNARL with
+TITO available in emergencies.  As more features are added during Phase
+III, the version which is in field test could be updated.
+	~~Phase_III/Full_production_version~:  Upon completion of
+acceptance testing by operations, this version will be generally
+adopted.
+	~~Phase_IV/Futures~:  A set of enhancements could be done, as
+documented in the "SNARL External Specifications" which could make this
+product much more powerful.
+.Skip to Column 1;
+.ByHand;
+
+
+------------------------------ Phase I ---------------------------------
+.EndHand;
+.List (-5,5,0,"(A)");
+.Item;
+.DSNEXTS: LISTS!
+Complete first pass on DSNARL external design.  In this document,
+the descriptions of the tape examination features should be
+quite complete; some of the others may be much less detailed at this
+point.  The document will be ready to distribute for comments (at
+least among PDP10/SPP group).
+.ByHand;
+	(TARGET:  July 6)  (COMPLETED:  July 10)
+.EndHand;
+.Item;
+.SNINTS: LISTS!
+Complete the internal specifications for SNARL.
+.ByHand;
+	(TARGET:  July 24)  (COMPLETED:  September 14)
+.EndHand;
+.Item;
+.TABGEN:  LISTS!
+Recode and debug TABGEN using the parser described for SNARL.  This
+step has carryover into step {LISTS! FRONT} since there is a set of
+standard routines which will be common to both.  Some of the program
+specific routines will be similar.
+.ByHand;
+	TARGET:  October 23)  (COMPLETED:  October 31)
+.EndHand;
+.Item;
+.FRONT: LISTS!
+Implementation will proceed on SNARL with the front-end command
+parser.  The entire grammar and command files will be implemented
+along with intermediate routines which will "parameterize" the
+information in the parse tree.  Instead of calling the command
+handlers, the intermediate routines will report their information
+for the purpose of testing.  (Later on, the actual calls can be
+added.)
+.ByHand;
+	(TARGET:  October 31)  (COMPLETED:  November 15)
+.EndHand;
+.Item;
+.DEBFRONT:  LISTS!
+Debug step {LISTS! FRONT}.
+.ByHand;
+	(TARGET:  November 7)  (COMPLETED:  November 20)
+.EndHand;
+.Item;
+.MODES: LISTS!
+Implement and debug QUIT, the mode setting commands, ?, REWIND,
+and UNLOAD.  Set up SNARL so that a substitute disk file may be
+used for tape during initial debugging.
+.ByHand;
+	(TARGET:  December 5)  (COMPLETED:  December 6)
+.EndHand;
+.Item;
+.STORE: LISTS!
+Implement WHERE, STORE, and NEW TAPE commands.  This
+step will include commands and handling for
+user aborts but not for continuation tapes (which will be treated
+as an error abort at this time).
+.ByHand;
+	(TARGET:  January 14, 1980)  (COMPLETED:  January 30, 1980)
+.EndHand;
+.Item;
+.DSNINTS:  LISTS!
+Do a quick internal specification for the dump functions (on TTY) of
+DSNARL and implement a skeleton DSNARL with REWIND and the TTY dump
+functions.
+.ByHand;
+	(TARGET:  January 30)  (COMPLETED:  February 15)
+.EndHand;
+.Item;
+.DEBSTORE:  LISTS!
+Debug steps {LISTS! STORE} and {LISTS! DSNINTS}.
+.ByHand;
+	(TARGET:  June 5)  (COMPLETED:  June 18)
+.EndHand;
+.Item;
+.DIRECTORY:  LISTS!
+Implement DIRECTORY.
+.ByHand;
+	(TARGET:  June 16)  (COMPLETED:  July 8)
+.EndHand;
+.Item;
+.RETRIEVE:  LISTS!
+Implement RETRIEVE, and GET.
+.ByHand;
+	(TARGET:  August 4)  (COMPLETED:  August 5)
+.EndHand;
+.Item;
+.DEBRETRIEVE:  LISTS!
+Debug everything coded so far.  Implement and debug any necessary DSNARL
+changes resulting from SNARL debugging.  Debug user aborts.
+.ByHand;
+	(TARGET:  September 26)  (COMPLETED:  October 6)
+.EndHand;
+.Item;
+.DOCUMENT:  LISTS!
+Get the SNARL documentation up to date, particularly the internal
+documentation.  Starting with the next project, the documentation will
+be kept in parallel with the development.
+.ByHand;
+	(TARGET:  September 29)  (COMPLETED:  November 3)
+.EndHand;
+.Item;
+.CUT:  LISTS!
+Implement and debug CUT AFTER, APPEND, and COF.
+.ByHand;
+	(TARGET:  November 19)  (COMPLETED:  
+.EndHand;
+.Item;
+.COMPARE:  LISTS!
+Specify, implement, and debug a DSNARL function which will
+compare the contents and lookup blocks of sets of files.
+.ByHand;
+	(TARGET:  December 15)  (COMPLETED:  
+.EndHand;
+.Item;
+.SHAKEDOWN:  LISTS!
+Test the current product in preparation for release for limited internal
+use.  Update the external documentation, and prepare a memo defining the
+usable portions.  At this point, a release could me made for limited
+internal use.  Since the continuation features would not be usable,
+this version could not be used by operations unless a responsible
+person would be willing to do some individual testing and provide
+feedback.
+.ByHand;
+	(TARGET:  January 7)  (COMPLETED:
+.EndHand;
+.Begin Narrow -5,0;
+.ByHand;
+
+----------------------------- Phase II ---------------------------------
+.EndHand;
+.Widen; End;
+.Item;
+.CONT:  LISTS!
+Implement the continuation tape handling commands and associated changes
+to the file transfer commands.
+.ByHand;
+	(TARGET:  January 19)  (COMPLETED:  
+.EndHand;
+.Item;
+.DEBCONT:  LISTS!
+Debug step {LISTS! CONT}.
+.ByHand;
+	(TARGET:  January 30)  (COMPLETED:  
+.EndHand;
+.Item;
+.TRANS:  LISTS!
+Implement and debug TRANSLATE and UNTRANSLATE.
+.ByHand;
+	(TARGET:  February 12)  (COMPLETED:  
+.EndHand;
+.Item;
+.DEVICE:  LISTS!
+Implement and debug DEVICE, TID, LOG, and UNLOG.  At this point, the
+product should be usable by operations and could be
+released for internal testing.  It could not, of course, be put to
+general use before a period of acceptance testing is complete.  I need to
+work out a plan with operations for the conversion to SNARL.
+.ByHand;
+	(TARGET:  March 4)  (COMPLETED:  
+.EndHand;
+.Begin Narrow -5,0;
+.ByHand;
+
+---------------------------- Phase III ---------------------------------
+.EndHand;
+.Widen; End;
+.Item;
+.RANGES:  LISTS!
+Specify and implement the ability to handle tape ranges along with other
+selection criteria within the RETRIEVE class of commands.
+.Item;
+.HELP:  LISTS!
+Implement and debug the remaining help and program information
+commands.
+.Item;
+.VEREXTS:  LISTS!
+Design externals and internals for tape verification and recovery
+features of DSNARL.
+.Item;
+.VERIMP:  LISTS!
+Implement tape verification and recovery features of DSNARL.
+.Begin Narrow -5,0;
+.ByHand;
+
+----------------------------- Phase IV ---------------------------------
+.EndHand;
+.Widen; End;
+.Item;
+.FUTURES:  LISTS!
+Futures . . .
+.EndList;
+.Skip to Column 1;
+.ByHand;
+                         ~~SCHEDULE~
+
+~~        	Target          Completion      Steps~
+
+----------------------------- Phase I ----------------------------------
+	        July 6          July 10         {LISTS! DSNEXTS}
+		July 24         September 14	{LISTS! SNINTS}
+		October 23	October 31	{LISTS! TABGEN}
+		October 31	November 15	{LISTS! FRONT}
+		November 7	November 20	{LISTS! DEBFRONT}
+		December 5      December 6	{LISTS! MODES}
+     1980	January 14	January 30	{LISTS! STORE}
+		January 30	February 15	{LISTS! DSNINTS}
+		June 5		June 18		{LISTS! DEBSTORE}
+		June 16		July 8		{LISTS! DIRECTORY}
+		August 4	August 5	{LISTS! RETRIEVE}
+		September 26	October 6	{LISTS! DEBRETRIEVE}
+		September 29	November 3	{LISTS! DOCUMENT}
+		November 19			{LISTS! CUT}
+		December 15			{LISTS! COMPARE}
+     1981	January 7			{LISTS! SHAKEDOWN}
+----------------------------- Phase II ---------------------------------
+		January 19			{LISTS! CONT}
+		January 30			{LISTS! DEBCONT}
+		February 12			{LISTS! TRANS}
+		March 4				{LISTS! DEVICE}
+.Skip 4;
+.EndHand;
+.Begin Center;
+~~SLIPPAGES~
+.End;
+	The delay between items {LISTS! DSNINTS} and {LISTS! DEBSTORE}
+was due to firefighting on TAPELIB aggravated by network
+flakiness.  Also, several months was spent on TAPELIB to improve its
+general reliability and resistance to network problems.
+	Slippage on {LISTS! DEBRETRIEVE} occurred as a result of
+encounters with tricky or undocumented tape device characteristics
+which were time consuming both to discover and deal with.
+	~~Potential_schedule_disturbances_to_be_dealt_with~:  The
+amount of management time I amding must be watched closely.  The
+project management time for SNARL will increase predictably as soon as
+SNARL is in internal test.  A project management class (1 week) is a
+strong possibility for 1Q81.
+
+HW.6E
