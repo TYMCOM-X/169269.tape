@@ -1,0 +1,13 @@
+.page frame 60 high 80 wide;
+.area text lines 4 to 57;
+.title area heading lines 1 to 3;
+.title area footing line 60;
+.place text;
+.Library |(CARL)MEMO.PUB|;
+.To |William R. Soley|
+.Cc |Adele Gadol/Greg Lyons/Sherman Gavette/Michael Hinckley/Ernie Socci/Darren Price/Todd Corenson|
+.re |Benchmarks run for the KI, KL, KS and F3|
+.fillflag_True;
+.body
+.narrow 0,5
+.endbody
