@@ -1,0 +1,4156 @@
+
+
+
+                     ******************************
+
+                                 SNARL
+                     (Store Now And Retrieve Later)
+
+                     Internal Specifications for a
+                       Proposed TITO Replacement
+
+                             April 5, 1981
+                              Adele Gadol
+
+                     ******************************
+
+
+
+                           Table of Contents                             
+
+
+
+
+
+Section                                                             Page
+
+
+
+    List of Figures           .  .  .  .  .  .  .  .  .  .  .  .  .   vi
+
+
+1.    General information     .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+    1.1    Document description  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+    1.2    References         .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+    1.3    Special debugging or test versions   .  .  .  .  .  .  .  . 1
+
+
+2.    Program structure and flow of control  .  .  .  .  .  .  .  .  . 2
+
+    2.1    Modules            .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+    2.2    Communication      .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+
+         2.2.1   System status vector  .  .  .  .  .  .  .  .  .  .  . 5
+
+         2.2.2   Magnetic tape device status .  .  .  .  .  .  .  .  . 5
+
+
+3.    SNARL and DSNARL - The main program .  .  .  .  .  .  .  .  .  . 5
+
+    3.1    Function           .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+
+    3.2    Entry points and subroutines   .  .  .  .  .  .  .  .  .  . 5
+
+    3.3    Sequence of steps - main program  .  .  .  .  .  .  .  .  . 7
+
+    3.4    Global storage defined   .  .  .  .  .  .  .  .  .  .  .  . 7
+
+    3.5    Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .  . 9
+
+         3.5.1   Changing command sets .  .  .  .  .  .  .  .  .  .  . 9
+
+
+4.    SNCLI and DSNCLI - The parser or command language
+                          interpreter  .  .  .  .  .  .  .  .  .  .  . 9
+
+    4.1    Function           .  .  .  .  .  .  .  .  .  .  .  .  .  . 9
+
+    4.2    Special syntax routine structure  .  .  .  .  .  .  .  .  . 9
+
+
+                                   i
+
+
+
+    4.3    Entry points and subroutines   .  .  .  .  .  .  .  .  .  . 9
+
+    4.4    Global storage used   .  .  .  .  .  .  .  .  .  .  .  .   15
+
+    4.5    Storage structures defined in this module  .  .  .  .  .   15
+
+    4.6    Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   17
+
+         4.6.1   Command file handling .  .  .  .  .  .  .  .  .  .   17
+
+         4.6.2   Keeping track of multiple line commands .  .  .  .   17
+
+         4.6.3   Parse error printing  .  .  .  .  .  .  .  .  .  .   17
+
+
+5.    SNPARS                  .  .  .  .  .  .  .  .  .  .  .  .  .   17
+
+
+6.    DSPARS                  .  .  .  .  .  .  .  .  .  .  .  .  .   17
+
+
+7.    SNIO - I/O and interrupts and other general routines  .  .  .   18
+
+    7.1    Function           .  .  .  .  .  .  .  .  .  .  .  .  .   18
+
+    7.2    Entry points and subroutines   .  .  .  .  .  .  .  .  .   18
+
+    7.3    Global storage used   .  .  .  .  .  .  .  .  .  .  .  .   20
+
+    7.4    Interrupt philosophy  .  .  .  .  .  .  .  .  .  .  .  .   20
+
+    7.5    Reason for alternate channel procedures .  .  .  .  .  .   20
+
+
+8.    MODES - mode switch setting   .  .  .  .  .  .  .  .  .  .  .   20
+
+    8.1    Function           .  .  .  .  .  .  .  .  .  .  .  .  .   20
+
+    8.2    Entry points       .  .  .  .  .  .  .  .  .  .  .  .  .   21
+
+    8.3    Global storage used   .  .  .  .  .  .  .  .  .  .  .  .   21
+
+
+9.    FTRANS - file transfer and related commands  .  .  .  .  .  .   22
+
+    9.1    Function           .  .  .  .  .  .  .  .  .  .  .  .  .   22
+
+    9.2    Entry points and subroutines   .  .  .  .  .  .  .  .  .   22
+
+    9.3    Global storage used   .  .  .  .  .  .  .  .  .  .  .  .   29
+
+    9.4    Global storage structures defined in this module .  .  .   29
+
+    9.5    Local storage structures .  .  .  .  .  .  .  .  .  .  .   32
+
+
+                                   ii
+
+
+
+    9.6    Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   33
+
+         9.6.1   Creating a sorted list for a STORE ALL
+                          transfer  .  .  .  .  .  .  .  .  .  .  .   33
+
+         9.6.2   Creating a username list for a STORE with GAN
+                          list parameter  .  .  .  .  .  .  .  .  .   34
+
+         9.6.3   Storage order when writing files to tape   .  .  .   34
+
+         9.6.4   Opening a file for storage to tape   .  .  .  .  .   34
+
+         9.6.5   Storing a file to tape - the data flow  .  .  .  .   34
+
+         9.6.6   Retrieval order when reading files from tape  .  .   35
+
+         9.6.7   Opening a file for retrieval   .  .  .  .  .  .  .   35
+
+         9.6.8   Retrieving a file - the data flow .  .  .  .  .  .   35
+
+         9.6.9   Tape resident directory - when used  .  .  .  .  .   36
+
+         9.6.10  Management of data pages and other tape
+                          markers   .  .  .  .  .  .  .  .  .  .  .   36
+
+         9.6.11  Keeping track of opened files  .  .  .  .  .  .  .   37
+
+         9.6.12  Statistics reporting during data transfers .  .  .   37
+
+
+10.   DSDUMP - DSNARL dump routines .  .  .  .  .  .  .  .  .  .  .   37
+
+    10.1   Entry points and subroutines   .  .  .  .  .  .  .  .  .   37
+
+    10.2   Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   38
+
+         10.2.1  Treatment of tape  .  .  .  .  .  .  .  .  .  .  .   38
+
+
+11.   DSCHEC - testing and checking routines .  .  .  .  .  .  .  .   39
+
+    11.1   Entry points and subroutines   .  .  .  .  .  .  .  .  .   39
+
+    11.2   Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   39
+
+
+12.   TAPCOM - tape related commands   .  .  .  .  .  .  .  .  .  .   40
+
+    12.1   Function           .  .  .  .  .  .  .  .  .  .  .  .  .   40
+
+    12.2   Entry points and subroutines   .  .  .  .  .  .  .  .  .   40
+
+    12.3   Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   41
+
+
+
+                                  iii
+
+
+
+         12.3.1  Managing tape device reassignment
+                          restrictions .  .  .  .  .  .  .  .  .  .   42
+
+
+13.   SNHELP - Help and program information commands  .  .  .  .  .   42
+
+    13.1   Function           .  .  .  .  .  .  .  .  .  .  .  .  .   42
+
+    13.2   Entry points and subroutines   .  .  .  .  .  .  .  .  .   42
+
+    13.3   Algorithms         .  .  .  .  .  .  .  .  .  .  .  .  .   42
+
+         13.3.1  Printing long and short help text .  .  .  .  .  .   42
+
+
+14.   SNMISC - Miscellaneous commands  .  .  .  .  .  .  .  .  .  .   43
+
+    14.1   Function           .  .  .  .  .  .  .  .  .  .  .  .  .   43
+
+    14.2   Entry points and subroutines   .  .  .  .  .  .  .  .  .   43
+
+
+15.   Building SNARL and DSNARL from Source  .  .  .  .  .  .  .  .   43
+
+    15.1   Command files      .  .  .  .  .  .  .  .  .  .  .  .  .   43
+
+    15.2   Customizing the modules  .  .  .  .  .  .  .  .  .  .  .   44
+
+    15.3   Changing the Help Text   .  .  .  .  .  .  .  .  .  .  .   44
+
+    15.4   Changing the SNARL or DSNARL command syntax   .  .  .  .   44
+
+
+    Appendix A
+
+       SNARL software list    .  .  .  .  .  .  .  .  .  .  .  .  .   45
+
+
+    Appendix B
+
+       DSNARL software list   .  .  .  .  .  .  .  .  .  .  .  .  .   46
+
+
+    Appendix C
+
+       SNARL Grammar          .  .  .  .  .  .  .  .  .  .  .  .  .   47
+
+
+    Appendix
+
+       DSNARL Grammar         .  .  .  .  .  .  .  .  .  .  .  .  .   iv
+
+
+    Appendix
+
+
+                                   iv
+
+
+
+       SNARL and DSNARL Help File Format  .  .  .  .  .  .  .  .  .  . v
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   v
+
+
+
+                            List of Figures                              
+
+
+
+Figure                                                              Page
+
+
+1.  SNARL Block Diagram .  .  .  .  .  .  .  .  .  .  .  .  .  .  .    4
+
+2.  Command Tracking Structures  .  .  .  .  .  .  .  .  .  .  .  .   16
+
+3.  File Transfer Lists .  .  .  .  .  .  .  .  .  .  .  .  .  .  .   31
+
+4.  FTRANS Local Storage Structures .  .  .  .  .  .  .  .  .  .  .   33
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   vi
+
+
+
+1    General information      
+
+
+
+1.1    Document description        
+
+     This document is intended as an explanation of the  internal design
+of SNARL.   It began as  a plan for  implementation, and it  is evolving
+into an internal maintenance specification as the work proceeds.
+
+     As it  will be evident  from the load  command files  and listings,
+SNARL and its companion  maintenance program, DSNARL, share quite  a bit
+of code.  The general structure of both programs is the same,  and there
+are modules in SNARL which have an analogous, similarle  in DSNARL.
+The  similar  modules  are  constructed  with   conditional  compilation
+("ck!sn" sections  are SNARL, "ck!dsn"  are DSNARL only).   For example,
+SNCLI and  DSNCLI differ only  in terms of  the special  syntax routines
+which are included to handle the particular grammar of each program.  Of
+course, some of the modules  in each program have no counterpart  in the
+other.   This  document  describes  both  programs;  in  most  cases,  a
+reference to SNARL applies also to DSNARL.
+
+     I  attempted  to structure  this  paper in  a  "top  down" fashion,
+describing  first the  overall structure  of SNARL  and proceeding  to a
+detailed discussion of the  processes, individual modules, and  the data
+structures.  However, some reference between sections may be necessary.
+
+
+
+1.2    References       
+
+SNARL External Specifications
+DSNARL External Specifications
+TYMCOM-X Reference Manual
+TYMCOM-X Monitor Reference Manual
+TDPARS Description
+TABGEN Description
+SAIL Manuals
+MAPLIB Documentation (SAIL paging procedures)
+SAILIB Documentation (SAIL library procedures)
+
+
+
+1.3    Special debugging or test versions           
+
+     Several flavors of SNARL  may be constructed by using  the switches
+"debug" and "production!version" to alter the compilation.
+
+     If  "debug"  is  made "true",  then  the  following  differences in
+operation will be noted:
+
+a)  UNLOAD will be treated as a REWIND command.
+
+
+
+
+                                   1
+
+
+
+b)  A  keyboard  interrupt will  be  fielded by  SNARL  as  an immediate
+    interrupt, and the user will be prompted by the phrase:
+            Int or Xit?
+    If "I" is entered, then  the interrupt is deferred as it  would have
+    been in the normal SNARL.   If "X" is entered, SNARL  is immediately
+    exited.  The user is quizzed until one of these letters is entered.
+
+c)  A TRACE statement will be available if the debugging version  of the
+    grammar has  been used.  The  "TRACE ON" command  will set  a switch
+    which causes  a trace of  the finished parsing  graph to  be printed
+    instead of doing the command executions.  "TRACE OFF" turns off this
+    mode.
+
+     If  "production!version"  is  made  "false",  then   the  following
+differences in operation will be noted.
+
+a)  It will be possible to run SNARL using a disk file as  the simulated
+    tape device  and then  to operate without  GD license.   The initial
+    device prompt should  be answered with  the string "DSK".   The file
+    "SNARL.TAP" is used for tape I/O.
+
+b)  LOOKUP rather  than ENTER access  is made to  files which are  to be
+    STORED.  This is a courtesy during debug stages and allows  SNARL to
+    be run with minimal license.  Beware -- other access may be  made to
+    files while SNARL is working on them.
+
+
+
+
+2    Program structure and flow of control          
+
+
+
+2.1    Modules       
+
+     SNARL will consist of the following major types of procedures.
+
+A.  The Main program      
+
+    1.  The main initializes the command device and introduces itself.
+
+    2.  It reads commands from the user.
+
+    3.  It parses the commands.
+
+    4.  It executes the appropriate service function.
+
+    5.  The main checks and will reset system status.
+
+    6.  It reports results.
+
+B.  Parser    
+
+
+
+
+                                   2
+
+
+
+    1.  The parser translates a user request into a function call on one
+        of the service procedures which carries out the work.
+
+    2.  It reports syntax errors.
+
+C.  Service routines     
+
+    1.  Each procedure implements a command verb.  Procedures which must
+        share  data  structures  or  functions  will  be  grouped  as  a
+        "module".
+
+    2.  Those  service routines  which are  interruptable will  have the
+        responsibility  for  checking system  status  during appropriate
+        times  in  the   processing  and  doing  whatever   handling  is
+        necessary, such as aborting itself neatly or calling the command
+        interpreter to process a command at interrupt time.
+
+    3.  Certain  service  routines  may  also  set  some  system  status
+        conditions.
+
+D.  Interrupt handlers     
+
+    1.  There will be a process for each abnormal hardware condition and
+        one for user interrupt.  Special handlers may be  applicable for
+        abnormal software conditions also.
+
+    2.  At interrupt time, the appropriate process is called.
+
+    3.  These procedures communicate with the rest of the system using a
+        status vector and device status words held in global storage.
+
+    4.  The types of status which must be set are the interrupt type and
+        a  command  status  vector  indicating  which  commands  may  be
+        accessed at interrupt time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   3
+
+
+
+
+This is a diagram of the flow of control and active modules at various
+points during the processing.
+
+
+                      ------- if ------
+                      |     error     |
+                      v               |
+                 -----------     -----------     -----------
+       input --> |  SNCLI  | --> |  SNCLI  | --> |  SNCLI  | -- 
+                 -----------     |---------|     |---------|   |
+                      ^          | SNPARS  |     | service |   |
+                      |          -----------     | routine |   |
+                      |                          -----------   |
+                      |                                        |
+                       -------------------<--------------------
+
+
+        at        -----------                  -----------
+     keyboard --> |  SNCLI  | ---------------> |  SNCLI  |
+    interrupt     |---------|                  |---------|
+                  | service | <-- system       | service |
+                  | routine |     status       | routine | --> ATTN
+                  |---------|       |          |---------|      |
+                  |  SNIO   | --->---          |  SNCLI  | --<---
+                  -----------                  -----------
+                                                    |
+                                                    |
+                       ---------------<--------------
+                       |
+                       v
+                  -----------     -----------     -----------
+                  |  SNCLI  |     |  SNCLI  |     |  SNCLI  |
+                  |---------|     |---------|     |---------|
+    interrupt     | service | --> | service | --> | service |
+      time        | routine |     | routine |     | routine |
+     command      |---------|     |---------|     -----------
+                  |  SNCLI  |     |  SNCLI  |                
+                  |---------|     |---------|                 
+                  | SNPARS  |     | SNPARS  |
+                  -----------     |---------|
+                                  | service |
+                                  | routine |
+                                  -----------
+
+
+
+                     Figure 1.  SNARL Block Diagram
+
+
+
+
+
+
+
+
+                                   4
+
+
+
+2.2    Communication       
+
+
+2.2.1    System status vector           
+
+     The main  and the  various service,  interrupt, and  error routines
+communicate  their progress  through  a status  vector  called "snstat".
+"Snstat" is a  string which is treated  somewhat like a  pushdown stack.
+The first character is always the latest piece of information.
+
+     Any  of  the following  pieces  of information  may  appear  in the
+string.
+"K"     keyboard interrupt received (set by "attn!i")
+"A"     abort the current task (set by ABORT command)
+"S"     stop the current task (set by STOP command)
+"C"     service routine completed successfully
+"D"     mag tape device error detected
+"H"     hung device condition detected
+
+
+2.2.2    Magnetic tape device status            
+
+     Magnetic tape device status is kept in global storage with the main
+program so that it will be accessible to the other  modules.  Initially,
+information will be kept for only one device; it could be expanded later
+to a list of devices.
+
+
+
+
+3    SNARL and DSNARL - The main program           
+
+
+
+3.1    Function       
+
+     The main is  the master control for  all the other  functions which
+SNARL  performs.  Also  found  in this  module  are most  of  the global
+storage,  initialization   procedures  for   the  global   storage,  and
+subroutines associated with the main program.
+
+
+
+3.2    Entry points and subroutines          
+
+
+SIMPLE PROCEDURE default;
+     Sets up defaults for many of the global parameters.
+
+
+STRING PROCEDURE version;
+     Retrieves  the  program  version  numbers  and  returns  them  as a
+printable string.
+
+
+
+                                   5
+
+
+
+INTERNAL STRING PROCEDURE pr!time (INTEGER time);
+     This procedure converts "time" expressed in seconds  since midnight
+into a printable string expressing the time in hours and minutes.
+
+
+INTERNAL STRING PROCEDURE pr!date (INTEGER date);
+     This procedure converts "date"  which should be in DEC  date format
+to a printable string of the form DD MON YR.
+
+
+INTERNAL PROCEDURE curdt (REFERENCE INTEGER time,date);
+     This procedure returns the current time and date in the user's time
+zone.   "Time" is  in seconds  since midnight.   "Date" is  in  DEC date
+format.
+
+
+INTERNAL STRING PROCEDURE pr!reel (INTEGER reelno);
+     Returns  a  string for  printing  the reel  number  value  given in
+"reelno".
+
+
+INTERNAL STRING PROCEDURE pr!ppn (INTEGER ppn);
+     Returns a string for printing the ppn value given in "ppn".
+
+
+INTERNAL STRING PROCEDURE pr!user( STRING username );
+     Takes a string and surrounds it with parentheses.
+
+
+INTERNAL SIMPLE STRING PROCEDURE pad (STRING str;  INTEGER totlen);
+     This routine pads the  string "str" to the desired  length "totlen"
+and returns the resultant string.
+
+
+INTERNAL BOOLEAN PROCEDURE checrec;
+     This routine checks the  tape block read into the  array, "tapblk",
+to see  whether it  is a complete  check record  (all words  contain the
+check constant).
+
+
+INTERNAL SIMPLE BOOLEAN PROCEDURE ab!cond;
+     This routine  checks the  system status  vector "snstat"  for abort
+requests.
+
+
+STRING PROCEDURE sysinfo;
+     This routine retrieves two words of system and  monitor information
+and returns it as a printable string.
+
+
+
+
+
+
+
+
+                                   6
+
+
+
+3.3    Sequence of steps - main program            
+
+a)  Check user license and throw user off unless user has GD license.
+
+b)  Print out SNARL announcement.
+
+c)  Initialize variables including set up of standard command  set token
+    array based upon user license.
+
+d)  Set up for deferred interrupt handling.
+
+e)  Get initial device assignment; this is done by executing  the DEVICE
+    command service routine.
+
+f)  Main loop:   This is ended  when "quitsw" (set  by QUIT  command) is     
+    TRUE.  Send out  the prompt; make the  proper calls to  read, parse,
+    and execute a command.   Check the status vector and  report unusual
+    conditions according to the following table of entries.
+        vector contains          report                   
+            "C"                     no report
+            "CA" or "CS"            report command completion
+            "A" or "S"              report command aborted
+            "AD" or "AH"            report abort and cause
+    Clear the status vector.
+
+g)  Before exiting the program, close and release all opened files.
+
+
+
+3.4    Global storage defined         
+
+     Most of the global storage for SNARL is found in this module.  This
+includes the arrays used to tailor the grammar according to user license
+or other  restrictions, the  magnetic tape  status information,  and the
+system status vector.
+
+\   Global storage defined here in the main;
+
+PRESET!WITH 0;
+INTERNAL INTEGER ARRAY std!g[1:11];     \ Standard grammar set-up array;
+
+INTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];
+        \ For holding contents of whole tape records.;
+
+INTERNAL BOOLEAN quitsw;        \ Says when to quit SNARL.;
+INTERNAL INTEGER cmdtkn;        \ Token identifying current command;
+
+INTERNAL INTEGER oper!ppn;      \ Ppn of (SNARL) program operator;
+INTERNAL STRING oper!name;      \ User name of (SNARL) program operator;
+
+ck!sn
+INTERNAL INTEGER spr!sw,        \ Settable mode switches;
+   old!sw, sys!sw, rpr!sw,      \ All except ree!sw contain a token #;
+   dsk!sw, tty!sw, ree!sw;      \ Ree!sw contains the reel # value.;
+
+
+                                   7
+
+
+
+endc
+INTERNAL INTEGER
+   mtchan, mteof,       \ mag tape channel stuff;
+   mtstat,              \ sense data,,status bits;
+   mtdens,              \ currently set density;
+   mtrec,               \ physical record containing last complete file
+                        \ processed;
+   mtwdpos,             \ word position of file in "mtrec";
+   mtpos,               \ number of last complete file processed;
+   mtibuf,              \ number of buffers for buffered input;
+   mtobuf,              \ number of buffers for buffered output;
+   mtppn,               \ ppn of last complete file accessed;
+   otchan,              \ channel of last previous device;
+   otdens,              \ density of last previous device;
+   tappfno,             \ current tape physical file number;
+   tapbloc,             \ current tape physical block number;
+   tapppn,              \ current tape ppn value;
+   tappos,              \ current tape file position;
+   ofdchan, ofdeof;     \ "cof" hardcopy device channel stuff;
+
+INTERNAL STRING mtdev,          \ mag tape device name;
+   mtuser,                      \ user containing last file accessed;
+   mtfile,                      \ name of last file accessed;
+   otdev,                       \ name of last previous device;
+   offil,                       \ "cof" output file name;
+   ofdev;                       \ "cof" output device name;
+
+INTERNAL INTEGER look!size;     \ lookup block size used;
+INTERNAL INTEGER spec!size;     \ computed size of "specrec" array;
+
+INTERNAL STRING snstat;         \ the SNARL or DSNARL status vector.;
+ck!sn
+INTERNAL BOOLEAN stor!sw,       \ True if last file accessed was stored,
+                                  false if retrieved;
+   new!sw,                      \ True if NEW TAPE command just done;
+   app!sw;                      \ True if APPEND command just done;
+endc
+
+INTERNAL BOOLEAN dskdev;        \ True if current mag tape device
+                                  is really a disk;
+
+PRESET!WITH
+   "XXX", "HED", "DIR",         \ These are the symbolic names for;
+   "RCD", "LOK", "DAT",         \ the various logical record types;
+   "EMP", "EOF", "BOU",         \ found on SNARL tapes.  They are;
+   "EOU", "EOT", "CON",         \ used for printing the maps.;
+   "DUM", "UFD", "MFD";
+INTERNAL STRING ARRAY headsymbols [1:15];
+PRESET!WITH
+   xxx, hed, dir, rcd, lok,     \ These are the corresponding numeric;
+   dat, emp, feo, bou, eou,     \ types which are put in "rcdmap" by;
+   eot, con, dum, ufd, mfd;     \ "s!bloc" which reads the tape blocks.;
+INTERNAL INTEGER ARRAY headers [1:15];
+
+
+
+                                   8
+
+
+
+3.5    Algorithms       
+
+
+3.5.1    Changing command sets           
+
+     Using the  "cmdset" subroutine (from  TDPARS library),  the grammar
+may  be  restricted.   At   SNARL  initialization  time,  an   array  is
+constructed to use  with "cmdset" to create  the normal set  of commands
+for the current user.  This is influenced by the user's license or, if a
+debug version, whether a tape  device has been assigned.  This  array is
+stored  in "std!g"  and can  be used  at any  time to  reset  the normal
+command mode.  If using a  debug version, a device assignment  may cause
+"std!g" to change.  Other arrays  are also defined which may be  used to
+restrict the  command set  at keyboard  interrupt time,  when requesting
+continuation tape information, or  when looking for a  particular phrase
+response.  This eliminates the need for special scanning and parsing.
+
+
+
+
+4    SNCLI and DSNCLI - The parser or command language interpreter              
+
+
+
+4.1    Function       
+
+     This module consists of routines which pre-scan the  user's command
+line and call the standard TDPARS functions in order to  translate SNARL
+commands into  service routine calls.   The special syntax  and semantic
+routines which may be called during the parsing reside here too.
+
+
+
+4.2    Special syntax routine structure          
+
+     If specified  by the  grammar, a special  syntax routine  is called
+during parsing after  successful application of its  corresponding rule.
+For all of these routines, the "link" parameter is actually a pointer to
+the node in the parsing graph representing the non-terminal  token value
+of the  left-hand side of  a rule which  has been  applied successfully.
+Each of the special syntax or semantic routines are  boolean procedures.
+If they find no errors in the items they check, then the value "true" is
+returned.  A return of "false" will cause the current rule being applied
+to fail.  For  more information about the  use of these  procedures, see
+the TDPARS documentation.
+
+
+
+4.3    Entry points and subroutines          
+
+
+INTERNAL R!P (any!class) PROCEDURE chksym (INTEGER toknum);
+     This procedure is  called by "parse" and  is a link  to "check!sym"
+
+
+
+                                   9
+
+
+
+which resides within "snpars".  It causes the symbol matcher to  match a
+keyword in the input string with an identifier in the grammar.
+
+
+INTERNAL BOOLEAN PROCEDURE cmdstk;
+     This procedure initializes the  command stack and makes  the user's
+console the top level entry in the stack.
+
+
+SIMPLE PROCEDURE unstak;
+     This routine pops  the command file  stack, setting up  to continue
+processing with the previous command file.
+
+
+INTERNAL SIMPLE PROCEDURE bailout;
+     This  routine bails  out  of all  opened command  files  and closes
+outstanding TTY input.
+
+
+SIMPLE PROCEDURE free!lin;
+     This routine clears the "linptr" list.
+
+
+BOOLEAN PROCEDURE stack (STRING filnam;  BOOLEAN rep!err);
+     This routine opens a new command file, saves the information on the
+stack,  and  makes  the  appropriate  success  or  failure  return.  The
+"filnam" parameter is  a file name string  for a SAIL lookup  call.  The
+"rep!err" parameter  indicates whether or  not "stack" should  print any
+error messages to the logging device(s).
+
+
+SIMPLE INTERNAL INTEGER PROCEDURE c!chan;
+     This procedure  returns the channel  number of the  current command
+file.
+
+
+INTERNAL SIMPLE PROCEDURE brkset;
+     This  procedure  initializes   the  break  tables  needed   by  the
+"pre!scan" and "strsav" routines.
+
+
+INTERNAL BOOLEAN PROCEDURE pre!scan (BOOLEAN tty(false), cmd!ok(true),
+  rep!err(true));
+     This procedure  reads and tokenizes  a user command,  producing the
+structure "tokent" which is later checked by the symbol matching routine
+"chksym".  A return of "true" indicates the success of the pre!scan.
+     If "tty"  is true,  the input will  be read  from the  console, and
+command file references are illegal.  Otherwise, input will be read from
+the current command file (which may be the TTY).
+     If "cmd!ok" is  true, then a command  file reference is  legal.  If
+"tty" is true, then "cmd!ok" is made false by "pre!scan".
+     If "rep!err"  is true,  then "pre!scan" will  report errors  to the
+current log device(s).
+
+
+
+                                   10
+
+
+
+     "Pre!scan"  identifies  the following  user-defined  terminals:  An
+{identifier} is a combination of alphabetic and numeric characters which
+is terminated by a  delimiter other than " "  or "*" and begins  with an
+alphabetic character.   A {usrnam}  is a  Tymcom-X username  enclosed in
+parentheses.  An {integer} is a delimited set of numeric  characters.  A
+{filpc} is a delimited set of characters which is legal for a  file name
+or extension.  It may  contain alphanumerics.  A {wldpc} is  a delimited
+set of characters which is legal for a wild-card file name or extension.
+It  may  contain  alphanumerics or  " "  or  "*".  {Text}  is  a  set of
+characters comprising the comment portion of the COMMENT  command, which
+must be handled specially by the "pre!scan".
+     When  reporting  an  error  in  a  multi-line  command,   only  the
+applicable line will be displayed.
+
+
+PROCEDURE scnerr (STRING errmsg);
+
+
+STRING PROCEDURE cmdin (INTEGER brtab);
+
+
+PROCEDURE make!stlist (R!P (pgraph) link);
+     This procedure constructs the store list record structure  from the
+pgraph tree structure.
+
+
+PROCEDURE make!relist (R!P (pgraph) link);
+     This procedure constructs the "retrieve" list record structure from
+the pgraph tree structure.
+
+
+PROCEDURE make!ganlist (R!P (pgraph) link);
+     This procedure constructs the "ganlst" record structure (a  list of
+GAN number ranges) from the pgraph tree structure
+
+
+PROCEDURE make!poslist (R!P (pgraph) link);
+     This procedure constructs the "poslst" record structure (a  list of
+file position ranges) from the pgraph tree structure.
+
+
+STRING PROCEDURE make!filstr( R!P (any!class) link );
+     This procedure  puts together  a file string  from the  parse graph
+branch <fildes>.  "Link" should point to the <fildes> branch.
+
+
+PROCEDURE xctcmd (R!P (pgraph) link);
+     This is the procedure which is executed after a completed  parse of
+the input  command (successful application  of the rule  for <command>).
+In "xctcmd" any final work  which is needed to change the  parsing graph
+into a service routine call is done.  Some consistency checking may also
+be done here.  Then, the appropriate service routine is called.
+     "Xctcmd"  will  check system  status  for an  abort  request before
+
+
+
+                                   11
+
+
+
+calling a  service routine.  It  will also check  for a mag  tape device
+change, and, if the the command  about to be executed is not  proper (if
+not NEW TAPE or APPEND), it will reinstate the old device.   Following a
+service routine  call, it  will check system  status and  report unusual
+conditions  to  the user.   In  addition, "xctcmd"  requests  the proper
+clean-up from SNPARS where necessary.
+
+
+PROCEDURE prserr;
+     This procedure reports parsing errors to the user and bails  out of
+all opened command files.
+
+
+INTERNAL BOOLEAN PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+     This  routine  does  the necessary  calls  to  "pre!scan", "parse",
+"prserr", and "xctcmd" in order to scan, interpret, execute,  and report
+syntax errors  found in  the standard  user commands.   "Do!cmnd" always
+calls "parse" with the goal symbol of the grammar (ie. it  handles whole
+commands).
+
+
+INTERNAL PROCEDURE prtalt (INTEGER index);
+     This procedure prints out a list of keyword choices given a grammar
+rule  which requires  one of  a  list of  keywords to  satisfy  it.  The
+"index" parameter is the index in "gramr" of the beginning of the rule.
+
+
+INTERNAL INTEGER PROCEDURE readkey (STRING prompt;  INTEGER rule);
+     This procedure does the appropriate parsing in order to  retrieve a
+keyword from the user and  return its token value.  This will  work only
+for  a grammar  rule which  is  a simple  choice among  keywords  of the
+language.  "Prompt" is a string to be typed at the user.  "Rule"  is the
+token  number of  the left-hand-side  of the  desired rule  to  use.  No
+command file references are allowed in the input.
+
+
+INTERNAL BOOLEAN PROCEDURE readint (STRING prompt;  INTEGER rule;
+   REFERENCE INTEGER result);
+     This procedure does the appropriate parsing to retrieve  an integer
+value from the user.   The string "prompt" is  to be typed at  the user.
+The "rule" parameter should be a token value for the left-hand-side of a
+rule  whose  right-hand-side  requires  an  {integer}.   The  result  is
+obtained from the intermediate result structure "intres" and is returned
+in "result".  This  procedure has the value  "false" only when  the user
+hit the carriage return, entering no value.
+
+
+INTERNAL STRING PROCEDURE readstr (STRING prompt;  INTEGER rule);
+     This procedure  does the appropriate  parsing to retrieve  a string
+value from the user.   The string "prompt" is  to be typed at  the user.
+The "rule" parameter should be a token value for the left-hand-side of a
+rule whose  right-hand-side requires a  value which will  be saved  as a
+string by an intermediate  routine.  The string result is  obtained from
+
+
+
+                                   12
+
+
+
+the intermediate result structure "strres".  This procedure  will return
+a null string when the user hit the carriage return, entering no value.
+
+
+INTERNAL BOOLEAN PROCEDURE tidsav (R!P (any!class) link);
+     This SNARL special syntax procedure saves the TID value as a string
+intermediate result.
+
+
+INTERNAL BOOLEAN PROCEDURE possav (R!P (any!class) link);
+     This SNARL  special syntax procedure  saves an  individual position
+list item.  The item may be an octal number or "E".  If the latter, then
+the item is entered as '377777777777, the largest theoretically possible
+value.
+
+
+INTERNAL BOOLEAN PROCEDURE gitsav (R!P (any!class) link);
+     This SNARL special syntax  procedure saves an individual  GAN item.
+The item may be an octal number or "E".  If the latter, then the item is
+entered as '777777, the largest possible GAN value.
+
+
+INTERNAL BOOLEAN PROCEDURE gansav (R!P (any!class) link);
+     This SNARL special syntax  procedure saves a GAN  range expression.
+A single GAN is converted to a range with both parts of the  range equal
+to the single GAN.   A range is stored with  the first GAN in  the left-
+half, and the second GAN in the right half.
+
+
+INTERNAL BOOLEAN PROCEDURE ppnsav (R!P (any!class) link);
+     This  special  syntax procedure  computes  and saves  a  PPN  as an
+integer value.
+
+
+INTERNAL BOOLEAN PROCEDURE strsav (R!P (any!class) link);
+     This special syntax procedure  retrieves and stores a  string value
+as an intermediate result.
+
+
+INTERNAL BOOLEAN PROCEDURE dtsav (R!P (any!class) link);
+     This SNARL  special syntax  routine saves  the date  and time  as a
+single word with  the date in  the left half and  the time in  the right
+half.  The  date is  DEC format, and  the time  is expressed  as seconds
+since midnight.  The time zone is GMT.
+
+
+INTERNAL BOOLEAN PROCEDURE datsav (R!P (any!class) link);
+     This  SNARL special  syntax procedure  computes the  date  from the
+user-supplied date information.  If the year is not specified,  then the
+current one is  used.  If the month  is not specified, then  the current
+one is used.
+
+
+BOOLEAN PROCEDURE chkint (R!P (any!class) link;  BOOLEAN octval;
+
+
+                                   13
+
+
+
+  INTEGER lb('400000000000),ub('377777777777));
+     This special  syntax procedure  is called  by other  routines which
+wish to save an  integer value if a  range check succeeds.  "Lb"  is the
+lower bound to  be checked with the  "geq" relation.  "Ub" is  the upper
+bound to checked with the "leq" relation.  If "octval" is true, then the
+symbolic input is treated as octal, otherwise decimal.
+
+
+INTERNAL BOOLEAN PROCEDURE daysav (R!P (any!class) link);
+     This SNARL  special syntax routine  checks and possibly  stores the
+<day> value.
+
+
+INTERNAL BOOLEAN PROCEDURE yrsav (R!P (any!class) link);
+     This SNARL  special syntax routine  checks and possibly  stores the
+<year> value.
+
+
+INTERNAL BOOLEAN PROCEDURE hrsav (R!P (any!class) link);
+     Analogous routine to "yrsav" for hour values.
+
+
+INTERNAL BOOLEAN PROCEDURE minsav (R!P (any!class) link);
+     Analogous routine to "yrsav" for minute values.
+
+
+INTERNAL BOOLEAN PROCEDURE timsav (R!P (any!class) link);
+     This SNARL special syntax procedure computes the time from hour and
+minute values, and stores it in terms of seconds since midnight.
+
+
+ck!sn INTERNAL BOOLEAN PROCEDURE fposck( R!P (any!class) link );
+     This procedure  checks the  legality of a  file position  number to
+assure that it falls within a possible range.
+
+
+INTERNAL BOOLEAN PROCEDURE intsav (R!P (any!class) link);
+     This  special  syntax  procedure  checks  and  stores  a  full-word
+positive integer value expressed in decimal.
+
+
+INTERNAL BOOLEAN PROCEDURE hoctsv (R!P (any!class) link);
+     This special syntax procedure checks and stores a half-word integer
+value expressed in octal.
+
+
+INTERNAL BOOLEAN PROCEDURE halfsv (R!P (any!class) link);
+     This SNARL special syntax  procedure checks and stores  a half-word
+integer value expressed in decimal.
+
+
+ck!dsn INTERNAL BOOLEAN PROCEDURE rngchk (R!P (any!class) link);
+     This DSNARL special syntax procedure checks the range parameters to
+the "T" command and saves them as a word range in "tapblk".
+
+
+                                   14
+
+
+
+4.4    Global storage used         
+
+     This module uses the  record structure definitions for  the parsing
+graph, the system status information, and the parsing error information.
+
+
+
+4.5    Storage structures defined in this module            
+
+     The  following record  structures are  the patterns  for  the lists
+shown in Figure 2.
+
+R!C comfil                      \ This is the command file stack;
+   (INTEGER chan,               \ the channel number;
+   break,                       \ break character save;
+   eof,                         \ eof and error info. save;
+   line;                        \ current line  ;
+   STRING device,               \ device name ("tty", "dsk", etc.);
+   file;                        \ file name string (for SAIL lookup);
+   R!P (comfil) prev);          \ ptr. to previous file in stack;
+
+R!P (comfil) ttyfil,            \ ptr. to original tty command device;
+   curfil;                      \ current command file;
+
+R!C linptr                      \ Keeps track of command lines;
+   (INTEGER pos,                \ position in "cmdstr" of start of line;
+   line;                        \ line number from command file;
+   R!P (linptr) next;           \ next "linptr" entry;
+   R!P (comfil) filptr);        \ points to command file entry;
+
+R!P (linptr) linhed,            \ ptr. to head of linptr list;
+   lstlin;                      \ ptr. to end of linptr list;
+
+INTEGER pagno, sosno;           \ Dummies for "setpl";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   15
+
+
+
+
+                                COMFIL
+
+
+                           +--------------+
+                ttyfil---> |  chan, line, |
+                           | device, file |
+                           +--------------+
+                                   ^
+                                   |
+                           +--------------+
+                           |  chan, line, |
+                           | device, file |
+                           +--------------+
+                                   ^
+                                   .
+                                   .
+                                   ^
+                                   |
+                           +--------------+
+                curfil---> |  chan, line, |
+                           | device, file |
+                           +--------------+
+
+________________________________________________________________________
+
+
+                                LINPTR
+
+
+                            +-----------+
+                linhed----> | pos, line | ----> to "comfil" entry
+                            +-----------+       containing this line
+                                  |
+                                  v
+                            +-----------+
+                            | pos, line | ----> to "comfil" entry
+                            +-----------+       containing this line
+                                  |
+                                  v
+                                  .
+                                  .
+                                  v
+                            +-----------+
+                lstlin----> | pos, line | ----> to "comfil" entry
+                            +-----------+       containing this line
+
+
+
+                 Figure 2.  Command Tracking Structures
+
+
+
+
+
+
+                                   16
+
+
+
+4.6    Algorithms       
+
+
+4.6.1    Command file handling           
+
+     The record  structure, "comfil" will  keep track of  opened command
+files (including the TTY).  As a new command file is opened, its name is
+reported to the TTY and log, and the information is saved in an entry in
+"comfil".  A pointer  is set to identify  the current file.   When SNARL
+gets to the end of a command file, it unlinks the record structure entry
+after closing the file.  Input will generally be done through "pre!scan"
+to assure that commands are being read from the proper place.
+
+
+4.6.2    Keeping track of multiple line commands              
+
+     For the purpose of locating and reporting parsing  errors, multiple
+line commands are described  by the structure "linptr".  As  the current
+command is assembled in "cmdstr", the continuation characters  and CR-LF
+sequences are removed, so that the command can be treated as if  it were
+a single  line.  Each record  in "linptr" represents  a fragment  of the
+command terminated by a CR-LF.  The text is obtained from "cmdstr" using
+the position pointer in each record of "linptr".
+
+
+4.6.3    Parse error printing           
+
+     The  procedure  "prserr  reports parsing  errors.   In  addition to
+printing the applicable message, which is accomplished simply by  a call
+to "messag" in SNPARS, the procedure pinpoints the offending  portion of
+the command.  The original command (or command fragment in the case of a
+multiple line command) is printed with an "^" pointing to  the offending
+piece.  The  command file  is also identified.   The cursor  position at
+failure, "curhgh" is located in the "linptr" list to get the  portion of
+the  command to  print.  The  record  found will  point to  the  file in
+"comfil".
+
+
+
+
+5    SNPARS     
+
+     This  module  consists of  the  configured TDPARS  source  which is
+produced by TABGEN using the SNARL grammar.  For a  complete description
+of its contents and function, please see the TDPARS documentation.
+
+
+
+
+6    DSPARS     
+
+     This  module  consists of  the  configured TDPARS  source  which is
+produced by TABGEN using the DSNARL grammar.  For a complete description
+of its contents and function, please see the TDPARS documentation.
+
+
+                                   17
+
+
+
+7    SNIO - I/O and interrupts and other general routines             
+
+
+
+7.1    Function       
+
+     This  module consists  of general  I/O routines  and  the interrupt
+handlers.
+
+
+
+7.2    Entry points and subroutines          
+
+
+INTERNAL SIMPLE INTEGER PROCEDURE getmchan;
+     This procedure is used to get a channel for mapping.   The channels
+assigned will be  in the range  16-31 (which SAIL  does not use  or know
+about).  The bit map word "hchans" is used to keep track of the channels
+(a 1 in the leftmost bit means channel 16 is in use, etc.).
+
+
+SIMPLE PROCEDURE setchan;
+     Initialization for the alternate channel assignment routine.
+
+
+INTERNAL SIMPLE PROCEDURE relchan (REFERENCE INTEGER channel;
+  INTEGER closebits(0));
+     This is  an alternate  "RELEASE".  If the  channel was  assigned by
+SAIL  (less than  16)  then SAIL's  RELEASE is  invoked.   Otherwise, an
+alternate  is invoked  which will  work with  the channels  assigned for
+mapping.
+
+
+INTERNAL BOOLEAN PROCEDURE xeof (INTEGER eofvar);
+     This procedure checks  to see whether the  "eof" bit is set  in the
+given "eof" variable.
+
+
+INTERNAL BOOLEAN PROCEDURE xerr (INTEGER eofvar);
+     This procedure checks to  see whether the "eof"  variable indicates
+an error condition and prints some information about the error.
+
+
+ck!sn INTERNAL PROCEDURE tapout (INTEGER channel, rcdtyp, count,
+   offset(1);  INTEGER ARRAY tapbuf);
+     This procedure outputs an  array of information to tape.   It keeps
+track  of the  word  counts with  respect  to the  physical  tape record
+boundaries and puts out record  headers or dummy records where  they are
+appropriate.
+     "Channel"  is the  tape channel.   "Rcdtyp" is  the  logical record
+type.  The  "count" parameter is  the size of  the data array  (in words
+including the record marker) to be output.  "Taprcd" marks the beginning
+of a buffer of data to be written.
+
+
+
+                                   18
+
+
+
+PROCEDURE new!rec;
+     Starts a new physical tape block for "tapout".
+
+
+ck!sn INTERNAL PROCEDURE to!begin;
+     This routine  initializes variables so  that "tapout" will  start a
+new physical record when called by "s!sto".
+
+
+ck!sn INTERNAL INTEGER PROCEDURE retwdpos;
+     Returns the word position in  the tape block where the  next output
+for STORE will begin.
+
+
+PROCEDURE i!attn;
+     This  deferred  interrupt  procedure is  executed  when  a keyboard
+interrupt is detected.
+
+
+PROCEDURE i!hung;
+     This deferred  interrupt procedure is  executed when a  hung device
+condition is detected.
+
+
+PROCEDURE i!mag;
+     This deferred interrupt procedure  is executed when a  device error
+condition is detected.
+
+
+INTERNAL PROCEDURE i!kybd;
+     This procedure can be called from other routines in SNARL  to check
+for  and service  a keyboard  interrupt.  If  one has  occurred  (and is
+marked on the SNARL status vector, then the user is prompted for  one of
+the interrupt-time commands, which is then executed.
+
+
+PROCEDURE i!time;
+     This  procedure  is  invoked  to  make  notification   of  time!out
+interrupts.
+
+
+SIMPLE PROCEDURE i!panic;
+     This routine handles an immediate keyboard interrupt.  It will take
+care of the case where the program is expecting keyboard input  from the
+user and the CTRL-C is entered  as part of the input.  Checking  is done
+by looking at the save program counter to see if it points at  an INCHRW
+instruction or  an XCT  for that instruction.   If so,  the saved  PC is
+incremented and the appropriate register loaded with the CTRL-C  code in
+order to simulate the receipt of the CTRL-C as an actual character.
+
+
+INTERNAL PROCEDURE int!init;
+     This routine sets up the SAIL deferred interrupt  handling required
+by SNARL.
+
+
+                                   19
+
+
+
+INTERNAL BOOLEAN PROCEDURE set!tape!bufs (INTEGER direction);
+     This procedure initializes  or re-initializes the tape  channel for
+buffered data transfers.  The "direction" should be either "I" for input
+or "O" for output.
+
+
+
+7.3    Global storage used         
+
+     The system status vector  and magnetic tape status  information are
+accessed from this module.
+
+
+
+7.4    Interrupt philosophy        
+
+     SNARL will not have regularly spaced polling points from  which the
+normal processing  may be  interrupted in order  to schedule  a deferred
+interrupt routine.  Since there will be specific points in the  main and
+service routines where interrupts  will be checked, the polling  will be
+done  at  these  points  also.   The  explicit  polling  will  cause the
+appropriate deferred routine(s) to be scheduled; then SNARL can check to
+see what has happened.
+
+
+
+7.5    Reason for alternate channel procedures           
+
+     The  alternate  "getchan" procedure,  "getmchan",  is  intended for
+obtaining  disk channels  for files  which are  not be  opened  with the
+normal SAIL "open".  The mapped files (being STORED and  RETRIEVEd) fall
+into this category, since the extended lookup blocks will be needed, and
+it  would  be  wasteful  to  do  extra  "chanio"  calls.   The "relchan"
+procedure  will  release  any  channel,  so  that  it  may  be  used for
+generalityy throughout.  It must  be used to release a  channel assigned
+by "getmchan".
+
+
+
+
+8    MODES - mode switch setting         
+
+
+
+8.1    Function       
+
+     The procedures in this module are the service routines for the mode
+switch  setting  commands:   MODE, OLD,  SYS,  RPRINT,  SPRINT, REELSET,
+DSKREP, and TTYREP.
+
+
+
+
+
+
+
+                                   20
+
+
+
+8.2    Entry points        
+
+     There is an entry  point (actually a separate procedure)  to handle
+each command named above.  They are as follows.
+
+
+INTERNAL PROCEDURE s!mode (BOOLEAN alter);
+     This routine handles the MODE command.  The parameter "alter" tells
+whether the ALTER  switch was part of  the user's MODE command.   If so,
+then the user is allowed to modify the switches interactively.   If not,
+then the current switch settings are simply reported to the user.
+
+
+INTERNAL PROCEDURE s!spr (INTEGER swval(0));
+     This procedure handles the SPRINT command.
+
+
+INTERNAL PROCEDURE s!ree (INTEGER swval(0));
+     This procedure handles the REELSET command.
+
+
+INTERNAL PROCEDURE s!old (INTEGER swval(0));
+     This procedure handles the OLD command.
+
+
+INTERNAL PROCEDURE s!sys (INTEGER swval(0));
+     This procedure handles the SYS command.
+
+
+INTERNAL PROCEDURE s!rpr (INTEGER swval(0));
+     This procedure handles the RPRINT command.
+
+
+INTERNAL PROCEDURE s!dsk (INTEGER swval(0));
+     This procedure handles the DSKREP command.
+
+
+INTERNAL PROCEDURE s!tty (INTEGER swval(0));
+     This procedure handles the TTYREP command.
+
+
+
+8.3    Global storage used         
+
+     The mode switch service  routines must access the  switch locations
+which are stored with the main program.
+
+
+
+
+
+
+
+
+
+
+                                   21
+
+
+
+9    FTRANS - file transfer and related commands           
+
+
+
+9.1    Function       
+
+     This code is included in SNARL only.  The procedures in this module
+are  the  service  routines for  the  commands:   STORE,  RETRIEVE, GET,
+DIRECTORY, TRANSLATE, and UNTRANSLATE.  The grouping allows  for sharing
+of  code  among  the  commands  whose  functions  are  similar  and  for
+localizing the file list structures to one module.
+
+
+
+9.2    Entry points and subroutines          
+
+
+R!P (map1) PROCEDURE set!map!space;
+     This procedure sets up a ring of private pages for mapping.
+
+
+PROCEDURE erase!pages (REFERENCE R!P (map1) rp);
+     This procedure clears the internal page storage.
+
+
+R!P (map1) PROCEDURE write!pages (R!P (map1) maprp;  INTEGER chan);
+     This routine makes sure that the pages in the ring have been posted
+to the scratch directory file open on "chan" before the file is closed.
+
+
+R!P (map1) PROCEDURE dirpagchk(R!P (map1) maprp);
+     This procedure is  a companion to  "dirout" which checks  whether a
+directory file page is complete.  When it is, a "validate" is started on
+the page, so that it will be written.
+
+
+PROCEDURE dirincr (R!P (map1) maprp; INTEGER chan);
+     This  procedure is  a companion  to "dirout"  which  puts directory
+entries into a paging ring for output.  This routine increments the word
+counter and creates and maps a new file page when necessary.
+
+
+PROCEDURE dirinit;
+     Initializes variables to start "dirout" with a fresh page.
+
+
+R!P (map1) PROCEDURE dirout (R!P (map1) maprp; INTEGER chan);
+     This routine writes a directory  entry into a page in the  ring for
+posting to the current scratch directory file open on "chan".
+
+
+PROCEDURE write!directory;
+     This procedure  writes the  tape resident  directory from  the file
+"snarl.tmp" which has been built during the storage operation.
+
+
+                                   22
+
+
+
+INTEGER PROCEDURE loklud (STRING username);
+     This procedure looks up the  "username" in the LUD and  returns the
+corresponding PPN.  A zero is returned if the lookup failed.
+
+
+BOOLEAN PROCEDURE gan!search (INTEGER gan);
+     This procedure searches the  "ganlst" for "gan" and  returns "true"
+if "gan" is within one of the ranges.
+
+
+BOOLEAN PROCEDURE pos!search (INTEGER pos);
+     This procedure searches the  "poslst" for "pos" and  returns "true"
+if "pos" is within one of the ranges.
+
+
+BOOLEAN PROCEDURE filequ (STRING name1, ext1, name2, ext2);
+     This procedure  matches two file  names and extensions  and returns
+"true"  when the  sets  are equal  and "false"  otherwise.   "Name2" and
+"ext2"  may  be  wild  in  the  TYMCOM-X  sense  with   some  additional
+capability.  A "*"  in any position in  either name or  extension causes
+the  remainder  of  that  piece  to  be  interpreted  as  containing " "
+characters.
+
+
+BOOLEAN PROCEDURE filmatch (STRING fname, fext;  INTEGER ppn, lsttyp;
+   REFERENCE R!P (any!class) usrptr, filptr);
+     This procedure searches the  designated file list for the  one used
+by the current  command (which may be  RETRIEVE, GET, or  DIRECTORY) and
+returns "true"  if it is  found and "false"  otherwise.  The  list being
+searched may contain wild card file names.  The file name given is taken
+as is.
+     "Fname" is the file name to search for.
+     "Fext" is the file extension to search for.
+     "Ppn" is the corresponding PPN to search for.
+     "Lsttyp" is the type of the list to search.
+     "Usrptr" and "filptr" are  record pointers used to search  the user
+list and file  list respectively for the  entry which matches  the given
+file  and  ppn  values.   If this  procedure  succeeds,  then  these two
+pointers will be pointing at the desired entries upon return.
+
+
+SIMPLE INTEGER PROCEDURE remndr (reference integer val;  integer dvsr);
+     Returns the  remainder and  reduces the base  by dividing  "val" by
+"dvsr".
+
+
+STRING PROCEDURE cksum (INTEGER ckwd);
+     This routine takes an integer checksum from "ckwd" and put  it into
+a 6-character form.  Characters 2  and 5 are vowels, and the  others are
+consonants (eg. "CEKSUM").
+
+
+SIMPLE INTEGER PROCEDURE consonant (reference integer x);
+
+
+
+                                   23
+
+
+
+     Get the next character as a consonant and reduce the base.   If the
+remainder yields a vowel, then change it to a consonant according to the
+formula:  A=>V, E=>W, I=>X, O=>Y, U=>Z
+
+
+PROCEDURE ds!clean (INTEGER lsttyp);
+     This routine deallocates the current data structure used  by either
+the "s!sto" or "s!ret" service routines.
+
+
+PROCEDURE df!close;
+     This procedure  closes any disk  files being transferred  which are
+left  open upon  return from  "s!sto" or  "s!ret".   Create/supersede is
+inhibited.  This would be the normal case during a "s!sto" and  would be
+necessary if aborting from  "s!ret".  The only reason these  files would
+be left open is if "df!close" is called as a result of an abort.
+
+
+BOOLEAN PROCEDURE get!users;
+     This procedure converts the  "ganlst" into a user list  residing in
+the  structure "allst".   The pointer  "filist" is  changed to  point to
+"allst", and the "ganlst" structure is deleted.
+
+
+BOOLEAN PROCEDURE sort!users (STRING first!user(null), last!user(null));
+     This procedure reads the MFD  and builds a sorted user list  in the
+record structure "allst".  Beginning and ending user names, "first!user"
+and "last!user", are optional and will set bounds on the  list returned.
+User "SYS" is the exception and always appears first in a  complete user
+list.
+
+
+PROCEDURE st!fill;
+     This procedure makes a pass through the "stusrs" list and  fills in
+either the ppn or user, whichever is required.  Errors are  reported and
+bad records thrown out.
+
+
+PROCEDURE re!fill;
+     This procedure makes a pass through the "reusrs" list and  fills in
+either the ppn or user, whichever is required.  Errors are  reported and
+bad records thrown out.
+
+
+BOOLEAN PROCEDURE dorepl;
+
+
+SIMPLE PROCEDURE init!counts;
+     Initializes variables for  data transfer commands if  starting from
+the "beginning" of the tape.
+
+
+PROCEDURE dtprint ( STRING outstr );
+
+
+
+                                   24
+
+
+
+     This procedure does the normal report output for the  data transfer
+commands according to the current COF settings.
+
+
+PROCEDURE report!file (STRING filstr;  INTEGER swval;
+   REFERENCE INTEGER filcnt, filtot);
+     This  routine  counts files  being  processed by  one  of  the data
+transfer  commands and  reports  them if  the user  requested  the FILES
+option of the given switch.
+
+
+PROCEDURE report!user (STRING user; INTEGER ppn, swval;
+   REFERENCE INTEGER filcnt, usrtot);
+     This routine counts the number  of whole users processed by  one of
+the  data transfer  commands  and reports  the  totals if  the  user has
+requested either the FILES or the USERS option of the given switch.
+
+
+PROCEDURE report!total (STRING phrase(null));
+     This  routine  reports  the  totals  for  the  STORE  command  just
+completed.
+
+
+SIMPLE PROCEDURE pr!totals (STRING phrase(null);
+   INTEGER cmdtkn(!retr!c));
+     This routine reports the totals for the files just processed by one
+of the commands:  GET, DIRECTORY, or RETRIEVE.
+
+
+R!P (any!class) PROCEDURE spec!cr (INTEGER lb(1), ub(1));
+     This procedure creates  a new "map1" record  which will be  used to
+mark a special tape record and will not be used to map a page.
+
+
+R!P (any!class) PROCEDURE opnch!cr;
+     This procedure creates a  new "opn!chan" record which will  be used
+to save information about a  file which is currently represented  in the
+mapping structure.
+
+
+INTERNAL PROCEDURE s!sto (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+     This procedure is the  service routine for the STORE  command.  Its
+parameters are as follows.
+     Parameter  "lsttyp"  is  the  file list  type  of  the  <file list>
+argument supplied by the user in the STORE command.  It is  expressed as
+as a token value (referenced by a symbol definition word) and may be one
+of three values:  !allst, !ganlst, or !filist.  These  values correspond
+to user parameters of "ALL", a list of ranges of global  account numbers
+(GAN's), or the user/file list which is legal for the STORE command.
+     Parameter "afttim" corresponds to the AFTER user modifier.  It is a
+one-word date/time code whose default is 0 which represents the earliest
+possible time.
+
+
+                                   25
+
+
+
+     Parameter "beftim"  corresponds to  the BEFORE  modifier.  It  is a
+one-word date/time code whose default is the largest possible time.
+     The "modbts" word expresses the state of the remaining  legal STORE
+modifiers whose values are either TRUE or FALSE.  The  bit corresponding
+to the desired modifier is set if the modifier was supplied (TRUE).  The
+interesting bits are as follows:
+           bit 32 - TODAY
+           bit 33 - INCREMENTAL
+           bit 34 - CHANGED
+           bit 35 - TWICE
+     The  "stusr", "stnam",  and  "stext" parameters  correspond  to the
+starting user,  filename, and  extension which may  be specified  by the
+STARTING WITH modifier.  The "stnam" and "stext" strings may not contain
+wild-card characters.
+     The "endusr", "endnam",  and "endext" parameters correspond  to the
+ending  user, filename,  and  extension which  may be  specified  by the
+ENDING WITH modifier.  The "endnam" and "endext" strings may not contain
+wild-card characters.
+
+
+BOOLEAN PROCEDURE page!rdy;
+     This procedure readies a page to be mapped for reading.  It returns
+"true" if the page was  completely free (such as at start-up  time), and
+"false" otherwise.
+
+
+PROCEDURE outfil;
+     This routine opens  up the current  file which will  potentially be
+stored to tape and checks to see whether it meets the  conditions stated
+by the user command.  If so, it dumps the current file to tape.   In the
+process,  the file  is  mapped to  a ring  of  pages set  up  earlier by
+"set!map!space".  The pages are part  of a mapping structure, and  it is
+used for reading files as follows:
+
+        RECORD!CLASS map1               \ The mapping structure
+           (INTEGER ARRAY a             \ Holds a mapped file page
+           INTEGER ui                   \ Page status indicator
+           R!P (any!class) up)          \ Pointer to next page in ring
+
+where:
+        If (ui land '37000000) neq 0 then put out to tape the special
+                record whose header is defined by the ui word and whose
+                data (if any) is in map1:a.
+        If ui > 0 and lh(ui) = 0 then ui contains the page number of a
+                mapped file page.
+        If ui = 0 then there is nothing mapped.  Page is available.
+
+
+PROCEDURE outufd;
+     *** more to come ***
+
+
+BOOLEAN PROCEDURE open!ufd (INTEGER ppn);
+
+
+
+                                   26
+
+
+
+     This routine opens a ufd  and checks the ignore bit to  see whether
+any files  in this directory  should be dumped.   If successful  and the
+ignore  bit  is off,  then  "true" is  returned.   Otherwise  "false" is
+returned.
+
+
+PROCEDURE sto!clean;
+
+
+SIMPLE PROCEDURE sto!end;
+
+
+BOOLEAN PROCEDURE user!in!range (STRING user, stusr, endusr);
+     This procedure checks  whether the given  username in "user"  is in
+the range  defined by  "stusr" and "endusr",  starting and  ending users
+respectively.  It takes account of the fact that "SYS" is  considered to
+be first in a sorted user list.
+
+
+BOOLEAN PROCEDURE hed!ok (INTEGER rtype, rlen);
+     This  procedure  checks  the  reasonableness  of  a  potential tape
+logical record header.   "Rtype" is the record  type, and "rlen"  is the
+length portion of the record header.
+
+
+BOOLEAN PROCEDURE repostn;
+     This procedure attempts to  reposition the tape for reading  at the
+block beyond the supposed current one which caused the trouble.
+
+
+SIMPLE PROCEDURE messg;
+
+
+INTERNAL PROCEDURE s!ret (INTEGER comnd, lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+     This procedure is  the service routine  for the RETRIEVE,  GET, and
+DIRECTORY commands.  It's parameters are as follows.
+     "Comnd" is a token value which identifies the actual  command which
+is being processed by this procedure.  It may be either !retr!c, !get!c,
+or !dire!c.
+     Parameter  "lsttyp"  is  the  file list  type  of  the  <file list>
+argument supplied  by the user's  command.  It is  expressed as  a token
+value (referenced by a symbol definition word).  If a  RETRIEVE command,
+"lsttyp"  may be  either !allst,  !ganlst, !poslst,  or  !rtrlst.  These
+values  correspond to  user parameters  of "ALL",  a list  of  ranges of
+global  account  numbers  (GAN's),  a list  of  file  positions,  or the
+user/file list  which is legal  for the RETRIEVE  command.  If a  GET or
+DIRECTORY command,  then itmay  be either  !allst, !ganlst,  !poslst, or
+!filist.  !Filist  refers to the  legal user/file list  for the  GET and
+DIRECTORY commands.
+     Parameter "afttim" corresponds to the AFTER user modifier.  It is a
+one-word date/time code whose default is 0 which represents the earliest
+possible time.
+
+
+                                   27
+
+
+
+     Parameter "beftim"  corresponds to  the BEFORE  modifier.  It  is a
+one-word date/time code whose default is the largest possible time.
+     The  "modbts"  word  expresses the  state  of  the  remaining legal
+RETRIEVE  modifiers whose  values  are either  TRUE or  FALSE.   The bit
+corresponding  to  the  desired  modifier is  set  if  the  modifier was
+supplied (TRUE).  The interesting bits are as follows:
+           bit 29 - CHECKSUM   (used by DIRECTORY command)
+           bit 30 - LIMITED    (used by DIRECTORY command)
+           bit 31 - SETDUMPED  (used by GET and RETRIEVE commands)
+     The  "stusr", "stnam",  "stext", "endusr",  "endnam",  and "endext"
+parameters are the same as for the routine "s!sto".
+     Within "s!ret",  page mapping  is used for  writing files  to disk.
+The  pages used  are part  of a  mapping structure  which is  treated as
+follows:
+
+        RECORD!CLASS map1               \ The mapping structure
+           (INTEGER ARRAY a             \ Holds a mapped file page
+           INTEGER ui                   \ Page status indicator
+           R!P (any!class) up)          \ Pointer to next page in ring
+
+where:
+        If (ui land 37000000) neq 0 then ui denotes a record header.  If
+                needed, the actual record will be in map1:a.  If an feo
+                record then map1:a[1] will contain the number of a file
+                page to delete before closing the file or 0 if none.
+        If ui < 0 then inhibit supercede/create when closing this file.
+        If ui > 0 (bit0=0) then ui contains the page number of a mapped
+                file page.
+        If ui = 0 then there is nothing mapped.  Page is available.
+
+
+PROCEDURE rdy!page;
+     This routine gets a page  in the mapping structure ready to  be re-
+mapped.   This will  usually involve  un-mapping the  page or  closing a
+file.
+
+
+SIMPLE PROCEDURE dir!report;
+     This procedure prints  the standard directory information  for each
+file referenced by "s!ret" for the DIRECTORY command.
+
+
+PROCEDURE ret!clean;
+
+
+SIMPLE PROCEDURE ret!end;
+
+
+INTERNAL PROCEDURE s!tra (BOOLEAN typeit);
+     This procedure  is the service  routine for the  TRANSLATE command.
+The "typeit" parameter  tells the procedure  to display the  contents of
+the translate table  if its value is  TRUE.  If "typeit" is  FALSE, then
+"s!tra" will verify correctness of user names in the translate  list and
+fill in the translate record structure.
+
+
+                                   28
+
+
+
+INTERNAL PROCEDURE s!unt;
+     This  is the  service routine  for the  UNTRANSLATE  command.  This
+procedure clears the translate table structure and releases the storage.
+
+
+
+9.3    Global storage used         
+
+     The service routines  for the data  transfer commands use  the mode
+switches and global tape position information.
+
+
+
+9.4    Global storage structures defined in this module             
+
+     The following record structures are the patterns for the file lists
+shown in Figure 3.
+
+\ Global storage defining some of the file list structures.;
+
+INTERNAL R!P (any!class) filist;        \ pointer to the beginning of a
+                                          user list in use;
+
+INTERNAL R!C stfil              \ Used as a list of single file names;
+   (STRING name,                \ a file name;
+   ext;                         \ file extension;
+   R!P (stfil) next);           \ next file in this list;
+
+INTERNAL R!C stusrs             \ User list for STORE, GET, DIRECTORY;
+   (STRING user;                \ a user name;
+   INTEGER ppn;                 \ the corresponding ppn;
+   R!P (stfil) files;           \ pointer to list of single file names;
+   R!P (stusrs) next);          \ the next user in this list;
+
+INTERNAL R!C repusr             \ Replacement user names for RETRIEVE;
+   (STRING user;                \ the user name;
+   INTEGER ppn);                \ the corresponding ppn;
+
+INTERNAL R!C repfil             \ Replacement file names for RETRIEVE;
+   (STRING name,                \ file name;
+   ext);                        \ file extension;
+
+INTERNAL R!C retfil             \ File or file pair list for RETRIEVE;
+   (STRING name,                \ file name;
+   ext;                         \ file extension;
+   R!P (repfil) repl;           \ pointer to replacement file;
+   R!P (retfil) next);          \ pointer to next file or file pair;
+
+INTERNAL R!C reusrs             \ User of user pair list for RETRIEVE;
+   (STRING user;                \ a user name;
+   INTEGER ppn;                 \ the corresponding ppn;
+   R!P (repusr) repl;           \ pointer to replacement user name;
+   R!P (retfil) files;          \ pointer to file or file pair list;
+   R!P (reusrs) next);          \ pointer to next user in this list;
+
+
+                                   29
+
+
+
+INTERNAL R!C ganlst             \ Holds a list of gan number ranges;
+   (INTEGER lower,              \ lower bound of the range;
+   upper;                       \ upper bound of the range;
+   R!P (ganlst) next);          \ next range entry;
+
+INTERNAL R!C poslst             \ Holds a list of file position ranges;
+   (INTEGER lower,              \ lower bound of the range;
+   upper;                       \ upper bound of the range;
+   R!P (poslst) next);          \ next range entry;
+
+INTERNAL R!C trusrs             \ User pairs for TRANSLATE command;
+   (STRING orig,                \ original user name;
+   repl;                        \ replacement user name;
+   INTEGER oppn,                \ originial ppn;
+   rppn;                        \ replacement ppn;
+   R!P (trusrs) next);          \ pointer to next user pair;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   30
+
+
+
+
+                       STORE, DIRECTORY, GET
+
+
+          -------------
+filist--> | USER, PPN |
+          -------------
+                |
+                v
+          -------------     --------     --------             --------
+          | USER, PPN | --> | file | --> | file | --> ... --> | file |
+          -------------     --------     --------             --------
+                |
+                v
+                .
+                .
+                v
+          -------------
+          | USER, PPN |
+          -------------
+
+_______________________________________________________________________
+
+
+                              RETRIEVE
+
+
+                          filist
+                            |
+                            v
+    ---------------     ---------     ---------
+    | replacement | <-- | USER, |     | repl. |
+    |    user     |     |  PPN  |     | file  |
+    ---------------     ---------     ---------
+                            |             ^
+                            v             |
+    ---------------     ---------     --------             --------
+    | replacement | <-- | USER, | --> | file | --> ... --> | file |
+    ---------------     |  PPN  |     --------             --------
+                        ---------
+                            |
+                            v
+                            .
+                            .
+                            v
+                        ---------
+                        | USER, |
+                        |  PPN  |
+                        ---------
+
+
+
+
+                     Figure 3.  File Transfer Lists
+
+
+                                   31
+
+
+
+9.5    Local storage structures         
+
+     The following  record class descriptions  are the patterns  for the
+structures shown in Figure 4.
+
+\ Local storage structures;
+
+R!C allst                       \ Sorted user list for a "STORE ALL";
+   (STRING user;                \ the user name;
+   INTEGER ppn,                 \ the corresponding ppn;
+   stbits;                      \ UFD status bits;
+   R!P (allst) next);           \ the next user in this list;
+
+R!C map1x                       \ Local storage similar to "map1" for;
+   (INTEGER ARRAY a;            \ marking special tape records;
+   INTEGER ui;
+   R!P (any!class) up);
+
+R!C opn!chan            \ Stores list of file specifications whose data;
+   (INTEGER channel,    \ is in page map.  "Channel" is disk channel;
+   eof,                 \ Eof variable for "channel";
+   ppn,                 \ associated PPN;
+   pos,                 \ file position number;
+   bloc,                \ physical record number in which file begin;
+   word;                \ word position in "bloc";
+   STRING file,         \ file name and extension;
+   user;                \ associated user name;
+   INTEGER ARRAY look;  \ To hold "lok" record.;
+   R!P (opn!chan) next);        \ next "opn!chan" entry.;
+R!P (opn!chan) opnhead,         \ Pointer to beginning of "opn!chan";
+   opntail,                     \ Pointer to end of "opn!chan";
+   orp;                         \ Pointer for scanning "opn!chan".;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   32
+
+
+
+
+                      User List for "STORE ALL"
+
+
+            +------------+      +------------+           +------------+
+filist ---> | user, ppn, | ---> | user, ppn, | -->...--> | user, ppn, |
+            | stat. bits |      | stat. bits |           | stat. bits |
+            +------------+      +------------+           +------------+
+
+________________________________________________________________________
+
+
+           Storage for Mapped Data and Special Tape Records
+
+
++----------------+      +----------------+           +----------------+
+| mapped page or | ---> | mapped page or | -->...--> | mapped page or |
+| special record |      | special record |           | special record |
++----------------+      +----------------+           +----------------+
+        ^                                                    |
+        |                                                    v
+        -------------<-------------------------<--------------
+
+________________________________________________________________________
+
+
+                Tracking for Opened Files (FIFO list)
+
+
+      +------------+      +------------+           +------------+
+      | necessary  | ---> | necessary  | -->...--> | necessary  |
+      | file specs |      | file specs |           | file specs |
+      +------------+      +------------+           +------------+
+            ^                                            ^
+            |                                            |
+         opnhead                                      opntail
+    ("first-in" file)                             ("last-in" file)
+
+
+
+
+               Figure 4.  FTRANS Local Storage Structures
+
+
+
+
+9.6    Algorithms       
+
+
+9.6.1    Creating a sorted list for a STORE ALL transfer                 
+
+     A STORE ALL transfer, with  or without a starting or  ending point,
+is done  on the basis  of usernames in  sorted alphabetical  order.  The
+
+
+
+                                   33
+
+
+
+exception is (SYS) which always  comes first.  In order to do  this, the
+list of usernames obtained from reading the MFD must be sorted.
+
+     The algorithm that will be  used is a simple selection sort  with a
+merge.   The  sorted file  list  is  built up  in  the  record structure
+"allst".   To  start, a  group  of entries  is  read from  the  MFD.  By
+selection,  that  first  group  is  entered  in  "allst"  in  increasing
+alphabetic order.  For each of  the remaining groups read from  the MFD,
+individual entries selected must be merged with the "allst".   Since the
+"allst" is in sorted  order, only a portion  of it must be  compared for
+each  entry  to  be  merged,  starting  with  the  last  record entered.
+Usernames which are alphabetically  less than the starting  username, if
+given, or greater than the ending username are discarded.
+
+
+9.6.2    Creating a username list for a STORE with GAN list parameter                   
+
+     The MFD is be  read the same as for  a "STORE ALL", and the  GAN of
+each entry will be compared with the GAN list.  If the MFD GAN  is found
+in the user's  GAN list, then the  associated username will  be selected
+for storage.  This yields a list of usernames which will be in MFD order
+and will reside in the record structure "allst".
+
+
+9.6.3    Storage order when writing files to tape               
+
+     Explicitly named files  will be written to  tape in the  order they
+appear in the user  command.  SNARL does not do  a UFD search on  a file
+name which  has no  wild card characters.   A wild  card file  name will
+cause a UFD search which may generate one or more file names; these will
+be in UFD order.
+
+
+9.6.4    Opening a file for storage to tape               
+
+     In order to use the  extended lookup block without doing  more than
+the necessary calls, the files  are accessed with the system  "open" and
+"enter" calls.  SAIL's channel management is not used; in its place, the
+"getmchan" and "relchan" alternate procedures are utilized to assign and
+release file  channels.  The use  of "enter is  intentional in  order to
+"busy" the  file while  processing it.   Files must  be closed  with the
+option bit '40 (inhibit create/supersede).
+
+
+9.6.5    Storing a file to tape - the data flow                 
+
+     Each page in the ring  of pages described by the class  "map1" will
+be mapped to a page in  the current file being stored to tape.   As each
+file page is mapped, it is also pre-referenced so that the disk transfer
+may  be started.   This  mapping and  disk  transfer can  take  place in
+parallel with the transfer to tape of the assembled file pages.
+
+     As each page is written to  tape, then the core page may  be mapped
+
+
+
+                                   34
+
+
+
+to a new file page, the next one in succession, and pre-referenced.  The
+mapping of  file pages continues  until there are  no more pages  in the
+current  file.  In  order to  keep the  page buffers  filled, additional
+files may be opened  and mapped to the  core pages as space  permits.  A
+disk file is  closed when all  its pages have  been written to  the tape
+buffers.
+
+     When a "hole"  is found in the  disk file, SNARL will  search ahead
+(using a mapping call) to  the next existent page.  The number  of empty
+pages is calculated  from the page number  returned by the call  and the
+page number of the previous existent page.  Then the "hole" marker (EMP)
+can be linked into  the assembled page list and  put out to tape  in the
+proper sequence.
+
+
+9.6.6    Retrieval order when reading files from tape               
+
+     Files are retrieved from tape in the order in which they  appear on
+the  tape.  As  the lookup  information  for each  file is  read,  it is
+checked against the stored  form of the user  or file request to  see if
+there is a  match.  If the other  conditions stated in the  user command
+are met, then the file is read.
+
+
+9.6.7    Opening a file for retrieval             
+
+     This  method is  the  same as  for  STORE except  that  the inhibit
+create/supersede option is only needed to close problem files which will
+not be permanently saved.
+
+
+9.6.8    Retrieving a file - the data flow               
+
+     As file data is  read from tape, it  is moved into the  page holder
+arrays described by  the class "map1".  As  each array is filled,  it is
+mapped  to  a  new page  in  the  disk file  being  written.   The write
+operation is initiated so that the data transfer can be done in parallel
+with the tape reading.
+
+     When each array  page is written to  disk, it can accomodate  a new
+one coming from tape.  The mapping continues until the  end-of-file (EOF
+record) on  tape is reached.   In order to  keep the core  pages filled,
+additional files may be opened  and tape read as space permits.   A disk
+file is closed when all its page buffers have been posted on disk.
+
+     A new disk file is opened (and the information saved in "opn!chan")
+as soon as a "lok" record  is read from tape.  The reasons this  is done
+are:
+a)  The  mapping routines  allocate  space when  a page  map  request is
+    processed.  A channel and file  must be open in order to  effect the
+    write page mapping.  If the data pages following were  simply stored
+    in the structure, then it would be necessary to map them  later when
+    the file  was created (wasting  time).  In the  mean time,  the data
+    fills space in the mapping structure.
+
+
+                                   35
+
+
+
+b)  For error recovery, it is  best to find the errors in  file creation
+    or mapping immediately before information is moved into  the mapping
+    structure which must be cleaned up later.
+
+     When a hold marker (EMP) is found on tape, then the disk  file page
+count is increased by the appropriate amount such that the next  page of
+data is written with the correct page number; this creates the "hole" on
+disk.
+
+
+9.6.9    Tape resident directory - when used              
+
+     DIRECTORY command.  The tape resident directory is always  used for      
+a LIMITED directory.  It is not used otherwise.
+
+     RETRIEVE and GET commands.  The tape resident directory is read and        
+compared with the file  list given in the  command to produce a  list of
+file positions  (which may  be stored  in a  temporary file).   Then the
+command service routine operates  using the list of file  positions.  If
+the resident tape  directory appears to be  bad, then this fact  will be
+reported to the user and an ordinary search of the tape files from front
+to back will be done instead.  For the first coding and testing  pass on
+the data transfer commands, only the ordinary search will be done.
+
+     STORE  command.   The  STORE  command  creates  the  tape  resident       
+directory after storing the files onto tape.  The directory is  built in
+a temporary file while the command is executing.
+
+
+9.6.10    Management of data pages and other tape markers                 
+
+     For speed,  it is desirable  to overlap I/O  operations during  a a
+data transfer.  In order to do  this during a STORE, it is  necessary to
+continue  reading  new  files  without  stopping  the  tape   to  finish
+outputting  a file.   During a  RETRIEVE, the  file page  mapping should
+continue even if the previous  file has not been posted and  closed.  In
+order to do this, there must  be a method to keep track of  special tape
+records that are  being read or written  (such as the "lok"  records) so
+that they may be written in the proper order to the tape (if STORing) or
+so that the proper file-handling decisions be made when reading tape (if
+RETRIEVing).   The logical  way to  do this  was to  link  these special
+records into the mapping list.  Since the mapping procedures  create the
+"map1" array  space only when  a page map  request is processed,  it was
+necessary for SNARL  to manage the creation  of records and  array space
+for the  special records.   There, the structure  "map1x" is  defined to
+match the structure of "map1".  When SNARL creates a special  record and
+links it into the mapping  list, it allocates the array  storage needed.
+When  one of  these specials  is processed,  it is  unlinked  from list.
+"Map1" and "Map1x" are both referenced in the program as "map1".
+
+
+
+
+
+
+
+                                   36
+
+
+
+9.6.11    Keeping track of opened files              
+
+     "Opn!chan" is used to keep track of opened disk files during a data
+transfer.  It is a FIFO list;  newly opened files are added to  the end,
+and  files which  are  closed are  removed  from the  front.   There are
+several reasons to justify a separate structure to keep track  of opened
+disk files during a data transfer.
+a)  If the information were kept  only in the special record  that links
+    into the mapping structure,  it might disappear before the  file can
+    be completely procesed.
+b)  If  several  files  are  opened at  once,  a  class  structure  is a
+    convenient  way to  keep  track of  the  newest and  oldest  for the
+    purpose of knowing which file to close or in order to find the place
+    on tape where the current file began.
+
+
+9.6.12    Statistics reporting during data transfers              
+
+     The statistics reported reflect what was actually completed  on the
+destination  device.   For  instance,  the report  on  a  file  during a
+RETRIEVE is done following the  closing of the created disk file  by the
+"rdy!page" routine.
+
+
+
+
+10    DSDUMP - DSNARL dump routines          
+
+     This module contains the service routines for the  DSNARL commands:
+TYPE or T, MAP, and BLOCK.
+
+
+
+10.1    Entry points and subroutines           
+
+
+PROCEDURE default;
+
+
+PROCEDURE dsp!str (INTEGER mode, low, high);
+     This routine is for displaying a portion of the current  tape block
+in a symbolic format.  "Mode" is the token value corresponding to either
+"ASCII" or "SIXBIT".  "Low" and "high" are a range of words to display.
+
+
+PROCEDURE dsp!num (INTEGER mode, low, high);
+     This routine is for displaying a portion of the current  tape block
+in a numeric format.  "Mode" is the token value corresponding  to either
+"OCTAL" or "DECIMAL".  "Low" and "high" are a range of words to display.
+
+
+PROCEDURE typrec (INTEGER template);
+     This procedure types a range of words in "tapblk" according  to the
+record type "template".
+
+
+                                   37
+
+
+
+BOOLEAN PROCEDURE search!heads (INTEGER y);
+     This procedure searches "tapblk" for  a word which appears to  be a
+good logical record marker.   "Headtype" is set to the  potential marker
+value, whether good or not.
+
+
+INTERNAL PROCEDURE s!indi (INTEGER swval);
+     This routine is the service routine for the INDICES command.
+
+
+INTERNAL PROCEDURE s!bloc (INTEGER rel!pos, abs!pos);
+     This routine  is the  service routine for  the BLOCK  command.  The
+"rel!pos" parameter refers to relative positioning and may be one of the
+token  values  !NEXT,  !PREVIOUS,  or  !LAST.   The  "abs!pos" parameter
+referes to an absolute block position (the normal SNARL header  block is
+block 0).  If "rel!pos" is zero, then "abs!pos" is used.
+     "S!bloc" does not usually rewind first when an absolute position is
+given.  If the tape has been moved without the program knowing  it, then
+it is up to the user to rewind the tape explicitly before positioning.
+     "S!bloc" actually reads the block  desired and builds a map  of the
+SNARL logical records, if any can be distinguished.  This map is  put in
+"rcdmap" and has the following format:
+        rcdmap[x,1] = the header type (value found on tape)
+        rcdmap[x,2] = <beginning word index>,,<ending word index>
+where the  indices reference  words in "tapblk"  which will  contain the
+physical block read from tape.
+
+
+PROCEDURE create!map (INTEGER index, headval, low, high);
+
+
+INTERNAL PROCEDURE s!map;
+     This is the service routine for the map command.  It  operates with
+the array "rcdmap"  which is the internal  representation of the  map of
+the current  block which was  built when that  block was read.   See the
+description of "s!bloc" for documentation of "rcdmap".
+
+
+INTERNAL PROCEDURE s!typ (INTEGER low, high, mode);
+     This procedure is the service routine for the various  "T" commands
+which display portions  of the current  physical tape block.   "Low" and
+"high" are word indices into "tapblk".  The "mode" parameter is the mode
+in which the requested words will be displayed.
+
+
+
+10.2    Algorithms        
+
+
+10.2.1    Treatment of tape            
+
+     In this module, the tape is treated in an unbuffered fashion and is
+oriented toward  the physical  blocks on tape.   This allows  for easier
+"random" access to various portions of the tape.
+
+
+                                   38
+
+
+
+11    DSCHEC - testing and checking routines           
+
+     This module contains the service routines for the  DSNARL commands:
+DIFFERENCES and QCHECK.
+
+
+
+11.1    Entry points and subroutines           
+
+
+PROCEDURE diflin( integer index, word1, word2 );
+     This procedure puts out a line of the "differences" summary.
+
+
+PROCEDURE lokcom( reference integer array look1, look2 );
+     This  procedure  compares  two  lookup  blocks  and  reports  their
+differences.  The words which contain  the username and PPN of  the file
+owner are ignored.
+
+
+INTEGER PROCEDURE loklud (STRING username);
+     This procedure looks up the  "username" in the LUD and  returns the
+corresponding PPN.  A zero is returned if the lookup failed.
+
+
+INTERNAL PROCEDURE s!diff( STRING user1, file1, ext1,
+   user2, file2, ext2 );
+     This procedure will compare  two files or equivalently  named files
+from two directories.
+     "User1" and "user2" are the two usernames from which files  will be
+taken for comparison.  They must both be specified (not null).
+     "File1"  and "file2"  are  file names  to compare.   This  does not
+include  the extension  portion, and  only six  characters of  these are
+used.  If "file1" is not null  then "file2" must not be null.   If these
+are null, then  a directory search will  be done.  All files  in "user1"
+and  "user2" which  have  equivalent names  will be  compared  with each
+other.
+
+
+SIMPLE PROCEDURE difclean;
+
+
+PROCEDURE comp!contents;
+     This procedure does a  simple binary comparison of the  current two
+files  being  considered  by  "s!diff".   It  stops  listing  beyond  20
+differences.
+
+
+
+11.2    Algorithms        
+
+
+
+
+
+
+                                   39
+
+
+
+12    TAPCOM - tape related commands          
+
+
+
+12.1    Function        
+
+     This  module contains  the  service routines  for  the tape-related
+commands:  WHERE, CUT AFTER, REWIND, UNLOAD, DEVICE, TID, NEW  TAPE, and
+APPEND.
+
+
+
+12.2    Entry points and subroutines           
+
+
+INTERNAL PROCEDURE s!rewi (BOOLEAN wait);
+     This procedure is the  service routine for the REWIND  command.  If
+the "wait" parameter is  "true", then "s!rewi" will wait  for completion
+before returning.
+
+
+INTERNAL PROCEDURE s!unlo (BOOLEAN wait);
+     This procedure is the  service routine for the REWIND  command.  If
+the "wait" parameter is  "true", then "s!rewi" will wait  for completion
+before returning.
+
+
+ck!sn INTERNAL BOOLEAN PROCEDURE chk!hed;
+     This procedure reads the first physical block on the tape currently
+mounted and returns "true" if the block seems to be a legal SNARL header
+block.  If a SNARL header,  the pertinent information about the  tape is
+printed to the current TTY device.  If not a SNARL header, a  message is
+printed to indicate that fact.  "Chk!hed" release and re-opens  the tape
+device in dump mode.
+
+
+INTERNAL PROCEDURE s!devi (STRING devnam(null); INTEGER densty(0));
+     This  procedure  is the  service  routine for  the  DEVICE command.
+"Devnam" is the  device name, if supplied,  and "densty" is  the desired
+density, if supplied.  The tape device is opened in dump mode.
+
+
+ck!sn INTERNAL SIMPLE PROCEDURE s!wher;
+     This is the service routine for the WHERE command.  It  reports the
+latest  access  information  about the  current  tape  using  the status
+information in global storage.
+
+
+ck!sn STRING PROCEDURE get!tid;
+     This procedure gets a TID value from the user for verification.
+
+
+ck!sn INTERNAL PROCEDURE s!new (STRING tidval(null));
+
+
+
+                                   40
+
+
+
+     This procedure  is the  service routine for  the NEW  TAPE command.
+The "tidval" parameter,  if supplied, is the  value to be stored  on the
+tape.
+
+
+PROCEDURE create!header;
+     This routine creates or re-initializes the header record of a SNARL
+tape and makes room for the directory blocks which will follow.
+
+
+INTEGER PROCEDURE taperec( REFERENCE INTEGER ARRAY tapedata;
+   INTEGER stpnt, trectyp );
+     "Taperec" searches  the buffer "tapedata"  starting with  the array
+index "stpnt" for the tape record header in "trectyp".  The buffer index
+is returned if the record is found, and 0 is returned otherwise.
+
+
+INTEGER PROCEDURE findrec( INTEGER stpnt, trectyp );
+     "Findrec" searches  tape records  for the  first occurrence  of the
+record denoted by "trectyp".  It is intended to be used  with unbuffered
+I/O.  Before, calling "findrec", the first buffer to be  searched should
+be  in "tapblk".   "Stpnt" is  the buffer  index where  the  search will
+begin.  New records  are read as needed  and "tapbloc" is  updated.  The
+index into "tapblk"  is returned if successful.   A zero is  returned if
+unsuccessful.
+
+
+ck!sn INTERNAL PROCEDURE s!appe( STRING tidval(null) );
+     This procedure is the service routine for the APPEND command.
+
+
+PROCEDURE modify!header;
+     This routine modifies the TID in the header record of a SNARL tape.
+It is assumed that the header just read is in the array "tapblk".
+
+
+ck!sn INTERNAL PROCEDURE s!cut( INTEGER filpos );
+     This procedure is the service routine to the CUT AFTER command.
+
+
+INTEGER PROCEDURE srchpos( INTEGER filpos );
+     This  procedure  finds the  beginning  of the  file  on  tape whose
+position  is  "filpos", using  "findrec"  to do  this.   The  index into
+"tapblk"  of the  "lok" record  is returned  if successful.   A  zero is
+returned if unsuccessful.  "Srchpos" is meant to be used with unbuffered
+I/O.
+
+
+
+12.3    Algorithms        
+
+
+
+
+
+
+                                   41
+
+
+
+12.3.1    Managing tape device reassignment restrictions              
+
+     A tape device change is not allowed to take effect unless  the next
+command following  the DEVICE  command is  either a  NEW TAPE  or APPEND
+command.  If  the use tries  another command, then  the old  tape device
+will be reinstated with notification.
+
+     When a device change  is requested, the new device  is initialized,
+but the old one is not released.  The information is retained  for both.
+The procedures,  "new!c" and  "appe!c", will  check to  see if  a device
+change has occurred; if so, they  will release the old one and  make the
+new one the current device.
+
+     Within  the routine  "xctcmd" (in  SNCLI), a  check is  made  for a
+device change.  If the command which is about to be executed is  not one
+of the two proper ones, then  the new mag tape device will  be released,
+the old one will be made current, and the user will be notified.
+
+
+
+
+13    SNHELP - Help and program information commands            
+
+
+
+13.1    Function        
+
+     This module contains the service routines for the  commands:  HELP,
+?, INSTRUCTIONS, GRIPE, and NEWS.
+
+
+
+13.2    Entry points and subroutines           
+
+
+INTERNAL PROCEDURE s!qmrk (INTEGER cmdtkn(0));
+     This  procedure handles  the  "?" command  which  gives abbreviated
+help.  If no specific command is requested, then "s!qmrk" works directly
+from the grammar  to list the commands  that are currently  available to
+the user.  Otherwise, the help text found in "snhelp.doc" is  used along
+with the reference arrays "hlpref" and "txtref" to print the  short help
+text.
+
+
+
+13.3    Algorithms        
+
+
+13.3.1    Printing long and short help text               
+
+     The help text for both the "?" and "HELP" commands is located in an
+external  file  described in  Appendix  E.   The text  in  that  file is
+delimited such that the service routines can distinguish the appropriate
+
+
+
+                                   42
+
+
+
+information to be printed for either a short or long help  request.  The
+assistance for individual commands  is also delimited, so that  a simple
+search will locate the portion of text needed to give help for  a single
+command.
+
+
+
+
+14    SNMISC - Miscellaneous commands         
+
+
+
+14.1    Function        
+
+     This module contains the  service routines for the  commands:  COF,
+LOG, UNLOG, COMMENT, and QUIT.
+
+
+
+14.2    Entry points and subroutines           
+
+
+INTERNAL PROCEDURE s!quit;
+
+
+INTERNAL PROCEDURE s!abor;
+
+
+INTERNAL PROCEDURE s!stop;
+
+
+ck!sn INTERNAL PROCEDURE s!cof( INTEGER devtok(0);
+   STRING outfil(null) );
+     This is the service routine for the COF command.
+
+
+
+
+15    Building SNARL and DSNARL from Source           
+
+
+
+15.1    Command files         
+
+     SNARL  is written  in  SAIL.  The  following  compiler-loader build
+files are applicable to the construction of SNARL and DSNARL.
+        snarl.cmd       standard SNARL build file
+        snarl.deb       one-segment SNARL load (used for debugging)
+        dsnarl.cmd      standard DSNARL build file
+        dsnarl.deb      one-segment DSNARL load (used for debugging)
+
+
+
+
+
+
+                                   43
+
+
+
+15.2    Customizing the modules          
+
+     As was  mentioned previously,  a number of  the module  sources are
+shared between the two programs.  They must be customized when  they are
+compiled.  In addition, there are other options to select  which require
+conditional compilation.
+
+     Each module  source which  is shared  requires another  source file
+called "sndsn.sai".  A listing follows:
+
+DEFINE !snarl= "false", !dsnarl= "true";
+DEFINE debug= "false", production!version= "false";
+DEFINE ck!sn= "ifcr !snarl thenc";
+DEFINE ck!dsn= "ifcr !dsnarl thenc";
+
+
+     If  compiling  or loading  SNARL,  then set  !snarl  to  "true" and
+!dsnarl to "false".  Do the reverse if compiling or loading DSNARL.
+
+     To  use  the BAIL  debugger  and other  SNARL  or  DSNARL debugging
+options, then set  debug to "true" and  use the command  the appropriate
+command file.
+
+     To   select   the   test   version   of   SNARL   or   DSNARL  make
+production!version "false".
+
+     Remember that the /compile XEXEC option must be used to assure that
+the desired modules are compiled when a change is made to a source which
+is "required"  by one of  the modules.  The  system will not  know about
+these "requires".
+
+
+
+15.3    Changing the Help Text           
+
+     If the help  text is changed for  either program, then  the program
+BLDHLP must be run to create the indices into the text for either SNHELP
+or DSHELP.  Then the "help" module must be recompiled.
+
+
+
+15.4    Changing the SNARL or DSNARL command syntax              
+
+     The  syntax  is changed  by  altering the  BNF  description  of the
+appropriate command language and  configuring a new parser  module using
+the TABGEN program.  You must be familiar with the parsing technique and
+the TABGEN program.
+
+     The grammar change may also involve a change to the  related module
+if  the  syntax  difference  represents  a  functional  difference.   In
+addition, the pre-processing of  the command (following parsing)  may be
+affected.  The places in the  program to check are the  "xctcmd" routine
+in SNCLI or DSNCLI and the associated command executor.
+
+
+
+                                   44
+
+
+
+                               Appendix A                                
+
+                          SNARL software list                            
+
+
+
+
+     *** more to come ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   45
+
+
+
+                               Appendix B                                
+
+                          DSNARL software list                            
+
+
+
+
+     *** more to come ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   46
+
+
+
+                               Appendix C                                
+
+                             SNARL Grammar                              
+
+
+
+
+     The  following grammar  is  the BNF  description which  is  used by
+TABGEN  to  produce the  tables  and parser  for  SNARL.   Therefore, it
+includes error  messages and  references to  special syntax  or semantic
+routines.
+
+     There are several exception conditions handled by the scanner.  One
+is the COMMENT command.  The user-defined terminal {text}  is determined
+by the scanner when it  finds the command word COMMENT.   It "tokenizes"
+the remainder  of the  command as  {text} to  make the  parsing routines
+happy.
+
+     Another exception is  the handling of command  files.  A call  to a
+command  file  is  detected  during  scanning,  and  the  file  name  is
+determined  at  that  point.  Prior  to  parsing,  the  complete command
+sentence is assembled by the scanner.
+
+{LF}    ::= 12
+{COM}   ::= ","
+{Q}     ::= 77
+{CLN}   ::= ":"
+{UNDER} ::= 137
+{DASH}  ::= "-"
+{DOT}   ::= "."
+{EQ}    ::= "="
+{LBRKT} ::= "["
+{RBRKT} ::= "]"
+
+<command> "Extra input in command."
+        ::= <statement> {LF}
+
+<statement>
+        ::= <mode_c>
+        ::= <spri_c>
+        ::= <reel_c>
+        ::= <old_c>
+        ::= <sys_c>
+        ::= <rpri_c>
+        ::= <dskr_c>
+        ::= <ttyr_c>
+        ::= <new_c>
+        ::= <appe_c>
+        ::= <stor_c>
+        ::= <retr_c>
+        ::= <get_c>
+        ::= <dire_c>
+        ::= <wher_c>
+        ::= <cut_c>
+
+
+                                   47
+
+
+
+        ::= <rewi_c>
+        ::= <unlo_c>
+        ::= <devi_c>
+        ::= <tid_c>
+        ::= <help_c>
+        ::= <qmrk_c>
+        ::= <inst_c>
+        ::= <grip_c>
+        ::= <news_c>
+        ::= <tran_c>
+        ::= <untr_c>
+        ::= <cof_c>
+        ::= <log_c>
+        ::= <unlg_c>
+        ::= <comm_c>
+        ::= <quit_c>
+        ::= <stop_c>
+        ::= <cont_c>
+        ::= <go_c>
+        ::= <abor_c>
+
+<mode!c> "Illegal command word."
+        ::= 'MODE' 'ALTER'
+        ::= 'MODE'
+
+<spri!c> "Illegal command word."
+        ::= 'SPRINT' <p_fmt>
+        ::= 'SPRINT'
+
+<p_fmt> "Illegal switch value."
+        ::= 'TOTALS'
+        ::= 'USERS'
+        ::= 'FILES'
+
+<reel_c> "Illegal command word."
+        ::= 'REELSET' <reelno>
+        ::= 'REELSET'
+
+<reelno> [HALFSV] "Need a number between 1 and (2**18)-1."
+        ::= {integer}
+
+<old_c> "Illegal command word."
+        ::= 'OLD' <old_sw>
+        ::= 'OLD'
+
+<old_sw> "Illegal switch value."
+        ::= 'NEWEST'
+        ::= 'DISK'
+        ::= 'DISC'
+        ::= 'TAPE'
+        ::= 'CONFIRM'
+
+<sys_c> "Illegal command word."
+        ::= 'SYS' <old_sw>
+
+
+                                   48
+
+
+
+        ::= 'SYS'
+
+<rpri_c> "Illegal command word."
+        ::= 'RPRINT' <p_fmt>
+        ::= 'RPRINT'
+
+<dskr_c> "Illegal command word."
+        ::= 'DSKREP' <rep_sw>
+        ::= 'DSKREP'
+
+<rep_sw> "Illegal switch value."
+        ::= 'WIDE'
+        ::= 'NARROW'
+
+<ttyr_c> "Illegal command word."
+        ::= 'TTYREP' <rep_sw>
+        ::= 'TTYREP'
+
+<new_c> "Illegal command word."
+        ::= 'NEW' 'TAPE' <tidfld>
+        ::= 'NEW' 'TAPE'
+        ::= 'NEW' <tidfld>
+        ::= 'NEW'
+
+<tidfld> [TIDSAV] "Illegal TID parameter."
+        ::= 'TID' <tidval>
+
+<tidval> [TIDSAV]
+        ::= {integer}
+        ::= {identifier}
+
+<appe_c> "Illegal command word."
+        ::= 'APPEND' <tidval>
+        ::= 'APPEND'
+
+<stor_c> "Illegal command word."
+        ::= 'STORE' <stmods> <stlist>
+        ::= 'STORE' <stlist>
+
+<stlist> "Illegal store list."
+        ::= <allst>
+        ::= <ganlst>
+        ::= <filist>
+
+<allst>
+        ::= 'ALL'
+
+<ganlst>
+        ::= 'GAN' {EQ} <gans>
+
+<gans>
+        ::= <ganitm> {COM} <gans>
+        ::= <ganitm>
+
+
+
+                                   49
+
+
+
+<ganitm> [GANSAV]
+        ::= <ganno> {DASH} <ganno>
+        ::= <ganno>
+
+<ganno> [GITSAV] "Need an octal number between 1 and (2**18)-1 or E."
+        ::= <gannum>
+        ::= 'E'
+
+<gannum> [HOCTSV]
+        ::= {integer}
+
+<filist>
+        ::= <usritm> {COM} <filist>
+        ::= <usritm>
+
+<usritm>
+        ::= <usrdes> <filset>
+        ::= <usrdes>
+
+<filset>
+        ::= <wldfil> {COM} <filset>
+        ::= <wldfil>
+
+<usrdes> "Need a PPN or user name."
+        ::= <ppn>
+        ::= <user>
+
+<ppn> [PPNSAV]
+        ::= {LBRKT} <ppnpc> {COM} <ppnpc> {RBRKT}
+
+<ppnpc> [HOCTSV]
+        ::= {integer}
+
+<user> [STRSAV]
+        ::= {usrnam}
+
+<wldfil>
+        ::= <wldnm> {DOT} <wldext>
+        ::= <wldnm> {DOT}
+        ::= <wldnm>
+
+<wldnm> [STRSAV]
+        ::= {wldpc}
+        ::= {filpc}
+        ::= {identifier}
+        ::= {integer}
+
+<wldext>
+        ::= <wldnm>
+
+<stmods>
+        ::= <stm> <stmods>
+        ::= <stm>
+
+
+
+                                   50
+
+
+
+<stm> "Illegal STORE modifier."
+        ::= <af_mod>
+        ::= <be_mod>
+        ::= <st_mod>
+        ::= <en_mod>
+        ::= <tw_mod>
+        ::= <ch_mod>
+        ::= <in_mod>
+        ::= <to_mod>
+
+<af_mod> [DTSAV]
+        ::= 'AFTER' <time> <date>
+        ::= 'AFTER' <time>
+
+<be_mod> [DTSAV]
+        ::= 'BEFORE' <time> <date>
+        ::= 'BEFORE' <time>
+
+<st_mod>
+        ::= 'STARTING' 'WITH' <stpnt>
+        ::= 'STARTING' <stpnt>
+
+<en_mod>
+        ::= 'ENDING' 'WITH' <stpnt>
+        ::= 'END' <stpnt>
+
+<tw_mod>
+        ::= 'TWICE'
+
+<ch_mod>
+        ::= 'CHANGED'
+
+<in_mod>
+        ::= 'INCREMENTAL'
+
+<to_mod>
+        ::= 'TODAY'
+
+<date> [DATSAV] "Illegal date expression."
+        ::= <day> <mon> <year>
+        ::= <day> <mon>
+        ::= <day>
+
+<day> [DAYSAV]
+        ::= {integer}
+
+<mon> [STRSAV]
+        ::= 'JAN'
+        ::= 'FEB'
+        ::= 'MAR'
+        ::= 'APR'
+        ::= 'MAY'
+        ::= 'JUN'
+        ::= 'JUL'
+
+
+                                   51
+
+
+
+        ::= 'AUG'
+        ::= 'SEP'
+        ::= 'OCT'
+        ::= 'NOV'
+        ::= 'DEC'
+
+<year> [YRSAV]
+        ::= {integer}
+
+<time> [TIMSAV] "Illegal time expression."
+        ::= <hour> {CLN} <min>
+
+<hour> [HRSAV]
+        ::= {integer}
+
+<min> [MINSAV]
+        ::= {integer}
+
+<stpnt>  "Need a user or PPN and file name."
+        ::= <user> <filnm>
+
+<filnm>
+        ::= <fname> {DOT} <fext>
+        ::= <fname> {DOT}
+        ::= <fname>
+
+<fname> [STRSAV]
+        ::= {filpc}
+        ::= {identifier}
+        ::= {integer}
+
+<fext>
+        ::= <fname>
+
+<retr_c>
+        ::= 'RETRIEVE' <remds> <relist>
+        ::= 'RETRIEVE' <relist>
+
+<relist> "Illegal retrieve list."
+        ::= <allst>
+        ::= <ganlst>
+        ::= <poslst>
+        ::= <rtrlst>
+
+<poslst>
+        ::= 'POS' {EQ} <pstns>
+
+<pstns>
+        ::= <positm> {COM} <pstns>
+        ::= <positm>
+
+<positm>
+        ::= <posno> {DASH} <posno>
+        ::= <posno>
+
+
+                                   52
+
+
+
+<posno> [POSSAV] "Need an integer or E."
+        ::= <posnum>
+        ::= 'E'
+
+<posnum> [INTSAV]
+        ::= {integer}
+
+<rtrlst>
+        ::= <rtritm> {COM} <rtrlst>
+        ::= <rtritm>
+
+<rtritm>
+        ::= <retusr> <retset>
+        ::= <retusr>
+
+<retusr> "Need a PPN or user name or a pair of either."
+        ::= <upair>
+        ::= <usrdes>
+
+<upair>
+        ::= <usrdes> {UNDER} <usrdes>
+
+<retset>
+        ::= <retfil> {com} <retset>
+        ::= <retfil>
+
+<retfil>
+        ::= <fpair>
+        ::= <wldfil>
+
+<fpair>
+        ::= <filnm> {UNDER} <wldfil>
+
+<remds>
+        ::= <rem> <remds>
+        ::= <rem>
+
+<rem> "Illegal RETRIEVE or GET modifier."
+        ::= <af_mod>
+        ::= <be_mod>
+        ::= <st_mod>
+        ::= <en_mod>
+        ::= <se_mod>
+
+<se_mod>
+        ::= 'SETDUMPED'
+
+<get_c>
+        ::= 'GET' <remds> <gelist>
+        ::= 'GET' <gelist>
+
+<gelist> "Illegal GET or DIRECTORY list."
+        ::= <allst>
+        ::= <ganlst>
+
+
+                                   53
+
+
+
+        ::= <poslst>
+        ::= <filist>
+
+<dire_c>
+        ::= 'DIRECTORY' <dimds> <gelist>
+        ::= 'DIRECTORY' <gelist>
+
+<dimds>
+        ::= <dim> <dimds>
+        ::= <dim>
+
+<dim> "Illegal DIRECTORY modifier."
+        ::= <af_mod>
+        ::= <be_mod>
+        ::= <st_mod>
+        ::= <en_mod>
+        ::= <ck_mod>
+        ::= <li_mod>
+
+<ck_mod>
+        ::= 'CHECKSUM'
+
+<li_mod>
+        ::= 'LIMITED'
+
+<wher_c> "Illegal command word."
+        ::= 'WHERE'
+
+<cut_c> "Illegal command word."
+        ::= 'CUT' 'AFTER' <filno>
+
+<filno> [INTSAV] "Need a file position number."
+        ::= {integer}
+
+<rewi_c> "Illegal command word."
+        ::= 'REWIND' <rwopt>
+        ::= 'REWIND'
+
+<rwopt>
+        ::= 'WAIT'
+
+<unlo_c> "Illegal command word."
+        ::= 'UNLOAD' <rwopt>
+        ::= 'UNLOAD'
+
+<devi_c> "Illegal command word."
+        ::= 'DEVICE' <dvnam> <dens>
+        ::= 'DEVICE' <dvnam>
+        ::= 'DEVICE'
+
+<dvnam> [STRSAV] "Not a mag-tape device name."
+        ::= {identifier}
+
+<dens> [INTSAV] "Expected a mag-tape density."
+
+
+                                   54
+
+
+
+        ::= {integer}
+
+<tid_c> "Illegal command word."
+        ::= 'TID' <tidval>
+        ::= 'TID' 'DELETE'
+        ::= 'TID'
+
+<help_c> "Illegal command word."
+        ::= 'HELP' <cmdwd>
+        ::= 'HELP'
+
+<qmrk_c> "Illegal command word."
+        ::= {Q} <cmdwd>
+        ::= {Q}
+
+<cmdwd> "Expected a command word."
+        ::= 'MODE'
+        ::= 'OLD'
+        ::= 'SYS'
+        ::= 'RPRINT'
+        ::= 'SPRINT'
+        ::= 'REELSET'
+        ::= 'DSKREP'
+        ::= 'TTYREP'
+        ::= 'NEW' 'TAPE'
+        ::= 'NEW'
+        ::= 'APPEND'
+        ::= 'STORE'
+        ::= 'RETRIEVE'
+        ::= 'GET'
+        ::= 'DIRECTORY'
+        ::= 'WHERE'
+        ::= 'CUT' 'AFTER'
+        ::= 'REWIND'
+        ::= 'UNLOAD'
+        ::= 'DEVICE'
+        ::= 'TID'
+        ::= 'HELP'
+        ::= {Q}
+        ::= 'INSTRUCTIONS'
+        ::= 'GRIPE'
+        ::= 'NEWS'
+        ::= 'TRANSLATE'
+        ::= 'UNTRANSLATE'
+        ::= 'COF'
+        ::= 'LOG'
+        ::= 'UNLOG'
+        ::= 'COMMENT'
+        ::= 'QUIT'
+        ::= 'STOP'
+        ::= 'CONTINUE'
+        ::= 'GO'
+        ::= 'ABORT'
+
+
+
+                                   55
+
+
+
+<inst_c> "Illegal command word."
+        ::= 'INSTRUCTIONS'
+
+<grip_c> "Illegal command word."
+        ::= 'GRIPE'
+
+<news_c> "Illegal command word."
+        ::= 'NEWS'
+
+<tran_c> "Illegal command word."
+        ::= 'TRANSLATE' <trlst>
+        ::= 'TRANSLATE'
+
+<trlst> "Illegal TRANSLATE list."
+        ::= <tritm> {COM} <trlst>
+        ::= <tritm>
+
+<tritm>
+        ::= <user> {UNDER} <user>
+
+<untr_c> "Illegal command word."
+        ::= 'UNTRANSLATE'
+
+<cof_c> "Illegal command word."
+        ::= 'COF' <prdev> <fildes>
+        ::= 'COF' <prdev>
+        ::= 'COF' <fildes>
+        ::= 'COF'
+
+<prdev> "Not a legal print device."
+        ::= 'TTY'
+        ::= 'LPT'
+        ::= 'TELETYPE'
+        ::= 'TERMINAL'
+
+<fildes> "Need a user or PPN and file name."
+        ::= <usrdes> <filnm>
+        ::= <filnm>
+
+<log_c> "Illegal command word."
+        ::= 'LOG' <fildes> 'ERRORS'
+        ::= 'LOG' <fildes>
+
+<unlg_c> "Illegal command word."
+        ::= 'UNLOG'
+
+<comm_c> "Illegal command word."
+        ::= 'COMMENT' {text}
+
+<quit_c> "Illegal command word."
+        ::= 'QUIT'
+
+<stop_c> "Illegal command word."
+        ::= 'STOP'
+
+
+                                   56
+
+
+
+<cont_c> "Illegal command word."
+        ::= 'CONTINUE'
+
+<go_c> "Illegal command word."
+        ::= 'GO' 'TID' <tidval>
+        ::= 'GO' <tidval>
+        ::= 'GO'
+
+<abor_c> "Illegal command word."
+        ::= 'ABORT'
+
+<yes_or_no>
+        ::= 'YES'
+        ::= 'NO'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   57
+
+
+
+                               Appendix D                                
+
+                             DSNARL Grammar                              
+
+
+
+
+     The  following grammar  is  the BNF  description which  is  used by
+TABGEN  to produce  the  tables and  parser for  DSNARL.   Therefore, it
+includes error  messages and  references to  special syntax  or semantic
+routines.
+
+     There are several exception conditions handled by the scanner.  One
+is the COMMENT command.  The user-defined terminal {text}  is determined
+by the scanner when it  finds the command word COMMENT.   It "tokenizes"
+the remainder  of the  command as  {text} to  make the  parsing routines
+happy.
+
+     Another exception is  the handling of command  files.  A call  to a
+command  file  is  detected  during  scanning,  and  the  file  name  is
+determined  at  that  point.  Prior  to  parsing,  the  complete command
+sentence is assembled by the scanner.
+
+{LF}    ::= 12
+{COM}   ::= ","
+{Q}     ::= 77
+{CLN}   ::= ":"
+{UNDER} ::= 137
+{DASH}  ::= "-"
+{DOT}   ::= "."
+{EQ}    ::= "="
+{LBRKT} ::= "["
+{RBRKT} ::= "]"
+
+<command> "Extra input in command."
+        ::= <statement> {LF}
+
+<statement>
+        ::= <dump_c>
+        ::= <indi_c>
+        ::= <bloc_c>
+        ::= <map_c>
+        ::= <type_c>
+        ::= <rewi_c>
+        ::= <unlo_c>
+        ::= <devi_c>
+        ::= <help_c>
+        ::= <qmrk_c>
+        ::= <inst_c>
+        ::= <grip_c>
+        ::= <news_c>
+        ::= <diff_c>
+        ::= <log_c>
+        ::= <unlg_c>
+
+
+                                   58
+
+
+
+        ::= <comm_c>
+        ::= <quit_c>
+        ::= <stop_c>
+        ::= <cont_c>
+        ::= <go_c>
+        ::= <abor_c>
+
+<dump_c> "Illegal command word."
+        ::= 'DUMP'
+
+<indi_c> "Illegal command word."
+        ::= 'INDICES' <indval>
+
+<indval> "Illegal index type."
+        ::= 'OCTAL'
+        ::= 'DECIMAL'
+
+<bloc_c> "Illegal command word."
+        ::= 'BLOCK' <bloval>
+
+<bloval> "Illegal block value."
+        ::= 'NEXT'
+        ::= 'PREVIOUS'
+        ::= 'LAST'
+        ::= <blonum>
+
+<blonum> [INTSAV]
+        ::= {integer}
+
+<map_c> "Illegal command word."
+        ::= 'MAP'
+
+<type_c> "Illegal command word."
+        ::= <trange> 'T' <mode>
+        ::= <trange> 'T'
+        ::= 'T' <mode>
+        ::= 'T'
+
+<trange> [rngchk] "Bad range expression."
+        ::= <word1> {cln} <word2>
+        ::= <row> {com} <column>
+
+<word1> [INTSAV]
+        ::= {integer}
+
+<word2> [INTSAV]
+        ::= {integer}
+
+<row> [INTSAV]
+        ::= {integer}
+
+<column> [INTSAV]
+        ::= {integer}
+
+
+
+                                   59
+
+
+
+<mode>
+        ::= 'OCTAL'
+        ::= 'DECIMAL'
+        ::= 'SIXBIT'
+        ::= 'ASCII'
+        ::= 'HED'
+        ::= 'DIR'
+        ::= 'RCD'
+        ::= 'LOK'
+        ::= 'DAT'
+        ::= 'EMP'
+        ::= 'DUM'
+        ::= 'BOU'
+        ::= 'EOU'
+        ::= 'DEFAULT'
+
+<rewi_c> "Illegal command word."
+        ::= 'REWIND' <rwopt>
+        ::= 'REWIND'
+
+<rwopt>
+        ::= 'WAIT'
+
+<unlo_c> "Illegal command word."
+        ::= 'UNLOAD' <rwopt>
+        ::= 'UNLOAD'
+
+<devi_c> "Illegal command word."
+        ::= 'DEVICE' <dvnam> <dens>
+        ::= 'DEVICE' <dvnam>
+        ::= 'DEVICE'
+
+<dvnam> [STRSAV] "Not a mag-tape device name."
+        ::= {identifier}
+
+<dens> [INTSAV] "Expected a mag-tape density."
+        ::= {integer}
+
+<help_c> "Illegal command word."
+        ::= 'HELP' <cmdwd>
+        ::= 'HELP'
+
+<qmrk_c> "Illegal command word."
+        ::= {Q} <cmdwd>
+        ::= {Q}
+
+<cmdwd> "Expected a command word."
+        ::= 'DUMP'
+        ::= 'INDICES'
+        ::= 'BLOCK'
+        ::= 'MAP'
+        ::= 'T'
+        ::= 'REWIND'
+        ::= 'UNLOAD'
+
+
+                                   60
+
+
+
+        ::= 'DEVICE'
+        ::= 'HELP'
+        ::= {Q}
+        ::= 'INSTRUCTIONS'
+        ::= 'GRIPE'
+        ::= 'NEWS'
+        ::= 'DIFFERENCES'
+        ::= 'LOG'
+        ::= 'UNLOG'
+        ::= 'COMMENT'
+        ::= 'QUIT'
+        ::= 'STOP'
+        ::= 'CONTINUE'
+        ::= 'GO'
+        ::= 'ABORT'
+
+<inst_c> "Illegal command word."
+        ::= 'INSTRUCTIONS'
+
+<grip_c> "Illegal command word."
+        ::= 'GRIPE'
+
+<news_c> "Illegal command word."
+        ::= 'NEWS'
+
+<diff_c> "Illegal command word."
+        ::= 'DIFFERENCES' <set1> {COM} <set2>
+
+<set1>  "Need a user or user and file name."
+        ::= <user> <filnm>
+        ::= <user>
+        ::= <filnm>
+
+<set2>  "Need a user or user and file name."
+        ::= <user> <filnm>
+        ::= <user>
+        ::= <filnm>
+
+<log_c> "Illegal command word."
+        ::= 'LOG' <fildes> 'ERRORS'
+        ::= 'LOG' <fildes>
+
+<fildes> "Need a user or ppn and file name."
+        ::= <usrdes> <filnm>
+        ::= <filnm>
+
+<usrdes> "Need a PPN or user name."
+        ::= <ppn>
+        ::= <user>
+
+<ppn> [PPNSAV]
+        ::= {LBRKT} <ppnpc> {COM} <ppnpc> {RBRKT}
+
+<ppnpc> [HOCTSV]
+
+
+                                   61
+
+
+
+        ::= {integer}
+
+<user> [STRSAV]
+        ::= {usrnam}
+
+<filnm>
+        ::= <fname> {DOT} <fext>
+        ::= <fname> {DOT}
+        ::= <fname>
+
+<fname> [STRSAV]
+        ::= {filpc}
+        ::= {identifier}
+        ::= {integer}
+
+<fext>
+        ::= <fname>
+
+<unlg_c> "Illegal command word."
+        ::= 'UNLOG'
+
+<comm_c> "Illegal command word."
+        ::= 'COMMENT' {text}
+
+<quit_c> "Illegal command word."
+        ::= 'QUIT'
+
+<stop_c> "Illegal command word."
+        ::= 'STOP'
+
+<cont_c> "Illegal command word."
+        ::= 'CONTINUE'
+
+<go_c> "Illegal command word."
+        ::= 'GO'
+
+<abor_c> "Illegal command word."
+        ::= 'ABORT'
+
+<yes_or_no>
+        ::= 'YES'
+        ::= 'NO'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   62
+
+
+
+                               Appendix E                                
+
+                   SNARL and DSNARL Help File Format                        
+
+
+
+
+     The help file  contains the information  which will be  accessed by
+the  "HELP" and  "?" commands.   In order  for the  long and  short help
+information to be distinguished and to separate the text for the various
+commands, a simple file format must be used.
+
+     Help text is interleaved  with text separator commands  which begin
+with "{" and are terminated by "}".  Each should contain the  symbol for
+the token value of the  SNARL or DSNARL command word followed  by either
+"s" or "l" or both, all separated by commas.  For example:
+        {!rewind,s,l}
+The "s" denotes the beginning of "short" text which is typed in response
+to the "?" command.  the "l" denotes the beginning of "long"  text which
+is typed in  response to the  "HElP" command.  The  end of the  block of
+text which follows is determined by either the next separator command or
+the end-of-file.
+
+     Possible enhancement.  It may be desirable to create  an additional      
+level of text separation for parameter descriptions.  This  would enable
+the expansion of the help facility to include portions of commands.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   63
+    ~2T2
