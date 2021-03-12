@@ -1,0 +1,49 @@
+.Skip 2;
+.ByHand;
+PROCEDURE diflin( integer index, word1, word2 );
+.EndHand;
+	This procedure puts out a line of the "differences"
+summary.
+
+.Skip 2;
+.ByHand;
+PROCEDURE lokcom( reference integer array look1, look2 );
+.EndHand;
+	This procedure compares two lookup blocks and reports their
+differences.  The words which contain the username and PPN of the file
+owner are ignored.
+
+.Skip 2;
+.ByHand;
+INTEGER PROCEDURE loklud (STRING username);
+.EndHand;
+	This procedure looks up the "username" in the LUD and returns
+the corresponding PPN.  A zero is returned if the lookup failed.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!diff( STRING user1, file1, ext1,
+   user2, file2, ext2 );
+.EndHand;
+	This procedure will compare two files or equivalently named
+files from two directories.
+	"User1" and "user2" are the two usernames from which files will
+be taken for comparison.  They must both be specified (not null).
+	"File1" and "file2" are file names to compare.  This does not
+include the extension portion, and only six characters of these are
+used.  If "file1" is not null then "file2" must not be null.  If these
+are null, then a directory search will be done.  All files in "user1"
+and "user2" which have equivalent names will be compared with each
+other.
+
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE difclean;
+.EndHand;
+.Skip 2;
+.ByHand;
+PROCEDURE comp!contents;
+.EndHand;
+	This procedure does a simple binary comparison of the current
+two files being considered by "s!diff".  It stops listing beyond 20
+differences.
+
