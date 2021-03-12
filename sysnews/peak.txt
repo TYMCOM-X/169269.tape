@@ -1,0 +1,474 @@
+PEAK Reference Guide               Version 1.0                       Page 1
+
+
+    This is a brief guide to the screen editor PEAK.  Other available 
+    documentation includes (sysnews)peak.key and (sysnews)peak.cht.
+    Peak.key contains a list of commands by key bindings.  Peak.cht
+    is a chart (132 characters wide) of bindable keys with the PEAK
+    default function bindings.  This file can be printed out or copied
+    to your directory and used to keep track of additional bindings.
+
+Use of PEAK
+
+    PEAK is intended for Tymshare internal use only.
+
+Accessing PEAK
+
+    PEAK is accessible by the monitor command 'PEAK'.  The 
+    complete command is PEAK [filename] [/Pn] [/Ln] [/R] where
+    /Pn is the page number on which to start editing, /Ln is the
+    line number on which to start editing and /R will read in 
+    the file "Read Only" (no modification allowed).  
+
+Terminal Type
+
+    If you do not have tty class set, PEAK will ask for your terminal
+    type.  If you are not sure what your terminal type is, typing "?" 
+    at the "Terminal type?" prompt will give a list of supported terminals.
+
+Inserting
+
+    All normally printing characters insert themselves when typed.
+    This includes RETURN and TAB.  To insert a control character
+    you must "quote" it with ^Q.
+
+    ^Q              Insert the next character                       [Quote]
+
+Moving Around - Basic Cursor Movement
+
+    ^F              Move forward                                  [Forward]
+    ^B              Move backward                                [Backward]
+    ^A              Move to beginning of line           [Beginning of Line]
+    ^E              Move to end of line                       [End of Line]
+    ^N              Move to next line                                [Down]
+    ^P              Move to previous line                              [Up]
+
+    ESC F           Move forward over token                 [Forward Token]
+    ESC B           Move backward over token               [Backward Token]
+
+    You can think of a "token" as being a word or a number.  To have other
+    characters included with the word or number, define them as tokens or
+    numbers with the "Is Token" or "Is Number" command (see page 6).  Your
+    peak.ini is a good place to define token characters.
+
+    ESC {           Move to top of page                       [Top of Page]
+    ESC }           Move to bottom of page                 [Bottom of Page]
+PEAK Reference Guide               Version 1.0                       Page 2
+
+
+Moving Around in the Window
+
+    Unless you have split the screen into two windows, "window" is 
+    synonymous with "screen" in the following commands.
+
+    ESC ,           Move to top of window                   [Top of Window]
+    ESC .           Move to end of window                [Bottom of Window]
+    ^V              Move to next window                    [Forward Window]
+    ESC V           Move to previous window               [Backward Window]
+    ^Z              Scroll window up                     [Scroll Window Up]
+    ESC Z           Scroll window down                 [Scroll Window Down]
+    ESC !           Move point to top of window     [Line to Top of Window]
+
+Moving Around in the Buffer
+
+    PEAK does not edit the file itself; it reads the file into a buffer and
+    all editing is done there.
+
+    ESC <           Move to top of buffer                   [Top of Buffer]
+    ESC >           Move to end of buffer                [Bottom of Buffer]
+
+    ESC <space>     Set a "mark" in the buffer                   [Set Mark]
+
+    Up to ten marks can be set.  All mark commands can be given an argument
+    to specify which mark will be referenced by the command.  For example,
+    "ESC <space>" sets mark 0, "^U 5 ESC <space>" would set mark 5.
+
+    ESC G           Go to a mark                                [Goto Mark]
+    ^X S            Exchange the point and a mark               [Swap Mark]
+
+    "Point" is the present position of the cursor.
+
+Deleting
+
+    ^D              Delete character                               [Delete]
+    ^H              Delete previous character             [Delete Backward]
+
+    ESC D           Delete token                     [Delete Token Forward]
+    ESC H           Delete previous token           [Delete Token Backward]
+
+    ^K              Kill line                                   [Kill Line]
+    ESC K           Kill to end of line                 [Kill Partial Line]
+
+    ^K kills the line from point to end of line including the cr-lf at the
+    end of the line, ESC K kills either the line from point to end of line,
+    or the cr-lf.  Note:  ESC K will not kill a form feed, ^K will.  Giving
+    ESC K a large argument will kill to the end of the page and stop there.
+
+    ^W              Kill to a mark                            [Wipe Region]
+    ^Y              Recover killed text                [Insert Kill Buffer]
+
+    All text killed without moving the cursor will be in the kill buffer.
+    After moving the cursor, a subsequent kill will delete the previous 
+    contents of the kill buffer and replace it with the most recent kill.
+PEAK Reference Guide               Version 1.0                       Page 3
+
+   
+Setting the Argument
+
+    ^U [n]          Set argument to n (default 4)                [Argument]
+
+    (Detailed explanation on page 7)
+
+Finishing Up
+
+    ^X ^F           Write files and exit                           [Finish]
+    ^X ^C           Exit without writing files                  [Safe Exit]
+    ^X ^E           Write files and return to caller        [Finish to RPG]
+
+Searching/Replacing
+
+    ESC S           Search                                         [Search]
+    ESC R           Reverse search                         [Reverse Search]
+
+    The complete command is "ESC S <string> ESC".
+
+    ^S              Repeat last search                       [Search Again]
+    ^R              Repeat last reverse search       [Reverse Search Again]
+
+    ESC C           Change                                         [Change]
+
+    The complete command is "ESC C <string1> ESC <string2> ESC".
+
+    ESC Q           Query change                             [Query Change]
+
+    Responses to the query change command are: "Y","y", or <space> - yes,
+    change this string;  "." - change this string and stop; "^G" - stop.
+    Any other character continues searching without replacing the target 
+    string.
+    
+    ESC M           Multiple string search                [Multiple Search]
+
+    "ESC M <string1> ESC <string2> ESC ... <stringn> ESC ESC" is the 
+    complete command; n is any number up to 10.  You can repeat the search
+    with "ESC M ESC".
+
+    ESC (           Reverse search for matching open parenthesis 
+                                                             [Match Parens]
+    ESC )           Search for matching close parenthesis    [Match Parens]
+
+    ESC =           Show search String                 [Show Search String]
+
+Manipulating Windows
+
+    ^X 2            Use 2 windows                            [Split Window]
+    ^X 1            Use 1 window                           [Unsplit Window]
+    ^X ^O           Go to other window                     [Switch Windows]
+    ^X G            Enlarge window                            [Grow Window]
+
+    Windows may be two places in one files, or two different files.
+PEAK Reference Guide               Version 1.0                       Page 4
+
+
+Fancier Text Manipulation
+
+    ESC ^W          Copy text from point to mark              [Copy Region]
+
+    ^J              Start new line at current indentation 
+                                                    [Open Line with Indent]
+    ^O              Open the line                               [Open Line]
+    ^T              Twiddle (swap) the last two characters      [Transpose]
+    ESC ^J          Right justify line from point to end of line
+                                                       [Right Justify Line]
+    ^X W            Delete whitespace                   [Delete Whitespace]
+
+    Deletes whitespace from point to first character forward on line.
+
+    ESC I           Indent a line (add leading whitespace)    [Indent Line]
+    ESC U           Unindent a line (remove leading whitespace) 
+                                                            [Unindent Line]
+
+    ^^              Toggle case of character                  [Toggle Case]
+    ESC ^           Toggle case of word                      [Toggle Token]
+
+Reading/Writing Files
+
+    ^X ^R           Read a file into a new buffer               [Read File]
+
+    The complete command is "^X ^R <filespec> ESC".  Switches /Pn, /Ln,
+    and /R are the same as in accessing PEAK.
+
+    ^X ^I           Insert a file into the current buffer     [Insert File]
+    ^X ^W           Write the current buffer                   [Write File]
+
+    "^X ^W ESC" writes out the current buffer with the current filespec.
+
+Manipulating Buffers
+
+    ^X <            Move to previous buffer              [Last Buffer]
+    ^X >            Move to next buffer                       [Next Buffer]
+    ^X ^N           Build a scratch buffer                     [New Buffer]
+    ^X ^K           Kill this buffer                          [Kill Buffer]
+    ^X ^S           Checkpoint this buffer                     [Checkpoint]
+    ^X ^U           Recover last checkpoint            [Recover Checkpoint]
+
+    You can force a checkpoint by ^X ^S, and then edit, knowing you can 
+    return to the state of the file at the checkpoint by ^X ^U.  The file
+    will be automatically checkpointed if there have been no changes for 
+    the number of seconds set as the checkpoint interval, or if you move
+    to another file in the buffer chain.
+
+Locking Files
+
+    ^X -            Lock file (prevents modifications)        [Lock Buffer]
+    ^X +            Clear file lock                         [Unlock Buffer]
+PEAK Reference Guide               Version 1.0                       Page 5
+
+
+Macros and Key Bindings
+
+    ^X D            Define a macro                           [Define Macro]
+    ^X E            Define a macro by example (^G terminates)
+                                                  [Define Macro by Example]
+    ^X X            Execute current macro                   [Execute Macro]
+    ^X M            Bind macro to key                          [Bind Marco]
+    ^X B            Bind function to key                    [Bind Function]
+    ^X [            Push key binding onto stack              [Push Binding]
+    ^X ]            Pop key binding off stack                 [Pop Binding]
+    ^X ^L           Execute command file                     [Command File]
+    ^X |            Start comment (for command file) (| terminates)      
+                                                            [Start Comment]
+Modes
+
+    ^X N            Put PEAK in "Normal" mode                 [Normal Mode]
+    ^X T            Put PEAK in "Text" mode                     [Text Mode]
+
+    In "Text" mode PEAK will automatically insert carriage returns to keep 
+    your text within your defined right margin.
+
+    ESC O           Toggle "Overwrite" flag         [Toggle Overwrite Flag]
+    ESC W           Toggle "Wrap" flag                   [Toggle Wrap Flag]
+
+    "Overwrite" will overwrite on editing rather than inserting.  "Wrap"
+    controls whether overlong lines wrap or disappear off the screen.
+
+
+Other Things of General Interest
+
+    ^G              Abort command                           [Abort Command]
+
+    Very useful command that aborts whatever command you have begun to type
+
+    ^L              Repaint the screen                     [Refresh Window]
+
+    ESC ?           Display on-line help message and buffer chain    [Help]
+    ^X ?            Name function bound to a key           [Query Function]
+    ESC ~           Clear "buffer modified" flag          [Unmodify Buffer] 
+    ^X "            Display string on message line (" terminates) 
+                                                            [Start Message]
+    ^X ^T           Show date and time                  [Date Time Message]
+
+Information Strings
+
+    ^X I            Insert information string   [Insert Information String]
+
+    Will insert an information string into the file.  Complete form is
+    "^X I <I-Str> ESC".  Presently defined information strings are:
+
+        Date        Present date as dd-mmm-yy (29-Nov-82)
+	Time        Current time as hh:mm:ss (17:15:19)
+	Username    Logged in username in uppercase (LOIS)
+
+PEAK Reference Guide               Version 1.0                       Page 6
+
+
+Environment Variables
+
+    ^X =            Query the value of a variable          [Query Variable]
+        The complete form is "^X = <variable name> ESC"
+    ^X _            Assign the argument to the variable     [Bind Variable]
+        The complete form is "^Un^X _ <variable name> ESC"
+
+        Current environment variables and defaults are:
+
+    Variable         Default       Purpose
+    --------         -------       -------
+
+    Multiplier            4        Default for "Argument" command
+    WrapLongLines         1        When nonzero, long lines will wrap
+    BreakPageOnFF         1        When nonzero, page will break on ff
+    EscapeAs$             1        When nonzero, ESC printed as $
+    OverWriteOnInsert     0        When nonzero, overwrites
+    UseTabs               1        Controls use of TAB in indent
+                                     command; will change spaces to
+                                     TABs where possible if nonzero
+    TabWidth              8        Controls tab stops
+    IndentWidth           2        Width of indentation for Meta-I,
+                                     Meta-U commands
+    RightMargin          72        Margin control in "text" mode
+    ExactCaseMatch        0        Controls case matching in searches;
+                                     when nonzero, matching is exact
+    CheckpointInterval   60        Time in seconds for checkpointing
+
+Special Character Searching
+
+    ESC :           Reverse search for "special" character 
+                                                   [Reverse Special Search]
+    ESC ;           Search for "special" character         [Special Search]
+
+Defining Special Characters/Tokens
+
+    ESC X is special ESC <char> ESC
+                    Defines <char> as "special" character for ESC ; and
+                    ESC : commands
+    ESC X is number ESC <char> ESC
+                    Defines <char> as "number" for ESC B, ESC F, ESC H
+                    and ESC D commands
+    ESC X is token ESC <char> ESC
+                    Defines <char> as "token" for ESC B, ESC F, ESC H
+                    and ESC D commands
+    ESC X is delim ESC <char> ESC
+                    Defines <char> as "delim" for ESC B, ESC F, ESC H
+                    and ESC D commands.  A delim is the opposite of a
+                    "token" for these commands.
+
+    All four have a "not" form also; "not special", "not number",
+    "not token, and "not delim", which will undo the definition.
+PEAK Reference Guide               Version 1.0                       Page 7
+
+
+Executing Functions by Name
+
+    ESC X           Execute a function by name
+
+    The complete form is "ESC X <function name> ESC".  All functions
+    in PEAK have a symbolic name.  The symbolic names have been given
+    in brackets for all functions.  Some functions are not bound to
+    keys, and must be accessed symbolically.  They are:
+
+    Center Line          Centers current line with margins set
+    Indent Region        Indents region from point to mark 0
+    Unindent Region      Unindents region from point to mark 0
+    Token UC             For use with "toggle case" command
+    Token LC             For use with "toggle case" command
+    Window Bar           Sets character(s) for window bar
+    Delete NULLs         Delete NULLs in file
+    XOFF Synch           Allows XON/XOFF handshaking
+    Nothing              Does nothing
+    Beep                 Rings bell
+
+Setting the Argument
+
+    Every command is passed a numeric argument which, unless set
+    explicity, is zero.  The argument tells most commands to
+    do themselves that many times (except that the default of zero
+    means to do themselves once).  The argument is also used with
+    commands dealing with marks to specify which of the ten marks
+    to use.
+
+    To set the argument type ^U followed by a number.  The next
+    command typed will be passed that number.  If no number is
+    typed a default "multiplier" will be used.  The default value
+    of the multiplier is 4.  Hence the command string ^U10^F will
+    send the argument 10 to ^F, which in turn will cause it to move
+    forward over 10 characters.  The string ^U^F would send the
+    default argument of 4.
+
+    The current value of the argument will be displayed on the message
+    line when the ^U command is given.  For example, the default
+    number of 4 will be shown when ^U is typed.  If ^U is followed
+    by the number 10, the message line will then display "Arg: 10".
+
+    Arguments can be multiplied.  If an argument is passed to ^U it
+    will multiply it against the next argument given.  The string
+    ^U10^U3^N first sends an argument of 10 to ^U, which multiplies
+    that against 3, and passes 30 to ^N, which will then move down
+    30 lines.  Likewise, ^U^U^N will move down 16 lines.
+
+    The multiplier may be changed to some number other than 4 by the
+    assign environment variable command "Un^X _ <variable name> ESC".
+PEAK Reference Guide               Version 1.0                       Page 8
+
+
+Peak.ini
+
+    When PEAK starts up it looks for a file named "PEAK.INI" on
+    your logged in directory (NOT the GFD'd directory) for special
+    initialization commands.  A PEAK.INI should start by locking
+    the file so that stray characters in PEAK.INI won't cause
+    inadvertant modifications to the buffer.  
+
+    A sample PEAK.INI, which sets the indentation width to 6,
+    defines a macro to go to the top of the next page, and binds
+    the macro to Meta-P and Meta-p, is:
+
+        ^X-
+        ^X| Lock file |
+
+        ^X| Sample PEAK.INI |
+
+        ^X| set the indentation width to 6 |
+        ^U6^X_IndentWidth$
+
+        ^X| define a macro to get to the top of the next page |
+        ^Xd/$}^N/
+
+        ^X| bind the macro to Meta-P and Meta-p |
+        ^Xm$P
+        ^Xm$p
+
+        ^X| Unlock file|
+        ^X+             
+
+    NOTE:  There is NO carriage return at the end of the last line.
+
+Status and Message Lines
+
+    The status line at the bottom of the editing window gives the following
+    information:  Editor name  Version number (Terminal type  Major mode
+    [+],  [Wrap]  [Over])  [<]  File name  [>]  - Cursor position in file - 
+    [*]  [$]  with:
+        Major mode  Text or Normal
+        +           Executed peak.ini
+        Wrap        Wrap flag set
+        Over        Overwrite flag set
+        <           Previous buffer(s) in buffer chain
+        >           Subsequent buffer(s) in buffer chain
+        *           Buffer modified flag
+        $           File read only
+
+    Cursor position is given in percent of file before the cursor, or
+    Top or End.
+
+    Below the status line, the message line gives prompts and information
+    from PEAK.
+
+PEAK Reference Guide               Version 1.0                       Page 9
+
+
+Continuing PEAK after Attaching to Detached Job
+
+    If you are dropped in the middle of an edit, have detach on disconnect
+    set and it was not a host crash, you can continue your edit without
+    losing anything when you are able to log in again.  Attach to your
+    detached job, ESC (or ^C if you are in PDP10 mode), continue, and
+    then ^L.  The ^L not only refreshes the screen, but also will reset 
+    your terminal characteristics for the duration of the edit.
+
+Backup Files
+
+    PEAK will write a file with the extension "bak" for each file you
+    edit.  When you write out your edited buffer with either ^X^W or
+    ^X^F, PEAK renames the original file to <filename>.bak, after
+    deleting the old <filename>.bak (if one exists), and then writes 
+    out the current edit.
+
+    Thus the .bak file normally will contain a copy of the file before 
+    you began the current edit.  However, if you write out the file in
+    the middle of your edit with a ^X^W, the .bak file will contain
+    the file at the state of the previous write.
+
+    Should you be editing more than one file with the same name (but 
+    different extensions) read into different buffers, the .bak file
+    will contain a backup for only one of the files.
+
+  . gs
