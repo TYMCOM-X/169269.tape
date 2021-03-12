@@ -1,0 +1,371 @@
+# 09-09-74 RPG VERSION 114.2
+
+        TYMEXA MODE < G.E. MODE > IS NOW CONSIDERED BY RPG TO 
+        BE THE SAME AS TYMEX MODE.  UNDERSCORE NOW SEEN AS ^A.
+
+# 07-01-74 RPG VERSION 114.1
+
+ /F40LIB,/SFOLIB,/ALGLIB, AND /COBLIB CHANGED TO 
+ /LIBF40,/LIBSFO,/LIBALG, AND /LIBCOB TO AVOID CONFLICT
+  WITH PROCESSOR NAMES.
+ 
+ /NOBINARY NOW INPLIES /NOLOAD
+
+# 06-13-74 RPG VERSION 114.0
+
+FIXED A PROBLEM WHICH CAUSED SFO TO NOT LIKE ITS DEBUG-
+MODE SWITCH
+
+NEW SWITCHES /F40LIB,/ALGLIB,/SFOLIB, AND /COBLIB
+THESE TELL LOADER TO FORCE LIB40,ALGLIB,SFOLIB,OR COBLIB
+RESPECTIVELY TO BE LOADER.
+
+# 05-13-74 RPG VERSION 113.0
+
+This version of RPG includes all the changes which appeared in the
+unreleased version 111.7 except for the new COPY logic which depended
+on PIP version 33.  The PIP code is still available in the source for
+RPG under the assembly switch PIP33 (presently turned off).  The other
+changes from 111.7 are:
+
+    Various bugs fixed in the LISTER commands and in the use of command
+    files.
+
+    The message NO PREVIOUS LOAD-TYPE COMMAND is now NO PREVIOUS COMPILE-
+    TYPE COMMAND.
+
+    You can now use your own user name in commands when you are GFD'd
+    into another directory.
+
+    A situation in which LOADER was called during a COMPILE command
+    has been fixed.
+
+    In the DIFFERENCES command, the switches BINARY (equivalent to
+    WORD), COREIMAGE (equivalent to EXPAND), and SYMBOLIC (equivalent
+    to ASCII) have been added.  These names are more mnemonic than
+    the old ones.  The old switches will still be accepted.
+
+    Command files will work in the RENAME and SEND commands properly.
+
+    Garbaging at the end of a long letter which is terminated by RPG
+    shouldn't happen any more.
+
+# 04-23-74 RPG VERSION 112.0
+The following are new in 112.0:
+
+A new entry point has been added to RPG for use by PERFORM, SFORTRAN,
+and any others.  This entry point is obtained by running RPG with a
+start increment of one and the sixbit text 'KLUDGE' in register 17.
+Register 16 is then assumed to contain a function code.  If RPG is
+called with a start increment of one and anything other than 'KLUDGE'
+in register 17, the normal editor-call action of taking a command from
+SVC is performed.  Current function codes for the KLUDGE entry are:
+
+    0 - For PERFORM - Take command from nnnPEC.TMP and return control
+        to PERFORM when done.
+
+    1 - For SFORTRAN - See below.
+
+    Other functions can be added to this list as needed.
+
+The features which will be required for SFORTRAN have been added.
+They are:
+
+    The KLUDGE entry point with a function code of 1 is used by the
+    SFORTRAN editor for its commands which call RPG.  This entry is
+    equivalent to the normal editorentry except for the following:
+
+        RPG takes a command from SFC rather than SVC.
+
+        On an error, RPG will run SFORTR instead of exiting.
+
+        In a COMPILE command, SFORTR! will be sent to the last compiler
+        run to cause it to run SFORTR.
+
+        In a LOAD, EXECUTE, etc. command, /11Y will be sent to the
+        LOADER to tell it and the user program to return to SFORTR
+        on an error or termination.
+
+    SFORTRAN has been added to the standard processor list.  The
+    extension is .SFO, the command switch is /SFORTRAN, and the
+    compiler name is SFOCMP.  This addition required reducing the
+    allowable number of nonstandard processors in a command from 3
+    to 2.  It's about time to fix RPG to get rid of this silly
+    restriction.
+
+    New compile-type-command switches /DEBUG and /NODEBUG turn
+    debug mode (for the SFORTRAN compiler only) on and off.
+    In debug mode, the compiler gets a /D and the default extension
+    is .RDL instead of .REL.  These switches do not affect loading.
+
+    New compile-type-command switch /SDEBUG sets debug mode for
+    both compilation and loading.  The switch sends /12Y to the
+    loader and turns on /DEBUG.  /SDEBUG is supposed to be
+    given before any files are loaded but this is not enforced.
+
+    New command -SDEBUG is equivalent to -EXECUTE %13Y /SDEBUG
+    or >INITIALIZE within SFORTRAN.
+
+Some non-SFORTRAN changes:
+
+I fixed four of my own bug reports (if you want something done at all,
+do it yourself?).  They are:
+
+    #24392  When you say @FOO RPG will now look for FOO.CMD and then
+            FOO.  It used to look for FOO first.
+
+    #24398  NESTING TOO DEEP will now tell the name of the command
+            file it couldn't open instead of saying IO TO UNASSIGNED
+            CHANNEL.
+
+    #24407  -LOAD A=B=C is now diagnosed as an error.
+
+    #23665  -LOAD A=B where A.REL exists but no source file B with
+            any extension exists is now an error.  It used to just
+            go ahead and load A.REL.
+
+The compile-type-command switches /READ and /SEQUENCE which didn't
+do anything have been removed.
+
+The compile-type-command switches /BINDEV and /LISTDEV have been
+removed.  They were supposed to let you use something other than
+DSK for .REL and .LST files but they didn't work right.
+
+
+The rest of this is new in 113.0:
+
+The BIT SHORTAGE which caused problems in 112.0 has been solved.  The
+problem was a halfword was being used as if it had more bits than it
+really had.  I expanded the halfword (which contained command switch
+settings) to a fullword and now there are plenty of bits to go around.
+
+CFORTRAN interface is different.  CFORTRAN should now use the KLUDGE
+entry point with a function code of 2.  The command to be done should
+be in SFC rather than SVC and /ZF and %3Y should no longer be used.
+Also, the COMPILE command in CFORTRAN should be sent to RPG as
+COMPILE/FDEBUG rather than FDEBUG/ZF.  Version 13.0 of CFORTRAN has
+these changes.  This stuff fixes the problem where a syntax error in a
+RUN command dumped you back to TYMEX instead of returning to CFORTRAN.
+
+/NONSTANDARD and SETPROCS now work together correctly.
+
+In SFORTRAN-editor mode the default processor is now SFO instead of F40.
+
+/SAVE(filename) and /SSAVE(filename) which send filename/14Y and
+filename/15Y to the loader have been added.  When implemented in the
+loader, this will provide the capability of making save files without
+giving a monitor SAVE command.
+
+It used to be that if you had operator license set and gave a CTEST
+POSTMAN command instead of just POSTMAN you would get to see everyone's
+mail rather than just your own.  I took this out.  There is now no
+distinction at any time between CTEST anything and just a plain command.
+
+That's all except for a lot of internal changes to clean up the
+code and fix the bit shortage.
+
+# 02-18-73 RPG VERSION 111.7
+--------------------------------------
+
+1) COPY "WILDCARD" LOGIC WAS IMPLEMENTED IN THIS VERSION OF RPG.
+    A NEW VERSION OF PIP (#33.7) WILL BE REQUIRED TO RUN WITH THIS
+    VERSION OF RPG, IN ORDER TO USE THE NEW COPY LOGIC.  THE CHANGES
+    MADE TO RPG WERE:
+
+        A). RPG NOW CONVERTS ALL OCCURRENCES OF "#" IN A FILE-
+            SPECIFICATION TO THE COPY COMMAND TO "?".
+        B). A "/X" SWITCH IS WRITTEN IN THE OUTPUT STRING FROM THE COPY
+            COMMAND IN ALL INSTANCES, EXCEPT WHEN COPYING TO A FILE
+            FROM TELETYPE OR WHEN CONCATENATING SEVERAL FILES INTO ONE 
+            FILE USING "COPY".
+
+
+2) THREE BUGS WERE FIXED IN THE MAIL COMMAND:
+        A). THE GARBAGING PROBLEM AT THE END OF LONG LETTERS WHICH
+            WAS CAUSED BY BUFFER OVERFLOWING HAS BEEN FIXED.
+        B). TWO PROBLEMS IN SENDING "LETTER-FILES" (I.E.,
+                "SEND USERNAME
+                 TYPE LETTER:
+                 @FILE.EXT"  )
+            THIS SHOULD NOW BE POSSIBLE FOR LETTERS WHICH ARE SHORTER
+            THAN THE MAXIMUM PERMISSIBLE LETTER SIZE.  (NOTE, HOWEVER,
+            THAT FILES WHICH ARE LONGER (!!) THAN THIS SIZE
+            ARE NOT (!!) CURRENTLY BROKEN UP INTO SEVERAL SMALLER 
+            LETTERS OR OTHERWISE HANDLED SENSIBLY.  RATHER, RPG GIVES 
+            THE USER A "BAD FILE" MESSAGE.
+
+
+3) THE INTERFACE WITH PERFORM WAS RE-WRITTEN SO THAT IT DOES NOT STRIP
+    RPG OF HOME-FILES (HF) LICENSE.  (IT WAS ALSO CLEANED UP IN THE 
+    PROCESS.)  THIS CHANGE REQUIRES A NEW VERSION OF PERFORM WITH SOME
+    TRIVIAL CHANGES TO BE ON THE SYSTEM (SYS).
+
+
+4) TWO BUGS IN THE LISTER CODE SECTION WERE FIXED:  IT IS NOW POSSIBLE
+    TO SPECIFY FILENAMES FROM ANOTHER USER'S DIRECTORY INSIDE AN 
+    INDIRET FILE AND TO PROCEED SUCH A FILE WITH ANY VALID LISTER 
+    SWITCH WITHOUT CAUSING RPG ANY PROBLEMS.
+
+
+5) THE "RENAME" COMMAND HAS BEEN RE-WRITTEN TO ACCEPT INDIRECT FILES.
+    (I.E., YOU CAN NOW SAY:  "RENAME @FOO")
+
+
+6) A NUMBER OF PROBLEMS RELATING TO THE USE OF INDIRECT FILES
+    CONTAINING RPG COMMAND STRINGS WERE FIXED.  MOST OF THESE PROBLEMS
+    ARE CAUSED BY THE FACT THAT RPG HAS NO SET CONVENTION ABOUT THE
+    USE OF SCRATCH ACCUMULATORS.  EVEN THOUGH THESE PROBLEMS WERE
+    FIXED, THE LACK OF A POLICY ON SCRATCH ACCUMULATORS REMAINS AND 
+    WILL LIKELY BE THE CAUSE OF TROUBLE IN THE FUTURE.
+
+
+7) A CIRCUMSTANCE IN WHICH A NONSENSICAL RUN-CALL TO LOADER WAS
+    MADE IS NOW CHECKED FORAVOIDED.
+
+DOCUMENTATION FOR RPG -- VERSION 111.6
+--------------------------------------
+
+TWO BUGS WERE FIXED IN THIS VERSION.  THE FIRST INVOLVED A PROBLEM IN
+GETTING THE PROPER FILE PROTECTION VALUES WHEN USING THE LONG FORM
+OF THE "DECLARE" COMMAND.   THIS HAS BEEN FIXED.
+
+THE SECOND BUG REPORT INVOLVED THE CREATION OF A MAIL FILE "XOBLAM"
+IN THE USER'S DIRECTORY IF LOOKUP ON THAT FILE IN DIRECTORY "SYS" 
+FAILED.  THIS HAS BEEN CHANGED SO THAT "XOBLAM" IS CREATED ON "SYS"
+IN THE EVENT OF A LOOKUP FAILURE (I.E., WHEN THERE IS NO FILE BY THAT
+NAME).
+
+ALSO NEW IN THIS VERSION OF RPG IS THE IMPLEMENTATION OF COMMAND FILES
+FOR THE "DIFFERENCES" COMMAND.  HENCE, IT IS NOW POSSIBLE TO SAY
+"DIFFER @FOO" WHERE "FOO" CONTAINS A VALID LIST OF FILCOM COMMANDS.
+(THIS WAS NOT POSSIBLE ON THE PREVIOUS VERSION OF FILCOM, HOWEVER
+THE CURRENT VERSION HAS BEEN ALTERED TO ACCEPT MULTIPLE LINE INPUT FROM
+TMPCOR FILES.)
+
+THREE NEW SWITCHES WERE ADDED TO THE "DIFFERENCES" COMMAND FOR USE WITH
+THE NEW FILCOM.  THEY ARE:
+RPG SWITCH      FILCOM SWITCH    FUNCTION
+-----------------------------------------
+
+/QUICK          /Q              QUICK COMPARE ONLY, I.E., GIVE A
+                                MESSAGE IF FILE DIFFERS OR NOT
+/HELP           /H              TYPES A BRIEF DESCRIPTION OF FILCOM:
+                                ITS FUNCTIONS, SYNTAX, AND SWITCHES
+/UPDATE         /U              COMPARE IN ASCII UPDATE MODE (I.E., LIST
+                                SECOND FILE WITH A "\" ON LINES THAT ARE
+                                NEW.
+
+DOCUMENTATION FOR RPG -- VERSION 111.3
+--------------------------------------
+
+COMMAND FILES CAN NOW BE PROCESSED BY RPG FOR THE FOLLOWING PROGRAMS:
+
+        DIRIT   PIP     LISTER    LOADER
+
+
+SWITCHES NESTED WITHIN THE COMMAND FILES THEMSELVES AND WITHIN THE
+COMMAND FROM THE TTY ARE NOW ACCEPTABLE.  THUS THE FOLLOWING WILL WORK:
+
+           DIR @CMDFIL/EVE, RPG.*, LOADER.INF, INF###.NEW
+           FILES @FOO/SEC, BAZ,TMP, SNORG.ALL
+           TYPE A, B, @C/LOL 140, D
+           LIST BAR, @SNUK/NOC/QUE, FOONLY.DED
+           LOAD @SPICE, SUGAR, NICE%T
+
+DOCUMENTATION FOR RPG -- VERSIONS 111.1 AND 111.2
+------------------------------------------------------------
+
+THESE VERSIONS OF RPG FIX EIGHT BUGS (ONE UNREPORTED), IMPLEMENT ONE
+
+DEVELOPMENT REQUEST, AND PROVIDE THE LOGIC FOR AN INTERFACE
+WITH THE "PERFORM" PROGRAM.  THE BUGS ARE AS FOLLOWS:
+
+1).  #20480 -- THE "SEND" COMMAND USED TO GIVE A DSK ADDRESS
+	CHECK ERROR WHEN REFERENCING A COMMAND FILE FULL OF USER
+	NAMES.  IT NOW WORKS PROPERLY (I.E., SEND @FOO, 
+	WHERE "FOO" IS A FILE CONTAINING A LIST OF USER
+	NAMES, IS HANDLED CORRECTLY.)
+
+2).  SEMI-COLONS NOW WORK AS LINE CONTINUATION CHARACTERS IN
+	COMMANDS TO "SEND" AND "SEND" COMMAND FILES.  THIS HAD
+	BEEN A BUG, ALTHOUGH IT HAD NOT BEEN REPORTED.  THE
+	FOLLOWING COMMAND NOW WORKS PROPERLY:
+
+		-SEND EVR:GJM:TOM:;
+		 WFW:WORKING:JIMF
+
+	THE SEMI-COLON ALSO WORKS INSIDE COMMAND FILES WHEN 
+	"SEND"ING A LETTER.
+
+3).  #21154 --  "FDC" NOW GIVES THE PROPER DEFAULT VALUES FOR 
+	YOUR DIRECTORY.  BY TYPING A DASH TO THE QUESTIONS 
+	"ACCOUNT" AND "PUBLIC", YOU NOW GET THE LATEST DEFAULT
+	ASSIGNMENT FROM THE CURRENT VERSION OF THE MONITOR.
+	
+	TO WIT:
+
+		-FDC
+		    ALLOW ACCOUNT?:  -
+		    	   PUBLIC?:  -
+		-PFDC
+		    ACCOUNT:  SHARABLE LISTABLE
+		    PUBLIC:	SHARABLE
+	
+	RPG NOW CONSULTS THE MONITOR ON DEFAULT VALUES FOR
+	THE "DECLARE" COMMAND AS WELL, IN ORDER TO BE COMPATIBLE
+	WITH FUTURE MONITORS.
+
+4).  #21573 --  "COPY" TO AN APPENDABLE FILE DOES NOT WORK.
+	THIS IS NOT A BUG IN RPG, BUT A DELIBERATE LIMITATION
+	ON THE POWER OF "PIP".  THE ERROR MESSAGE WHICH
+	"PIP" PRODUCES, HOWEVER, LEAVES SOMETHING TO
+	BE DESIRED.  AGAIN, NOT A BUG IN RPG.
+
+5).  A BUG WHICH WAS NOT SUBMITTED IN A FORMAL REPORT, BUT
+	CAUSED QUITE A BIT OF CONSTERNATION NONETHELESS, WAS
+	HARRY BOWER'S FAMOUS TMPCOR-COMMAND-FILE-GARBAGING
+	BUG. THE BUG WAS INTRODUCED IN SOME CHANGES WHICH MIKE
+	GEARY MADE TO VERSION 110.2. , BUT HAS BEEN FIXED BY
+	MIKE IN THE CURRENT VERSION.
+
+(VERSION 111.2)
+
+6).  #21648 -- THE "/NAME" FILENAME SCANNING BUG HAS BEEN
+	FIXED IN THE CURRENT VERSION.  THE PROBLEM HAS ARISEN 
+	WHEN THE DESIRED FILENAME WAS GIVEN AN EXTENSION
+	AS IN "LOAD /NAME FOONLY.NEW".  THIS NOW WORKS PROPERLY
+	WITHIN RPG; IT DOES NOT, HOWEVER, WORK WITHIN THE LOADER 
+	JUST YET.  I'LL GET TO THAT SHORTLY.
+	
+7).  #21791 -- MIKE GEARY'S FAMOUS DEVELOPMENT REQUEST QUA BUG
+	REPORT.  THE REQUESTED FEATURE HAS BEEN ADDED: 
+	SWITCHES TO THE LOADER ARE NOW LEGAL WITHOUT AN
+	ADJACENT FILENAME.  (E.G., "LOAD %S%T,FOO")
+
+8).  #21650 -- A SWITCH FOLLOWING A COMMAND FILE NOW DOES 
+	THE CORRECT THING FOR BOTH THE "FILES" AND "DIRECTORY"
+	COMMANDS.  WHERE FILE "FOO.CMD" CONTAINS "A.*,B.*", OR
+	ITS EQUIVALENT, THE FOLLOWING WILL NOW WORK PROPERLY:
+
+		-FI @FOO /TIM, RPG.*
+
+	THIS WAS NOT THE CASE PREVIOUSLY; RPG WOULD
+	BALK WHEN IT CAME TO THE SWITCH AND CEASE PROCESSING
+	OF THE COMMAND.  HOWEVER, FIXING THIS BUG GIVES RISE TO
+	AN AWARENESS OF OTHER LIMITATIONS IN RPG.  FOR INSTANCE,
+	THERE IS NO LOGIC WITHIN THE "FILES" AND "DIRECTORY"
+	NESTING LOGIC TO ALLOW FOR SEVERAL LINES OF COMMANDS
+	WITHIN AN INDIRECT ("COMMAND") FILE.  THIS SHOULD BE
+	FIXED, AND I'LL TRY TO DO IT AS SOON AS I
+	CAN FIND THE TIME.
+
+
+
+THE FINAL ITEM OF INTEREST IS THE ADDITION OF "PERFORM HOOKS" 
+INTO RPG.  THE LOGIC FOR A SMOOTH, ALTHOUGH SOMEWHAT WASTEFUL,
+INTERFACE BETWEEN RPG AND "PERFORM" HAS NOW BEEN COMPLETED.
+
+IN GENERAL, IT SHOULD BE INVISIBLE TO THE USER, WHO SHOULD
+BE MADE TO BELIEVE THAT "PERFORM" IS EXECUTING ALL THOSE
+COMMANDS FOR HIM.
+   {3%mÿ
