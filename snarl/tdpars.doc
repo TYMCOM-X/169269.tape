@@ -1,0 +1,796 @@
+
+
+
+                        ************************
+
+                                 TDPARS
+
+                        Description of a General
+                          Top-Down Parser for
+                            Application Use
+
+                           September 13, 1979
+                              Adele Gadol
+
+                        ************************
+
+
+
+                           Table of Contents                             
+
+
+
+
+
+Section                                                             Page
+
+
+
+
+1.     General information    .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.1    Design objectives  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.2    References      .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.3    Function        .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+
+2.     The grammar            .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       2.1    Symbol types    .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+       2.2    Grammar structure  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+
+3.     Features of this parser   .  .  .  .  .  .  .  .  .  .  .  .  . 3
+
+       3.1    The pieces needed to interpret commands .  .  .  .  .  . 3
+
+       3.2    Special syntax or semantic routines  .  .  .  .  .  .  . 4
+
+       3.3    Saving intermediate results .  .  .  .  .  .  .  .  .  . 5
+
+       3.4    Error handling  .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+
+
+4.     Data structures        .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+
+       4.1    Token table     .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+
+       4.2    Error message array   .  .  .  .  .  .  .  .  .  .  .  . 6
+
+       4.3    Dictionary layout  .  .  .  .  .  .  .  .  .  .  .  .  . 6
+
+       4.4    The token entry list  .  .  .  .  .  .  .  .  .  .  .  . 7
+
+       4.5    Parsing graph   .  .  .  .  .  .  .  .  .  .  .  .  .  . 8
+
+
+5.     Subroutines and how they are used  .  .  .  .  .  .  .  .  .  . 9
+
+       5.1    From the standard TDPARS file  .  .  .  .  .  .  .  .  . 9
+
+
+                                   i
+
+
+
+       5.2    From the parsing library .  .  .  .  .  .  .  .  .  .   10
+
+
+6.     Building a parser using TDPARS  .  .  .  .  .  .  .  .  .  .   11
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   ii
+
+
+
+1    General information      
+
+
+
+1.1    Design objectives        
+
+     The initial goal of this  project was to build the  command handler
+for  the  SNARL program  which,  for  a utility  program,  has  a rather
+extensive set  of commands.   I wanted something  which could  be easily
+modified without debugging each  change.  The result was a  more general
+tool  with  which  to  build a  wide  variety  of  command  handlers for
+applications  programs written  in SAIL.   To that  end, I  felt  it was
+necessary to  have a  relatively simple  parser which  would be  easy to
+understand and use and which would be compact.
+
+
+
+1.2    References       
+
+     Read the  documentation on the  program TABGEN for  instructions on
+building  a  configured  parser  from  the  sample  software  and  a BNF
+description of the desired language.
+
+     For background reading on  parsers in general and  top-down parsers
+in particular, try COMPILER CONSTRUCTION FOR DIGITAL COMPUTERS  by David
+Gries.
+
+
+
+1.3    Function       
+
+     The function of a parser is to determine whether the input given it
+is  legal  according to  a  description for  building  the  proper input
+entities.  The parser will also  construct a graph of the  derivation of
+the  particular form  is is  looking at.   The grammar  (or description)
+could be a set of rules defining legal statements, phrases, or perhaps a
+whole program.
+
+     TDPARS is a top-down parser and works from a tree-structured set of
+rules.  The grammar may contain rules with left recursion but  not right
+recursion.  The parsing graph is built starting at the root  and working
+to the branches  with the input being  scanned and matched from  left to
+right.  A graph of the input showing the rules used during the  parse is
+produced.  These structures are described in Section 4.
+
+
+
+
+2    The grammar      
+
+
+
+
+
+
+
+                                   1
+
+
+
+2.1    Symbol types        
+
+     A legal grammar for  this parser will contain the  following symbol
+types.
+
+Terminal symbols 
+These  symbols  are  the  primitive  elements  of  the  language.   When
+expresses in a grammar description, they need no further definition.
+
+User-defined terminals 
+A user-defined terminal is really a special case of the terminal symbol.
+It is an element that is handled in a special way by the pre-scanner and
+"tokenized" as a terminal symbol.
+
+Non-terminal symbol 
+This symbol type  is not a  primitive and must be  defined by a  rule or
+production of the grammar.   There may be several  different definitions
+of a non-terminal symbol.
+
+The goal symbol  
+The goal symbol  is a non-terminal symbol  which appears in  the grammar
+description  only  once.   During  parsing,  this  is  the  symbol whose
+production rule must be satisfied in order for the parse to succeed.
+
+
+
+2.2    Grammar structure        
+
+     The  grammar is  expressed as  a set  of rules,  each one  of which
+contains a  non-terminal symbol  and a set  of possible  definitions for
+that symbol.  A symbolic expression of the grammar in BNF lists the non-
+terminal  to be  defined on  the left  hand side  of the  rule,  and the
+definitions on the right hand side.  Non-terminal symbols may  appear in
+the right hand side, but they must be further defined by other rules.
+
+     An error  message may  be associated with  each rule.   See Section
+3.4 for an explanation of parser treatment of these messages.
+
+     A  subroutine,  which  will  be executed  by  the  parser  upon the
+successful  application of  a production,  may be  associated  with each
+rule.  See also Section 3.2.
+
+     The parser uses an internal  description of a grammar to  parse the
+input given  it.  Information about  building a grammar  description and
+converting  it to  a  form which  the parser  can  use is  found  in the
+description of the program TABGEN.
+
+
+
+
+
+
+
+
+
+
+                                   2
+
+
+
+3    Features of this parser        
+
+     The term  "parser" has been  used to refer  to the entire  piece of
+configured  software which  recognizes  the input.   However,  there are
+several steps in the whole process, some of which must be customized for
+a particular application by  the user.  The table generator  TABGEN does
+much of the job of configuring a parser, but it may be necessary for the
+user to modify or rewrite  the sample scanning routines to  suit his/her
+needs.  In order  to do that,  it is important  to know how  the various
+pieces function in this system.  It might be helpful to look at a sample
+configured parser, such as SNPARS, while reading the following sections.
+
+
+
+3.1    The pieces needed to interpret commands            
+
+
+3.1.1    The PRE!SCAN routine           
+
+     This routine  will probably  require modifications  by the  user to
+adapt it to specific needs.  PRE!SCAN and the subroutines that  it calls
+serve the purpose  of "tokenizing" the input  line, breaking it  up into
+the data types (terminal symbols)  which will be recognized by  the rest
+of the parser.  When PRE!SCAN has successfully finished with  the input,
+it has  created the token  entry portion of  the parsing  graph.  Notice
+that the sample PRE!SCAN uses  a keyword array to determine  whether the
+alphabetic symbol it has found is a keyword.  Keywords could, of course,
+be described  entirely within  the grammar rules  as could  integers and
+other multi-character entities, the trade-off being the run-time storage
+needed to hold the much larger parsing graph instead of the code to pick
+apart these symbols during a first pass over the input.  This is  one of
+the decisions the user must make.
+
+
+3.1.2    PARSE         
+
+     PARSE is the subroutine  that does the actual top-down  tree search
+and input match and builds the remainder of the parsing graph, returning
+a pointer  to the  beginning of  the tree  structure if  successful.  It
+draws  input from  the  token entries  in PGRAPH  using  CHECK!SYM which
+serves the dual  purpose of scanner and  symbol matcher.  PARSE  and the
+routines ultimately called by it should not require modifications.
+
+     The algorithm that is  used goes as follows.  The  grammar contains
+one and only one rule whose left  hand side is the goal node; that  is a
+node which appears only once, as the left hand side.  This rule  must be
+satisfied with the  entire input string used  in order for the  parse to
+succeed.   The parse  starts  the selection  of this  rule  and the
+matching of input to it.   When a non-terminal node occurs on  the right
+hand side of  the rule, the  parse routine must  now work with  the next
+level of  the grammar tree.   It finds the  set of rules  comprising the
+definition of the  given symbol and starts  testing the first  rule.  It
+tries  each  one  in  turn  until  a  rule  succeeds  or  until  all the
+
+
+
+                                   3
+
+
+
+alternatives have been tried.  At each failure, PARSE must  backtrack in
+the input string and in  the graph being built to the  appropriate point
+where matching began.  Still lower  levels of the tree are  reached when
+non-terminals are found in the grammar rules.
+
+
+3.1.2.1    INIT!GRAPH           
+
+     This subroutine initializes the  parsing graph.  It must  be called
+during  the command  loop of  the  user program  to clear  the  graph as
+desired.
+
+
+3.1.3    FINDGRM         
+This  routine aids  the user  in  utilizing PARSE  on a  portion  of the
+grammar.  FINDGRM finds the index in GRAMR, the stored representation of
+the grammar rules, of the rule it is told to search for.  It looks for a
+match on a given token value  which is found in the left-hand side  of a
+rule.  Since PARSE  requires as a parameter  the index of a  stored rule
+which it  is to  use, it  can be  forced to  use only  a portion  of the
+grammar by calling it with the index of the rule which forms the root of
+the portion desired.  FINDGRM aids in locating that index.
+
+
+3.1.4    Other routines          
+
+     Other routines, such  as error reporting  routines may be  added as
+desired or  modified from some  of the samples.   There will be  more on
+this is the following sections.
+
+
+3.1.5    The dictionary          
+
+     An internal representation of the grammar, the dictionary,  must be
+a part of the run-time package.  TABGEN creates the SAIL source  for the
+dictionary from a BNF description of the language.
+
+
+
+3.2    Special syntax or semantic routines           
+
+     Each grammar rule (a left-hand side and its alternatives)  may have
+associated with  it one  special routine  which is  to be  executed upon
+successful application of that rule during the parse.  (Look at  the the
+case statement in  PARSE.) The routines must  be supplied in  the user's
+program,  and  the  names  of  the  routines  incorporated  in  the  BNF
+description of the language  which the user supplies to  TABGEN.  TABGEN
+takes care of building the  case statement in the PARSE routine  and the
+necessary external  references.  Each  of the  user subroutines  must be
+callable with one integer parameter which will be the index in PGRAPH of
+the root of the structure just completed.
+
+
+
+
+
+                                   4
+
+
+
+3.3    Saving intermediate results         
+
+     A special semantic routine supplied by the user to be called during
+parsing  may  store  an  intermediate result  on  the  tree.   A library
+routine, PRUNE, may be called by the user's routine to store  the result
+and clean up the associated branch of the tree.
+
+
+
+3.4    Error handling        
+
+     The  user may  associate an  error message  with each  rule  in the
+grammar  by  including  them  in the  BNF  description  of  the language
+processed by TABGEN.  The messages are compiled into a string  array and
+referenced by index within  the grammar rules.  While PARSE  is building
+the parse  graph, it  saves the pointer  to the  input token  entry, the
+CURSOR, whenever it advances the pointer to a position which  is further
+in the input than it has been before.  Whenever it saves the  cursor, it
+also  saves  the  associated  message  index  (or  0  if   none),  which
+corresponds  to  the  rule   currently  being  applied.   If   PARSE  is
+unsuccessful, the  integer CURHGH  will be  the maximum  cursor position
+achieved, and the integer MSGHGH will be the index of the  error message
+corresponding to the rule which failed at that maximum  cursor position.
+In  the  parser  example,  the  routine  PRSERR  uses  those  pieces  of
+information to print a "^" under the offending input in the user command
+followed by the error message.   Other types of error routines  could be
+used instead.
+
+
+
+
+4    Data structures      
+
+
+
+4.1    Token table        
+
+At run time, the following arrays will exist.
+
+KEYWRD
+This is a string array with each element a keyword identifier or special
+character.  Each of these is a primitive element in the grammar which is
+typed exactly as described in the language description.
+
+KEYTOK
+This is the companion array to KEYWRD which relates each of the keywords
+to  a  token  number.   This  is  an  integer  array  set  up  such that
+KEYTOK(I)=token # for the string in KEYWRD(I).
+
+
+
+
+
+
+
+
+                                   5
+
+
+
+4.2    Error message array         
+
+     A string  array called  MESSGS, each  element containing  one error
+message, will be included.
+
+
+
+4.3    Dictionary layout        
+
+     Imagine the representation in BNF of the parsing rules defining the
+grammar.  The dictionary is  the internal representation of  those rules
+which is needed  by the parser  at run time.   It resides in  an integer
+array  called  GRAMR.  There  are  four element  types:   left-hand side
+elements representing the start of a symbol  definition, right-hand-side
+links representing the beginning of the rule definition, right-hand side
+elements representing the pieces of the rule definition, and  an end-of-
+chain marker.  The first three have three 12-bit fields.
+
+
+4.3.1    Left-hand-side elements of rules            
+
+                       -------------------
+                       | TKN | ROU | ERR |
+                       -------------------
+
+TKN
+This is the  token number.  Values greater  than or equal to  octal 4000
+signify terminal elements of the grammer; the others are non-terminals.
+
+ROU
+This is a pointer to a  semantic or special syntax routine which  can be
+supplied by the user  program and which will  be called by PARSE  upon a
+successful match of  the input string  with the corresponding  rule.  It
+is, in  fact, an  index into a  case statement  on the  special routines
+which will be found in the configured parser.  (Look at the code  in the
+PARSE subroutine in a  configured example, such as SNPARS.)  To indicate
+that this  element represents a  left side, the  4000 bit in  this field
+will be set.
+
+ERR
+This is a pointer to an error message, actually an index into the string
+array MESSGS.  PARSE keeps track of the error messages such that the one
+corresponding to  the deepest  level of the  grammar reached  during the
+parse  will be  available for  printing if  the input  cannot  be parsed
+successfully.
+
+
+4.3.2    Right-hand-side links          
+
+                         ----------------------
+                         | 4000 | NLFT | SUCC |
+                         ----------------------
+One  of  these  nodes  follows  immediately  after  each  left-hand-side
+element.
+
+
+                                   6
+
+
+
+NLFT
+This  is  an array  index  to  the next  left-hand-side  element  in the
+grammar.
+
+SUCC
+This  is the  array pointer  to the  successor or  first right-hand-side
+element (normally the next position in the array) defining the left-hand
+symbol.  If SUCC=0, there is no successor, and the production  rule will
+always fail.  The use of such  an element makes it easy to  alter, under
+program control, the set of  commands available for use by  changing the
+value of SUCC.
+
+4.3.3    Right-hand-side elements          
+
+                          --------------------
+                          | TKN | DEF | FAIL |
+                          --------------------
+
+TKN
+This is the token number.
+
+DEF
+If  TKN denotes  a non-terminal  symbol, then  DEF is  a pointer  to its
+definition (an  array index  into GRAMR  indicating the  left side  of a
+rule).  The 4000 bit of this field is 0 to mark a right hand element.
+
+FAIL
+This is  a pointer (array  index) to the  next alternative if  this rule
+fails.  A null (zero) value indicates no more alternatives.
+
+NOTE:  The successor (next element  in rule) always follows at  the next
+location in the array.  The end  of a rule is represented by  an end-of-
+chain marker.
+
+
+4.3.4    End-of-chain marker          
+
+     This entity marks  the end of  a right-hand-side rule  or successor
+list.  It is simply a null (zero) word.
+
+
+
+4.4    The token entry list          
+
+     The token entry  list is built by  the pre-scanning operation  as a
+representation of the tokens found  in the input line, CMDSTR.  It  is a
+forward linked list in  which each entry contains information  about the
+type of  the token  and pointers to  the actual  string quantity  in the
+input.  It is implemented by the following SAIL record class.
+
+r!c tokent                      \ The token entry list;
+  (integer token,               \ token number;
+  pos,                          \ position in CMDSTR;
+  len;                          \ length of token string;
+
+
+                                   7
+
+
+
+  r!p (tokent) next);           \ next token entry;
+
+r!p (tokent) tokhed,            \ beginning of token list;
+  toktop,                       \ pointer to last token entry;
+  cursor;                       \ current token during parsing;
+
+
+
+4.5    Parsing graph        
+
+     The parsing graph, a  tree structure, is the representation  of the
+input sentence which is built  by the PARSE routine.  The  parsing graph
+will occupy  a record class  in which each  complete entry in  the class
+represents a node in the tree.
+
+     Intermediate  results  are  stored  in  separate  structures  whose
+entries are  pointed at  by pointers in  the parsing  graph.  Additional
+types and result structures could be defined by the programmer.
+
+r!c pgraph                      \ The parsing graph;
+  (integer tkn,                 \ token number;
+  type;                         \ type of result, if any;
+  r!p def,                      \ ptr to definition of node;
+  succ,                         \ ptr to successor node;
+  result);                      \ ptr to result, if any;
+
+r!p pgrhed;                     \ ptr to beginning of PGRAPH;
+
+r!c intres                      \ storage for integer results;
+  (integer intval);             \ the value;
+r!c strres                      \ storage for string results;
+  (string strval);              \ the value;
+
+
+4.5.1    Terminal nodes          
+
+     These  locate the  terminal symbols  found in  the input.   In this
+node,  the  portions  of  each record  class  entry  have  the following
+meanings.
+
+TKN  This is the token number.  It will have a value greater  than octal
+     4000 indicating a terminal symbol.
+
+TYPE This will not have a meaningful value here.
+
+DEF  This  will point  at  the corresponding  entry in  the  token list,
+     TOKENT.
+
+SUCC This points at  the successor or next  element in the  input parse.
+     If the value is null, then this node is the last one in  this level
+     of the tree.
+
+RESULT This will not have a meaningful value here.
+
+
+
+                                   8
+
+
+
+4.5.2    Non-terminal nodes          
+
+     These locate  the meta  symbols encountered  during the  parse.  In
+this node, the  portions of each record  class entry have  the following
+meanings.
+
+TKN  This is the token number as before.  It will have a value less than
+     octal 4000.
+
+TYPE  This may  contain an  indicator of the  type of  the result  if an
+     intermediate result has been stored here.
+
+DEF  This will point to the  place in the parsing graph  structure where
+     this symbol is defined (further reduced).
+
+SUCC  This points to the successor element.
+
+RESULT  If an intermediate result was stored at this point,  RESULT will
+     point to the proper entry in one of the result classes.
+
+
+
+
+5    Subroutines and how they are used          
+
+
+
+5.1    From the standard TDPARS file           
+
+RECURSIVE R!P PROCEDURE reset!cursor (R!P link);
+     This routine finds and  returns the new cursor position  which must
+be moved as  a result of  backtracking on the  parse graph by  the parse
+routine.  The "link" parameter is a pointer to the position in the graph
+where a branch was erased ("pruned").
+
+RECURSIVE R!P PROCEDURE free!graph (R!P link);
+     This  procedure  frees the  parsing  graph from  the  given pointer
+position to the ends.
+
+R!P PROCEDURE newnod (INTEGER dict);
+     This  procedure gets  and initializes  a new  node for  the parsing
+graph.  The parameter "dict" is an array pointer to a grammar element in
+the dictionary.  The element type is used to initialize the type  of the
+new graph node.  NEWNOD returns the pointer to the new node.
+
+RECURSIVE R!P PROCEDURE parse (INTEGER dict,msglst(0));
+     This is the  routine which builds  the parsing graph  including all
+necessary linking to complete the tree structure.  It ultimately returns
+to the caller  a pointer to  the first element  of the structure  if the
+parse was successful.  If unsuccessful, it returns N!R.
+     The parameter "dict" is an  array index to the rule of  the grammar
+that parse should begin with (usually the goal symbol production).
+     "msglst" is usually not supplied by the caller.  It is used to keep
+
+
+
+                                   9
+
+
+
+track of  the current message  which is associated  with the  rule being
+checked.  When "parse" calls itself, it will pass the value  of "msglst"
+to the next level.
+
+INTERNAL PROCEDURE init!graph;
+     This routine resets the graph  back to its null state and  puts the
+pointers back to their initial values.
+
+
+
+5.2    From the parsing library          
+
+R!P PROCEDURE chksym (INTEGER toknum);
+     This  procedure  functions  as  the  scanner  and  symbol  matcher.
+"toknum" is  the token number  needed for a  match.  If the  next symbol
+called for in a parsing rule is a terminal, then this routine  is called
+to get the next  input token and check  if it matches "toknum",  the one
+required.  If successful, CHKSYM returns a pointer to the token entry in
+PGRAPH.  If unsuccessful, it returns N!R.
+     This  routine matches  both keyword  tokens and  identifiers  to an
+identifier.   If  this  is  unacceptable,  then  the  programmer  should
+substitute an equivalent routine.
+
+PROCEDURE prserr;
+     This  routine  prints out  the  appropriate error  message  after a
+failed  parse.  It  first puts  out the  command (or  command line  if a
+multiple-line command) followed  by a line with  a pointer to  the piece
+where  the  failure  was  discovered  followed  by  the   error  message
+associated with one of the grammar rules.
+
+PROCEDURE alpha (INTEGER char);
+     This  procedure  returns TRUE  if  "char" is  alphabetic  and FALSE
+otherwise.
+
+PROCEDURE digchk (INTEGER char);
+     This  procedure  returns TRUE  if  "char" is  a  digit  and "FALSE"
+otherwise.
+
+INTEGER PROCEDURE keychk (STRING find);
+     This routine checks to see  whether "find" is in the  keyword table
+and returns the correct  token number if it  is.  If not a  keyword, the
+routine returns a zero.
+
+PROCEDURE brkset;
+     This is a sample procedure to set break tables which is a companion
+to the sample pre-scanner (used in SNARL) included in the library.
+
+BOOLEAN PROCEDURE pre!scan;
+     This sample pre-scanner (used in SNARL) reads the input command and
+makes a token list which points at the terminal symbols in the assembled
+input string.  The command is fully expanded before processing; in other
+words, a command file call is processed and the text retrieved.  Leading
+white space at  the beginning of a  command and trailing white  space on
+
+
+
+                                   10
+
+
+
+all lines of  a command will be  purged by the routine.   Characters are
+shifted to upper case.
+     Each input line  (everything up to a  CR-LF sequence) may be  up to
+132 characters in length.
+     Special processing is done for all the user-defined terminals which
+are in the SNARL grammar.
+
+INTEGER PROCEDURE fndgrm (INTEGER toknum);
+     This procedure searches  the stored grammar representation  for the
+beginning of the rule which defines the token "toknum".   If successful,
+the  array index  in DICT  of  the rule  is returned;  zero  is returned
+otherwise.  The value "toknum" must represent a non-terminal symbol.
+     This routine is used when a program needs to call PARSE on a branch
+or subset of the grammar.  It  can use FNDGRM to locate the  array index
+which must be used as a parameter to PARSE.
+
+RECURSIVE R!P PROCEDURE fndtok (R!P link; INTEGER toknum);
+     This procedure searches the parsing graph, starting at  "link", for
+the token whose value is "toknum".  If successful, a pointer to the node
+containing the  token is returned.   N!R is returned  otherwise.  FNDTOK
+goes for depth in the tree before successor elements.
+
+PROCEDURE st!int (R!P link; INTEGER result);
+     This procedure stores the intermediate result "result" at the place
+in the parsing  graph pointed to by  "link".  The position  pointer must
+point at a non-terminal symbol.  The remainder of that branch  is pruned
+(storage removed).
+
+PROCEDURE st!str (R!P link; STRING result);
+     This procedure works the same as ST!INT for string results.
+
+PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match);
+     This procedure  fixes the right-hand-side  links in the  grammar so
+that the  designated rules are  removed from the  set of  grammar rules.
+"Tknlst" is an  array of token  values each representing  the left-hand-
+side of  a rule.  If  "match" is TRUE,  then all rules  whose left-hand-
+sides match an entry in  "tknlst" will be removed from the  command set.
+If "match is  FALSE, then all rules  whose left-hand-sides do  not match
+any entry in "tknlst" will be removed.  If the "tknlst" array contains a
+0 value in the first word, then the whole set of rules is set to be used
+(no elements removed).
+
+
+
+
+6    Building a parser using TDPARS         
+
+                       *****  more to come  *****
+
+
+
+
+
+
+
+
+                                   11
+ +@T=
