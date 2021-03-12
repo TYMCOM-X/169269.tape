@@ -1,0 +1,162 @@
+ENTRY pre!scan, chksym;
+BEGIN
+
+REQUIRE "tbgsym.sai" SOURCE!FILE;
+
+LET R!P = RECORD!POINTER;
+LET R!C = RECORD!CLASS;
+LET n!r = null!record;
+DEFINE \ = "COMMENT";
+DEFINE crlf="('15&'12)", cr='15, lf='12, tab='11;
+
+EXTERNAL STRING cmdstr;							\ The user command;
+
+INTEGER line!brk, sp!brk, id!brk, str!brk, num!brk;
+
+PROCEDURE brkset;
+	\ This routine initializes the break tables needed by "pre!scan"
+in order to do the prelimary scan of the input line;
+BEGIN
+   STRING alphas, digits;
+   alphas_"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   digits_"0123456789";
+   line!brk_getbreak;
+   setbreak(line!brk,"_"&lf&cr&tab&" ",cr,"kin");
+   sp!brk_getbreak;
+   setbreak(sp!brk," "&tab,null,"xrn");
+   id!brk_getbreak;
+   setbreak(id!brk,alphas&digits&"!",null,"xrn");
+   str!brk_getbreak;
+   setbreak(str!brk,"'"&""""&lf,null,"ins");
+   num!brk_getbreak;
+   setbreak(num!brk,digits,null,"xrn");
+END;
+
+
+INTERNAL BOOLEAN PROCEDURE pre!scan;
+	\ This routine does the preliminary scanning and "tokenization"
+of the input lines to TABGEN.  It has the following characteristics:
+(1) Blanks and tabs serve as break characters for termination of the
+    other entities in the grammar.
+(2) Lower case characters are converted to upper case.
+(3) Leading and trailing white space on each command is removed.  Excess
+    white space within the commands is also removed.
+(4) At this point, "pre!scan" does not handle arbitrarily long lines.  A
+    maximum count of 132 is used.  An error message will be generated if
+    that count is exceeded.
+(5) The character "_" is converted to "!".
+(6) "Pre!scan" finds the user defined terminals {identifier}, {integer},
+    and {string}.;
+
+BEGIN
+   REQUIRE brkset INITIALIZATION;
+   EXTERNAL STRING PROCEDURE rvscan (REFERENCE STRING s;
+      INTEGER table;  REFERENCE INTEGER brchar);
+   EXTERNAL INTEGER PROCEDURE keychk (STRING find);
+   EXTERNAL BOOLEAN PROCEDURE alpha (INTEGER char);
+   EXTERNAL BOOLEAN PROCEDURE digchk (INTEGER char);
+   EXTERNAL INTEGER PROCEDURE delim (INTEGER char);
+   EXTERNAL R!C tokent			\ The token entry list;
+      (INTEGER token,			\ the token value;
+      pos,				\ position in "cmdstr";
+      len;				\ length of token string;
+      R!P (tokent) next);		\ ptr. to next tokent record;
+   EXTERNAL R!P (tokent) tokhed,	\ beginning of token list;
+      toktop,				\ last token entry;
+      cursor;				\ cursor position for parse;
+   EXTERNAL INTEGER gchan,		\ grammar channel (BNF file);
+      geof, gbreak;
+   INTEGER brchr,			\ break character save loc.;
+      pos,				\ "cmdstr" position;
+      tkn,				\ token value;
+      len;				\ token length;
+   R!P (any!class) rp;
+   STRING tmpstr, toktmp;
+
+   gbreak_0;
+   WHILE gbreak neq lf DO BEGIN						\ To ignore blank lines . . .;
+      tmpstr_input(gchan,sp!brk);					\ Input, removing leading white space;
+      IF geof THEN RETURN (false);
+      cmdstr_cmdstr&input(gchan,line!brk);
+      CASE gbreak of BEGIN
+[0]	 BEGIN
+	    print("Line too long."&crlf);  RETURN (false);
+	 END;
+[" "]
+[tab]	 cmdstr_cmdstr&gbreak;
+["_"]	 cmdstr_cmdstr&"!";
+[lf]	 BEGIN
+	    rvscan(cmdstr,sp!brk,brchr);  cmdstr_cmdstr&lf;
+	 END
+      END;
+   END;
+
+   toktmp_cmdstr;  pos_1;  tkn_0;					\ Prepare for second pass;
+   WHILE tkn neq !lf DO BEGIN "tokenize loop"
+      brchr_toktmp[1 for 1];
+      IF brchr=" " or brchr=tab THEN BEGIN
+	 pos_pos+1;  brchr_lop(toktmp);  CONTINUE "tokenize loop";
+      END
+      ELSE IF alpha(brchr) THEN BEGIN "identifier check"
+	 tmpstr_scan(toktmp,id!brk,brchr);
+	 len_length(tmpstr);
+	 IF not (tkn_keychk(tmpstr)) THEN tkn_!identifier;
+      END "identifier check"
+      ELSE IF (brchr="""") or (brchr="'") THEN BEGIN "string check"
+	 gbreak_brchr;  pos_pos+1;  brchr_lop(toktmp);
+         tmpstr_scan(toktmp,str!brk,brchr);
+	 IF brchr=gbreak THEN BEGIN
+	    tkn_!string;  len_length(tmpstr);
+	 END
+	 ELSE BEGIN
+	    print("String not terminated properly."&crlf);
+	    RETURN (false);
+	 END;
+      END "string check"
+      ELSE IF (tkn_delim(brchr)) neq 0 THEN BEGIN
+	 len_1;  tmpstr_lop(toktmp);
+      END
+      ELSE IF digchk(brchr) neq 0 THEN BEGIN "integer check"
+	 tmpstr_scan(toktmp,num!brk,brchr);
+	 len_length(tmpstr);  tkn_!integer;
+      END "integer check"
+      ELSE BEGIN
+	 print("Illegal character in input."&crlf);
+	 RETURN (false);
+      END;
+      tokent:token[rp_new!record(tokent)]_tkn;
+      tokent:pos[rp]_pos;  tokent:len[rp]_len;
+      IF toktop=n!r THEN cursor_(tokhed_rp)
+      ELSE tokent:next[toktop]_rp;
+      toktop_rp;
+      pos_pos+len+(IF tkn=!string THEN 1 ELSE 0);
+   END "tokenize loop";
+   RETURN (true);
+END;
+
+
+INTERNAL PROCEDURE prserr;
+	\ This procedure prints the error message generated from an
+unsuccessful parse.;
+BEGIN
+   EXTERNAL STRING PROCEDURE messag;
+   EXTERNAL INTEGER curhgh;
+   STRING spacer;  INTEGER i;
+   print(cmdstr,crlf);
+   spacer_null;
+   FOR i_2 step 1 until curhgh DO spacer_spacer&" ";
+   print(spacer,"^",crlf,messag,crlf);
+   RETURN;
+END;
+
+
+INTERNAL R!P (any!class) PROCEDURE chksym (INTEGER toknum);
+	\ This procedure is a link to "check!sym" which is called by
+"parse".  "Chksym" calls "check!sym" with a "key!id" parameter of
+!identifier.;
+BEGIN
+  EXTERNAL R!P (any!class) PROCEDURE check!sym (INTEGER toknum, key!id);
+  RETURN (check!sym(toknum,!identifier));
+END;
+
+END $
