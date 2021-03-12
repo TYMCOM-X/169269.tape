@@ -1,0 +1,735 @@
+
+
+
+                       *************************
+
+                                 TABGEN
+
+                            Description of a
+                       Table Generator Companion
+                               to TDPARS
+
+                            August 24, 1979
+                              Adele Gadol
+
+                       *************************
+
+
+
+                           Table of Contents                             
+
+
+
+
+
+Section                                                             Page
+
+
+
+
+1.     General information    .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.1    Function        .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+       1.2    References      .  .  .  .  .  .  .  .  .  .  .  .  .  . 1
+
+
+2.     Creating a configured parser .  .  .  .  .  .  .  .  .  .  .  . 1
+
+
+3.     Using TABGEN           .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+       3.1    Preparation     .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+
+       3.2    Running TABGEN  .  .  .  .  .  .  .  .  .  .  .  .  .  . 3
+
+
+4.     Program structure and flow of control .  .  .  .  .  .  .  .  . 3
+
+       4.1    Structure       .  .  .  .  .  .  .  .  .  .  .  .  .  . 3
+
+       4.2    Sequence of operations of main program  .  .  .  .  .  . 3
+
+       4.3    Pass one handling of grammar statements .  .  .  .  .  . 4
+
+       4.4    Pass two creation of configured parser  .  .  .  .  .  . 5
+
+
+5.     Data structures        .  .  .  .  .  .  .  .  .  .  .  .  .  . 6
+
+
+6.     Subroutines and how they are used  .  .  .  .  .  .  .  .  .  . 7
+
+
+    Appendix A
+
+       Grammar for BNF input to TABGEN .  .  .  .  .  .  .  .  .  .   10
+
+
+
+
+
+
+
+
+                                   i
+
+
+
+1    General information      
+
+
+
+1.1    Function       
+
+     The function of TABGEN is to produce configured parsers and related
+tables  using  the  basic TDPARS  routines  and  a  language description
+supplied by the user.  The output of TABGEN is a SAIL source  file which
+can  be  compiled  and loaded  with  the  program which  is  to  use the
+configured parser.
+
+
+
+1.2    References       
+
+     Read the TDPARS Description before reading this document.               
+
+
+
+
+2    Creating a configured parser        
+
+     There are a number of things that must be done by TABGEN  to create
+a configured  parser from  the BNF  grammar description.   The necessary
+data structures must be created and the PARSE routine modified to handle
+the execution of the special syntax and semantic routines.
+
+A.  All the symbols  in the BNF grammar  description must be  assigned a
+    token number.   Symbol definitions are  produced in the  SAIL output                     
+    for    the   non-terminal    and   user-defined    terminal   symbol
+    representations.  For instance, the grammar item "<statement>" might
+    produce the definition:
+            DEFINE !statement = '1;
+    The character "!" is appended to the beginning of each such word, so
+    that the user can easily avoid creating duplicate symbols in his/her
+    program which would interfere.   The character "_" is  translated to
+    "!".   These  definitions  allow  for  meaningful  searching  of the
+    finished parsing graph by the user program.
+
+B.  The SAIL source for the token table must be produced.  This involves
+    the definition of  and loading of proper  values for the  two arrays
+    KEYWRD and KEYTOK.
+
+C.  The  SAIL  source  for  the error  message  array,  MESSGS,  must be
+    generated.
+
+D.  The  dictionary  GRAMR  must be  generated.   This  is  the internal
+    representation of the language,  whose BNF description must  be read
+    from a file supplied by the user.
+
+E.  Special syntax or semantic  routines are called from PARSE  within a
+    case  statement.   The standard  TDPARS  file will  contain  a PARSE
+
+
+
+                                   1
+
+
+
+    without this case statement, which must be built by TABGEN using the
+    information about these routines in the BNF language description.
+
+
+
+
+3    Using TABGEN      
+
+
+
+3.1    Preparation       
+
+     Before using TABGEN, a grammar  must be prepared.  Appendix A  is a
+BNF representation of the structure of a legal grammar, itself specified
+according  to  the rules.   It  is, in  fact,  the grammar  used  by the
+configured parser for TABGEN itself.
+
+     Here are a few rules to make the interpretation of the BNF  rules a
+little easier to follow.
+
+A)  A  statement line  consists  of one  of three  things:   a delimiter
+    definition,  the left-hand  side  of a  rule or  production,  or the
+    right-hand side of a rule or production.
+
+B)  Delimiter definitions are  needed for special characters  which will
+    appear  as  primitives  in the  grammar.   In  addition  to allowing
+    unprintable or  undistinguishable characters to  be used  within the
+    grammar rules, these definitions associate a meaningful  symbol with
+    the character so that the token value of the character may  later be
+    referenced.  Some special  characters could cause  problems, because
+    TABGEN tries to create a symbol for the SAIL symbol definition using
+    the grammar symbol (in  this case, the special character)  which may
+    not be a legal SAIL name.  Therefore the delimiter definition allows
+    a symbol (treated as a  user-defined terminal) to be equated  to the
+    ASCII value of the character such that the character  is substituted
+    for the symbol  when the BNF  description is interpreted  by TABGEN.
+    The value supplied in the statement should be an octal value.
+
+C)  The left-hand side statement  must contain the representation  for a
+    non-terminal  symbol.   In  addition, it  may  optionally  contain a
+    subroutine name, or an  error string, or both.  The  subroutine name
+    is  enclosed  in  brackets,  and the  error  string  is  enclosed in
+    quotation marks, either the single or double variety.
+
+D)  The right-hand side statement is  a definition of the symbol  in the
+    last left-hand side  statement.  It is  correct to follow  the left-
+    hand side  with a  series of right-hand  sides.  The  next left-hand
+    side statement terminates the production.
+
+E)  An end-of-file terminates the final production.
+
+F)  Blank lines in the BNF description file are ignored.
+
+G)  The input is free form; the placement of blanks is not crucial.
+
+
+                                   2
+
+
+
+3.2    Running TABGEN        
+
+     Run the program with the exec level command:
+
+.R TABGEN
+
+     TABGEN  will first  prompt  for the  grammar file.   Enter  a legal
+TYMCOM-X file name.
+
+     Next, TABGEN will prompt for the parser file.  This will be used to
+output the configured parser source.
+
+     The next prompt will be for the symbol definition file.   This will
+contain  the  symbol  definitions  only;  the  configured   parser  must
+"require" this  file.  The symbol  definitions are stored  separately to
+make  it  easy for  other  program  sources which  will  be  using these
+definitions to include them.
+
+     After this file information  has been entered and  verified, TABGEN
+proceeds to create the configured parser and symbol definition file.  It
+is a two-pass operation with errors in the grammar rules  being detected
+during  the  first pass.   Other  logic errors  such  as  undefined non-
+terminal symbols will be  detected during the second pass.   TABGEN will
+print a message when each pass is complete.
+
+     In general,  errors found while  processing the grammar  will cause
+TABGEN to  be aborted.  Syntax  errors will be  reported along  with the
+statment  which caused  the problem,  while other  logic errors  will be
+reported as a brief explanation of the error.
+
+
+
+
+4    Program structure and flow of control          
+
+
+
+4.1    Structure       
+
+     Since TABGEN has conceptually one main task to accomplish, it has a
+simple  structure,  a main  program  and subroutines.   TABGEN  does not
+handle its own  interrupts; if the user  interrupts with ESC  or CTRL-C,
+then the program will be aborted.  The parser for the grammar statements
+is built using TDPARS and TABGEN itself.
+
+
+
+4.2    Sequence of operations of main program            
+
+A)  Initialize the data structures.
+
+B)  Get the grammar file  name from the user  and try to open  the file.
+    If unsuccessful, let user try again.
+
+
+
+                                   3
+
+
+
+C)  Get the parser file name from the user and try to open the  file for
+    exclusive writing.  Let the user try again if the ENTER fails.
+
+D)  Get the name of the symbol definition file from the user and  try to
+    open the file for exclusive writing.  Let the user try again  if the
+    ENTER fails.
+
+E)  Pass  one:  For  each grammar  statement, parse  it and  execute the      appropriate  routine which  will save  the information  expressed in
+    that statement.
+
+F)  Release the grammar file.
+
+G)  Pass two:   Build the  finished parser  from the  intermediate forms     
+    accumulated during pass one.
+
+H)  Release remaining files and terminate.
+
+
+
+4.3    Pass one handling of grammar statements            
+
+     During  the  first  pass,  the  grammar  rules  are  read  and  the
+information  accumulated into  intermediate  data forms  from  which the
+final configured parser  and its tables are  built.  For the  purpose of
+building  the  internal  data  structures,  three  statement  types  are
+significant:   delimiter  definitions,  left-hand  sides  of  rules, and
+right-hand sides of rules.
+
+
+4.3.1    Delimiter definitions          
+
+A)  Get the symbol which is to be equated to the special  character, and
+    create the symbol to be used in the SAIL source.
+
+B)  Enter the  symbol into a  list of terminal  symbols, and  update the
+    current token counts.
+
+C)  Find the value of the special character from the BNF  statement.  If
+    given as  an octal value,  convert it to  string.  Enter  that value
+    into the keyword list.
+
+
+4.3.2    Left-hand sides of rules            
+
+A)  Get the BNF symbol for  the non-terminal which will be  defined, and
+    create the symbol to be used in the SAIL source.
+
+B)  Enter the symbol into a list of non-terminal symbols, and update the
+    current token counts.
+
+C)  Create  a skeleton  dictionary  entry for  the  intermediate grammar
+    structure.
+
+
+
+                                   4
+
+
+
+D)  Find out if a subroutine name was specified.  If so, enter it in the
+    subroutine name structure, and save the index in the current grammar
+    structure entry.
+
+E)  Find out if an error string  was specified.  If so, enter it  in the
+    error  message array,  and  save the  index in  the  current grammar
+    structure entry.
+
+F)  Create a skeleton right-hand-side link entry.
+
+
+4.3.3    Right-hand sides of rules            
+
+A)  Process each  element in the  statement.  For  non-terminal symbols,
+    create the new symbol, and enter it into the  appropriate structure.
+    For terminal symbols,  create the new symbol  and enter it  into the
+    appropriate table.   If the  terminal is a  keyword, then  enter the
+    keyword string into the appropriate table.  In either case, create a
+    new skeleton dictionary entry.
+
+B)  When finished  with all  the elements in  the statement,  create the
+    end-of-chain marker.
+
+
+
+4.4    Pass two creation of configured parser            
+
+     In this step, TABGEN  uses the intermediate data structures  it has
+built and the  standard TDPARS file to  build a configured  parser.  The
+tables and data structures and any necessary "requires" are  merged with
+the  standard TDPARS  file.  The  symbol definitions  are put  out  in a
+separate file.
+
+A)  Do additional error  checking on the intermediate  structures.  Make
+    sure non-terminals have been defined and put in "dummy"  rules (with
+    no right-hand sides) if not.  Warn the user.
+
+B)  Create the symbol definition file and close it.
+
+C)  Now work on the parser file.  Copy from TDPARS to the parser file up
+    to  the  point  where   the  "require"  statement  for   the  symbol
+    definitions is needed.  Output that "require" statement.
+
+D)  Next, build and output the final grammar, working from  the internal
+    record structure.
+
+E)  Build the token table which consist of the arrays KEYWRD and KEYTOK.
+
+F)  Build the error message table, the array MESSGS.
+
+G)  Copy from TDPARS to the parser  file up to the point in  PARSE where
+    the case statement for subroutine execution will be inserted.
+
+
+
+
+                                   5
+
+
+
+H)  Build the special syntax subroutine case statement, and output it to
+    the parser file.
+
+I)  Copy the remainder of the standard TDPARS file to the parser file.
+
+
+
+
+5    Data structures      
+
+     Most of  the storage in  TABGEN is for  the purpose of  holding the
+intermediate forms of each the  TDPARS tables which is being  built from
+the  grammar  description.    For  ease  of  handling   dynamic  storage
+allocation, these forms are built as record structures.
+
+R!C grules              \ The intermediate grammar structure;
+  (INTEGER tkn,         \ token number;
+  def,                  \ token definition or subroutine pointer;
+  fail;                 \ next alternative or error message pointer;
+  R!P (grules) next;    \ pointer to next record entry;
+
+R!P (grules) grfrst,    \ first grammar node;
+  grrule,               \ beginning of rule definition;
+  grlast;               \ last grammar node;
+INTEGER grcnt;          \ count of grammar nodes;
+
+R!C nterms              \ non-terminal symbol storage;
+  (STRING sym;          \ symbol name;
+  INTEGER tkn;          \ token value;
+  R!P (nterms) next);   \ next record of storage;
+
+R!P (nterms) ntfrst,    \ pointer to first nterms entry;
+  ntlast;               \ pointer to last nterms entry;
+INTEGER ntcnt;          \ non-terminal symbol count;
+
+R!C terms               \ terminal symbol storage;
+  (STRING sym;          \ symbol name;
+  INTEGER tkn;          \ token value;
+  R!P (terms) next);    \ next record of storage;
+
+R!P (terms) tfrst,      \ pointer to first terms entry;
+  tlast;                \ pointer to last terms entry;
+INTEGER tcnt;           \ terminal symbol count;
+
+R!C msgs                \ error message storage;
+  (STRING msg;          \ the message text;
+  R!P (msgs) next);     \ next record of storage;
+
+R!P (msgs) erfrst,      \ pointer to first msgs entry;
+  erlast;               \ pointer to last msgs entry;
+INTEGER msgcnt;         \ message count;
+
+R!C spcsyn              \ special subroutine storage;
+  (STRING subnam;       \ the subroutine name;
+
+
+                                   6
+
+
+
+  R!P (spcsyn) next);   \ pointer to next record;
+
+R!P (spcsyn) spfrst,    \ pointer to first spcsyn entry;
+  splast;               \ pointer to last spcsyn entry;
+INTEGER spcnt;          \ special subroutine count;
+
+R!C kywrds              \ keyword storage;
+  (STRING sym;          \ the keyword string;
+  INTEGER tkn;          \ the corresponding token value;
+  R!P (kywrds) next);   \ pointer to next record;
+
+R!P (kywrds) kyfrst,    \ pointer to first kywrds entry;
+  kylast;               \ pointer to last kywrds entry;
+INTEGER kycnt;          \ count of keywords;
+
+
+
+
+6    Subroutines and how they are used          
+
+BOOLEAN PROCEDURE xctcmd (R!P link);
+
+     This procedure processes  the grammar statement whose  graph begins
+at "link".   It returns the  value TRUE  if there is  nothing in  in the
+statement  which  should  cause TABGEN  to  abort  processing  and FALSE
+otherwise.
+
+R!P PROCEDURE trmchk (STRING trmnam);
+
+     This procedure  checks the class  of terminal symbol  names, TERMS,
+for an  occurance of "trmnam".   If found, it  returns a pointer  to the
+appropriate record.  If not, it returns N!R.
+
+R!P PROCEDURE ntchk (STRING ntnam);
+
+     This  procedure  checks  the class  of  non-terminal  symbol names,
+NTERMS, for an occurance of "ntnam".  If found, it returns a  pointer to
+the appropriate record.  If not, it returns N!R.
+
+R!P PROCEDURE msgchk (STRING messg);
+
+     This  procedure works  the same  as TRMCHK  and NTCHK  for messages
+specified in the grammar and the associated storage class, MSGS.
+
+R!P PROCEDURE spcchk (STRING subnam);
+
+     This  procedure works  the  same as  TRMCHK and  NTCHK  for special
+subroutine names and the associated storage class, SPCSYN.
+
+R!P PROCEDURE keychk (STRING keywrd);
+
+     This procedure works the same as TRMCHK and NTCHK for  keywords and
+the associated storage class, KYWRDS.
+
+
+
+                                   7
+
+
+
+PROCEDURE newtrm (STRING trmnam);
+
+     This procedure  enters the new  symbol, "trmnam", into  the storage
+class of terminal symbols, TERMS.
+
+PROCEDURE newnt (STRING ntnam);
+
+     This procedure  enters the  new symbol,  "ntnam", into  the storage
+class of non-terminal symbols, NTERMS.
+
+PROCEDURE newmsg (STRING messg);
+
+     This procedure  enters the new  message, "messg", into  the storage
+class of messages, MSGS.
+
+PROCEDURE newspc (STRING subnam);
+
+     This procedure enters the  new subroutine name, "subnam",  into the
+storage class of subroutine names, SPCSYN.
+
+PROCEDURE newkey (STRING keywrd);
+
+     This procedure enters the  new keyword, "keywrd", into  the storage
+class of keywords, KYWRDS.
+
+R!P PROCEDURE newgr (INTEGER tokval);
+
+     This procedure  creates a skeleton  grammar entry with  "tokval" in
+the TKN position.  The pointer to the new entry is returned.
+
+PROCEDURE bldgr;
+
+     This is the procedure which outputs to the parser file the finished
+grammar array.  It works from the record class, GRULES, and  creates the
+source for the array GRAMR.
+
+PROCEDURE bldtab;
+
+     This procedure coordinates the building of the final  parser tables
+which are output as SAIL source.
+
+PROCEDURE bldefs;
+
+     This procedure builds and outputs to the symbol definition file the
+source for the symbol token definitions.
+
+PROCEDURE bldkey;
+
+     This  procedure builds  and outputs  to the  parser file  the final
+keyword token table which consists of the arrays KEYWRD and KEYTOK.
+
+PROCEDURE bldmsg;
+
+
+
+
+                                   8
+
+
+
+     This procedure builds and outputs the final message  array, MESSGS,
+to the parser file.
+
+PROCEDURE bldspc;
+
+     This procedure builds and  outputs the special syntax  routine case
+statement to the parser file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   9
+
+
+
+                               Appendix A                                
+
+                    Grammar for BNF input to TABGEN                         
+
+
+
+
+     In the following  grammar, there are several  user-defined terminal
+symbols.  Here are there meanings.
+
+{identifier} 
+This is  a distinguishable  string of  characters which  are legal  as a
+symbol name.  Fundamentally,  it should be  a proper SAIL  variable name
+with the exception that the character "_" is also accepted.  There are a
+few places in the grammar,  such as the subroutine name, where  a proper
+SAIL  name is  a must;  in these  places, a  special routine  checks the
+symbol name for correctness.
+
+{integer} 
+This is an unsigned positive integer.
+
+{string} 
+This is a string of  characters enclosed in quotation marks,  either the
+single or double variety.
+
+     Notice that a terminal symbol keyword (not a user-defined terminal)
+is the {string} type.  This is to allow grammars with  keywords composed
+of "strange" characters which might cause problems with parsing.
+
+{LF}    ::= 12
+{LBRKT} ::= "["
+{RBRKT} ::= "]"
+{LSQUG} ::= "{"
+{RSQUG} ::= "}"
+{LT}    ::= "<"
+{GT}    ::= ">"
+
+<statement> [XCTCMD]
+        ::= <del_def> {LF}
+        ::= <lhs_rule> {LF}
+        ::= <rhs_rule> {LF}
+
+<del_def>
+        ::= <user_def_term> <separator> <char>
+
+<user_def_term>
+        ::= {LSQUG} {identifier} {RSQUG}
+
+<separator>
+        ::= "::="
+
+<char>
+        ::= <char_value>
+        ::= <len1_str>
+
+
+                                   10
+
+
+
+<char_value> [CHRCHK] "Not an ASCII character value."
+        ::= {integer}
+
+<len1_str> [LENCHK] "Need a single character here."
+        ::= {string}
+
+<lhs_rule>
+        ::= <nt_symbol>
+        ::= <nt_symbol> <sub_name>
+        ::= <nt_symbol> <error_string>
+        ::= <nt_symbol> <sub_name> <error_string>
+
+<nt_symbol>
+        ::= {LT} {identifier} {GT}
+
+<sub_name>
+        ::= {LBRKT} {identifier} {RBRKT}
+
+<error_string>
+        ::= {string}
+
+<rhs_rule>
+        ::= <separator> <sym_list>
+
+<sym_list>
+        ::= <symbol> <sym_list>
+        ::= <symbol>
+
+<symbol>
+        ::= <nt_symbol>
+        ::= <term_symbol>
+
+<term_symbol>
+        ::= {string}
+        ::= <user_def_term>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   11
+    )yZõ
