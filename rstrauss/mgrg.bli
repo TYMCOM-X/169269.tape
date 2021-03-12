@@ -1,0 +1,295 @@
+MODULE MGRG(DOLLAR,DEBUG,STACK=GLOBAL($CSTK$,#277),CCL,
+DEBUGGER=EXTERNAL(SIX12))=
+BEGIN
+
+%
+   Created 2:46 p.m.  June 12, 1981 A.D.     /DGK
+
+   This marvelous module was created as a driver for the ultra high power
+   list command  (UHPLC).  Actually this module is not really so marvelous,
+   it is really nothing more than a modified rip off of the MGUTIL driver
+   (which itself is probably nothing much more than a modified rip off of
+   some other driver, which itself ...)
+%
+require (MIDAS)K1DEFS.BLI;
+require (MIDAS)K2DEFS.BLI;
+require (MIDAS)K3DEFS.BLI;
+require (MIDAS)FDEFS.BLI;
+require (MIDAS)PPDEFS.BLI;
+require (MIDAS)PDEFS.BLI;
+require (MIDAS)HDEFS.BLI;
+require (MIDAS)UDEFS.BLI;
+require (MIDAS)C1DEFS.BLI;
+require (MIDAS)C2DEFS.BLI;
+require (MIDAS)C3DEFS.BLI;
+require (MIDAS)C5DEFS.BLI;
+require (MIDAS)CCDEFS.BLI;
+REQUIRE (MIDAS)R1DEFS.BLI;
+require (MIDAS)Q6DEFS.BLI;
+REQUIRE (MIDAS)Q4DEFS.BLI;
+
+
+
+EXTERNAL QCNLP$,QCOLP$,QLNWP$,QLNFP$,QLCMX$,$QSTRT,QSYMP$,PQ1$$$,PQ2$$$;
+external $EVVTV;
+EXTERNAL JOBDDT, $PQERR, $QESC, QFOO$, QRNAM$, QRLST$, $QCESC, $QOMTOK;
+external QWCSP$, QRCSP$, QRILP$, QUERC$, QRCB$, QSAVDF$, $QABRT;
+EXTERNAL QLLWP$, $QSINI, QTCON$, QTDCN$;
+external $QBPDB, $QGTLC, $QBRGB, $QGERR, $QBERR, $QBGN;
+external QRGB$ QRGBP$;
+
+MAP QCLLS$ QCNLP$:QCOLP$;
+MAP QLCBM$ QLCMX$;
+
+LOCAL KEEPCCLVREG, RETCSTKR;
+
+MACHOP  TTCALL=#051,
+        HALT  =#254;
+
+UNDECLARE $KASTK,$KARSQ,$KARDK,$KAUPD,$KAINS,$KADLT,$KADAL;
+UNDECLARE $YAUDIT;
+GLOBAL ROUTINE $YAUDIT=0;
+UNDECLARE $TOCST,$TELIN,$TOSTR;
+GLOBAL ROUTINE $TOCST=0;
+GLOBAL ROUTINE $TELIN=0;
+GLOBAL ROUTINE $TOSTR=0;
+UNDECLARE $TCSCR;
+GLOBAL ROUTINE $TCSCR=0;
+UNDECLARE $TEPRT,$TBCNV,$TOUTC;
+GLOBAL ROUTINE $TEPRT=0;
+GLOBAL ROUTINE $TBCNV=0;
+GLOBAL ROUTINE $TOUTC=0;
+UNDECLARE $TYESN,$TMINI;
+GLOBAL ROUTINE $TYESN=$UYESN(UV$ONCEONLY,0);
+GLOBAL ROUTINE $TMINI=0;
+UNDECLARE $KBMRG;
+GLOBAL ROUTINE $KBMRG=0;
+UNDECLARE $RLOCK;
+GLOBAL ROUTINE $RLOCK=0;
+GLOBAL ROUTINE $KASTK(FCB)=$KSETK(.FCB);
+GLOBAL ROUTINE $KARDK(FCB,NORELLOCK)=$KRDKY(.FCB,.NORELLOCK);
+GLOBAL ROUTINE $KARSQ(FCB,CURSORFLAG)=$KRSEQ(.FCB,.CURSORFLAG);
+GLOBAL ROUTINE $KAUPD(FCB,SEARCH)=$KUPDT(.FCB,.SEARCH);
+GLOBAL ROUTINE $KAINS(FCB)=$KINSR(.FCB);
+GLOBAL ROUTINE $KADLT(FCB)=$KDLTE(.FCB);
+GLOBAL ROUTINE $KADAL(FCB)=$KDALL(.FCB);
+
+
+macro
+   OUTSA(A)=
+      TTCALL(3,A)&,
+
+   OUTSTR(STR)=
+      OUTSA(plit asciz STR)&;
+
+
+
+routine $QPRSE=
+   begin
+      local	CLINE$	LINE,
+      		PP$	PARSE,
+      			PARSEBLK[PV$PPSZ];
+
+      map KFCB$ CONTF$;
+
+      PQ1$$$(); PQ2$$$();	% Dummy to get GRAMR loaded	%
+      $EVVTV();			% Dummy to get Meta token to	%
+				% TV token Xlation table loaded	%
+      PARSE := PARSEBLK<0,0>;
+      PARSE[PP$SOURCE] := $QOMTOK<0,0>;
+      PARSE[PP$TKNSIZE] := CV$TOKSZ;
+      PARSE[PP$ERROROUT] := $PQERR<0,0>;
+      PARSE[PP$TKNBLDR] := $CGTHN<0,0>;
+      CIHDT$[0] := $QCESC<0,0>;
+
+      QRCB$ := .QSAVDF$;   % In case QRCB$ was "borrowed" by update routines %
+
+      QLNFP$ := 0;
+
+      IF .QLLWP$ GTR 100000
+         THEN QLLWP$ := .QLLWP$-100000  % Edit command changed last line %
+         ELSE QLLWP$ := .QLNWP$;
+      $UAPSZ(UV$PROMPT,$USPTR('?M?J'));
+      $UAPDC(UV$PROMPT,QLNWP$ := (.QLNWP$ MOD 20) + 1);
+      $UAPSZ(UV$PROMPT,$USPTR('.0>>'));
+      $UPRPT(UV$PROMPT);
+      QCNLP$ := .QLCMX$[.QLNWP$];
+
+      WHILE .QCNLP$ NEQ 0
+        DO
+          BEGIN
+          $CFREE(.QCNLP$[Q$LCBP]);
+          QCOLP$ := .QCNLP$[Q$NXTP];
+          $CFREE(.QCNLP$);
+          QCNLP$ := .QCOLP$
+          END;
+
+      QLCMX$[.QLNWP$] := 0;
+      QCNLP$ := QLCMX$[.QLNWP$]<0,0>;
+      QCOLP$ := QLCMX$[.QLLWP$]<0,0>;
+      CPOS$ := 5 + (.QLNWP$ GEQ 10) + (.QLNFP$ GEQ 10);
+      $QGTLC();    % Get appropriate old line for editing %
+      $KREAD(CONTF$);
+      LINE := .CONTF$[K$IDADR];
+      QFOO$ := FALSE;
+      CTBLK$ := $CSCAN(.LINE[C$BPTR], .LINE[C$LCBCNT], 0);
+      COMNG$ := 0;
+      COMTR$ := 0;
+      QUERC$ := 0;  % USING EVERY relation not carried over %
+      QRGBP$[QG$RELLST] := 0;
+      QRGBP$[QG$ALTERLIST] := FALSE;  % No ALTER list yet %
+      QRGBP$[QG$INTOREL] := 0;
+      QTCON$ := QTDCN$ := 0;     % No temporary [DIS]CONNECTs yet %
+
+      $PLALR(.PARSE);	% Go Parse and Execute the command %
+   end;
+
+
+ROUTINE XDIVCHK =
+    BEGIN
+    % SEE WHETHER THE NO-DIVIDE FLAG IS SET.
+      RETURNS 0 IF NOT, OTHERWISE RETURNS THE VALUE OF THE PC
+    %
+
+    MACHOP 
+	JSP  = #265,
+	TLZN = #627,
+	TDZA = #634,
+	JRST = #254;
+
+    JSP (VREG,XDIVCHK+4);	% GET THE PC AND THE FLAGS %
+    TLZN(VREG,#40);		% IS THE NO-DIVIDE FLAG SET? %
+    TDZA(VREG,VREG);		% NOT SET. RETURN ZERO %
+    JRST(2,3,VREG);		% SET. CLEAR FLAG BIT IN THE PC %
+
+    .VREG
+    END;
+
+
+ROUTINE IQLEXEC(RTNADR)=
+   BEGIN
+   CIHDT$[0] := $QCESC<0,0>;
+   $CISREN();  % Re-enable escapes %
+   while 1 do
+      begin
+         $CGTAREA(.CMEMA$[CV$IQLTEMP]);
+         $QBGN();			% do beginning of command things %
+         $QPRSE();
+         if XDIVCHK() neq 0
+            then
+               OUTSTR('Divide by zero detected during this command');
+        $KFRAFCB(.CMEMA$[CV$IQLTEMP]);
+         $CFRAREA(.CMEMA$[CV$IQLTEMP],0)
+      end;
+      END;
+
+
+ROUTINE REPORT(RTNADR)=
+   BEGIN
+   LOCAL CDC$ BLK;
+   LOCAL LSTK,RLSTK;
+
+
+   CIHDT$[0] := $QESC<0,0>;
+   RABRT$ := $QABRT<0,0>;  % Set up proper abort routine %
+   $CTMRH(-1);          % Call for a Premium Charge %
+
+   $CGTAREA(.CMEMA$[CV$IQLPERM]);
+
+
+   if $KLKUP(KV$EXISTS, KV$INPUT, SIXBIT 'MIDRNT', SIXBIT 'MSG', .COWNR$)
+      then RMFCB$ := $KMFOP(0)
+         else $KFATL(#507);
+
+   $CPOP(CPARM$, BLK);
+   IF .QSYMP$ EQL 0
+     THEN $QSINI(.BLK);
+
+  LSTK := #777777 AND CREATE IQLEXEC( 0 )    % Set up IQLEXEC as a co-routine so that %
+          AT $CGZAM( .CSTKR$[1] * kv$pags - 1,.CMEMA$[CV$IQLPERM]) %   its environment may be rebuilt after %
+          LENGTH .CSTKR$[1] * kv$pags -1    %   an escape.                           %
+          THEN 0;
+
+  WHILE 1 DO
+    BEGIN
+    RLSTK := EXCHJ( .LSTK, 0 );  % Go (back) to IQLEXEC %
+    IF .RLSTK EQL -1 THEN       % Escape happened, rebuild environment %
+      BEGIN
+      $CFREEM(.LSTK);           % Throw away old stack  %
+      LSTK := #777777 AND CREATE IQLEXEC( 0 )        % Build new environment %
+              AT $CGZAM( .CSTKR$[1] * kv$pags - 1, 0 )
+              LENGTH .CSTKR$[1] * kv$pags - 1
+              THEN 0
+      END
+    ELSE EXCHJ( $CSTK$, .BREG ) % Go out to main-line code for    %
+    END;                        %  next overlay or exit           %
+
+   END;
+
+
+
+
+KEEPCCLVREG := .VREG;
+
+IF .KEEPCCLVREG EQL 0 THEN
+  BEGIN
+  TTCALL(3,PLIT(ASCIZ'?M?JThis MAGNUM overlay may NOT be run DIRECTLY.?M?J'));
+  HALT(4,0,0,0)
+  END;
+
+COLAY$ := .CRG$;        % Set to know who we are %
+CWSAP$ := .CRG$[2];     % Get this overlays fudge factor for WSSL adj. %
+
+$CIHDT$ALIGN;   % Re-align interrupt handler dispatch table %
+$CPOP$ALIGN;    % Align $CPOP & $CPUSH %
+$CDDT$RESET;    % If DDT is present, get its address back into JOBDDT %
+$CTERM$ALIGN;   % Re-align CTERM file-control block for new hi-seg addresses. %
+$USPCL$ALIGN;   % Re-align UV$SPCL port if necessary %
+$CTIOS$ALIGN;   % Re-align TIOS file-control blocks for new hi-seg addresses. %
+$COMINI();      % Initialize high core %
+$CROUTINE$ALIGN;  % Make low core globals point to high core routines %
+$CTCC();        % TRU Component Checkpoint %
+
+$CGTAREA( 0 );
+$CGTAREA(.CMEMA$[CV$IQLPERM]);
+$CGTAREA( 0 );
+$CGTAREA(.CMEMA$[CV$IQLTEMP]);		% Get areas		%
+$CGTAREA( 0 );
+$CGTAREA(.CMEMA$[CV$IQLPERM]);
+$QSTRT();		% Initialize some things 		%
+QSYMP$ := 0;		% Zero out the relation symbol table 	%
+QRNAM$ := 0;		% No default relation name 		%
+QRCB$ := QSAVDF$ := 0;  % No DEFAULT relation yet		%
+QRLST$ := 0;		% And no open relations yet 		%
+QWCSP$ := 0;		% No where clause yet 			%
+QRCSP$ := 0;		% No Relations open yet 		%
+QRILP$ := 0;		% No RILB exists yet    		%
+QRGBP$ := $QBRGB();	% Build Report Globals Block 		%
+RPDB$ := $QBPDB();	% Build PDB 				%
+QLNWP$ := QLNFP$ := 0;
+QLCMX$ := $CGZAM(21, .CMEMA$[CV$IQLPERM]);
+
+while 1 do
+   begin
+      $CGTAREA(0);
+      $CISREN();      % Re-enable interrupt system %
+      CSTKR$ := #777777 AND CREATE REPORT(.BREG)
+                AT $CGZAM(.CSTKR$[1] * KV$PAGS - 1, 0)
+                LENGTH .CSTKR$[1] * kv$pags -1
+                THEN 0;
+      RETCSTKR := EXCHJ(.CSTKR$,.BREG);
+      $CFREEM(.CSTKR$);
+      if .RETCSTKR neq -1	% QUIT or EXIT, go back to MIDAS %
+         then
+            begin
+               $KFRAFCB(.CMEMA$[CV$IQLPERM]);
+               $CFRAREA(.CMEMA$[CV$IQLTEMP],0);
+               $CFRAREA(.CMEMA$[CV$IQLPERM],0);
+               $CGTAREA(0);
+               $COLAY()        % Go to the next overlay %
+            end
+   end;
+
+
+END ELUDOM
+    
