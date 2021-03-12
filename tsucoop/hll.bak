@@ -1,0 +1,94 @@
+BEGIN
+ 
+REQUIRE "(SAILIB)SAIL.DEF" source!file;
+Internal Simple Boolean Procedure SubSet(String STR, Sub);
+comment SubSet returns true if all the characters in string STR;
+comment are some subset of those in string SUB;
+start!code "SUBSET"
+ 
+    define T1=1, C=2, K='13, Temp='14, User='15, SP='16, P='17;
+    label slap, SUBlup, NoWay, Ret;
+ 
+        Push    P,C;            !  Save an AC here;
+        Skipn   T1,-3(SP);      !  Don't allow null test strings;
+          Jrst  NoWay;
+        Tlz     T1,-1;          !  Clear "constant" stuff!
+ 
+slap:   Sojl    T1,Ret;         !  T1 will be -1=True on temination;
+        Skipn   K,-1(SP);       !  Don't allow null set strings;
+          Jrst  NoWay;
+        Tlz     K,-1;           !  Clear "constant" stuff;
+        Move    User,-2(SP);    !  Character set byte pointer;
+        Ildb    C,(SP);         !  Char from test string!;
+SUBlup: Ildb    Temp,User;      !  Char from set;
+        Camn    C,Temp;         !  Does it match? ;
+           Jrst slap;           !  Yes, don't look any further;
+        Sojg    K,SUBlup;       !  No, count and loop;
+
+NoWay:  Movei   T1,0;           !  Character mismatch, return False;
+Ret:    Pop     P,C;            !  Restore AC;
+ 
+end "SUBSET";
+ 
+Internal String Procedure READIT( String Chars );
+begin "READIT"
+    String S;
+    Integer C;
+ 
+   S := Null;
+   While not( SubSet( Chars, C := INCHRW ) ) do
+      begin "create string"
+         If (C = '177) or (C = #bs) then
+            begin "backup a bit"
+               If (length(S)) then  comment true if S has length > 0;
+                  begin "something there"
+                     If ((S[inf-1 for 1] = #cr) and
+                        (S[inf for 1] = #lf)) then
+                        begin "do last line"
+                           S := S[1 to inf-2];
+                                         comment S gets substring from 1st
+                                                 char to 3rd from last;
+                           For c := Length(S) step -1 until 1 do
+                                         comment C gets length of the string
+                                           then steps back to last lf;
+                              begin "find last lf"
+                                 If (S[C for 1] = #lf) then
+                                    begin "show line"
+                                         comment print from last lf to end;
+                                       Print(S[C+1 to inf]);
+                                         comment since S[C] was found to be the
+                                           last lf, print all from S[C+1];
+                                       Done;  comment terminates "For" loop;
+                                    end "show line"
+                                 else
+                                    If (C = 1) then
+                                       Print(S);
+                              end "find last lf";
+                        end "do last line"
+                     else
+                        begin "erase one character"
+                               Boolean None;
+                           None := (S[inf for 1] < #bs)        or
+                                   (#cr < S[inf for 1] < #esc) or
+                                   (#esc < S[inf for 1] < " ");
+                           S := S[1 to inf-1]; comment S gets all of S but last ch;
+                           If (C neq #bs) then
+                              Print(#bs);
+                           Print(" " & #bs);  comment cursor now under a blank;
+                        end "erase one character";
+                  end "something there"
+               else
+                  Print(#bel);
+            end "backup a bit"
+         else
+            s := S & C; comment add new char onto end of S;
+      end "create string";
+   Return(S);
+end "READIT";
+ 
+comment MAIN PROGRAM;
+ 
+Print("Enter a string, end with Esc or ^Z", Crlf&Crlf, "-->" );
+While (true) do
+   Print(Crlf&"<<"& Readit(#esc&#sub)& ">>"&Crlf&Crlf& "-->");
+end;
