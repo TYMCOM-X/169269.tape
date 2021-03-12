@@ -1,0 +1,53 @@
+
+                      TYMSHARE 36-BIT SYSTEMS                  21-Jun-84
+                      =======================
+
+
+Sysno  Net   CPU/ OS  Site ID       Utilization
+-----  ---   -------  -------       -----------
+
+F94    BUB   KL  T20  FREMONT       MAGNUM DEVELOPMENT                      
+
+S33    TRW   KS  TYM  ANAHEIM       TRW  (GATEWAY 633)                      
+
+V22    TYM   KI  TYM  VALLEY FORGE  PRIVATE NETWORK (DOMESTIC & INTERNATIONAL)
+D23    TYM   KI  TYM  DALLAS        U.S. POSTAL SERVICE / JAPAN
+C24    TYM   KS  TYM  CUPC                       
+D25    TYM   KI  TYM  DALLAS        TYMNET / CODE GENERATION BACKUP         
+C26    TYM   KL  TYM  CUPC          COEES (DEDICATED)                       
+D27    TYM   KI  TYM  DALLAS        INSD CUSTOMERS/U.S.POSTAL SERVICE/EUROPE
+F28    TYM   KL  TYM  FREMONT       TYMNET / ONTYME ACCOUNTING              
+C29    TYM   KL  TYM  CUPC          COEES                                   
+F30    TYM   KL  TYM  FREMONT       TYMNET ACCOUNTING                       
+D32    TYM   KI  TYM  HOUSTON       INSD CUSTOMERS / TYMNET NCS / U.S. P.S. 
+C33    TYM   KL  TYM  CUPC          TYMSHARE - INTERNAL                     
+C34    TYM   KI  TYM  CUPC          INSD CUSTOMER/TWA/TYMNET NCS APPLI/EUROPE
+C35    TYM   KL  TYM  CUPC          U.S. POSTAL SERVICE / TYMQUOTE
+C36    TYM   KL  TYM  CUPC          COEES
+D37    TYM   KI  TYM  DALLAS        U.S. POSTAL SERVICE / PRIVATE NET (BACKUP)
+F38    TYM   KL  TYM  FREMONT       TYMSHARE ACCOUNTING                     
+C39    TYM   KL  TYM  CUPC          NETWORK DEVELOPMENT / PRIVATE NET   
+D54    TYM   KL  TYM  DALLAS        INSD/U.S. P.S./TTMS CUSTOMERS/ORDER BACKUP
+C55    TYM   KL  TYM  CUPC          GENERAL TIMESHARING / RAILTRACK
+D56    TYM   KL  TYM  DALLAS        TYMNET ORDER ENTRY / INTERNATIONAL ACCTG
+C57    TYM   KI  TYM  CUPC          NETWORK DEVELOPMENT / TYMNET
+S59    TYM   KS  TYM  ST-CLOUD      CEGI                                    
+D65    TYM   KL  TYM  DALLAS        OTIS ELEVATOR (DEDICATED)               
+V70    TYM   KI  TYM  VALLEY FORGE  TYMNET CODE GENERATION                  
+V72    TYM   KI  TYM  VALLEY FORGE  TYMSHARE ACCOUNTING                     
+F74    TYM   KL  TYM  FREMONT       TYMSHARE ACCOUNTING/VALIDATION DB/TYMUSE
+D79    TYM   KI  TYM  VALLEY FORGE  TYMSHARE ACCOUNTING                     
+S83    TYM   KS  TYM  ST-CLOUD      CEGI                                    
+P90    TYM   KL  TYM  PUTEAUX       SLIGOS                                  
+S92    TYM   KS  TYM  ST-CLOUD      CEGI                                    
+X118   TYM   KS  T20  VG-2          SYSTEMS DEVELOPMENT
+F145   TYM   KS  T20  FREMONT       SOFTIME DEVELOPMENT                     
+M169   TYM   KS  TYM  ST. LOUIS     MALLINCKRODT                            
+S170   TYM   KS  TYM  ST-CLOUD      CEGI                                    
+S184   TYM   KS  TYM  ST-CLOUD      CEGI                                    
+S264   TYM   KS  TYM  ST-CLOUD      CEGI                                    
+S301   TYM   KS  TYM  ST-CLOUD      CEGI                                    
+H370   TYM   KS  TYM  HOUSTON       FAYEZ SAROFIM                           
+X930   TYM   F3  TYM  VG-2          TYMCOM-X DEVELOPMENT                    
+W1051  TYM   KS  TYM  SEATTLE       RAINIER NATIONAL BANK                   
+
