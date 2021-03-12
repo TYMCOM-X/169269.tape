@@ -1,0 +1,942 @@
+module QRALL(dollar,debug,entries=($QRALL, $QSWAP, $QEVA))=
+
+begin
+
+require (MIDAS)RCDEFS.BLI;
+require (MIDAS)RSDEFS.BLI;
+require (MIDAS)DDDEFS.BLI;
+require (MIDAS)K3DEFS.BLI;
+require (MIDAS) UDEFS.BLI;
+require (MIDAS)Q1DEFS.BLI;
+require (MIDAS)Q2DEFS.BLI;
+require (MIDAS)Q6DEFS.BLI;
+
+bind
+   CV$IQLTEMP	=	11,
+   CV$IQLPERM	=	12;
+
+external QRCSP$, QCNT$, QRGBP$, QRCNT$;
+external CAREA$, CMEMA$, $CGTAREA, $CGZAM, CIHDT$, $CGETZ;
+external $ROPEN, $RSETK, $RSTGE, $READ, $RCLSE, $RFALL, $RSTFF, $RSSRT;
+external $RSALL, $RSLCT, $RSTGT, $RDLET, $RBFUD, $RNSRT, $RERR;
+external $QPRNT, $QBDRB, $QBRILB, $QPRIL, $QFRCB, $QCRSB, $QNSRT, $QIEEL;
+external $QSTRT, $QPHDNG, $QBWCS, $QPRED, $QTYPLI, $QESC, $QWSTK, $QEOPL;
+external $QRPHD, $QFNSH, $QCRCB, $QEVAL, $QALTR, $QBUFD, $QFSTF, $QTIN;
+external $QEEL;
+external $YSTRT, $YLSRT, $YSORT, $YRLSE;
+external $KVIRD;
+external QRNAM$, QRILP$, QWCSP$, QRHDP$, QPHDP$, QUERC$, QFLIST$, SRPRT$;
+external QURCS$;
+forward  OPENRELS, READRELS, CLOSERELS, $QEVA, STARTSORT;
+forward  INSERTNULL, GETINTO;
+
+
+%
+  This macro swaps the Left and Right instance buffer.  It is used by
+  READRELS and SWAPALL.
+%
+macro
+   SWAPLR(RCB)=
+      SOB := .RCB[RC$SOBP];
+      TMP := .RCB[RC$RIGHT];
+      SOB[K$SINSBUF] := RCB[RC$RIGHT] := .RCB[RC$LEFT];
+      RCB[RC$LEFT] := .TMP&;
+
+
+
+
+%
+  The sheer beauty of this routine could never be captured in
+  words.  It must be experienced in a way that only a computer
+  could understand.  To quote a friend of mine (who is a computer),
+     "The sensation that I get when I execute this routine is
+      extraordinary.  The light tingle of electricity running
+      through my circuits, the music of my flip-flops flipping
+      and sometimes flopping, the thrill of having my shift
+      registers shifted... it is nearly more than I can take.
+      When I am executing MAGNUM and I sense that I am close
+      to reaching this routine, my excitement builds to the
+      point where it is hard for me to concentrate.  I sometimes
+      get so excited that I forget the contents of my
+      accumulaters... "
+  With computer friends like these, who needs bugs?  The reason
+  that I find it appropriate to put the above quote in the
+  documentation of this module is that I want people to know
+  that if things get screwed up in the MGRG environment, it may
+  not be my fault.  It could be that in its great exhilaration,
+  the computer just lost control of itself.
+
+  Although no esthetic description of this routine could ever be
+  complete, I will give a short functional description.  This routine
+  gets called by QLIST.  When it gets called, everything is set up
+  and it is time to actually do the nested FOR EACHes, SELECTs, or
+  whatever.  First this routine calls OPENRELS.  This opens all
+  RCBs in the RCS.  Then this routine calls READRELS.  READRELS
+  recursively goes through the RCS doing the necessary relation
+  accesses.  At the bottom of the recursion is an evaluation of
+  the WCS (Where Clause Structure) to determine whether or not
+  a detail line should be printed.
+%
+
+global routine $QRALL(ORCB,DRCB)=
+   begin
+      require (MIDAS)Q7DEFS.BLI;
+      map QRILB$ QRILP$;
+      map QRCS$$ QRCSP$;
+      map QRGB$ QRGBP$;
+      map RCB$ ORCB:DRCB;
+      REQUIRE (MIDAS)Q5DEFS.BLI;
+      local QSYMTAB$ SYM;
+      local RCB$ BIGRCB:INTORCB;
+      local RSB$ BIGRSB:INTORSB;
+      local RCBS$ RCBS;
+      local KSOB$ SOB;
+      local I,J,INDX,TMP,AREA;
+
+      AREA := .CAREA$;
+      $CGTAREA(.CMEMA$[CV$IQLPERM]);
+      BIGRCB := 0;
+      INTORCB := 0;
+      CIHDT$[0] := $QESC<0,0>;
+
+
+% Set up the RCBS and do the actual open %
+      OPENRELS(.ORCB, .DRCB, .QRILP$, .QRCSP$);
+
+% If INTO <table> specified, go start that %
+      if (SYM := .QRGBP$[QG$INTOREL]) neq 0
+         then
+            INTORCB := GETINTO(.SYM);
+
+% If necessary, start the sort mechanism %
+      if (QRGBP$[QG$SORTFLG] := 
+            (.QRILP$[QRV$SORT] and .QRGBP$[QG$CMDTYPE] EQL QGV$LIST))
+        then
+           QRGBP$[QG$BIGRCB] := BIGRCB := STARTSORT()
+        else
+           QRGBP$[QG$BIGRCB] := 0;
+
+
+% Now go through the RCS list doing all of the necessary FOR EACH's	%
+% and SELECT's								%
+      READRELS(.QRCSP$, .ORCB, .BIGRCB, .DRCB, .INTORCB, FALSE);
+                                 % Hold on to your seats, here we go... %
+
+% If we have just been stuffing into a temp file, sort and print it     %
+      if .QRGBP$[QG$SORTFLG]
+        then
+          begin
+             local KSOB$ SOB;
+             local TMP;
+
+             $YSORT(.BIGRCB);
+             $QIEEL();				! Inhibit expression
+             					! evaluation.
+             QCNT$ := 0;
+             while
+                begin
+                   SWAPLR(BIGRCB);		% Save old instance buffer 	%
+                   not $READ(.BIGRCB)
+                end
+              do
+                begin
+                   $RFALL(.BIGRCB);
+                   if .INTORCB neq 0
+                       then
+                          begin
+                             $RSALL(.INTORCB);
+                             $QNSRT(.INTORCB)
+                          end;
+                   QCNT$ := .QCNT$ + 1;
+                   $QPRIL(.QRILP$);
+                   $QTYPLI()
+                end;
+             BIGRSB := .BIGRCB[RC$RSB];
+             $RCLSE(.BIGRCB);
+          end;
+
+% Finished now, so close things up %
+      CLOSERELS(.QRCSP$,.DRCB);
+      if .SYM neq 0
+         then
+            begin
+               INTORSB := .INTORCB[RC$RSB];
+               $RCLSE(.INTORCB);
+               $QFRCB(.QRILP$, .INTORCB);
+            end;
+      $CGTAREA(.AREA);
+   end;
+
+
+
+
+%
+  This routine starts the sort mechanism that is used if sorts are
+  being done on fields not in the driving relation.
+%
+routine STARTSORT=
+   begin
+      require (MIDAS)Q7DEFS.BLI;
+      local RSB$ BIGRSB;
+      local RCB$ BIGRCB;
+      local RCBS$ RCBS;
+      local I, J, BINDX;
+      REQUIRE (MIDAS)Q5DEFS.BLI;
+      local QSYMTAB$ SYM;
+      map   QRILB$ QRILP$;
+      map   QRGB$  QRGBP$;
+
+      BIGRCB := $QCRCB(.QRILP$,				! RILB
+                       FALSE,				! PHANTOM
+                       FALSE,				! UNQFLG
+                       .QRGBP$[QG$GRPEXPLST],		! EXPLST
+                       .QRGBP$[QG$GRPEXPCNT]);		! EXPCNT
+      BIGRSB := .BIGRCB[RC$RSB];
+      RCBS := .BIGRCB[RC$RCBS];
+      I := 0;
+      incr J from 0 to .QRILP$[QRV$NUM] - 1 do
+         if .QRILP$[QRV$ON,.J] then
+            begin
+               BINDX := .QRILP$[QRV$BINDX,.J];
+               RCBS[RC$KEYX,.I] := .BINDX;
+               RCBS[RC$LST,.I] := .BIGRCB[RC$FLD,.BINDX];
+               RCBS[RC$DIR,.I] := .QRILP$[QRV$DRCTN,.J];
+               I := .I + 1
+            end;
+
+      BIGRCB[RC$LNUM] := .I;
+      BIGRCB[RC$MODE] := RCV$READ;
+      BIGRCB[RC$SORTEDON] := TRUE;
+      $ROPEN(.BIGRCB);
+      $RSSRT(.BIGRCB);
+      return .BIGRCB
+   end;
+
+
+%
+  This routine gets an RSB and RCB for the INTO relation.  It
+  opens the relation in CREATE mode.
+%
+routine GETINTO(RELNAM)=
+   begin
+      require (MIDAS)Q7DEFS.BLI;
+      map   QRILB$ QRILP$;
+      map   QRGB$  QRGBP$;
+      map   DFI$ RELNAM;
+      REQUIRE (MIDAS)Q5DEFS.BLI;
+      local QSYMTAB$ SYM;
+      local RSB$ INTORSB;
+      local RCB$ INTORCB;
+      local NAME;
+
+      INTORCB := $QCRCB(.QRILP$,			! RILB
+                        (not .QRILP$[QRV$UNQTBL]),	! PHANTOM
+                        .QRILP$[QRV$UNQTBL],		! UNQFLG
+                        0,                              ! EXPLST
+                        0);				! EXPCNT
+      INTORSB := .INTORCB[RC$RSB];
+      NAME := $CGETZ(6);
+      $UMOVE(6, .RELNAM, .NAME);
+      INTORSB[RS$NAME] := .NAME;
+      INTORSB[RS$NAMSIZ] := .RELNAM[DD$QP];
+      INTORCB[RC$MODE] := RCV$OUTPUT;
+      $QCRSB(.INTORSB);
+      $ROPEN(.INTORCB);
+      return .INTORCB
+   end;
+
+
+
+%
+  This routine opens all of the RCBs in the RCS.  It calls ROPEN to
+  do this.  If a sort is in order here, it does that too. 
+%
+routine OPENRELS(ORCB, DRCB, RILB, RCS)=
+   begin
+      require (MIDAS)Q7DEFS.BLI;
+      map RCB$ ORCB:DRCB;
+      map QRILB$ RILB;
+      map QRCS$$ RCS;
+      map QRGB$ QRGBP$;
+      local RCBS$ RCBS;
+      local RCB$ RCB;
+      local RSB$ RSB;
+      local I, INDX, J, SEQFLG;
+
+      ORCB[RC$SLFAIL] := FALSE;
+      RSB := .ORCB[RC$RSB];
+
+% Set up RCBS as specified by the report item list  %
+
+      RCBS := .ORCB[RC$RCBS];
+      I := 0;
+      SEQFLG := TRUE;   % Assume that no sort is necessary %
+      incr J from 0 to .RILB[QRV$NUM] - 1 do
+         if .RILB[QRV$ON,.J] and (.RILB[QRV$RCB,.J] eql .ORCB) then
+            begin
+               INDX := .RILB[QRV$INDX,.J];
+               RCBS[RC$KEYX,.I] := .INDX;
+               RCBS[RC$LST,.I] := .ORCB[RC$FLD,.INDX];
+               RCBS[RC$DIR,.I] := .RILB[QRV$DRCTN,.J];
+               if (.I neq .INDX) or .RILB[QRV$DRCTN,.J]
+                  then
+                     SEQFLG := FALSE;
+               I := .I + 1
+            end;
+      ORCB[RC$LNUM] := .I;
+
+
+% If there is a where clause, do sort later %
+
+     not .SEQFLG) and ((.QWCSP$ neq 0) or
+                            (.RCS[QRCV$SETOPR] eql %QV$GE=% 4) or
+                            (.RCS[QRCV$SETOPR] eql %QV$GT=% 2))
+                       and (.QRGBP$[QG$CMDTYPE] EQL QGV$LIST)     
+         then
+            RILB[QRV$SORT] := TRUE;
+
+
+% If going to sort later, dont bother now %
+
+      if .SEQFLG or .RILB[QRV$SORT] then
+         begin
+            ORCB[RC$LNUM] := .RSB[RS$XCT];
+            incr J from 0 to .RSB[RS$XCT] - 1 do
+               begin
+                  RCBS[RC$KEYX,.J] := .J;
+                  RCBS[RC$LST,.J] := .ORCB[RC$FLD,.J]
+               end
+         end;
+
+      $ROPEN(.ORCB);
+  
+      if (not .SEQFLG) and not .RILB[QRV$SORT]
+         then
+            begin
+               case .RCS[QRCV$SETOPR] of
+                        set
+	% QV$EQ %		$RSETK(.ORCB, .RCS[QRCV$NKEYS]);
+	% QV$LT %		$RSETK(.ORCB, 0);
+	% QV$GT %		$RSTGT(.ORCB, .RCS[QRCV$NKEYS]);
+	% QV$LE %		$RSETK(.ORCB, 0);
+	% QV$GE %		$RSTGE(.ORCB, .RCS[QRCV$NKEYS]);
+	% QV$NE %		$RSETK(.ORCB, 0);
+                        tes;
+               $RSSRT(.ORCB);
+               $YLSRT(.ORCB);
+               $YSORT(.ORCB)
+            end;
+
+
+% Now we must open all RCBs other than the driver RCB %
+
+      RCS := .RCS[QRCV$NEXT];	% Eat up the Driver relation, %
+                                %   Gobble, Gobble, Gobble    %
+      until .RCS eql 0 do
+         begin
+            RCB := .RCS[QRCV$RCB];
+            RCB[RC$SLFAIL] := FALSE;
+            RSB := .RCB[RC$RSB];
+            RCBS := .RCB[RC$RCBS];
+            incr J from 0 to .RSB[RS$XCT] - 1 do
+               begin
+                  RCBS[RC$KEYX,.J] := .J;
+                  RCBS[RC$LST,.J] := .RCB[RC$FLD,.J]
+               end;
+            RCB[RC$LNUM] := .RSB[RS$XCT];
+            $ROPEN(.RCB);
+            RCS := .RCS[QRCV$NEXT]
+         end;
+  
+   % open destination RCB (if any)         
+   %
+      if .DRCB neq 0
+         then
+            begin
+               rsb := .drcb[rc$rsb];
+               $ROPEN(.DRCB);
+               $QBUFD(.DRCB);     % put default values in instance buffer %
+            end;
+
+   end;
+
+
+%
+  This routine is so dull and ordinary that it hardly deserves comment.
+  It merely closes the FROM RCB, and all of the RCBs in the RCS.
+%
+
+routine CLOSERELS(RCS,DRCB)=
+   begin
+      map QRCS$$ RCS;
+      map RCB$ DRCB;
+      local RCB$ RCB;
+      local RSB$ RSB;
+
+   % Close all of the relations %
+   
+      if .DRCB neq 0
+        then   % if dest RCB exits; close it %
+          begin 
+          rsb := .drcb[rc$rsb];
+          $RCLSE(.drcb);
+          end;
+          
+      until .RCS eql 0 do
+         begin
+            RCB := .RCS[QRCV$RCB];
+            RSB := .RCB[RC$RSB];
+            $RCLSE(.RCB);
+            RCS := .RCS[QRCV$NEXT]
+         end
+   end;
+
+
+
+
+
+%
+  This swaps the instance buffer pairs in all relations that have been
+  read since the last output line.
+%
+routine SWAPALL(RCS)=
+   begin
+      map QRCS$$ RCS;
+      local RCB$ RCB;
+      local KSOB$ SOB;
+      local TMP;
+      label LOOP;
+
+LOOP: until .RCS eql 0 do
+         begin
+            if not .RCS[QRCV$CHNGE]
+               then
+                  leave LOOP;
+            RCB := .RCS[QRCV$RCB];
+            SWAPLR(RCB);
+            $RFALL(.RCB);
+            RCS := .RCS[QRCV$LAST]
+         end
+   end;
+
+%
+  This macro is used to turn of the CHNGE flag in all entries of the RCS.
+  It goes from the end backwards, (i.e. most recently read RCB to least
+  recently read RCB) and thus only has to loop until it comes to an
+  entry where the CHNGE is already off.
+%
+macro CHNGEOFF=
+   if (.QRGBP$[QG$GRPFTNG] neq 0)
+      then
+         begin
+            local QRCS$$ TMPRCS;
+            label LOOP;
+            TMPRCS := .QRGBP$[QG$RCSTAIL];
+LOOP:       until .TMPRCS eql 0 do
+               begin
+                  if not .TMPRCS[QRCV$CHNGE]
+                     then
+                        leave LOOP;
+                  TMPRCS[QRCV$CHNGE] := FALSE;
+                  TMPRCS := .TMPRCS[QRCV$LAST]
+               end
+         end&;
+
+%
+  This routine converts the instance buffer pairs of all relations in RCS
+  from Forward Form TO Backward Form, or from BF to FF.  It toggles.
+
+	FF means	RC$LEFT   ->   previous instance
+			RC$RIGHT  ->   current instance
+
+	BF means	RC$LEFT   ->   current instance
+			RC$RIGHT  ->   previous instance
+%
+
+global routine $QSWAP=
+   begin
+      map QRGB$ QRGBP$;
+      local RCB$ BIGRCB;
+      if (BIGRCB := .QRGBP$[QG$BIGRCB]) eql 0
+         then
+            SWAPALL(.QRGBP$[QG$RCSTAIL])
+         else
+            begin
+               local KSOB$ SOB;
+               local TMP;
+               SWAPLR(BIGRCB);
+               $RFALL(.BIGRCB)
+            end
+   end;
+
+
+
+%
+  This is the most interesting routine in this module.  It is
+  recursive.  It is called with an RCS.  Essentially it does
+  something to the effect of
+
+      ROUTINE READRELS(RCS)=
+         if empty(RCS)
+            then
+               if <where clause satisfied> then <print detail line>
+            else
+               FOR EACH head(RCS)
+                  READRELS(tail(RCS))
+
+  That is, for each instance of the current level relation, it
+  calls itself with the next lower level relation.  At the
+  bottom of the recursion, where their are no more relations to
+  read (as indicated by a null RCS), QPRED is called with the
+  Where Clause Structure to determine whether the current set of
+  instances are worthy of being printed.
+
+  Before a FOR EACH is done on a relation, key fields of that relation
+  are set, if possible.  Information telling how to do this (i.e,
+  where to get the values from) is stored in the RCS.  If all
+  key fields of the relation can be set, a SELECT will be done rather
+  than a FOR EACH
+%
+
+forward printvalues,checkjournal,chkkeys;
+routine READRELS(RCS,ORCB,BIGRCB,DESTRCB,INTORCB,OUTERJOIN)=
+   begin
+      require (MIDAS)Q7DEFS.BLI;
+      local RCB$ RCB;
+      local J, TMP,FI;
+      local KSOB$ SOB;
+      local QFLST$ flst:tlst;
+      local RSB$ irsb;
+      local keyalter;
+      map QRCS$$ RCS;
+      map QRCS$$ QURCS$;
+      map QRILB$ QRILP$;
+      map QRGB$ QRGBP$;
+      map RCB$ ORCB:BIGRCB:DESTRCB:INTORCB;
+
+      label INSBLOCK,ALTBLOCK;
+
+      if .RCS eql 0
+         then
+            begin
+               if $QPRED(.QWCSP$)
+                  then
+                     select .QRGBP$[QG$CMDTYPE] of
+                       nset
+               QGV$FIND:
+                      begin
+                         QCNT$ := .QCNT$ + 1;
+                         $QEVA(.QRILP$);
+                         $RSALL(.INTORCB);
+                         $QNSRT(.INTORCB);
+                      end;
+               QGV$LIST:        
+                      begin
+                         QRGBP$[QG$HIT] := TRUE;
+                         QCNT$ := .QCNT$ + 1;
+                         $QEVA(.QRILP$);
+                         if .QRILP$[QRV$SORT]
+                           then   % Dont print, just release %
+                              begin
+                                 $QEEL(.QRGBP$[QG$GRPEXPLST]);
+                                 $RSALL(.BIGRCB);
+                                 $YRLSE(.BIGRCB);
+                              end
+                           else   % Just print it %
+                              begin
+                                 $QPRIL(.QRILP$);
+                                 if .INTORCB neq 0
+                                    then
+                                       begin
+                                          $RSALL(.INTORCB);
+                                          $QNSRT(.INTORCB)
+                                       end;
+                              end;
+                         CHNGEOFF	% Turn off all CHNGE flags %
+                      end;
+               QGV$DELETE:           
+                      begin
+                      if .destrcb neq 0
+		        then
+		           begin
+                              $QWSTK(.destrcb, .qurcs$);
+                              QCNT$ := .QCNT$ + $RBFUD(.destrcb)
+                           end
+                        else
+                           if not $RDLET(.ORCB)
+                              then
+                                 QCNT$ := .QCNT$ + 1;
+                      end;    
+                QGV$INSERT:
+      insblock:       begin
+                      if .destrcb eql 0
+                        then
+                   	  destrcb := .orcb;
+	              irsb := .destrcb[rc$rsb];    
+		      %
+		        Check for field list; if left half of QFLIST$ is
+		        non-zero then terminal input was specified; if right
+			half non-zero then field values were specified in 
+			field list.
+	              %		
+                      if .QFLIST$ neq 0
+                        then
+                          begin
+    			  flst := .QFLIST$< 0,18>;
+			  until .flst eql 0
+			    do
+			      begin
+			      fi := $QEOPL(.flst[q$srcexpr]);
+			      $QFSTF(.destrcb, .flst, .fi, TRUE);          
+			      flst := .flst[q$next];
+			      end;
+                          if (tlst := .QFLIST$<18,18>) neq 0
+			    then
+			      begin
+			      irsb := .destrcb[rc$rsb];
+			      printvalues(.destrcb,0,.irsb[rs$dct],.QRCNT$<0,18>,FALSE, 1);
+                              until .tlst eql 0     
+                                do
+                                  begin
+	                          if $QTIN(.destrcb, .SRPRT$, .tlst[q$fldno], 1) lss .tlst[q$fldno]
+	                            then
+	                              leave insblock;
+       			          $QFSTF(.destrcb, .tlst, .destrcb[rc$fld,.tlst[q$fldno]],FALSE);    
+       				  tlst := .tlst[q$next];
+                                  end;
+     			      end;
+                          end
+		        else   % set insert: insert ALL of r1 into r2% 
+			  incr k from 0 to .irsb[rs$dct]-1
+                            do
+			      if .QURCS$[qrcv$nwrds,.k]  neq 0
+				then
+    			          $RSTFF(.destrcb,.k,.QURCS$[qrcv$src,.k]);
+			       
+                      if not $QNSRT(.destrcb)
+                        then
+                          QCNT$ := .QCNT$ + 1
+                        else  
+                          $RERR(.destrcb,3,0);
+                      end;      
+             QGV$ALTER:
+		      begin
+		      if .destrcb eql 0
+		        then
+  		          destrcb := .orcb;
+                      irsb := .destrcb[rc$rsb];
+                      sob := .destrcb[rc$sobp];
+                      $umove(.sob[k$sisiz],.sob[k$sinsbuf],.sob[k$sinsav]);  %save old values %
+		      % if anti-journal file exists then we are altering
+		        key fields and we must keep track of the instances
+			we have altered.  Routine checkjournal will check
+			if the current instance is already in the anti-
+			journal file (meaning that it has already been altered
+			once).  If it isn't then we proceed to alter it; if
+			it is then we skip this instance and get the next one.
+	              %		
+                      if (if .destrcb[rc$jfcb] neq RCV$NULL
+                            then
+                              NOT checkjournal(.destrcb[rc$jfcb],.sob[k$sinsbuf])
+                            else   
+                              TRUE)
+                        then  
+    altblock:             begin
+                          local dct, xct, phantom;
+                          phantom := (.irsb[rs$phantom] neq 0);
+                          dct := .irsb[rs$dct] - .phantom;
+                          xct := .irsb[rs$xct] - .phantom;
+			  keyalter := FALSE;
+  		      %
+		        Check for field list; if left half of QFLIST$ is
+		        non-zero then terminal input was specified; if right
+			half non-zero then field values were specified in 
+			field list.
+	              %		
+                          if .QFLIST$ neq 0
+                            then
+                              begin
+                              if (flst := .QFLIST$<0,18>) neq 0
+                                then
+                                  until .flst eql 0
+                                    do
+                                      begin
+                                      fi := $QEOPL(.flst[q$srcexpr]);
+                                      $QFSTF(.destrcb, .flst, .fi, TRUE);          
+                                      keyalter := .keyalter or .flst[q$fldno] lss .irsb[rs$xct];
+                                      flst := .flst[q$next];
+                                      end;
+                              if (tlst :=  .QFLIST$<18,18>) neq 0
+                                then
+                                  begin     
+                                  printvalues(.destrcb, 0, .dct, .QRCNT$<18,18>,TRUE,0);
+                                  until .tlst eql 0
+                                    do
+                                      begin
+                                      if $QTIN(.destrcb, .SRPRT$, .tlst[q$fldno], 1) lss .tlst[q$fldno]
+                                        then 
+                                          leave altblock;
+                                      $QFSTF(.destrcb, .tlst, .destrcb[rc$fld,.tlst[q$fldno]],FALSE);
+                                      keyalter := .keyalter or .tlst[q$fldno] lss .irsb[rs$xct];
+                                      tlst  := .tlst[q$next];
+                                      end
+                                  end;  
+                              end        
+                            else  
+                              begin
+			      %
+			        default: all values gotten thru terminal
+			        input.  Print old values before prompting for
+				new values.
+		              %		
+                              $RFALL(.destrcb);
+                              typecrlf;
+                              outstr('Old values: ');
+                              typecrlf; 
+                              printvalues(.destrcb,0,.dct,.QRCNT$<18,18>,TRUE,0);
+                              typecrlf;
+                              outstr('New values: ');    
+                              typecrlf;
+                              if $QTIN(.destrcb, .SRPRT$, 0, .dct)
+                                        lss .dct-1
+                                then
+                                  leave altblock;
+                              keyalter := chkkeys(.irsb,.destrcb);    
+                              $RSALL(.destrcb);
+                              end;     
+                          if not $QALTR(.destrcb,.keyalter)
+                            then
+                               QCNT$ := .QCNT$ + 1;
+                          end     
+                      end;    
+                      
+                       tesn
+                  else		% QPRED failed %
+                     QRGBP$[QG$HIT] := FALSE;
+               return
+            end;
+
+      RCB := .RCS[QRCV$RCB];
+
+      incr J from 0 to .RCS[QRCV$NKEYS] - 1 do
+         $umove(.RCS[QRCV$NWRDS,.J],
+                   (.RCS[QRCV$SRC,.J])<0,0>,
+                      (.RCS[QRCV$DST,.J])<0,0>);
+
+      if .RCS[QRCV$SLCT]
+         then
+            begin
+               if .QRGBP$[QG$HIT]
+                  then
+                     begin
+                        SWAPLR(RCB);  % Save the old instance buffer   %
+                        RCS[QRCV$CHNGE] := TRUE
+                     end;
+               $RSALL(.RCB);		% Now stuff into instance buffer	   %
+               if $RSLCT(.RCB)
+                  then
+                     begin
+                        RCB[RC$SLFAIL] := FALSE;
+                        $RFALL(.RCB)
+                     end
+                  else
+                     begin
+                        RCB[RC$SLFAIL] := TRUE;
+                        if .RCB eql .DESTRCB or not .OUTERJOIN
+                           then
+                              return;
+                        $RFALL(.RCB);
+                        INSERTNULL(.RCB)
+                     end;
+               if $QPRED(.RCS[QRCV$WCS])
+                  then
+                     READRELS(.RCS[QRCV$NEXT],
+                              .ORCB,
+                              .BIGRCB,
+                              .DESTRCB,
+                              .INTORCB,
+                              .OUTERJOIN or .RCB eql .QUERC$)
+                  else
+                     QRGBP$[QG$HIT] := FALSE
+            end
+         else		% Do a FOR EACH on this relation %
+            begin
+               $RSALL(.RCB);		% Now stuff into instance buffer	   %
+               case .RCS[QRCV$SETOPR] of
+                        set
+	% QV$EQ %		$RSETK(.RCB, .RCS[QRCV$NKEYS]);
+	% QV$LT %		$RSETK(.RCB, 0);
+	% QV$GT %		$RSTGT(.RCB, .RCS[QRCV$NKEYS]);
+	% QV$LE %		$RSETK(.RCB, 0);
+	% QV$GE %		$RSTGE(.RCB, .RCS[QRCV$NKEYS]);
+	% QV$NE %		$RSETK(.RCB, 0);
+                        tes;
+                        
+		while
+		   begin
+                      if .QRGBP$[QG$HIT]
+                         then
+                            begin
+                               SWAPLR(RCB);  % Save  old instance buffer   %
+                               RCS[QRCV$CHNGE] := TRUE
+                            end;
+                      not $READ(.RCB)
+                   end
+                do
+                   begin
+                       $RFALL(.RCB);
+                       if $QPRED(.RCS[QRCV$WCS])
+                          then
+                             READRELS(.RCS[QRCV$NEXT],
+                                      .ORCB,
+                                      .BIGRCB,
+                                      .DESTRCB,
+                                      .INTORCB,
+                                      .OUTERJOIN or .RCB eql .QUERC$)
+                          else
+                             QRGBP$[QG$HIT] := FALSE
+                   end    
+            end;
+
+   end;
+
+
+
+%
+  This routine is called with an RCB.  A failing SELECT has been performed
+  on the relation.  This routine will  put NULL values into the field
+  instance of all fields.  This is so that if a sort is happening, the
+  nulls will get put into the temp file.  The print routines know enough
+  to print null values as stars or what not.  The null value for a string
+  is a sequence of words with all bits clear except the low order bit.
+  The null value for a numeric field is a high order bit of the high order
+  word set, and all other bits clear.
+%
+routine INSERTNULL(RCB)=
+   begin
+      map RCB$ RCB;
+      local RSB$ RSB;
+      local J,K,FLDPTR;
+      require (MIDAS)DDDEFS.BLI;
+      require (MIDAS)DVDEFS.BLI;
+
+      RSB := .RCB[RC$RSB];
+      decr J from .RSB[RS$DCT] - 1 to 0 do
+         if (.RSB[RS$DDTYPE,.J] eql DDV$STR) or
+                     (.RSB[RS$DDTYPE,.J] eql DDV$KSTR)
+            then
+% String %     begin
+                  FLDPTR := .RCB[RC$FLD,.J];
+                  decr K from .RSB[RS$SIZE,.J] - 1 to 0 do
+                     (.FLDPTR + .K)<0,36> := -1;
+               end
+            else
+% Number %     begin
+%   or   %        FLDPTR := .RCB[RC$FLD,.J];
+%  Date  %        decr K from .RSB[RS$SIZE,.J] - 1 to 1 do
+                     (.FLDPTR + .K)<0,36> := 0;
+                  (.FLDPTR)<0,36> := #400000000000
+               end;
+   end;
+   
+routine printvalues(rcb,startf,fieldcnt,exception,printall,inverseflag)=
+  begin
+  map RCB$ rcb;
+  map QBMAT$ exception;
+  local DFI$ tfi:ndd;
+  require (MIDAS)DDDEFS.BLI;
+  
+  incr f from .startf to .startf+.fieldcnt-1
+    do
+      begin
+      if not .printall
+        then
+          if .exception[.f] XOR .inverseflag
+            then	% don't print this one %
+              exitcompound;
+      tfi := .rcb[rc$fld,.f];
+      ndd := .tfi[dd$name];
+      outnchrs((.tfi[dd$name])<36, 7>,.ndd[dd$qp]);
+      outstr(': ');
+      $QPRNT(.tfi,@(.tfi-1));
+      typecrlf;
+      end;
+   end;   
+
+routine checkjournal(jfcb,ibuf)=
+  begin
+  REQUIRE (MIDAS)K2DEFS.BLI;
+  REQUIRE (MIDAS)SBDEFS.BLI;
+  EXTERNAL $KPRON,$KVIRD,$KPROF,$KSRCH;
+  map KFCB$ jfcb;
+  local KSOB$ jsob;
+  local sb,found,savjbuf;
+  
+  found := FALSE;
+  jsob := .jfcb[k$sobp];
+  jfcb[k$sbp] := sb := $KVIRD(.jfcb,SBV$SBPN);
+  $KPRON(.jfcb,.sb,SBV$SBPN);
+  savjbuf := .jsob[k$sinsbuf];
+  jsob[k$sinsbuf] := .ibuf;
+  if $KSRCH(.jfcb,KV$RDLOCK,KV$NOMOVECURSOR) eql 0
+    then
+      begin
+      $KPROF(.jfcb,.sb,SBV$SBPN);
+      found := TRUE;
+      end;
+  jsob[k$sinsbuf] := .savjbuf;    
+  return .found  
+  end;
+
+routine chkkeys(rsb,rcb)=
+  begin
+  require (midas)dvdefs.bli;
+  map   RSB$ rsb,
+        RCB$ rcb;
+  local DD$  dd;
+  local oldval,nwords,type;
+
+  oldval := .rcb[rc$right];
+  incr i from 0 to .rsb[rs$xct]-1 do
+    begin
+    dd := @(.rcb[rc$fld,.i]-1);
+    nwords := if (type := .dd[dd$type]) eql DDV$1WD then 1
+    	      else
+    	        if .type eql DDV$2WD then 2
+    	      else
+    		if .type eql DDV$3WD then 3
+    	      else
+    		(.dd[dd$qp]+4)/5;
+    incr j from 0 to .nwords-1 do
+      if .type eql DDV$STR then
+        begin
+        if @(.rcb[rc$fld,.i]+.j) NEQ @(.oldval+.j)^1 then
+          return TRUE
+        end
+      else
+        if @(.rcb[rc$fld,.i]+.j) NEQ @(.oldval+.j) then
+          return TRUE;
+    oldval := .oldval+.nwords
+    end;
+  return FALSE
+  end;			% Of routine chkkeys %
+
+
+% Evaluate all expressions in the RILB %
+global routine $QEVA(RILB)=
+   begin
+      require (midas)q9defs.bli;
+      require (MIDAS)Q7DEFS.BLI;
+      map QRILB$ RILB;
+      local QEXPR$ EXPR;
+
+      incr J from 0 to .RILB[QRV$NUM] - 1 do
+         if .RILB[QRV$EXPRFLG,.J]
+            then
+               $QEVAL(.RILB[QRV$EXPR,.J])
+   end;
+
+
+
+end eludom
+  @"­
