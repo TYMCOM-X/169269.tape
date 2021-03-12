@@ -1,0 +1,1213 @@
+ENTRY;
+BEGIN "SNCLI"
+
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndsn.sai" SOURCE!FILE;
+
+ck!sn
+REQUIRE "snsym.sai" SOURCE!FILE;
+elsec
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+endc
+REQUIRE "sndefs.sai" SOURCE!FILE;
+!get!module(<brkfns>);
+!get!module(<extend>);
+!get!definitions(<tymint>);
+
+EXTERNAL INTEGER cmdtkn;		\ Token which identifies current command;
+EXTERNAL INTEGER intrpt;		\ Interrupt flag location;
+EXTERNAL STRING cmdstr,			\ The user command (in "snpars");
+   snstat;				\ SNARL status vector;
+EXTERNAL INTEGER ARRAY gramr[!grlow:!grhgh];	\ The grammar rules;
+
+EXTERNAL R!C pgraph			\ The parsing graph;
+   (INTEGER tkn,			\ token number;
+   type;				\ type of result, if any;
+   R!P (any!class) def,			\ ptr. to definition of node;
+   succ,				\ ptr. to successor node;
+   result);				\ ptr. to result, if any;
+EXTERNAL R!C intres			\ storage for integer results;
+   (INTEGER intval);			\ the value;
+EXTERNAL R!C strres			\ storage for string results;
+   (STRING strval);			\ the value;
+EXTERNAL R!C tokent			\ The token entry list;
+   (INTEGER token,			\ the token value;
+   pos,					\ position in "cmdstr";
+   len;					\ length of token string;
+   R!P (tokent) next);			\ ptr. to next tokent record;
+EXTERNAL R!P (tokent) tokhed,		\ beginning of token list;
+   toktop,				\ last token entry;
+   cursor;				\ cursor position for parse;
+
+EXTERNAL INTEGER mtchan;		\ mag tape channel number;
+ck!dsn
+EXTERNAL INTEGER ARRAY rcdmap[1:50,1:2];\ Logical record map of a tape block.;
+EXTERNAL BOOLEAN octal;			\ indices indicator for DSNARL dump functions;
+endc
+\  Assorted external procedures;	  
+
+EXTERNAL RECURSIVE R!P (any!class) PROCEDURE parse (INTEGER dict(1), msglst(0));
+EXTERNAL PROCEDURE init!graph;
+EXTERNAL PROCEDURE prtalt (INTEGER index);
+EXTERNAL RECURSIVE R!P (any!class) PROCEDURE fndtok
+   (R!P (any!class) link;  INTEGER toknum);
+EXTERNAL INTEGER PROCEDURE fndgrm (INTEGER toknum);
+EXTERNAL STRING PROCEDURE getkey (INTEGER toknum);
+EXTERNAL PROCEDURE st!int (R!P (any!class) link;  INTEGER result, type);
+EXTERNAL PROCEDURE st!str (R!P (any!class) link;  STRING result;
+   INTEGER type);
+\ External command service routines.;
+
+EXTERNAL PROCEDURE s!rewi (BOOLEAN wait);
+EXTERNAL PROCEDURE s!unlo (BOOLEAN wait);
+EXTERNAL PROCEDURE s!qmrk (INTEGER cmdtkn);
+EXTERNAL PROCEDURE s!abor;
+EXTERNAL PROCEDURE s!stop;
+EXTERNAL PROCEDURE s!quit;
+
+ck!sn
+EXTERNAL PROCEDURE s!mode (BOOLEAN alter);
+EXTERNAL PROCEDURE s!old (INTEGER swval(0));
+EXTERNAL PROCEDURE s!sys (INTEGER swval(0));
+EXTERNAL PROCEDURE s!rpr (INTEGER swval(0));
+EXTERNAL PROCEDURE s!spr (INTEGER swval(0));
+EXTERNAL PROCEDURE s!ree (INTEGER reelno(0));
+EXTERNAL PROCEDURE s!dsk (INTEGER swval(0));
+EXTERNAL PROCEDURE s!tty (INTEGER swval(0));
+EXTERNAL PROCEDURE s!wher;
+EXTERNAL PROCEDURE s!new (STRING tidval(null));
+EXTERNAL PROCEDURE s!sto (INTEGER lsttyp, afttim, beftim, modbts;
+   STRING stusr, stnam, stext, endusr, endnam, endext);
+EXTERNAL PROCEDURE s!ret (INTEGER cmdtkn, lsttyp, afttim, beftim, modbts;
+   STRING stusr, stnam, stext, endusr, endnam, endext);
+elsec
+EXTERNAL PROCEDURE s!indi (INTEGER swval);
+EXTERNAL PROCEDURE s!bloc (INTEGER swval, block!num);
+EXTERNAL PROCEDURE s!map;
+EXTERNAL PROCEDURE s!typ (INTEGER range1, range2, mode);
+endc
+\ Macro definitions;
+
+REQUIRE "{}<>" DELIMITERS;
+DEFINE xtkn(wd) = {ldb(point(12,gramr[wd],11))};
+DEFINE xdef(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xrou(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xerr(wd) = {gramr[wd] land '7777};
+DEFINE xsucc(wd) = {gramr[wd] land '7777};
+DEFINE xfail(wd) = {gramr[wd] land '7777};
+DEFINE nlft(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE clrsucc(wd) = {gramr[wd] land '777777770000};
+DEFINE psucc(wd,value) = {gramr[wd]_clrsucc(<wd>) lor value};
+
+INTEGER sp!brk, line!brk, ppn!brk,	\ Break tables set by brkset and;
+   file!brk, usr!brk, id!brk, wld!brk,	\ used by "pre!scan" and "strsav".;
+   num!brk, text!brk, uname!brk,
+   all!brk, up!brk;
+
+R!C comfil				\ This is the command file stack;
+   (INTEGER chan,			\ the channel number;
+   break,				\ break character save;
+   eof,					\ eof and error info. save;
+   line;				\ current line #;
+   STRING device,			\ device name ("tty", "dsk", etc.);
+   file;				\ file name string (for SAIL lookup);
+   R!P (comfil) prev);			\ ptr. to previous file in stack;
+
+R!P (comfil) ttyfil,			\ ptr. to original tty command device;
+   curfil;				\ current command file;
+
+R!C linptr				\ Keeps track of command lines;
+   (INTEGER pos,			\ position in "cmdstr" of start of line;
+   line;				\ line number from command file;
+   R!P (linptr) next;			\ next "linptr" entry;
+   R!P (comfil) filptr);		\ points to command file entry;
+
+R!P (linptr) linhed,			\ ptr. to head of linptr list;
+   lstlin;				\ ptr. to end of linptr list;
+
+INTEGER pagno, sosno;			\ Dummies for "setpl";
+
+
+\ Definitions of file transfer command file list structures;
+
+EXTERNAL R!P (any!class) filist;	\ The beginning of a user or gan list;
+
+EXTERNAL R!C stfil			\ Used as a list of single file names;
+   (STRING name,			\ a file name;
+   ext;					\ file extension;
+   R!P (stfil) next);			\ next file in this list;
+
+EXTERNAL R!C stusrs			\ The user list for STORE, GET, DIRECTORY;
+   (STRING user;			\ a user name;
+   INTEGER ppn;				\ the corresponding ppn;
+   R!P (stfil) files;			\ pointer to a list of single file names;
+   R!P (stusrs) next);			\ the next user in this list;
+
+EXTERNAL R!C repusr			\ Holds replacement user names for the RETRIEVE command;
+   (STRING user;			\ a user name;
+   INTEGER ppn);			\ the corresponding ppn;
+
+EXTERNAL R!C repfil			\ Holds replacement file names for the RETRIEVE command;
+   (STRING name,			\ a file name;
+   ext);				\ file extension;
+
+EXTERNAL R!C retfil			\ Forms a file or file pair list for RETRIEVE;
+   (STRING name,			\ a file name;
+   ext;					\ file extension;
+   R!P (repfil) repl;			\ pointer to replacement file;
+   R!P (retfil) next);			\ next file in this list;
+
+EXTERNAL R!C reusrs			\ Used as a list of users or user pairs for RETRIEVE command;
+   (STRING user;			\ a user name;
+   INTEGER ppn;				\ the corresponding ppn;
+   R!P (repusr) repl;			\ pointer to replacement user name;
+   R!P (retfil) files;			\ pointer to a list of single file names;
+   R!P (reusrs) next);			\ the next user in this list;
+
+EXTERNAL R!C ganlst			\ holds a list of GAN number ranges;
+   (INTEGER lower,			\ lower bound of the range;
+   upper;				\ upper bound of the range;
+   R!P (ganlst) next);			\ next range entry;
+
+EXTERNAL R!C poslst			\ holds a list of file position ranges;
+   (INTEGER lower,			\ lower bound of the range;
+   upper;				\ upper bound of the range;
+   R!P (poslst) next);			\ next range entry;
+INTERNAL R!P (any!class) PROCEDURE chksym (INTEGER toknum);
+	\ This procedure is called by "parse" and is a link to
+"check!sym" which resides within "snpars".  It causes the symbol matcher
+to match a keyword in the input string with an identifier in the grammar.;
+BEGIN
+  EXTERNAL R!P (any!class) PROCEDURE check!sym (INTEGER toknum, key!id);
+  RETURN (check!sym(toknum,!identifier));
+END;
+
+
+INTERNAL BOOLEAN PROCEDURE cmdstk;
+	\ This procedure sets up the command stack with an entry for the
+user's console.;
+BEGIN
+   comfil:chan[curfil_new!record(comfil)]_getchan;
+   comfil:line[curfil]_1;  comfil:device[curfil]_"TTY";
+   open (comfil:chan[curfil],"TTY",'760000,2,0,132,comfil:break[curfil],
+      comfil:eof[curfil]);
+   IF comfil:eof[curfil] THEN BEGIN
+      print("Cannot init the TTY." & crlf);
+      curfil_n!r;  RETURN (false);
+   END;
+   ttyfil_curfil;
+   setpl(comfil:chan[curfil],comfil:line[curfil],pagno,sosno);
+   RETURN (true);
+END;
+
+
+SIMPLE PROCEDURE unstak;
+	\ This routine pops the command file stack, setting up to
+continue processing with the previous command file.;
+BEGIN
+   release(comfil:chan[curfil]);
+   curfil_comfil:prev[curfil];
+   RETURN;
+END;
+
+
+INTERNAL SIMPLE PROCEDURE bailout;
+	\ This routine bails out of all opened command files and closes
+outstanding TTY input.;
+BEGIN
+   WHILE curfil neq ttyfil DO unstak;
+   close(comfil:chan[curfil]);  RETURN;
+END;
+
+
+SIMPLE PROCEDURE free!lin;
+	\ This routine clears the "linptr" list;
+BEGIN
+   WHILE linhed neq n!r DO linhed_linptr:next[linhed];
+   lstlin_n!r;  RETURN;
+END;
+
+
+BOOLEAN PROCEDURE stack (STRING filnam;  BOOLEAN rep!err);
+	\ This routine opens a new command file, saves the information
+on the stack, and makes the appropriate success or failure return.  The
+"filnam" parameter is a file name string for a SAIL lookup call.  The
+"rep!err" parameter indicates whether or not "stack" should print any
+error messages to the logging device(s).;
+BEGIN
+   R!P (any!class) rp;
+   rp_curfil;
+   comfil:chan[curfil_new!record(comfil)]_getchan;
+   comfil:line[curfil]_1;  comfil:device[curfil]_"DSK";
+   comfil:file[curfil]_filnam;  comfil:prev[curfil]_rp;
+   open(comfil:chan[curfil],"DSK",'760000,1,0,132,comfil:break[curfil],
+      comfil:eof[curfil]);
+   IF comfil:eof[curfil] THEN BEGIN
+      IF rep!err THEN print("Cannot init the disk.",crlf);
+      ut;  RETURN (false);
+   END;
+   lookup(comfil:chan[curfil],filnam,comfil:eof[curfil]);
+   IF comfil:eof[curfil] THEN BEGIN
+      IF rep!err THEN print("Cannot open file """,filnam,"""",crlf);
+      bailout;  RETURN (false);
+   END;
+   setpl (comfil:chan[curfil],comfil:line[curfil],pagno,sosno);
+   print (crlf & "<<" & filnam & ">>" & crlf);  RETURN (true);
+END;
+
+
+SIMPLE INTERNAL INTEGER PROCEDURE c!chan;
+	\ This procedure returns the channel number of the current
+command file;
+RETURN (comfil:chan[curfil]);
+
+
+INTERNAL SIMPLE PROCEDURE brkset;
+	\ This procedure initializes the break tables needed by the
+"pre!scan" and "strsav" routines.;
+BEGIN
+  STRING alphas, digits;
+  alphas_"ABCDEFGHIJKLMNOPQRSTUVWXYZ";  digits_"1234567890";
+  all!brk_ getbreak;  setbreak(all!brk,null,null,"kxan");
+  sp!brk_getbreak;  setbreak(sp!brk," " & #ht,null,"xrn");
+  line!brk_getbreak;  setbreak(line!brk,
+      #ctrl(<"C">) & " " & #ht & #lf & "@",#cr,"in");
+  ppn!brk_getbreak;  setbreak(ppn!brk,#ctrl(<"C">) & "]",null,"ian");
+  file!brk_getbreak;  setbreak(file!brk,alphas & digits & ".",null,"kxrn");
+  usr!brk_getbreak;  setbreak(usr!brk,#ctrl(<"C">) & ")",null,"ian");
+  id!brk_getbreak;  setbreak(id!brk,alphas & digits,null,"kxrn");
+ck!sn
+  wld!brk_getbreak;  setbreak(wld!brk,alphas & digits & "#" & "*",null,"kxrn");
+endc
+  num!brk_getbreak;  setbreak(num!brk,digits,null,"xrn");
+  text!brk_getbreak;  setbreak(text!brk,#ctrl(<"C">)&#lf,null,"irn");
+  uname!brk_getbreak;  setbreak(uname!brk,#ctrl(<"C">)&")",null,"ins");
+  up!brk_getbreak;  setbreak(up!brk,#ctrl(<"C">),null,"ki");
+  RETURN;
+END;
+
+
+INTERNAL BOOLEAN PROCEDURE pre!scan (BOOLEAN tty(false), cmd!ok(true),
+  rep!err(true));
+	\ This procedure reads and tokenizes a user command, producing
+the structure "tokent" which is later checked by the symbol matching
+routine "chksym".  A return of "true" indicates the success of the
+pre!scan.
+	If "tty" is true, the input will be read from the console, and
+command file references are illegal.  Otherwise, input will be read
+from the current command file (which may be the TTY).
+	If "cmd!ok" is true, then a command file reference is legal.  If
+"tty" is true, then "cmd!ok" is made false by "pre!scan".
+	If "rep!err" is true, then "pre!scan" will report errors to the
+current log device(s).
+	"Pre!scan! identifies the following user-defined terminals:
+An {identifier} is a combination of alphabetic and numeric characters
+which is terminated by a delimiter other than "#" or "*" and begins
+with an alphabetic character.  A {usrnam} is a Tymcom-X username
+enclosed in parentheses.  An {integer} is a delimited set of numeric
+characters.  A {filpc} is a delimited set of characters which is legal
+for a file name or extension.  It may contain alphanumerics.  A {wldpc}
+is a delimited set of characters which is legal for a wild-card file
+name or extension.  It may contain alphanumerics or "#" or "*".  {Text}
+is a set of characters comprising the comment portion of the COMMENT
+command, which must be handled specially by the "pre!scan".
+	When reporting an error in a multi-line command, only the
+applicable line will be displayed.
+;
+BEGIN
+   REQUIRE brkset INITIALIZATION;
+   EXTERNAL INTEGER PROCEDURE keychk (STRING find);
+   EXTERNAL BOOLEAN PROCEDURE alpha (INTEGER char);
+   EXTERNAL BOOLEAN PROCEDURE digchk (INTEGER char);
+   EXTERNAL INTEGER PROCEDURE delim (INTEGER char);
+   INTEGER brchr,			\ break character save loc.;
+      pos,				\ "cmdstr" position;
+      tkn,				\ token value;
+      len,				\ token length;
+      inchan;				\ current input channel;
+   R!P (any!class) rp, crp, lrp;
+   STRING tmpstr, toktmp, filstr;
+   BOOLEAN cmd!read;
+
+PROCEDURE scnerr (STRING errmsg);
+BEGIN
+   IF rep!err THEN print(errmsg & crlf);
+   bailout;  RETURN;
+END;
+
+STRING PROCEDURE cmdin (INTEGER brtab);
+BEGIN
+   STRING str;
+   disable(tinass(-1,cause!tty!escape,ch!attn));
+   str_input(inchan,brtab);
+   if comfil:break[crp] = #ctrl(<"C">) then snstat_ "K" & snstat;
+   if curfil neq ttyfil THEN print(str);
+   enable(tinass(-1,cause!tty!escape,ch!attn));
+   return(str);
+END;
+\   "Pre!scan procedure body begins here;
+
+   IF tty THEN BEGIN
+      cmd!ok_false;  crp_ttyfil;  
+   END ELSE crp_curfil;
+   inchan_comfil:chan[crp];  comfil:break[crp]_0;
+   linhed_(lstlin_(lrp_new!record(linptr)));
+   linptr:pos[lrp]_1;  linptr:line[lrp]_comfil:line[crp];
+   linptr:filptr[lrp]_crp;
+   cmd!read_false;  cmdstr_null;
+
+\ First pass - put command together, purging white space at the beginning
+  of the command and trailing white space at the end of each line of the
+  command and excess white space within the command.;
+
+   tmpstr_cmdin(sp!brk);						\ Purge leading white space;
+   WHILE not cmd!read DO BEGIN "pass 1"
+      poll;
+      if snstat[1 for 1]="K" then
+      BEGIN
+	 cmdstr_ #lf;  return (false);
+      END;
+      cmdstr_cmdstr & cmdin(line!brk);
+      IF comfil:eof[crp] THEN BEGIN					\ If eof or error,;
+	 IF crp neq ttyfil THEN unstak					\ bounce out of command file.;
+	 ELSE IF rep!err THEN scnerr("Apparent command reading error.");
+	 RETURN (false);
+      END;
+      CASE comfil:break[crp] of BEGIN
+["@"]	 BEGIN
+	    IF not cmd!ok THEN BEGIN
+	       IF rep!err THEN scnerr("File reference illegal here.");
+	       RETURN (false);
+	    END
+	    ELSE BEGIN
+	       tmpstr_null;  filstr_ cmdin(all!brk);			\ Now get the file name;
+	       if snstat[1 for 1] = "K" then continue "pass 1";
+	       IF filstr="[" THEN BEGIN					\ putting ppn reference, if any,;
+		  tmpstr_filstr & cmdin(ppn!brk);			\ following the name portion.;
+		  if snstat[1 for 1] = "K" then continue "pass 1";
+	          IF comfil:break[crp]=0 THEN BEGIN
+		     IF rep!err THEN scnerr("Illegal file name.");
+		     RETURN (false);
+		  END;
+		  filstr_ cmdin(file!brk);
+	       END
+	       ELSE filstr_filstr & cmdin(file!brk);
+	       if snstat[1 for 1] = "K" then continue "pass 1";
+	       IF comfil:break[crp]=0 THEN BEGIN
+		  IF rep!err THEN scnerr("Illegal file name.");
+		  RETURN (false);
+	       END;
+	       IF curfil neq ttyfil THEN print("@" & tmpstr & filstr);
+	       IF tmpstr neq null THEN filstr_filstr & tmpstr;
+	       filstr_scan(filstr,up!brk,brchr);
+	       IF stack(filstr,rep!err) THEN BEGIN
+		  crp_curfil;  inchan_comfil:chan[crp];
+		  linptr:next[lrp]_(lstlin_new!record(linptr));
+		  linptr:pos[lrp_lstlin]_length(cmdstr)+1;
+		  linptr:line[lrp]_comfil:line[crp];
+		  linptr:filptr[lrp]_crp;
+	       END
+	       ELSE RETURN (false);
+	    END;
+	 END;
+["("]	 BEGIN								\ Check user names here only to;
+	    cmdstr_cmdstr & (brchr_comfil:break[crp]);			\ assure that blanks within user;
+	    IF curfil neq ttyfil THEN print(brchr);
+	    cmdstr_cmdstr & cmdin(usr!brk);				\ names are not purged.;
+	    IF comfil:break[crp]=0 THEN BEGIN
+	       IF rep!err THEN scnerr("User name not terminated.");
+	       RETURN (false);
+	    END;
+	 END;
+[" "]
+[#ht]	 BEGIN
+	    cmdstr_cmdstr & " ";
+	    IF curfil neq ttyfil THEN print(" ");
+	    tmpstr_cmdin(sp!brk);
+	 END;
+[#lf]	 BEGIN
+	    IF length(cmdstr) neq 0 THEN BEGIN
+	       rvscan(cmdstr,sp!brk,brchr);				\ Get rid of trailing white space;
+	       IF brchr="&" THEN BEGIN					\ Check for continuation;
+	          linptr:next[lrp]_new!record(linptr);
+	          lrp_linptr:next[lrp];
+	          linptr:pos[lrp]_length(cmdstr);
+	          cmdstr_cmdstr[1 for (length(cmdstr)-1)];
+	          linptr:line[lrp]_comfil:line[crp]+1;
+	          linptr:filptr[lrp]_crp;
+	       END
+	    END;
+	    cmdstr_cmdstr & #lf;  cmd!read_true;
+	    IF curfil neq ttyfil THEN print(crlf);
+	    IF cmdstr=#lf THEN RETURN (false);
+	 END
+      END;
+   END "pass 1";
+
+\ Second pass.  Tokenize the line.;
+
+   tmpstr_cmdstr;  pos_1;  tkn_0;
+   WHILE tkn neq !lf DO BEGIN "tokenize loop"
+      brchr_tmpstr[1 for 1];
+      IF (tkn=!comment) and (toktop=tokhed) THEN BEGIN
+	 toktmp_scan(tmpstr,text!brk,brchr);  tkn_!text;		\ The COMMENT command is;
+      END
+      ELSE IF alpha(brchr) THEN BEGIN
+	 toktmp_scan(tmpstr,id!brk,brchr);
+ck!dsn
+	 if not (tkn_keychk(toktmp)) THEN tkn_!identifier;
+elsec
+	 if (brchr neq "#") and (brchr neq "*") THEN BEGIN
+	    IF not (tkn_keychk(toktmp)) THEN tkn_!identifier;
+	 END
+	 ELSE BEGIN
+	    toktmp_toktmp & scan(tmpstr,wld!brk,brchr);
+	    tkn_!wldpc;
+	 END;
+endc
+      END
+      ELSE IF digchk(brchr) THEN BEGIN
+	 toktmp_scan(tmpstr,num!brk,brchr);
+	 IF alpha(brchr) THEN BEGIN
+ck!dsn
+	    tkn_ !filpc;
+elsec
+	    IF (brchr neq "#") and (brchr neq "*") THEN tkn_!filpc
+	    ELSE BEGIN
+	       toktmp_toktmp & scan(tmpstr,wld!brk,brchr);  tkn_!wldpc;
+	    END;
+endc
+	 END
+ck!sn
+	 ELSE IF (brchr="*") or (brchr="#") THEN BEGIN
+	    toktmp_toktmp & scan(tmpstr,wld!brk,brchr);  tkn_!wldpc;
+	 END
+endc
+	 ELSE tkn_!integer;
+      END
+      ELSE IF (brchr=" ") or (brchr=#ht) THEN BEGIN
+	 pos_pos+1;  brchr_lop(tmpstr);  CONTINUE "tokenize loop";
+      END
+      ELSE IF brchr="(" THEN BEGIN
+	 pos_pos+1;  brchr_lop(tmpstr);
+	 toktmp_scan(tmpstr,uname!brk,brchr);  tkn_!usrnam;
+      END
+ck!sn
+      ELSE IF (brchr="*") or (brchr="#") THEN BEGIN
+	 toktmp_scan(tmpstr,wld!brk,brchr);  tkn_!wldpc;
+      END
+endc
+      ELSE IF (tkn_delim(brchr)) neq 0 THEN toktmp_lop(tmpstr)
+      ELSE BEGIN
+	 scnerr("Illegal character in input.");
+	 RETURN (false);
+      END;
+      tokent:token[rp_new!record(tokent)]_tkn;
+      tokent:pos[rp]_pos;  tokent:len[rp]_(len_length(toktmp));
+      IF toktop=n!r THEN cursor_(tokhed_rp)
+      ELSE tokent:next[toktop]_rp;
+      toktop_rp;
+      pos_pos+len+(IF tkn=!usrnam THEN 1 ELSE 0);
+   END "tokenize loop";
+   RETURN (true);
+END;
+ck!sn PROCEDURE make!stlist (R!P (pgraph) link);
+	\ This procedure makes the store list record structure from the
+pgraph tree structure.;
+BEGIN
+   R!P (any!class) rp1,rp2,rp3,rp4,link1,link2;
+
+   filist_ n!r;  link_ fndtok(link,!usritm);
+   WHILE link neq n!r DO BEGIN
+      rp1_ new!record(stusrs);
+      IF filist=n!r THEN filist_ rp1 ELSE stusrs:next[rp2]_ rp1;
+      link1_ pgraph:def[link];
+      link2_ pgraph:def[pgraph:def[link1]];
+      IF pgraph:type[link2]=i!type THEN					\ Get user or ppn, whichever;
+	 stusrs:ppn[rp1]_ intres:intval[pgraph:result[link2]]		\ was supplied.  The other one;
+	 ELSE stusrs:user[rp1]_ strres:strval[pgraph:result[link2]];	\ will be added by "s!sto";
+      IF (link1_ pgraph:succ[link1]) neq n!r THEN BEGIN			\ If there are file names;
+	 link1_ fndtok(link1,!wldfil);					\ following the user name,;
+	 WHILE link1 neq n!r DO BEGIN					\ then collect them in the;
+	    rp3_ new!record(stfil);					\ "stfil" record structure.;
+	    IF stusrs:files[rp1]=n!r THEN stusrs:files[rp1]_ rp3	\ pointer from user list.;
+	    ELSE stfil:next[rp4]_ rp3;
+	    link2_ fndtok(link1,!wldnm);
+	    stfil:name[rp3]_ strres:strval[pgraph:result[pgraph:def[link2]]];
+	    link2_ fndtok(link1,!wldext);  link2_ pgraph:def[link2];
+	    stfil:ext[rp3]_ strres:strval[pgraph:result[pgraph:def[link2]]];
+	    rp4_ rp3;  link1_ fndtok(pgraph:succ[link1],!wldfil);
+	 END;
+      END;
+      rp2_ rp1;  link_ fndtok(pgraph:succ[link],!usritm);
+   END;
+   RETURN;
+END;
+
+endc
+ck!sn PROCEDURE make!relist (R!P (pgraph) link);
+	\ This procedure makes the "retrieve" list record structure
+from the pgraph tree structure.;
+BEGIN
+   R!P (any!class) reu1, reu2, repu, ret1, ret2, repf,
+      link1, link2, link3;
+
+   filist_ n!r;  link_ fndtok(link,!rtritm);
+   while link neq n!r do
+   BEGIN
+      reu1_ new!record(reusrs);
+      if filist=n!r then filist_ reu1 else reusrs:next[reu2]_ reu1;
+      link1_ pgraph:def[link];
+      if pgraph:tkn[link2_ pgraph:def[link1]]=!upair then
+      BEGIN
+	 link2_ pgraph:def[link2];					\ If we have a user pair, then the first;
+	 if (link3_ fndtok(link2,!ppn)) = n!r				\ user we will encounter will be the replacement user.;
+	    then link3_ fndtok(link2,!user);				\ Pair could be of ppn's or users;
+	 repu_ new!record(repusr);  reusrs:repl[reu1]_ repu;		\ Get a new record from the appropriate class;
+	 if pgraph:type[link3_ pgraph:def[link3]]=i!type then		\ To store the replacement user or ppn and link it up.;
+	    repusr:ppn[repu]_ intres:intval[pgraph:result[link3]]
+	    else repusr:user[repu]_ strres:strval[pgraph:result[link3]];
+	 link2_ pgraph:succ[pgraph:succ[link2]];
+      END;
+      if (link3_ fndtok(link2,!ppn)) = n!r				\ Now get the single user or ppn or the tape;
+	 then link3_ fndtok(link2,!user);				\ user if we had a pair.;
+      if pgraph:type[link3_ pgraph:def[link3]]=i!type then
+	 reusrs:ppn[reu1]_ intres:intval[pgraph:result[link3]]
+	 else reusrs:user[reu1]_ strres:strval[pgraph:result[link3]];
+      if (link1_ pgraph:succ[link1]) neq n!r then		     
+      BEGIN
+	 link1_ fndtok(link1,!retfil);					\ If there are file names following;
+	 while link1 neq n!r do						\ the user designator, then collect;
+	 BEGIN								\ them in the "retfil" structure.;
+	    link2_ pgraph:def[link1];
+	    ret1_ new!record(retfil);					\ "retfil" record structure.;
+	    if reusrs:files[reu1]=n!r then reusrs:files[reu1]_ ret1	\ pointer from user list.;
+	    else retfil:next[ret2]_ ret1;
+	    if pgraph:tkn[link2] = !fpair then				\ File names may also be in pairs;
+	    BEGIN							\ Collect the replacement file names;
+	       link2_ pgraph:def[link2];				\ in the "repfil" structure, and;
+	       repf_ new!record(repfil);  retfil:repl[ret1]_ repf;	\ link each "repfil" entry to its;
+	       link3_ fndtok(link2,!fname);				\ corresponding "retfil" entry.;
+	       repfil:name[repf]_ strres:strval[pgraph:result[pgraph:def[link3]]];
+	       link3_ fndtok(link2,!fext);				\ The list of files in "repfil" classes;
+	       repfil:ext[repf]_ strres:strval[pgraph:result[pgraph:def[link3]]];
+	    END;							\ will be linked in a list for each user designator.;
+	    link3_ fndtok(link2,!wldnm);
+	    retfil:name[ret1]_ strres:strval[pgraph:result[pgraph:def[link3]]];
+	    link3_ fndtok(link2,!wldext);  link3_ pgraph:def[link3];
+	    retfil:ext[ret1]_ strres:strval[pgraph:result[pgraph:def[link3]]];
+	    ret2_ ret1;  link1_ fndtok(pgraph:succ[link1],!retfil);
+	 END;
+      END;
+      reu2_ reu1;  link_ fndtok(pgraph:succ[link],!rtritm);
+   END;
+   RETURN;
+END;
+
+endc
+ck!sn PROCEDURE make!ganlist (R!P (pgraph) link);
+	\ This procedure makes the "ganlst" record structure (a list of
+GAN number ranges) from the pgraph tree structure;
+BEGIN
+   R!P (any!class) rp1,rp2;  INTEGER ganitm;
+   filist_ n!r;  link_ fndtok(link,!ganitm);
+   WHILE link neq n!r DO BEGIN
+      ganitm_ intres:intval[pgraph:result[pgraph:def[link]]];
+      ganlst:upper[rp1_ new!record(ganlst)]_ !rh(<ganitm>);
+      ganlst:lower[rp1]_ !rh( <!lh(<ganitm>)> );
+      IF filist=n!r THEN filist_ rp1 ELSE ganlst:next[rp2]_ rp1;
+      rp2_ rp1;  link_ fndtok(pgraph:succ[link],!ganitm);
+   END;
+   RETURN;
+END;
+endc
+ck!sn PROCEDURE make!poslist (R!P (pgraph) link);
+	\ This procedure makes the "poslst" record structure (a list of
+file position ranges) from the pgraph tree structure;
+BEGIN
+   R!P (any!class) rp, rp1, rp2;
+   filist_ n!r;  link_ fndtok(link,!positm);
+   while link neq n!r do
+   BEGIN
+      rp_ pgraph:def[link];
+      poslst:lower[rp1_ new!record(poslst)]_
+	 intres:intval[pgraph:result[pgraph:def[rp]]];
+      if (rp_ fndtok(pgraph:succ[rp],!posno)) neq n!r then
+         poslst:upper[rp1]_ intres:intval[pgraph:result[pgraph:def[rp]]]
+      else poslst:upper[rp1]_ poslst:lower[rp1];
+      if filist=n!r then filist_ rp1 else poslst:next[rp2]_ rp1;
+      rp2_ rp1;  link_ fndtok(pgraph:succ[link],!positm);
+   END;
+   return;
+END;
+endc
+PROCEDURE xctcmd (R!P (pgraph) link);
+	\ This is the procedure which is executed after a completed
+parse of the input command (successful application of the rule for
+<command>).  In "xctcmd" any final work which is needed to change the
+parsing graph into a service routine call is done.  Some consistency
+checking may also be done here.  Then, the appropriate service routine
+is called.
+	"Xctcmd" will check system status for an abort request before
+calling a service routine.  It will also check for a mag tape device
+change, and, if the the command about to be executed is not proper (if
+not NEW TAPE or APPEND), it will reinstate the old device.  Following a
+service routine call, it will check system status and report unusual
+conditions to the user.  In addition, "xctcmd" requests the proper
+clean-up from SNPARS where necessary.
+;
+BEGIN
+   INTEGER swval;
+   R!P (any!class) rp;
+
+   cmdtkn_pgraph:tkn[pgraph:def[link]];					\ Get command rule token.;
+   CASE cmdtkn of BEGIN
+ck!sn
+ [!mode!c]  BEGIN
+	       swval_(IF fndtok(link,!alter)=n!r THEN false ELSE true);
+	       free!lin;  init!graph;  s!mode(swval);
+	    END;
+ [!spri!c]
+ [!rpri!c]  BEGIN
+	       IF (rp_fndtok(link,!p!fmt))=n!r THEN swval_0
+	       ELSE swval_pgraph:tkn[pgraph:def[rp]];
+	       IF cmdtkn=!spri!c THEN s!spr(swval) ELSE s!rpr(swval);
+	    END;
+ [!reel!c]  BEGIN
+	       IF (rp_fndtok(link,!reelno))=n!r THEN s!ree
+	       ELSE s!ree(intres:intval[pgraph:result[pgraph:def[rp]]]);
+	    END;
+ [!old!c]
+ [!sys!c]   BEGIN
+	       IF (rp_fndtok(link,!old!sw))=n!r THEN swval_0
+	       ELSE swval_pgraph:tkn[pgraph:def[rp]];
+	       IF cmdtkn=!old!c THEN s!old(swval) ELSE s!sys(swval);
+	    END;
+ [!dskr!c]
+ [!ttyr!c]  BEGIN
+	       IF (rp_fndtok(link,!rep!sw))=n!r THEN swval_0
+	       ELSE swval_pgraph:tkn[pgraph:def[rp]];
+	       IF cmdtkn=!dskr!c THEN s!dsk(swval) ELSE s!tty(swval);
+	    END;
+ [!new!c]   BEGIN
+	       STRING tidstr;
+	       if (rp_ fndtok(link,!tidfld)) = n!r then tidstr_ null
+	       else tidstr_ strres:strval[pgraph:result[pgraph:def[rp]]];
+	       free!lin;  init!graph;  s!new(tidstr);
+	    END;
+ [!appe!c]  print("The APPEND command is not implemented." & crlf);
+ [!stor!c]
+ [!retr!c]
+ [!get!c]
+ [!dire!c]  BEGIN
+	       INTEGER modebits, after!time, before!time, listype,
+		  time,date;
+	       STRING st!user, st!name, st!ext, end!user, end!name, end!ext;
+	       R!P (pgraph) modptr;
+	       modebits_ 0;  after!time_ -1;  before!time_ '377777777777;
+	       st!user_ (st!name_ (st!ext_ (end!user_ (end!name_
+		  (end!ext_ null)))));
+	       modptr_ link;
+	       while modptr neq n!r do
+	       BEGIN							\ and process each one;
+	          case cmdtkn of BEGIN
+	[!stor!c]    modptr_ fndtok(modptr,!stm);			\ Find the modifiers;
+	[!retr!c]
+	[!get!c]     modptr_ fndtok(modptr,!rem);			\ Find the modifiers;
+	[!dire!c]    modptr_ fndtok(modptr,!dim)			\ Find the modifiers;
+	          END;
+		  if modptr = n!r then done;
+		  swval_ pgraph:tkn[rp_ pgraph:def[modptr]];
+		  CASE swval of BEGIN
+	[!af!mod]    BEGIN
+			after!time_ intres:intval[pgraph:result[pgraph:def[rp]]];
+			time_ !rh( <after!time> );
+			date_ !rh( <!lh(<after!time>)> );
+			user!to!gmt(<date>,<time>);
+			after!time_ !xwd(<date>,<time>);
+		     END;
+	[!be!mod]    BEGIN
+			before!time_ intres:intval[pgraph:result[pgraph:def[rp]]];
+			time_ !rh( <before!time> );
+			date_ !rh( <!lh(<before!time>)> );
+			user!to!gmt(<date>,<time>);
+			before!time_ !xwd(<date>,<time>);
+		     END;
+	[!st!mod]    BEGIN
+			rp_ fndtok(rp,!stpnt);  rp_ pgraph:def[rp];	\ Get starting file name;
+			st!user_ strres:strval[pgraph:result[pgraph:def[rp]]];
+			rp_ fndtok(rp,!fname);				\ and file extension.;
+			st!name_ strres:strval[pgraph:result[pgraph:def[rp]]];
+			IF (rp_ (fndtok(rp,!fext))) neq n!r THEN
+			   st!ext_ strres:strval[pgraph:result[pgraph:def[rp]]];
+		     END;
+	[!en!mod]    BEGIN
+			rp_ fndtok(rp,!stpnt);  rp_ pgraph:def[rp];	\ Get starting file name;
+			end!user_ strres:strval[pgraph:result[pgraph:def[rp]]];
+			rp_ fndtok(rp,!fname);				\ and file extension.;
+			end!name_ strres:strval[pgraph:result[pgraph:def[rp]]];
+			IF (rp_ (fndtok(rp,!fext))) neq n!r THEN
+			   end!ext_ strres:strval[pgraph:result[pgraph:def[rp]]];
+		     END;
+	[!tw!mod]    modebits_ modebits lor mod!twice;
+	[!ch!mod]    modebits_ modebits lor mod!chngd;
+	[!in!mod]    modebits_ modebits lor mod!incr;
+	[!to!mod]    modebits_ modebits lor mod!today;
+	[!se!mod]    modebits_ modebits lor mod!setdmpd;
+	[!ck!mod]    modebits_ modebits lor mod!chksum;
+	[!li!mod]    modebits_ modebits lor mod!limited
+		  END;
+		  modptr_ pgraph:succ[modptr];
+	       END;
+	       case cmdtkn of BEGIN
+	[!stor!c] modptr_ fndtok(link,!stlist);				\ Now, do the store list;
+	[!retr!c] modptr_ fndtok(link,!relist);				\ Now, do the store list;
+	[!get!c]
+	[!dire!c] modptr_ fndtok(link,!gelist)				\ Now, do the store list;
+	       END;
+	       listype_ pgraph:tkn[rp_ pgraph:def[modptr]];
+	       case listype of BEGIN
+	[!allst]  ;
+	[!ganlst] make!ganlist(rp);
+	[!filist] make!stlist(rp);
+	[!rtrlst] make!relist(rp);
+	[!poslst] make!poslist(rp)
+	       END;
+	       free!lin;  init!graph;
+	       if cmdtkn = !stor!c then
+		  s!sto (listype, after!time, before!time, modebits,	\ Now call the appropriate service routine.;
+		     st!user, st!name, st!ext, end!user, end!name,
+		     end!ext)
+		  else s!ret (cmdtkn, listype, after!time,
+		     before!time, modebits, st!user, st!name,
+		     st!ext, end!user, end!name, end!ext);
+	    END;
+ [!wher!c]  s!wher;
+ [!cut!c]   print("The CUT command is not implemented." & crlf);
+ [!tid!c]   print("The TID command is not implemented." & crlf);	 
+endc
+ck!dsn
+ [!indi!c]  BEGIN
+	       rp_ fndtok(link,!indval);
+	       s!indi(pgraph:tkn[pgraph:def[rp]]);
+	    END;
+ [!bloc!c]  BEGIN
+	       if (rp_ fndtok(link,!blonum)) = n!r then
+	       BEGIN
+		  rp_ fndtok(link,!bloval);
+		  s!bloc(pgraph:tkn[pgraph:def[rp]],0);
+	       END
+	       else s!bloc(0,intres:intval[pgraph:result[pgraph:def[rp]]]);
+	    END;
+ [!map!c]   s!map;
+ [!type!c]  BEGIN
+	       INTEGER word1, word2, mode;
+	       if (rp_ fndtok(link,!trange)) neq n!r then
+	       BEGIN
+		  rp_ pgraph:result[pgraph:def[rp]];
+		  word1_ (intres:intval[rp] lsh -18) land '777777;
+		  word2_ intres:intval[rp] land '777777;
+	       END
+	       else word1_ (word2_ 0);
+	       if (rp_ fndtok(link,!mode)) neq n!r then
+		  mode_ pgraph:tkn[pgraph:def[rp]]
+	       else mode_ 0;
+	       s!typ(word1,word2,mode);
+	    END;
+endc
+ [!rewi!c]  BEGIN
+	       IF mtchan < 0 THEN
+		  print("No mag tape device is opened." & crlf)
+	       ELSE s!rewi(IF fndtok(link,!rwopt)=n!r THEN false ELSE true);
+ 	    END;
+ [!unlo!c]  BEGIN
+	       IF mtchan < 0 THEN
+		  print("No mag tape device is opened." & crlf)
+	       ELSE s!unlo(IF fndtok(link,!rwopt)=n!r THEN false ELSE true);
+	    END;
+ [!devi!c]  print("The DEVICE command is not implemented." & crlf);
+ [!help!c]  print("The HELP command is not implemented." & crlf);
+ [!qmrk!c]  BEGIN
+	       IF (rp_fndtok(link,!cmdwd))=n!r THEN swval_0
+	       ELSE swval_pgraph:tkn[pgraph:def[rp]];
+	       s!qmrk(swval);
+	    END;
+ [!inst!c]  print("The INSTRUCTIONS command is not implemented." & crlf);
+ [!grip!c]  print("The GRIPE command is not implemented." & crlf);
+ [!news!c]  print("The NEWS command is not implemented." & crlf);
+ck!sn
+ [!tran!c]  print("The TRANSLATE command is not implemented." & crlf);
+ [!untr!c]  print("The UNTRANSLATE command is not implemented." & crlf);
+ [!cof!c]   print("The COF command is not implemented." & crlf);
+endc
+ [!log!c]   print("The LOG command is not implemented." & crlf);
+ [!unlg!c]  print("The UNLOG command is not implemented." & crlf);
+ [!comm!c]  print("The COMMENT command is not implemented." & crlf);
+ [!quit!c]  s!quit;
+ [!stop!c]  s!stop;
+ [!cont!c]  ;
+ [!go!c]    print("The GO command is not implemented." & crlf);
+ [!abor!c]  s!abor
+   END;
+   RETURN;
+END;
+
+
+PROCEDURE prserr;
+	\ This procedure reports parsing errors to the user.;
+BEGIN
+   EXTERNAL INTEGER curhgh;
+   EXTERNAL STRING PROCEDURE messag;
+   R!P (any!class) rp1,rp2,rp3;  INTEGER i,j;  STRING str;
+   rp1_linhed;  rp2_linptr:next[rp1];
+   WHILE rp2 neq n!r DO BEGIN "find line"
+      IF (linptr:pos[rp1] leq curhgh) and
+	 (curhgh leq linptr:pos[rp2]) THEN DONE "find line";
+      rp1_rp2;  rp2_linptr:next[rp1];
+   END "find line";
+   rp3_linptr:filptr[rp1];
+   print(crlf & "<<" & comfil:device[rp3] & ":" & comfil:file[rp3] & ">>");
+   IF curfil neq ttyfil THEN print(" line ",comfil:line[rp3]);
+   print(crlf);
+   IF rp2 neq n!r THEN
+      print(cmdstr[linptr:pos[rp1] to (linptr:pos[rp2]-1)])
+   ELSE print(cmdstr[linptr:pos[rp1] to (length(cmdstr)-1)]);
+   i_curhgh-linptr:pos[rp1];  str_null;
+   FOR j_1 step 1 until i DO str_str & " ";
+   print(crlf & str & "^" & crlf & messag & crlf);
+   bailout;  RETURN;
+END;
+
+
+INTERNAL BOOLEAN PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+	\ This routine does the necessary calls to "pre!scan", "parse",
+"prserr", and "xctcmd" in order to scan, interpret, execute, and report
+syntax errors found in the standard user commands.  "Do!parse" always
+calls "parse" with the goal symbol of the grammar (ie. it handles whole
+commands);
+BEGIN
+   R!P (pgraph) pgptr;
+   print("> ");
+   IF pre!scan(tty,cmd!ok) THEN
+      IF (pgptr_parse)=n!r THEN prserr ELSE xctcmd(pgptr);
+   free!lin;  init!graph;
+   RETURN (IF pgptr=n!r THEN false else true);
+END;
+
+
+INTERNAL PROCEDURE prtalt (INTEGER index);
+	\ This procedure prints out a list of keyword choices given a
+grammar rule which requires one of a list of keywords to satisfy it.  The
+"index" parameter is the index in "gramr" of the beginning of the rule.;
+BEGIN
+   INTEGER i,j;
+   IF (i_xsucc(<index+1>))=0 THEN RETURN;
+   print("Legal values are:");
+   WHILE i neq 0 DO BEGIN "loop"
+      print(crlf & #ht);
+      FOR j_1 step 1 until 5 DO BEGIN
+	 print(getkey(xtkn(<i>)));
+	 print(IF (i_xfail(<i>)) neq 0 THEN ", " ELSE ";" & crlf);
+	 IF i=0 THEN DONE "loop";
+      END;
+   END "loop";
+   RETURN;
+END;
+
+
+INTERNAL INTEGER PROCEDURE readkey (STRING prompt;  INTEGER rule);
+	\ This procedure does the appropriate parsing in order to
+retrieve a keyword from the user and return its token value.  This will
+work only for a grammar rule which is a simple choice among keywords of
+the language.  "Prompt" is a string to be typed at the user.  "Rule" is
+the token number of the left-hand-side of the desired rule to use.  No
+command file references are allowed in the input.;
+BEGIN
+   R!P (any!class) rp;  BOOLEAN alldon;  INTEGER i,result;
+   alldon_false;  i_fndgrm(rule);  result_0;
+   WHILE not alldon DO BEGIN
+      print(prompt);
+      IF not pre!scan(true,false,false) THEN
+	 IF cmdstr=#lf THEN alldon_true ELSE prtalt(i)
+      ELSE BEGIN
+	 rp_parse(i);
+	 IF rp=n!r THEN prtalt(i) ELSE BEGIN
+	    result_pgraph:tkn[rp];  alldon_true;
+	 END;
+      END;
+      free!lin;  init!graph;
+   END;
+   RETURN (result);
+END;
+
+
+INTERNAL BOOLEAN PROCEDURE readint (STRING prompt;  INTEGER rule;
+   REFERENCE INTEGER result);
+	\ This procedure does the appropriate parsing to retrieve an
+integer value from the user.  The string "prompt" is to be typed at the
+user.  The "rule" parameter should be a token value for the left-hand-
+side of a rule whose right-hand-side requires an {integer}.  The result
+is obtained from the intermediate result structure "intres" and is
+returned in "result".  This procedure has the value "false" only when
+the user hit the carriage return, entering no value.;
+BEGIN
+   R!P (any!class) rp;  BOOLEAN alldon,retval;  INTEGER i;
+   alldon_false;  i_fndgrm(rule);  retval_true;
+   WHILE not alldon DO BEGIN "loop"
+      print(prompt);
+      IF not pre!scan(true,false,true) THEN BEGIN
+	 IF cmdstr=#lf THEN alldon_true;  retval_false;
+      END
+      ELSE BEGIN
+	 rp_parse(i);  IF rp=n!r THEN prserr
+	 ELSE BEGIN
+	    result_intres:intval[pgraph:result[rp]];  alldon_true;
+	 END;
+      END;
+      free!lin;  init!graph;
+   END "loop";
+   RETURN (retval);
+END;
+
+
+INTERNAL STRING PROCEDURE readstr (STRING prompt;  INTEGER rule);
+	\ This procedure does the appropriate parsing to retrieve a
+string value from the user.  The string "prompt" is to be typed at the
+user.  The "rule" parameter should be a token value for the left-hand-
+side of a rule whose right-hand-side requires a value which will be
+saved as a string by an intermediate routine.  The string result is
+obtained from the intermediate result structure "strres".  This
+procedure will return a null string when the user hit the carriage
+return, entering no value.;
+BEGIN
+   R!P (any!class) rp;  BOOLEAN alldon;  INTEGER i;  STRING result;
+   alldon_false;  i_fndgrm(rule);
+   WHILE not alldon DO BEGIN "loop"
+      print(prompt);
+      IF not pre!scan(true,false,true) THEN
+	 if cmdstr=#lf then return (null)
+      ELSE BEGIN
+	 rp_parse(i);  IF rp=n!r THEN prserr
+	 ELSE BEGIN
+	    result_ strres:strval[pgraph:result[rp]];  alldon_true;
+	 END;
+      END;
+      free!lin;  init!graph;
+   END "loop";
+   RETURN (result);
+END;
+\
+************************************************************************
+*  The following routines are special syntax and/or semantic routines  *
+*  called during the "parse" routine.  They are dependent upon the     *
+*  structure of the grammar and may need to be changed if the          *
+*  corresponding portions of the grammar change.                       *
+************************************************************************
+;
+ck!sn INTERNAL BOOLEAN PROCEDURE tidsav (R!P (any!class) link);
+	\ This procedure saves the TID value as a string intermediate
+result.;
+BEGIN
+  R!P (any!class) rp;
+  IF (rp_fndtok(link,!integer)) = n!r THEN rp_fndtok(link,!identifier);
+  rp_pgraph:def[rp];
+  st!str(link,cmdstr[tokent:pos[rp] for tokent:len[rp]],s!type);
+  RETURN (true);
+END;
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE possav (R!P (any!class) link);
+	\ This procedure saves an individual position list item.  The
+item may be an octal number or "E".  If the latter, then the item is
+entered as '377777777777, the largest theoretically possible value.;
+BEGIN
+   if pgraph:tkn[link] = !e then st!int(link,'377777777777,i!type)
+   else st!int(link,intres:intval[pgraph:result[pgraph:def[link]]],i!type);
+   return (true);
+END;
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE gitsav (R!P (any!class) link);
+	\ This procedure saves an individual GAN item.  The item may be
+an octal number or "E".  If the latter, then the item is entered as
+'777777, the largest possible GAN value.;
+BEGIN
+   if pgraph:tkn[link] = !e then st!int(link,'777777,i!type)
+   else st!int(link,intres:intval[pgraph:result[pgraph:def[link]]],i!type);
+   return (true);
+END;
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE gansav (R!P (any!class) link);
+	\ This procedure saves a GAN range expression.  A single GAN is
+converted to a range with both parts of the range equal to the single
+GAN.  A range is stored with the first GAN in the left-half, and the
+second GAN in the right half.;
+BEGIN
+  R!P (any!class) rp;  INTEGER gan1, gan2;
+  rp_pgraph:result[pgraph:def[link]];					\ Find the first GAN;
+  gan1_intres:intval[rp];						\ and get its value.;
+  if (rp_ fndtok(link,!ganno)) neq n!r THEN BEGIN			\ If there is a second GAN,;
+    rp_pgraph:result[pgraph:def[rp]];					\ then get its value.;
+    gan2_intres:intval[rp];
+  END									\ Otherwise make second GAN the;
+  else gan2_ gan1;							\ same as the first GAN.;
+  IF gan2 THEN IF gan1>gan2 THEN RETURN (false);			\ Make sure the range is proper;
+  IF not gan1 THEN RETURN (false);
+  st!int(link,(gan1 lsh 18)+gan2,i!type);  RETURN (true);
+END;
+endc
+INTERNAL BOOLEAN PROCEDURE ppnsav (R!P (any!class) link);
+	\ This procedure computes and saves a PPN as an integer value.;
+BEGIN
+  R!P (any!class) rp1,rp2;  INTEGER ppnwd;
+  rp1_pgraph:def[(rp2_fndtok(link,!ppnpc))];
+  ppnwd_intres:intval[pgraph:result[rp1]] lsh 18;
+  rp1_pgraph:succ[rp2];							\ Advance pointer, so we can get;
+  rp2_pgraph:def[fndtok(rp1,!ppnpc)];					\ the other half of the PPN.;
+  ppnwd_ppnwd+intres:intval[pgraph:result[rp2]];
+  st!int(link,ppnwd,i!type);  RETURN (true);
+END;
+INTERNAL BOOLEAN PROCEDURE strsav (R!P (any!class) link);
+	\ This procedure retrieves and stores a string value as an
+intermediate result.;
+BEGIN
+  R!P (any!class) rp;  INTEGER brchr;  STRING str;
+  rp_pgraph:def[link];
+  str_cmdstr[tokent:pos[rp] for tokent:len[rp]];
+  st!str(link,scan(str,up!brk,brchr),s!type);				\ Convert to upper case and store.;
+  RETURN (true);
+END;
+ck!sn INTERNAL BOOLEAN PROCEDURE dtsav (R!P (any!class) link);
+	\ This routine saves the date and time as a single word with the
+date in the left half and the time in the right half.  The date is DEC
+format, and the time is expressed as seconds since midnight.  The time
+zone is GMT.;
+BEGIN
+  R!P (any!class) rp;  INTEGER datwd,timwd;
+  rp_fndtok(link,!time);
+  rp_pgraph:result[pgraph:def[rp]];
+  timwd_intres:intval[rp];
+  IF (rp_fndtok(link,!date))=n!r THEN datwd_calli(0,'14)		\ If no date, then take today's.;
+  ELSE datwd_intres:intval[pgraph:result[pgraph:def[rp]]];
+  cnvdtim(datwd,timwd,gmt,0);						\ Convert to GMT.;
+  st!int(link,(datwd lsh 18)+timwd,i!type);
+  RETURN (true);
+END;
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE datsav (R!P (any!class) link);
+	\ This procedure computes the date from the user-supplied date
+information.  If the year is not specified, then the current one is 
+used.  If the month is not specified, then the current one is used.;
+BEGIN
+  INTEGER table,brchr,datval,brksav;  R!P (any!class) rp;
+  STRING mon,datstr,tmpstr,day,year;
+  datstr_stdate(calli(0,'14),'33);					\ Today's date in string format.;
+  rp_fndtok(link,!day);  rp_pgraph:result[pgraph:def[rp]];
+  day_cvs(intres:intval[rp]);						\ Get day in string format.;
+  IF (rp_fndtok(link,!mon))=n!r THEN mon_datstr[1 for 3]		\ If month not given, default;
+  ELSE BEGIN
+    rp_pgraph:result[pgraph:def[rp]];  mon_strres:strval[rp];		\ otherwise, save one given.;
+  END;
+  IF (rp_fndtok(link,!year))=n!r THEN BEGIN				\ If year not given. take default.;
+    table_getbreak;  setbreak(table,",",null,"is");			\ Extract year from string.;
+    tmpstr_scan(datstr,table,brchr);
+    year_datstr;  relbreak(table);
+  END
+  ELSE BEGIN
+    rp_pgraph:result[pgraph:def[rp]];					\ Otherwise save year given.;
+    year_cvs(intres:intval[rp]);
+  END;
+  datstr_day & "-" & mon & "-" & year;  brchr_scanu(datstr);
+  IF rddate(datval,brksav,brchr,datstr) THEN BEGIN			\ Check correctness, and convert;
+    st!int(link,datval,i!type);  RETURN (true);				\ to DEC format.  Save if OK.;
+  END
+  ELSE RETURN (false);
+END;
+endc
+BOOLEAN PROCEDURE chkint (R!P (any!class) link;  BOOLEAN octval;
+  INTEGER lb('400000000000),ub('377777777777));
+	\ This procedure is called by other routines which wish to save
+an integer value if a range check succeeds.  "Lb" is the lower bound to
+be checked with the "geq" relation.  "Ub" is the upper bound to checked
+with the "leq" relation.;
+BEGIN
+  R!P (any!class) rp;  INTEGER value;  STRING str;
+  rp_pgraph:def[link];
+  str_cmdstr[tokent:pos[rp] for tokent:len[rp]];
+  value_(IF octval THEN cvo(str) ELSE cvd(str));
+  IF (value geq lb) and (value leq ub) THEN BEGIN
+    st!int(link,value,i!type);  RETURN (true);
+  END
+  ELSE RETURN (false);
+END;
+ck!sn INTERNAL BOOLEAN PROCEDURE daysav (R!P (any!class) link);
+	\ This routine checks and possibly stores the <day> value.;
+RETURN (chkint(link,false,1,31));
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE yrsav (R!P (any!class) link);
+	\ This routine checks and possibly stores the <year> value.;
+RETURN (chkint(link,false,0,99));
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE hrsav (R!P (any!class) link);
+	\ Analogous routine to "yrsav" for hour values.;
+RETURN (chkint(link,false,0,23));
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE minsav (R!P (any!class) link);
+	\ Analogous routine to "yrsav" for minute values.;
+RETURN (chkint(link,false,0,59));
+endc
+ck!sn INTERNAL BOOLEAN PROCEDURE timsav (R!P (any!class) link);
+	\ This procedure computes the time from hour and minute values,
+and stores it in terms of seconds since midnight.;
+BEGIN
+  R!P (any!class) rp;  INTEGER timval;
+  rp_fndtok(link,!hour);  rp_pgraph:result[pgraph:def[rp]];
+  timval_3600*intres:intval[rp];  
+  rp_fndtok(link,!min);  rp_pgraph:result[pgraph:def[rp]];
+  timval_timval+60*intres:intval[rp];
+  st!int(link,timval,i!type);  RETURN (true);
+END;
+endc
+INTERNAL BOOLEAN PROCEDURE intsav (R!P (any!class) link);
+	\ This procedure checks and stores a full-word positive integer
+value expressed in decimal.;
+RETURN (chkint(link,false,0));
+INTERNAL BOOLEAN PROCEDURE hoctsv (R!P (any!class) link);
+	\ This procedure checks and stores a half-word integer value
+expressed in octal.;
+RETURN (chkint(link,true,0,'777777));
+ck!sn INTERNAL BOOLEAN PROCEDURE halfsv (R!P (any!class) link);
+	\ This procedure checks and stores a half-word integer value
+expressed in decimal.;
+RETURN (chkint(link,false,0,'777777));
+endc
+ck!dsn INTERNAL BOOLEAN PROCEDURE rngchk (R!P (any!class) link);
+	\ This procedure checks the range parameters to the "T" command
+and saves them as a word range in "tapblk".;
+BEGIN
+   INTEGER x, y, i;  R!P (any!class) rp;
+   if (rp_ fndtok(link,!row)) = n!r then rp_ fndtok(link,!word1);
+   x_ intres:intval[pgraph:result[pgraph:def[rp]]];
+   rp_ pgraph:succ[pgraph:succ[rp]];					\ The range to print may be given;
+   y_ intres:intval[pgraph:result[pgraph:def[rp]]];			\ as either a position in the map;
+   if (rp_ fndtok(link,!row)) neq n!r then				\ as defined by a row and column;
+   BEGIN								\ or as a range of word positions.;
+      i_ (x-1)*4+y;
+      if (i < 1) or (i > arrinfo(rcdmap,2)) then return (false);	\ Row and column indicators must;
+      if rcdmap[i,1] = 0 then return (false);				\ must be translated to a word;
+      st!int(link,rcdmap[i,2],i!type);					\ range.;
+   END
+   else BEGIN								\ Word ranges are parsed as;
+      if octal then							\ decimal values.  If the current;
+      BEGIN								\ indices are octal then the values;
+	 x_ cvo(cvs(x));  y_ cvo(cvs(y));				\ must be re-interpreted as octal.;
+      END;
+      if (x < 1) or (x > tape!buf!size) then return (false);
+      if (y < 1) or (y > tape!buf!size) then return (false);
+      st!int(link,(x lsh 18)+y,i!type);
+   END;
+   return (true);
+END;
+endc
+
+
+END "SNCLI";
+jcG
