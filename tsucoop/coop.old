@@ -1,0 +1,632 @@
+
+USE OF THE TERMINAL
+
+Much of the basic material is in the terminal owner's guide and the
+XEXEC Reference Manual.  The terminal identifier for the HP 2621 is
+"a" - if you are logging in over an engine.  If you are on NEXNET you
+just do a carriage return.
+
+Basic system to use is 930.  Co-op student is valid as TSUCOOP on 33,
+36 and 118 as well.
+
+Prompt character for XEXEC is "-", for PDP is ".".  To change from one
+to the other type pdp or xexec.  The different modes have slightly
+different commands; for example, <esc> gets you out of programs in
+XEXEC, ^C in PDP.  Deleting is also different, as follows:
+
+                        XEXEC            PDP
+
+    DELETE CHARACTER     ^A          ^Q or backspace
+    DELETE LINE          ^Q              ^U
+
+The Tymcom-X Section almost all use PDP mode, the rest of the known
+Tymcom-X world mostly uses XEXEC.
+
+As a good rule, when in doubt on the terminal, in any of the various
+programs, try typing "help" or "?"  and printing out the results.
+Another thing to try is "<command>/?".  Sometimes there is also a "help
+command.name" that gives further information.
+
+
+
+
+EDITORS
+
+There are three screen editors available.  Manuals are available for
+TV-EDIT (ct1), VUE (ct4), and a guide for PEAK.
+PEAK and VUE both have tutorials, which are in (SYSNEWS)PEAK.TUT 
+and (SYSNEWS)VUE.TUT.
+For line editor information, INFO on 930 has EDIT10 documentation,
+Editor is in the XEXEC manual (and Editor manual).
+
+TYMSHARE VG2
+
+Coffee room has coffee, and hot water for tea.
+There is a small refrigerator in the room next to conference room 5.
+
+
+HARDCOPY:
+
+SPOOL
+
+For hardcopy you have a number of options.  Long listings can be SPOOLed
+from one of the 10's.  You have to telecopy files from 930 for them to 
+be spooled.  Information on SPOOL is in the manual.  A hack exists, 
+(mpl)spool that will read a spool.def file in your directory so you don't
+have to type the answers to all those prompts each time.  You can copy
+someone else's and correct the necessary information.
+
+Files can be spooled to CENTER on Bubb Road, and usually will be delivered
+the next day.  Files can also be spooled to the print room in VG1 by
+using node=1155 as an option.  They will be printed in the next day or
+so depending on the load.  
+
+All spool requests are picked up in the print room on the shelf that is
+marked SYSTECH.
+
+350
+
+At present, the next best bet is to print out shorter files on the 350
+in the graphics lab.  Log into it as you do normally (terminal
+identifier is "a" as on the 444).  There is a manual by the 350.  
+
+DIABLO PRINTER
+
+For letter quality printing, use the Diablo.  There are two Diablo
+printers in the room opposite Conference Room 1.  One is hard wired, to
+use the other dial 6001, turn on printer and modum, insert phone when
+high pitched tone is heard.  
+
+The terminal identifier is "e".  To set margins, tabs, go LOCAL and
+follow instructions on wall.  To see what you are typing more clearly,
+set "Scroll" to on position.
+
+(MPL)TYPE AND (PUB)UNDER
+
+There are two good, useful printing programs on line, (mpl)type
+and (pub)under.  Documentation and help files for (mpl)type are on
+directory mpl, pub has a brief "help" text.  (pub)under is designed
+to print out files created by the program pub--and is the only program
+that will handle the underlining pub creates (control Xs) properly.
+(pub)under will print a file, inserting form feeds (^l) before and
+after.  Be sure to set "Top of Form" switch about three lines down
+before running program.  Unfortunately (pub)under cannot handle tabs.
+Under has the option of overstriking "n" number of times rather than
+underlining; the switch for overstriking is /n.
+
+COPYING FILES FROM ONE SYSTEM TO ANOTHER
+
+To copy a file from one system to another, either use telecopy (see
+manual) or run (spl)copy.  Telecopy has the advantage of enabling
+copying either to or from system you are in, and renaming files.
+
+(spl)copy is primarily useful when copying a file to many systems.
+It must be run from the directory from which the file is being copied
+and requires ac license - if you are sending files to a directory other
+than your own.
+
+TEMP CORE
+
+The program (sys)tc will display names of files in temp core. The
+individual files can be listed by typing file name at the program prompt.
+
+MAILBOX
+
+To set up a mailbox, do the following:
+
+.ctest setmai mail.box
+.ctest makini
+
+When you have set up a mailbox, all the mail you send or receive will
+be saved in the file.  It can be read by the program MAIL.
+
+At time of logon, or whenever you get a system level prompt, "mail
+waiting" will alert to mail on system.  At prompt, type "mail" to
+receive mail.
+
+To send mail, type "send user name" and at the prompt "TYPE LETTER: "
+type the text you want to send, ending with ^d.
+
+To send to more than one person, type user names separated by ":".
+Be sure to indicate in the mail you send that it is going to more than
+one person (perhaps list them within the letter you are sending).
+To send to a group of people regularly, you can list their user names
+in a file and send "@ file name".  Again it is good practice to be 
+sure recipients of the letter understand it is a group memo.
+
+For information on the mailbox program type "r mail" and them at
+the prompt "*" type "?".
+
+To send contents of a file type "@ file name" following the 
+prompt "TYPE LETTER: ".  A ^B will prompt for file name to include
+at that point of the letter you are typing.
+
+Command "postman" will review mail you have written and than has
+not yet been received.  It will give you the opportunity to type
+or cancel mail that has not been picked up.
+
+USER NAMES
+
+Within the section most use first names; Vivian and Greg their
+last names (hiatt and matoka).  Two in the section (Mike, and Bill)
+use initials (mch, wrs,).  The old convention was last name and first initial.
+
+PROGRAM DIRECTORIES
+
+There are library directories--mpl,spl,upl, "monitor program library"
+(for section use), "system program library" (in house use), and "user
+program library".  These contain useful programs and documentation.
+
+WHOIS
+
+There is a program (wrs)whois that will list employees of Tymshare
+with their location and cost code.  You request a substring of the
+name, or type "?" for more information on the program.
+
+NONAME
+
+To change any intial characteristics, run NONAME and then command
+"CHA", which will list characteristics and prompt for changes.
+DOCUMENTATION
+
+Basic documentation on-line can be found in (*6news) for user programs,
+(sysnews) for internal programs and by running info on 930 for monitor
+and specific section documentation.  Documentation for hacks is rather
+spotty--looking the directory where the program lives is a good first
+start.
+
+LICENSE
+
+To set license on Tymcom-X you can give the command 
+
+.o <license> <license><esc><oper password>
+
+or
+
+. o <license>...<license>
+<oper name>
+
+.<oper password>
+
+There are groups of licenses that can be set; the group names are
+"all" (which also can be set by o<esc>) which sets all your license,
+and the following subgroups (you only get what you have):
+
+"most"    RC OP SY GD TD JL AC RA WF
+"some"    RC SY RA WF
+"read"    RC SY RA
+
+To disable license type "sete 0".  You can reduce a group of licenses
+to one by "sete <license>" or "o <license>".
+
+RUNNING PROGRAMS
+
+The command "r <program>" will look on the directory (sys) for the program
+with an extension .sav, .shr or .hgh.  To run a program on your directory
+the command is "run <program>".
+ 
+HACKS AND SUCH
+
+There are some very useful hacks around.  One of the most userful is 
+(spl) that will prompt for strings to search for and files to
+look in.  It has some very nice features which you can get a brief list of 
+by a ? to the "Search in:" prompt.  To exit the program the command is ".h".
+WEEKLY SPOOL MAINTENANCE
+
+Once a week, in the morning log in as sppoper on :36.
+
+.r (mpl)mhx
+
+hosts:@clean.cmd
+commands:  
+@clean        ;"clean.cmd" contains "run spfix <cr> clean <cr> pending <cr>
+^D            ; quit <cr>"
+record?y
+file name: clean.rpt
+detach: n
+
+After it is completed run spmhx, file name clean.rpt (turn on printer for
+pending information).  
+
+Late in the afternoon, or the next morning:
+
+.r (mpl)mhx
+hosts:    ; host numbers of systems which were reported as having
+          ; requests in PROC or TAPE states
+commands:
+run spfix
+pend
+quit
+^D
+record?n (turn on printer)
+
+If the same job is still "stuck" in PRCO or TAPE state, log into that
+system as sppoper, run spfix and charge off using command "charge".
+
+NOTE:  If "charge" reports a record missing, continue anyway.  If it reports
+differences in page counts, generally choose the maximum.
+
+Give pend.rpt and list of old requests to SPOOL maintainer.
+SPOOL MAINTENANCE
+
+MONTHLY:
+
+At end of month log into :36 and run an mhx job to all systems to do repair:
+
+.r (mpl)mhx
+hosts: @month.cmd
+commands (end with control d)
+run spfix
+repair
+compare
+quit
+spool   ; this is to check to see if spfix has renamed SPOOL back to sys
+quit
+^d
+record?y
+fepair.rpt
+detach?n
+
+Then run spmhx, file name repair.rpt, to get a list of systems on which
+repair was not done (turn on printer).
+
+Any systems that were not done can be done individually later.
+
+NOTE:  If SPOOL cannot be run after running spfix on a system, the
+message "SPOOL MAINTENANCE IN PROGRESS.  PLEASE TRY AGAIN IN 30
+MINUTES" will be printed.  In that case log into that system as
+sppoper, set all your license, check to see if there is an
+(sppoper)spool.sav, and then rename as follows:
+
+.rename (sppoper)fakspo.sav=(sys)spool.sav
+.rename (sys)spool.sav=(sppoper)spool.sav
+
+Inform the SPOOL maintainer about this!
+
+It is normal to have all record reported bad by "repair" if SPOOL has
+not been used.
+
+ACCOUNTING FILE MAINTENANCE - MONTHLY
+
+At end of month send an mhx job to run spfix, command "unproc" to check
+for unprocessed bcharge and rcharg requests.  Charge off old requests--
+or contact the appropriate office about them.
+
+MONTHLY NODPRI AND PRIADR CHECK:
+
+Every month, also run mhx and do cksums on nodpri and priadr, and
+dir (this can be included in the end of month, or last day routines).  If
+discrepencies are discovered, there are a couple of alternatives:
+
+   1.  Just telecopy over the latest and most common copy to systems
+       lacking it.
+
+         This can be done using (mpl)copy.  At present it is a good
+         idea to do the following first:
+
+           
+   2.  Run (sppoper)spnode on "odd" systems, and check differences with
+       spnode on common systems.
+
+   3.  Do procedure as follows to get new prinod:
+
+          a.  log in to 8
+          b.  set license
+          c.  command copy
+          d.  from file:  (spool)nodpri
+          e.  to:  nodpri
+          f.  command telecopy
+          g.  mode receive binary fill=right
+          h.  mode transmitt binary fill=right
+          i.  (username)nodpri,:39
+          j.  log into 39
+          l.  run (sppoper)fixmap
+          m.  file name nodpri
+          n.  file out:  nodpri.out
+          o.  r cksum on nodpri.out and (spool)nodpri
+          p.  to find differences (if any)
+              1)  if you haven't done so, run (sppoper)spnode, out file 
+                  spnode.out
+              2)  disable spool (when free)
+              3)  rename (spool)nodpri to nodpri.bak (in case you have to
+                   reverse yourself)
+              4)  rename nodpri.out on your directory to (spool)nodpri
+              5)  r (sppoper)spnode, out file spnode.new
+              6)  differences, output to t, compare two files
+          q.  then copy around latest version (if all right)  using (mpl) copy
+          r.  be sure to check next day (using cksum, and an mhx job) to be
+                sure everything got moved all right.
+
+NOTE:
+
+Printer and Node locations are maintained on system 8, and changed or
+printed by program 1pnupd.  Validations maintains this data base:
+person to contact is Gael Venn, x7081, in case of problems.
+Time Sheet Procedures        February 1983                        Page 1
+
+
+                       MTS TIME SHEET PROCEDURES                          
+
+
+
+     Time sheets for the Tymcom-X  section are in a MAGNUM data  base on
+system  36 under  user  tymxmts.  Individual  time sheets  are  in files
+written  in  each user's  directory  by the  "generate"  command  in the
+procedure  time.sheets and  loaded into  the data  base  when completed.
+Projects and tasks  are added to  the lists by  the managers, or  can be
+inserted  by  the  user  when  filling  out  the  time  sheet.   Further
+information on preparing time sheets  can be found in "How to  Prepare a
+MTS Time Sheet".
+
+              WEEKLY LOADING AND GENERATING OF TIME SHEETS                    
+
+     Every Monday (or the first working  day of the week if Monday  is a
+holiday) all time sheets should be loaded at 1 p.m., and time sheets for
+the next week should be generated.
+
+     To  do  this log  into  36, set  write  files license,  and  gfd to
+tymxmts.   Run  ftmagnum,  run  procedure  time.sheets.   The  procedure
+time.sheets  has  four commands  other  than "help"  or  "quit":  "load"
+(which can be "l"), "reload" (or "rel" or "r"), "generate" (or  "gen" or
+"g"),
+
+     and "status" (or "outstanding" or  "out" or "o" or "s").   You will
+be using only the first three.
+
+     The command "load all" will load all time sheets for "resources" in
+the data base  who do not  have a termination  date entered.  If  a file
+name is not given  following "all", the next  prompt will be for  a week
+ending date, with the default to be used in brackets.  The  default date
+will be the  date of the previous  Friday, and carriage return  will use
+that date. If you want another date in the current year enter it  in the
+format mmmdd as "apr05".
+
+     To load  a single time  sheet the command  is "load  <resource id>"
+where "resource id" is the first three letters of the first name and the
+last initial of the person's name.  The file name can be included in the
+command line as in "l loil apr05.tim"; this is the only way to  reload a
+time sheet from the previous year as the program checks to see if a date
+given is indeed  a Friday in  the current year  and if not,  changes the
+date used to the following Friday.
+
+     If there are  any errors, MAGNUM will  report them.  Any  line that
+contains an error will not have the hours loaded.  Either edit  the file
+and  correct the  error, or  send  mail with  the error  message  to the
+originator of the time sheet and  ask them to correct the error  and let
+you know so it can be reload.
+
+     For each  time sheet loaded  a file "time.msg"  will be  written in
+their directory reporting the number of hours reported.  MAGNUM will ask
+if it is all right to create this new file with the question "New file -
+
+
+
+                                   1
+Time Sheet Procedures        February 1983                        Page 2
+
+
+OK?" or "Existing  file - OK?".  In  either case, respond with  "yes" or
+"y".  If any such files have been written, upon exiting  the time.sheets
+command module, the file ts.cmd  will be written (again MAGNUM  will ask
+if it all right to create the file) and a reminder will be given to send
+mail  @ts.cmd.   In  this  case after  leaving  MAGNUM,  while  still in
+directory (tymxmts), send mail @ts.cmd, message @time.msg.  If  any time
+sheets are blank, a  message will be printed  at the end of  the loading
+reporting the names of those  who have blank time sheets.  Send  mail to
+the manager of anyone with a blank time sheet reporting that fact.
+
+     After  loading  the  time  sheets,  issue  the  command   "gen  all
+{filename}".  Again, if a file name is not given, there will be a prompt
+for the date with the default  date given in brackets; in this  case the
+default date will be the following Friday.  A carriage return  uses that
+date, if you wish  another type it in.   If the time sheet  file already
+exists,  another  file  called "mmmddx.tim"  will  be  written  into the
+directory and a message will report that fact (and therefore you  do not
+have to worry about overwriting a completed time sheet).
+
+     After that, exit using the command "quit" or "q".
+
+     When  someone  finishes  a  time  sheet  that  was  blank  when you
+originally loaded them, load the new one individually using "load <re If
+any  time sheets  are redone,  load them  individually.  The  command is
+"load loil {filename}"; again a default date can be used.
+
+                                REPORTS                                
+
+     Many reports can be generated using the procedure mtx.   The report
+routinely generated each week  is the pc70 personnel status  report.  To
+produce this  report run  the procedure mtx.  Give the  command "pc70.rs
+<date>" where <date> is the date of the last Saturday before  the report
+date in the form  mm/dd/yy.  For example, if  the report is for  May 14,
+the command would be "pc70.rs 5/8/82".  Have this report written  into a
+file on your directory.  Exit  this module and then print two  copies of
+the report on the 350.   Give one complete copy to the  section manager,
+and give the unit  managers copies of their  time sheets and of  all the
+people in their units.
+
+     If  there are  any outstanding  time sheets  that get  done between
+Monday at 2 and the  following afternoon, they should be  loaded Tuesday
+afternoon and the pc70.rs report regenerated to the same file.
+
+     Print out  another copy of  the report and  burst and give  to each
+person (except  for the  managers).  If there  have been  changes, print
+another copy of the whole report for the section manager.
+
+
+
+
+
+
+
+
+
+
+                                   2
+Time Sheet Procedures        February 1983                        Page 3
+
+
+                                SCHEDULE                                
+
+Weekly time sheet procedure:
+
+Monday:
+
+   1:00 p.m.    load, generate all
+                mail to managers of any blank time sheets
+                mail to those with < 40 hours
+
+   2:00         reload any time sheets necessary
+                generate pc70.rs report
+                make two copies on 350 of report
+                   one copy to section manager
+                   one copy burst and to appropriate managers
+
+Tuesday:
+
+   1:00         load any time sheets that have been redone and
+                    generate pc70.rs report
+                print report on 350 - two copies if changed
+                   one copy to section manager if changed
+                   one burst to individuals
+                   if any have been reloaded, give copies to
+                     appropriate manager
+Time Sheet Procedures        February 1983                        Page 4
+
+
+                             SAMPLE SESSION                              
+    .o wf$
+    .gf tymxmts
+    .ftmagnum
+    9-JUN-1982  15:36:04
+    =:SCHEMA MTS
+    User: LOIS         in TYMXMTS
+    :run time.sheets
+    LOADING TIME.SHEETS
+    EXECUTION
+    >>load all
+    week ending [Jun04]:
+    (ADELE)JUN04.TIM ADEN Jun04     40.0 hours
+    (ADELE)TIME.MSG Existing file - OK? y
+    (CARL)JUN04.TIM CARB Jun04     42.0 hours
+    (CARL)TIME.MSG Existing file - OK? y
+    (DARREN)JUN04.TIM DARP Jun04     29.0 hours
+    (DARREN)TIME.MSG Existing file - OK? y
+    (DWS)JUN04.TIM DAVS Jun04
+    (DWS)TIME.MSG Existing file - OK? y
+    (KEN)JUN04.TIM KEND Jun04     40.0 hours
+    (KEN)TIME.MSG Existing file - OK? y
+    (LOIS)JUN04.TIM LOIL Jun04     40.5 hours
+    (LOIS)TIME.MSG Existing file - OK? y
+    (MCH)JUN04.TIM MIKH Jun04     52.0 hours
+    (MCH)TIME.MSG Existing file - OK? y
+    (TODD)JUN04.TIM TODC Jun04     41.0 hours
+    (TODD)TIME.MSG Existing file - OK? y
+    The following people have blank time sheets:
+    Dave Smith
+    >>gen loil
+    week ending [Jun11]:
+    PASS 1: current projects =    220, current tasks =      463
+    LOIL (LOIS)Jun11.TIM
+    >>q
+    TS.CMD Existing file - OK? y
+    Be sure to send mail @TS.CMD
+    EXECUTION COMPLETED
+    :run mtx
+    LOADING MTX
+    EXECUTION
+    TYMXMTS>pc70.rs 5/29/82
+    efault node for resource LOIL does not exist:
+    Enter the file name for the REPORT : (lois)rs0528.rpt
+     New file - OK? y
+    TYMXMTS>q
+    efault node for resource LOIL does not exist:
+    EXECUTION COMPLETED
+    :q
+    9-JUN-1982  15:39:21
+    EXIT
+    .send @ts.cmd
+    TYPE LETTER:
+    @time.msg
+Time Sheet Procedures        February 1983                        Page 5
+
+
+    .k
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   5
+To produce monthly hot line memos on system 930:
+
+.o wf$
+.gfd sppoper
+.ftmagnum
+:run calendar    		;to put in exceptions see hard copy memo
+LOADING CALENDAR
+EXECUTION
+
+month of report [next month]	;<cr> uses month in brackets
+(SPPOPER)[MMMYY].CAL New file - OK? y
+
+EXECUTION COMPLETED
+:q
+.com cold/com
+
+.run coldx	;cold.sec needs to be in sppoper
+memo file name:  cold.doc
+
+Diablo cold.doc and hot.sec.  Send original of cold.doc
+to Artson at 173 West San Fernando, San Jose, CA 95113.
+Copies to Mike and Todd, copies of hot.sec to section.
+   'G^|m
