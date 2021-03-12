@@ -1,0 +1,39 @@
+.Require "(PUB)XXX.DFS" Source!file;
+.StandardSpacing_1;
+.Memo;
+.UnderlineBetween (~~,~);
+.Indent 5;
+.MarginHeadings_true;
+.Device TTY;
+.Single Space;
+.Preface 1;
+This document is a collection of SAIL "gotchas" that got me at one time
+or other.
+.Begin Center;
+
+
+~~INTERRUPTS~
+
+.End;
+.List(-4,4,0,"1.");
+.Item;
+SAIL uses channels 1 through 4 to simulate overflow interrupts and
+ILL MEM REFS.  They should not be employed by a user program.
+.Item;
+If interrupt handling is being done without other process handling, then
+the "Require processes" statement is needed to insure that the necessary
+run-times are loaded.
+.EndList;
+.Begin Center;
+
+
+~~INPUT/OUTPUT_ROUTINES~
+
+.End;
+.List(-4,4,0,"1.");
+.Item;
+For buffered I/O, non-standard buffer sizes are not to be used when the
+device is a disk.  The buffers are normally specified in the OPEN
+subroutine call.
+.EndList;
+
