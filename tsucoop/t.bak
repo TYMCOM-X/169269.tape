@@ -1,0 +1,16 @@
+BEGIN
+require "NEWLIB.SAI" source!file;
+blanklines(2);
+Writeln("enter string.");
+Str_GetText(#lf);
+print(crlf);
+While Length(Str) do
+begin "looper"
+  s_lop(str);
+  loop(length(Str)-1)
+    print(" ");
+  print(s&#cr);
+end "looper";
+blanklines(2);
+
+end;
