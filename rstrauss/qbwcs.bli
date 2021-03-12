@@ -1,0 +1,227 @@
+module QBWCS(dollar,debug,entries=($QBWCS,$QPRED))=
+begin
+
+require (MIDAS)C1DEFS.BLI;
+require (MIDAS)C2DEFS.BLI;
+require (MIDAS)DDDEFS.BLI;
+require (MIDAS)DVDEFS.BLI;
+require (MIDAS)UDEFS.BLI;
+require	(MIDAS)Q1DEFS.BLI;
+require (MIDAS)Q3DEFS.BLI;
+require (MIDAS)Q8DEFS.BLI;
+require (MIDAS)Q9DEFS.BLI;
+require (MIDAS)QNDEFS.BLI;
+
+external $QURCS, $QGREL, $QFINDX, $QBRCS, $TCBSD, $TCSN;
+external $QPEXPR, $QEVAL;
+external QRGBP$, QWCSP$, QTDCN$, QTCON$;
+forward REDUCE, SPLICEOUT;
+
+macro
+   OPRTRANSPOSE(OPR)=
+      case OPR - QO$EQ of
+            set
+% QO$EQ %	QO$EQ;		%    X eq Y   =>   Y eq X     %
+% QO$LT %       QO$GT;		%    X lt Y   =>   Y gt X     %
+% QO$LE %	QO$GE;		%    X le Y   =>   Y le X     %
+% QO$GT %	QO$LT;		%    X gt Y   =>   Y lt X     %
+% QO$GE %       QO$LE;		%    X ge Y   =>   Y le X     %
+% QO$NE %	QO$NE;		%    X ne Y   =>   Y ne X     %
+            tes&,
+
+   QOTOQV(TYPE)=
+      case TYPE - QO$EQ of
+            set
+% QO$EQ %	QV$EQ;
+% QO$LT %	QV$LT;
+% QO$LE %	QV$LE;
+% QO$GT %	QV$GT;
+% QO$GE %	QV$GE;
+% QO$NE %	QV$NE;
+            tes&;
+
+
+routine BUCHECK(AOTBU,EXPR)=
+   begin
+      map QAOTREE$ AOTBU;
+      map QEXPR$ EXPR;
+      local QOP$ BU;
+      local QEXPR$ EXPR1:EXPR2:TMPEXPR;
+      local QFLDLST$ FLST1:FLST2:FLST;
+      local QNECT$ QNECT;
+
+      BU := .AOTBU[QA$OP];
+      EXPR1 := .BU[QO$OP1];
+      EXPR2 := .BU[QO$OP2];
+      if not .EXPR1[QE$FIELD]
+         then
+            if not .EXPR2[QE$FIELD]
+               then
+                  return .AOTBU    % There is nothing we can do        %
+               else
+                  begin
+                     TMPEXPR := .EXPR1;
+                     EXPR1 := BU[QO$OP1] := .EXPR2;
+                     EXPR2 := BU[QO$OP2] := .TMPEXPR;
+                     BU[QO$TYPE] := OPRTRANSPOSE(.BU[QO$TYPE])
+                  end;
+!
+!   Now EXPR1 is a field
+!
+
+      IF .EXPR2[QE$FIELD]
+         THEN
+            BEGIN     %  EXPR1 & EXPR2 are both fields - add to QTDCN$ chain %
+            QNECT := $CGETZ(QV$NECTSIZE);
+            FLST1 := .EXPR1[QE$FLDLST];
+            QNECT[Q$RCB1] := .FLST1[QF$RCB];
+            FLST2 := .EXPR2[QE$FLDLST];
+            QNECT[Q$RCB2] := .FLST2[QF$RCB];
+            QNECT[Q$INDX1] := -1;
+            QNECT[Q$NEXTN] := .QTDCN$;
+            QTDCN$ := .QNECT;
+            IF .BU[QO$TYPE] EQL QO$EQ
+               THEN
+                  BEGIN
+                  QNECT := $CGETZ(QV$NECTSIZE);
+                  QNECT[Q$RCB1] := .FLST1[QF$RCB];
+                  QNECT[Q$RCB2] := .FLST2[QF$RCB];
+                  QNECT[Q$INDX1] := .FLST1[QF$INDX];
+                  QNECT[Q$INDX2] := .FLST2[QF$INDX];
+                  QNECT[Q$NEXTN] := .QTCON$;
+                  QTCON$ := .QNECT
+                  END;
+            return .AOTBU
+            END;
+      if not .EXPR2[QE$CONSTANT]
+         then
+            return .AOTBU;
+
+!
+!   Now EXPR1 is a field and EXPR2 is a constant.
+!
+      FLST := .EXPR1[QE$FLDLST];
+      $QURCS(.BU,
+              .FLST[QF$RCB],
+               .FLST[QF$INDX],
+                .EXPR2[QE$FI],
+                  QOTOQV(.BU[QO$TYPE]));
+      SPLICEOUT(.BU, .EXPR);
+      return 0
+   end;
+
+
+
+!
+!  This recursive routine is called with an AND/OR tree of BUs (Boolean
+!  Units).  It tries to compactify the WHERE CLAUSE by distributing the BUs
+!  to FOR EACHs that are further out.  It returns a compacted AOT.  If the
+!  tree is a removable BU, or is an AND with two removable operands, 0 is
+!  returned.  (If zero is returned, it means that the tree it was called
+!  was totally decomposable.)  If the tree is an AND and one of its operands
+!  can be removed, the other operand is returned.  Under any other
+!  conditions, the tree is returned as it is because no compaction can be
+!  done.
+routine AOTCHECK(AOT,EXPR)=
+   begin
+      local QAOTREE$ LEFT:RIGHT;
+      map QAOTREE$ AOT;
+
+      if .AOT[QA$TYPE] eql QO$BU
+         then
+            return BUCHECK(.AOT,.EXPR);
+
+      if .AOT[QA$TYPE] neq QO$AND
+         then
+            return .AOT;
+
+      AOT[QA$RIGHT] := RIGHT := AOTCHECK(.AOT[QA$RIGHT],.EXPR);
+      AOT[QA$LEFT] := LEFT := AOTCHECK(.AOT[QA$LEFT],.EXPR);
+      case 2*(.LEFT eql 0) + (.RIGHT eql 0) of
+            set
+% F F %		return .AOT;
+% F T %		return REDUCE(.AOT,.LEFT,.EXPR);
+% T F %		return REDUCE(.AOT,.RIGHT,.EXPR);
+% T T %		(SPLICEOUT(.AOT[QA$OP],.EXPR); return 0)
+            tes
+   end;
+
+
+
+!
+! routine REDUCE.  This routine is called with an AND node, and a node
+! which is one of the two operands of the AND.  The other operand has
+! been spliced out.  This routine splices out the AND, and puts the FI
+! which had belonged to the AND into the other node.  The address of
+! child is returned.
+!
+routine REDUCE(ANDNODE,CHILD,EXPR)=
+   begin
+      map QAOTREE$ ANDNODE:CHILD;
+      map QEXPR$ EXPR;
+      local QOP$ ANDOP:CHILDOP;
+      ANDOP := .ANDNODE[QA$OP];
+      CHILDOP := .CHILD[QA$OP];
+      CHILDOP[QO$FI] := .ANDOP[QO$FI];
+      SPLICEOUT(.ANDOP,.EXPR);
+      return .CHILD
+   end;
+
+
+!
+! This routine is called with an OP and an EXPR.  It removes OP from
+! the EXPR OPlist  of EXPR.
+!
+routine SPLICEOUT(OP,EXPR)=
+   begin
+      map QOP$ OP;
+      map QEXPR$ EXPR;
+      local QOP$ PREVOP:NEXTOP;
+
+      NEXTOP := .OP[QO$NEXT];
+      PREVOP := .OP[QO$PREV];
+
+      if .PREVOP eql .EXPR
+         then
+            begin
+               EXPR[QE$EXPR] := .NEXTOP;
+               NEXTOP[QO$PREV] := .EXPR
+            end
+         else
+            begin
+               PREVOP[QO$NEXT] := .NEXTOP;
+               NEXTOP[QO$PREV] := .PREVOP
+            end
+   end;
+
+
+global routine $QBWCS(WHRCLS)=
+   begin
+      map QNODE$ WHRCLS;
+      local QEXPR$ EXPR;
+
+   % See if default  (No where clause specified) %
+      if .WHRCLS eql 0
+         then
+            return QWCSP$ := 0;
+
+      EXPR := $QPEXPR(.WHRCLS[QN$DEF]);
+      if (EXPR[QE$AOTREE] := AOTCHECK(.EXPR[QE$AOTREE],.EXPR)) neq 0
+         then
+            QWCSP$ := .EXPR
+         else
+            QWCSP$ := 0
+   end;
+
+
+global routine $QPRED(EXPR)=
+   begin
+      if .EXPR eql 0
+         then
+            TRUE
+         else
+            @$QEVAL(.EXPR)
+   end;
+
+
+end eludom
