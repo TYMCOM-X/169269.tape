@@ -1,0 +1,285 @@
+!	frame data ;
+
+set	AllFrames;		! contains FI's for all frames;
+
+
+!	events ;
+
+item	FrameHalt;		! any frame has halted;
+
+simple procedure EventIni;
+begin
+    Mkevtt (FrameHalt);
+end;
+require EventIni initialization[0];
+
+!	msg _ FrameErrMsg (F)
+
+Return appropriate error message for why the frame died
+;
+recursive string procedure FrameErrMsg ( frame	F );
+begin "FEM"
+    string  M;			! string to be returned;
+    integer L,R;		! class and type of error;
+    L _ lh( FD:hsbType[f] );	! class in left half;
+    R _ rh( FD:hsbType[f] );	! type in right half;
+    case L of begin "class"
+  	[0] case R of begin	! memry violations;
+	    [0] M_"?PC out of bounds at "&cvos(FD:hsbPC[f]);
+	    [1] M_"?ill mem ref for "&cvos(FD:hsb1[f])&" at "&cvos(FD:hsbPC[f]);
+	    [2] M_"?write violation for "&cvos(FD:hsb1[f])&" at "&cvos(FD:hsbPC[f]);
+	    [3] M_"?address check for "&cv6str(FD:hsb1[f])&": at "&cvos(FD:hsbPC[f]);
+	    [4] M_"?ill mem ref for "&cvos(FD:hsb1[f])&" in UUO at "&cvos(FD:hsbUUOPC[f]);
+	    [5] M_"?illegal interrupt address "&cvos(FD:hsb1[f]);
+	    [6] M_"?address break";
+	    [7] M_"?PDL overflow at "&cvos(FD:hsbPC[f]);
+	    else M_"?meory violation #"&cvos(R)&" -no message" end;
+	[1] case R of begin	! system errors;
+	    [0] M_"?page I/O error";
+	    [1] M_"?disk full durring copy on write";
+	    [2] M_"?paging hardware error";
+	    [3] M_"?too many locked pages - can't handle fault";
+	    [4] M_"?context page I/O error";
+	    [5] M_"?parity error(s - core removed";
+	    else M_"?system error #"&cvs(R)&" -no message" end;
+	[2] case R of begin	! device errors;
+	    [0] M_"?device "&cv6str(FD:hsb1[f])&" can't do output";
+	    [1] M_"?device "&cv6str(FD:hsb1[f])&" can't do input";
+	    [2] M_"?illegal data mode for device "&cv6str(FD:hsb1[f]);
+	    [3] M_"?IO to unassigned channel";
+	    [4] M_"?device "&cv6str(FD:hsb1[f])&": hung";
+	    [5] M_"?operator action requested for device "&cv6str(FD:hsb1[f])&":";
+	    else M_"?device error #"&cvos(R)&" -no message" end;
+	[3] case R of begin	! illegal instructions;
+	    [0] M_"?illegal uuo at "&cvos(FD:hsbUUOPC[f]);
+	    [1] M_"?fatal uuo error at "&cvos(FD:hsbUUOPC[f]);
+	    [2] M_"?ill inst at "&cvos(FD:hsbUUOPC[f]);
+	    [3] M_"?halt at "&cvos(FD:hsbUUOPC[f]);
+	    else M_"?ill inst trap #"&cvos(R)&" -no message" end;
+	[4] case R of begin	! frame exits (normal);
+	    [0] M_"exit";	! EXIT;
+	    [1] M_null;		! EXIT 1,;
+	    [2] M_"failed";	! FAIL exit;
+	    [4] M_cv6str(FD:hsb1[f])&" setup";
+	    [5] M_cv6str(FD:hsb1[f])&" saved";
+	    [6] M_"cleared";
+	    else M_"?frame exit #"&cvos(R)&" -no message" end;
+	[5] case R of begin	! SEGCON errors;
+	    [0] M_"?transmission error";
+	    [1] M_"?"&cvs(FD:hsb1[f])&" pages needed";
+	    [2] M_"?device "&cv6str(FD:hsb1[f])&": not available";
+	    [3] M_"?"&cv6str(FD:hsb1[f])&"."&cv6str(FD:hsb2[f])&" not found";
+	    [4] M_"?not a save file";
+	    [5] M_"?"&cv6str(FD:hsb1[f])&"."&cv6str(FD:hsb2[f])&" ENTER failure";
+	    [6] M_"?core argument must be specified";
+	    [7] M_"?mag tape HISEG format bad of system error";
+	    [8] M_"?fatal errors durring REMAP";
+	    [9] M_"?mag tape GET failure";
+	    [10] M_"?no start address";
+	    else M_"?SEGCON error #"&cvos(R)&" -no message" end;
+	else if FD:hsbType[f] =-1
+	    then M_"<^C>"	! ^C (or gate jump);
+	    else M_"?halt class "&cvos(L)&" type "&cvos(R)&" -no message" end;
+    return (M);
+end "FEM";
+!	HALT interrupt service
+
+This routine is called by DFRINT in response to an interrupt on the
+channel HALTchan (which is assigned cause HALTcause: interrupt when
+any child halts).  Note that it is assumed that if the RUN bit in
+JBTSTS has changed from FD:rf, but the halt count has not changed
+(FD:hc = FD:hsbCount), that the frame halted as the result of an
+untrapped ^C or HALT command given by an attached console.  This
+is hopefully temporary.
+;
+
+procedure HALTservice;
+begin "HALTservice"
+    frame F;
+    frame itemvar FF;
+    NoSched;			! no interrupts durring this;
+    foreach FF | FF in AllFrames do begin "next frame"
+	F _ datum(FF);
+	FD:sts[f] _ GetTab (FD:j[f],!GTSTS);! get current frame status;
+	if (FD:sts[f] xor FD:rf[f]) land bit(0) = 0 then continue;
+				! if run bit hasn't changed ignore;
+	FD:rf[f] _ FD:sts[f] land bit(1);! update run bit;
+	FD:hsb[f] _ hsbSize;	! setup and get halt status block;
+	frmopr (FD:j[f],FD:hsb[f],!FOHST);
+	ErrCheck("HALTservice: can't read halt status block for frame",
+	    FD:j[f] land '7777);
+	if FD:hc[f]=FD:hsbCount[f] then FD:hsbType[f] _ -1;
+				! if hasn't incrimented, halted by ^C;
+	FD:hc[f] _ FD:hsbCount[f];! update halt count;
+	cause (FrameHalt,FF);
+    end "next frame";
+    Sched;
+end "HALTservice";
+
+!	Initialize HALT interrupt
+;
+
+safe integer array HALTblock[1:2];
+define	HALTcause = '14;	! HALT in a child frame;
+define	HALTchan = '10; 	! HALT psi channel;
+
+simple procedure HALTini;
+begin
+    HALTblock[1] _ 2;
+    HALTblock[2] _ hl(-1) + location(HALTservice);
+    intmap (intass (HALTcause,HALTchan),
+	dfrint, hl(-2) + location(HALTblock[1]) );
+    enable (newenb(HALTchan));
+end;
+require HALTini initialization[2];
+
+!	FrameWait (F)
+
+Pass the terminal to the frame F and wai for the frame to halt.  Then
+print the reason for the halt.
+;
+
+recursive procedure FrameWait (frame F);
+if FD:rf[f] then begin 		! do this only if its been started;
+    MovePort (FD:j[f]);		! give them the port;
+    interrogate (FrameHalt, WAIT);! wait for it to halt;
+    MovePort (-1);		! get the port back;
+    print (crlf, FrameErrMsg(F), crlf);! print message;
+end;
+
+!	create a new frame
+;
+
+frame procedure NewFrame (
+	string User(null) );
+begin "newframe"
+    integer A!;
+    frame F;
+    frame itemvar FF;
+    integer array A[0:4];
+    if length(user) 
+      then begin		! user supplied arguments;
+        A[0] _ A[2] _ cvppn(user);
+	A[1] _ gettab(-1,!GTPRV);
+        A[3] _ cvsix(user[1 for 6]);
+        A[4] _ cvsix(user[7 for 6]);
+	A! _ hl(-arrinfo(A,2))+location(A[0]);
+      end 
+      else A! _ 0;		! default all arguments;
+    NoSched;			! dont let anybody see us this way;
+    F _ new!record(FD);		! new frame descriptor;
+    FF _ new(F);		! make an item for it;
+    FD:fi[f] _ FF;		! link it into FD;
+    FD:j[f] _ Frmop (0, A!, !FOCFM);! create the frame;
+    if !SKIP! then begin	! handle error condition;
+	Sched;
+	error (L,n!r,
+	    "NewFrame: cannot bear child, "&FRMOP!err[!SKIP!]);
+	return (n!r);
+    end;
+    FD:sts[f] _ GetTab (FD:j[f], !GTSTS); ! store JBTSTS;
+    put FF in AllFrames;	! it exists;
+    Sched;			! okay to be interrupted now;
+    return (F);			! return the FD;
+end;
+
+!	symbol _ RunProg(F,"program",[t/f])
+
+Run the named rogram in the named frame. If GivePort is
+true or unspecified, give the frame the port after it starts running.
+If the port is given away, wait for its return.
+;
+
+symbol procedure RunProg (
+	frame 	F; 
+	string 	Prog;
+	boolean	GivePort(true) );
+begin
+    integer J;			! frame number;
+    integer I;			! tmp;
+    integer array AC[0:'17];	! place to store data to deposit;
+    label AC!data,StAdr;	! address of program;
+    NoSched;			! don't allow interruptions;
+    J _ FD:j[f];		! get child frame handle;
+    calli (J,-'126);		! SetOTF;
+    if not !SKIP! then return(error(L,n!r,
+	"RunProg: cannot SETOTF"));
+    calli (hl('206001),-'67);	! give it 1 page;
+    if false then quick!code	! program to be deposited;
+        AC!data:
+		0;0;0;0;0;0;0;0;	! [0:7];
+		0;			! [10];
+        StAdr:  CALLI '10,'35;		! RUN uuo;
+		  JRST 4,'13;		! HALT;
+    end;
+    arrblt(AC[0],memory[location(AC!data)],'20);! copy program;
+    AC[0] _ cvsix("DSK");	! device;
+    AC[1] _ cvfil(Prog,AC[2],AC[4]);! program name;
+    if AC[4] and (lh(AC[4])=0) then begin ! copy username if given;
+        AC['6] _ memory[AC[4]];
+        AC['7] _ memory[AC[4]+1];
+        AC[4] _ '6;
+    end;
+    for I _ 0 step 1 until '17 do begin
+        integer array A[0:1];
+        A[0] _ I; A[1] _ AC[I];	! address, data;
+        Frmopr(J,A[0],!FOWVA);	! copy array to his address space;
+	if !SKIP! then return(error(L,n!r,
+	    "RunProg: cannot deposit frame, "&FRMOP!err[!SKIP!]));
+    end;
+    Frmop(J,hl(-1) lor (location(StAdr)-location(AC!data)),!FOSAA);
+    if !SKIP! then return(error(L,n!r,
+	"RunProg: cannot start frame, "&FRMOP!err[!SKIP!]));
+    FD:rf[f] _ true;		! flag as running;
+    Sched;			! allow scheduling;
+    if GivePort then FrameWait (F);
+    return (n!r);
+end;
+
+!	Bestow (frame,license)
+
+Bestow the named license on the specified frame.  This is currently
+done in a rather unethical manner (ie. POKE), but that will be fixed
+soon.
+;
+recursive procedure SetTab (
+	frame	F;
+	integer	Tab;
+	integer	Val );
+begin
+    integer J;
+    J _ FD:j[f] land '7777;	! get absolute frame handle;
+    start!code
+	label	FAIL;
+	SETOM	!SKIP!;		! success assumed;
+	HRL	1,Tab;		! get table number;
+	HRRI	1,!GTSLF;	! gettab index for table of addresses;
+	CALLI	1,'41;		! (1) _ address of JBT###;
+	  JRST	FAIL;		!   illness (probably no SY license);
+	MOVE	2,J;		! (2) _ absolute frame number;
+	ADDI	2,(1);		! (2) _ adr of JBT### word for f
+	MOVE	1,Val;		! (1) _ data to be deposited;
+	MOVEI	0,1;		! (0) _ adr of arg block;
+	CALLI 	0,-'12;		! poke the desired table;
+FAIL:	  SETZM	!SKIP!;		!   illness (probably no WC license);
+    end;
+end;
+
+!	symbol _ VectorStart (F,V,[t/f])
+;
+recursive symbol procedure VectorStart (
+	frame	F;
+	integer V;
+	boolean	GivePort(true) );
+begin "VectorStart"
+    integer J;
+    J _ FD:j[f];		! get frame number;
+    Frmop (J,V,!FOSVA);		! start at vector address;
+    if !SKIP! then return(error(L,n!r,
+	"VectorStart: "&FRMOP!err[!SKIP!]));
+    FD:rf[f] _ true;		! flag us as running;
+    if GivePort then FrameWait(F);
+    return (n!r);
+end "VectorStart";
+
+L@ 
