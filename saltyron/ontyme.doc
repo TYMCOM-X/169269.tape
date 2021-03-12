@@ -1,0 +1,209 @@
+
+
+
+                               ONTYME II
+                          INSTANT USERS GUIDE
+
+                             March 20,1982
+
+    Introduction:
+
+       This guide is a quick users guide to the use  of  the  Ontyme  II
+       message  switch  and  a  description  of how to use the Ontyme II
+       system from a PDP-10 host.  This guide is not designed to replace
+       the  online  documentation  for  Ontyme II but is just an instant
+       user series designed for the casual user.
+
+       Any errors or corrections to this guide  or  other  documentation
+       should be sent to IMSONT.SUP on the Ontyme II system.
+
+       Should you find that you are not valid on Ontyme II please  check
+       the following:
+            Does you organization have a local Ontyme account.  INSD and
+            Marketing  groups  should  contact  the INSD representative.
+            Independent groups, such as MIS, STD, Credit/Collections who
+            already  have  received account status, should contact their
+            organizational  representative.   If  no  account  has  been
+            assigned,  mail  your request to Ron Saltgaver c/o Corporate
+            HQ.  VG3/02.  An account application package  will  be  sent
+            immediately.  Please fill out the form and obtain the needed
+            signatures and send to  Ron  Saltgaver  20705  Valley  Green
+            Drive, Cupertino, Ca.  95014.
+
+            It will  take  about  3  weeks  for  the  Tymnet  Ontyme  II
+            validations  to  occur  and  the documents sent back to you.
+            Should you need a temporary name in the meantime, it is easy
+            to accomodate.
+
+
+
+
+    Ontyme II Overview
+
+       LOGON (directly to Ontyme II)
+
+          At the prompt for Please Log In:  type EMSTSHR<cr>.
+
+          This will connect you to Ontyme II and return the prompt:  ID?
+          You will then inter your Ontyme userid.  The system will  then
+          prompt you for a KEY which is the local Ontyme II password for
+          this specific userid.
+
+          If the login is correct then the prompt ACCEPTED will be typed
+          out.  Incorrect login will repeat with "ID?".
+
+          Note!!!  You are not in text entry mode.  ALL COMMANDS MUST BE
+          PRECEDED  BY  A  COLON.  Otherwise, you will be in text insert
+          mode.
+                                                                  Page 2
+
+
+       LOGOFF
+
+          There are several methods to leave Ontyme  II.   The  commands
+          are  :LOG,  :QUIT, and others.  The :LOG command causes you to
+          leave Ontyme II with no checking  for  pending  data  in  text
+          areas  that  may  be lost.  The :QUIT command will warn you of
+          possible loss of data.  If you do not mind  losing  the  data,
+          follow the warning responce with a carriage return.
+
+       Receiving Messages:  :READ ALL command.
+
+          Once accepted by Ontyme II just type:
+
+          :READ ALL<cr>
+
+          Your messages will be printed or the message ALL MESSAGES READ
+          will be printed out.
+
+       Sending Messages:  
+
+          Because the sending of messages requires the creation of  text
+          data and the use of the Ontyme II editor, I will restrict this
+          tutorial to the very basics possible and reference the uses of
+          IMS.
+
+          After acceptance by Ontyme, enter your text as though you  had
+          type SEND USERID to the MAIL or IMS MAIL system.  You can type
+          as many lines as you like  using  <ctrl>h  for  backspace  and
+          <ctrl>Q  for  line  delete.   There  are no tabs at present so
+          <ctrl>I will not succeed.
+
+          Opon completion you type:
+
+          :SEND USERID<cr> - e.g.  - :SEND IMSONT.SUP
+
+          The Ontyme II Editor is modeled  after  the  IBM  CMS  EDITOR.
+          Unfortunately  not  all  of  the IBM features are implemented.
+          The basic Editor commands can be found  in  the  documentation
+          and a few are as follows:
+
+          :Up :DEL :Next :Change /string/string/ :TOP :TYPE
+
+          PDP-10 users can create their text files  on  the  PDP-10  and
+          send   it   on   to   Ontyme.   See  (FTSYSDOC)ONTYME.DOC  for
+          information.
+
+          Once a message has been sent, it is  removed  from  your  text
+          data  area.   To  return a copy to your area you will need the
+          :GET command and the identifier for the message (ususally a  1
+          alpha  character followed by up to 6 digits).  Use the command
+          as follows:
+
+          :GET IDENTIFIER - e.g.  - :GET A34565<cr>
+
+          This would be done to send a message on to someone else or  to
+                                                                  Page 3
+
+
+          append text to a recieved message and then sending it on.
+
+    As with all tools, there are more  sophisticated  methods  of  using
+    Ontyme  II.   For  those  of  you  interested  in these commands and
+    variations, a reference  manual  has  been  given  to  your  account
+    supervisor.   Additional  copies  of  the  reference  manual  can be
+    ordered through the Tymnet Documentation Department.
+
+
+    Ontyme II PDP-10 interface:
+
+
+
+
+
+
+  This program is used to transfer files from a PDP-10 host to the  ONTYME
+  message  switch system.  All text is transfered without translation.  In
+  this manner the transfered file can contain both text and commands.
+
+  This program is located on systems 25,28,29,33,34,39, 65.                                                        _
+
+  To run the program type:
+
+  -GO (FTSYS)ONTYME <CR>
+
+  The following is a sample of the use  of  the  ONTYME  REMOTE  INTERFACE
+  program.
+
+
+ 
+ 
+ -GO (FTSYS)ONTYME
+ 
+ ENTER ONTYME NAME: imsont.user   - your user id or the userid you own.
+ 
+ ENTER PASSWORD: <does not print> - this is the ONTYME userid's 
+                                 password and not your PDP-10 password.
+                                 (passwords may not contain trailing 
+                                 spaces since they will be truncated)
+ 
+ ENTER FILE NAME: file13.mem  -  any legal PDP-10 file name
+                 (When completed, the file name will be requested again.
+                 While the file is being transfered the program will count
+                 lines in the file and after every 25 lines the following
+                 message appears:)
+ SENT: XXXX
+ 
+              (XXXX = NUMBER OF LINES TRANSFERED is printed when the
+                  program has completed the transfer)
+ 
+ ***  a second option to the file request is available.  This option
+      enable the user to send direct commands to ONTYME as though
+      he or she was logged in directly.
+ 
+                                                                    Page 4
+
+
+         This option is exercised by typing a percent sign (%) followed
+         by the desired text string.
+ ----------------------------------------------------------------------
+ ----------------------------------------------------------------------
+ 
+ Additional features of the ONTYME REMOTE INTERFACE system:
+ 
+         Tab (^I) will be translated into spaces filling out to an even
+         increment on 8.
+ 
+         All text received from the ONTYME system after any command will
+         be printed on the terminal.
+ 
+ -----------------------------------------------------------------------
+ -----------------------------------------------------------------------
+ 
+ ERROR MESSAGES
+ ------------------
+ 
+ UNABLE TO BUILD CIRCUIT  RESPONSE:XXXXXXXXXXXX
+ 
+         The circuit to the ONTYME system could not be built.
+         The response number is decoded below:
+ 
+ (X) BAD RESPONSE FROM MESSAGE SWITCH
+ 
+    X    MEANING
+ 
+    1    THE 'ID? ' MESSAGE WAS NOT RECEIVED.
+    2    THE 'KEY?' MESSAGE WAS NOT RECEIVED.
+    3,4  THE 'ACCEPTED' MESSAGE WAS NOT RECEIVED.
+    5    DATA NOT ECHOED PROPERLY.
+ 
