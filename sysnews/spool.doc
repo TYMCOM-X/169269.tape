@@ -1,0 +1,649 @@
+
+
+              REMOTE PRINTER OPERATION MANUAL
+
+THIS REFLECTS VERSION 6.00 OF SPOOL
+
+     This manual is a companion to the SPOOL USER'S  MANUAL,
+and   supplements  the  information   in  that  manual  (see
+(*6NEWS)SPOOL.DOC). The information in this manual describes
+the  operation of remote printers  for  SPOOL  and  commands
+associated   with   printing  remote  requests.   The remote
+printers supported by SPOOL are CDC, 2780, Data Products (DP)
+and Vogue.
+
+     In addition to the commands  described  in  the  USER'S
+MANUAL,  additional  commands  are  available  to designated
+people to print spooled requests.  In order to access  these
+commands,   license  must  be  set  using  the  SET  command
+described below.   The  SET  command  should  be  the  first
+command issued after entering the SPOOL system.
+
+
+                      Status Commands
+
+     The Status commands (STATUS, REPORT, and LIST)  may  be
+executed  by  operators.  Operators receive information only
+for their printer location and their district.  In addition,
+when operators execute one of the above commands, additional
+information is provided.  Two additional  status  words  can
+appear in the status line.
+
+  HOLD  The request has been placed on HOLD by an operator.
+  TRAN  The request is in a transfer state and needs to be
+        transfered by the operator to a different
+        printing site.
+
+     If  there  are  any  requests  to  be  transfered,  the
+operator  will  be reminded of this fact before each command
+is  processed  and  until  all  the   requests   have   been
+transfered.
+
+     Information concerning the type of paper and number  of
+pages  is  also  given  for  the  STATUS,  REPORT  and  LIST
+commands.  The number of pages that the operator sees is the
+least  number of pages required to complete the request, not
+the number of pages that will be charged.
+
+     Also, if a request requires a full character set (upper
+and  lower)  printer,  it will be flaged as "FC".  This will
+appear after the type of paper required for the request.
+
+
+     When a request is printed, the  accounting  information
+is  written  to  one of two places.  If there is no delivery
+charge, the information is written  directly  to  accounting
+and  no  further  action is required.  If there are delivery
+charges the information is held so that the operator may add
+the  charge.   Remote  operators  use  the  program 1RCHARGE
+                                                      Page 2
+
+
+(TYMCOM-IX) or RCHARG (TYMCOM-X) to  complete the request.
+
+     The hardcopy  for the request will  tell you if RCHARG
+or 1RCHARGE needs to be run.  If the  hardcopy  says  RCHARG
+must  be run  against the  request, it  must be done even if 
+there is no delivery  charge so that the accounting  records
+will  be  completed  for the  printing.  In such  a case the
+request  should  be charged  off with  .00  entered  for the 
+delivery charge.
+                                                      Page 3
+
+
+                       PRINT Command
+
+     There are four options for this command which can  only
+be used by operators.  This command does the printing of the
+spooled files on the printer.  When  the  request  has  been
+completed,  a  hardcopy is produced for the request.  At the
+onset of the first PRINT command issued, the  operator  will
+be  asked if his printer has a full character set (upper and
+lower).  If the reply is "NO", only those requests which  do
+not specify the FULLCH option when spooling will be printed.
+Should any of those requests  have  lower  case  characters,
+they  will  be converted to upper case before being printed.
+If the printer does not have a full character set,  requests
+that  require  it  (via the FULLCH option) can be printed by
+the  PRINT  <number>  command.   Those  requests   will   be
+converted  to  upper  case  before being printed.  The print
+options available are detailed below.  After the first print
+command  is  issued,  the operator will be asked what remote
+printer is being used.  The operator  must  respond  with  a
+valid printer name.
+
+PRINT [ALL]
+
+     This command will sort all pending requests  (PEND)  by
+type  of  form and number of parts before printing.  If only
+one type of form is needed for printing, the  operator  will
+be  told  to  mount  that  type  of  form  on  the  printer.
+Otherwise, if several different types of forms are needed, a
+summary  of  the  forms  is printed and the operator will be
+asked which type of form he wishes to print.   All  requests
+for  the  form  specified  will  be  printed and the process
+repeated until all requests for all forms are completed.
+
+
+PRINT FORM
+
+     This command is used for printing all pending  requests
+for  one  type of form.  The system will prompt the operator
+for the type of form desired, tell him how  many  pages  are
+required, and then print all pending requests for that form.
+
+
+                                                      Page 4
+
+
+PRINT <number>
+
+     This will print only the  request  specified.   If  the
+request  is  anything  but  PEND or HOLD, confirmation as to
+whether the request is to be redone  is  required.   If  the
+printer  has been flaged as not a full character set printer
+and the request requires it, the operator will be  asked  if
+he  wants to print it.  If so, the request will be converted
+to upper case before  being  printed.   The  type  of  paper
+required   is   then   typed   and  the  program  waits  for
+confirmation of the forms on the printer.   The  request  is
+then printed.
+
+     This is the only command which will print a job on HOLD
+status.    In   the  event  that  multiple  forms  paper  is
+unavailable, the request may be redone multiple  times,  and
+only one charge is recorded in the accounting.
+
+     Due to the possibility that  a  user  may  specify  the
+wrong  print  switches  when  he  makes  a  spool request, a
+feature has been included for the operator to  override  the
+user's print switches.
+
+     On the PRINT <number> and  RESTART  <number>  commands,
+the  operator  will  be asked OPTIONS:.  This is effectively
+asking the operator  what  print  switches  to  use  on  the
+request.   The  operator  may  specify the use of the user's
+original switches by a carriage  return,  or  he  may  enter
+switches   which   will  override  only  those  switches  he
+specifies.  Switches available are:  HEAD,  NOHEAD,  SINGLE,
+DOUBLE, FORTRAN (TYMCOM-X), NOFORTRAN (TYMCOM-X) and LINES=.
+
+
+
+PRINT <number> Filename
+
+     This command is used to print an individual file  of  a
+request.   The file is printed in its entirety and only once
+regardless of how  many  copies  the  requester  wants.   No
+accounting record is created.
+                                                      Page 5
+
+
+                   PRINT command examples
+
+
+:print
+
+REMOTE PRINTER TYPE: cdc
+
+IS THIS A FULLCASE PRINTER? yes
+
+TOTAL REQUIREMENTS ARE:
+LARGE -1 PART----   29 PAGES
+LARGE -2 PART----  324 PAGES
+SMALL -3 PART----   88 PAGES
+WHAT TYPE OF FORM DO YOU WANT TO PRINT? large
+PARTS: 2
+
+ARE THERE  324 PAGES OF 2 PART LARGE PAPER?
+CONFIRM BY TYPING YOUR NAME: smith
+
+
+
+                         Example 1
+                PRINT Command Using Default
+
+
+
+
+
+
+
+:print form
+FORMS: large
+PARTS: 1
+
+ARE THERE   29 PAGES OF 1 PART LARGE PAPER?
+CONFIRM BY TYPING YOUR NAME: smith
+
+
+
+                         Example 2
+                 PRINT by Form Type command
+                                                      Page 6
+
+
+:print 33125
+FOR HIGGINS    ON 8/03/75? no
+FOR SMOEJOE    ON 9/10/75? yes
+
+OPTIONS:             (carriage return means use requester
+                      options)
+
+ARE THERE  88 PAGES OF 3 PART SMALL PAPER?
+CONFIRM BY TYPING YOUR NAME: smith
+
+
+
+                         Example 3
+                  PRINT by Number Command
+
+
+
+
+
+
+
+:print 33125 a.lst
+
+FOR JOHNSON  ON 9/03/75? yes
+
+OPTIONS: fortran        (shows to use fortran carriage
+                         control on the file)
+
+ARE THERE 43 PAGES OF 1 PART LARGE PAPER?
+CONFIRM BY TYPING YOUR NAME: smith
+
+
+
+                         Example 4
+                PRINT by Number For One File
+                                                      Page 7
+
+
+                      RESTART Command
+
+     The RESTART command is used to restart a  request  that
+has  been  only partially completed.  The system will prompt
+for the request number, file name, restart copy  number  and
+restart  page  number.  The copy number can be obtained from
+the last file title page  of  the  file  in  question.   The
+restart page number is the physical page to restart printing
+on.  Page numbers on the listing cannot be relied upon as  a
+correct  indicator  as a restart printing point in the file.
+A carriage return indicates to begin printing at  the  start
+of  the  file.   When  the  file is found, SPOOL proceeds to
+print that file and all succeeding files for the request.
+
+
+
+:restart 33675
+FILE NAME: a.lst
+RESTART COPY NO.: 2
+RESTART PAGE NO.: 23
+
+ARE THERE 212 PAGES OF 1 PART TTY PAPER?
+CONFIRM BY TYPING YOUR NAME: smith
+
+                    Example 5
+                      RESTART Command
+
+
+
+                        HOLD Command
+
+     This is a  utility  command  which  is  used  to  place
+individual  requests on hold, such as when there is no paper
+for the request.  Once a request is on HOLD status, it shows
+up  as PEND on user STATUS commands, but are not included in
+the ALL commands for PRINT.  The only way that requests  may
+be taken off HOLD status is to be printed by the operator or
+canceled by the user or the operator.
+
+
+:hold  33887
+FROM 08/01/75? no
+FROM 10/08/75? yes
+
+REQUEST PUT ON HOLD
+
+                         Example 6
+                        HOLD Command
+
+
+
+
+                                                      Page 8
+
+
+                       CANCEL Command
+
+     Since users can only cancel requests which are  pending
+or  on  hold,  it  is  necessary  to allow someone to cancel
+requests which are in other status states.   Therefore,  the
+operator   can  cancel  anyone's  request  regardless  of  a
+request's status.
+                       DELETE Command
+
+     This command is for deleting a file from a request  and
+should  only  be  used  when  a file cannot be printed, i.e.
+file is bad or binary.
+
+                      TRANSFER Command
+
+     A request goes into transfer status when the  requester
+indicates  he wants his request printed at a different site.
+This command must be used against any request that has  TRAN
+status.   The  TRANSFER command is the only operator command
+which can be used against a request which  in  TRAN  status.
+The  TRANSFER  command  will  move  the  request to the site
+desired with the operators assistance.   When  the  operator
+issues  a  transfer  command  against the request, the SPOOL
+system will tell him the location to  transfer  the  request
+to.   The  operator  will enter a node number and an address
+will  be  typed  out   that   must   be   confirmed.    Upon
+confirmation,  the  request will now belong to the new site.
+In place of a node number, the word "CENTER" may be used, in
+which case, the request will be moved to the computer center
+for printing.
+
+:transfer 38256
+
+TRANSFER TO: SAN FRANCISCO, CALIF
+
+ENTER TRANSFER NODE: 1034
+
+NO REMOTE PRINTER
+ENTER TRANSFER NODE: 1001+
+TYMSHARE, INC.
+TYMSHARE CORPORATE HEADQUARTERS
+20705 VALLEY GREEN DRIVE
+CUPERTION, CA 95014
+
+OKAY? no
+                                                      Page 9
+
+
+ENTER TRANSFER NODE: 1052
+TYMSHARE, INC.
+SAN FRANCISCO DISTRICT
+425 CALIFORNIA, 2ND FLOOR
+SAN FRANCISCO, CA 94104
+
+OKAY? yes
+TRANSFER COMPLETED
+
+                         Example 7
+                      TRANSFER Command
+
+     In  order  to  determine  which  requests  need  to  be
+transfered, the operator should issue the STATUS command.
+
+     In order to get  the  node  numbers  for  the  TRANSFER
+command,  the  operator  should  log into the IMS system and
+call 1PNUPD.  The command PPA will give a complete  list  of
+printer location addresses and the associated nodes.
+
+
+
+                      HARDCOPY Command
+
+     This command will ask  the  operator  for  the  request
+number  and  the requester name.  All information entered by
+the requester at the time of spooling will be typed  out  on
+the operator's terminal.
+
+
+
+                        SET Command
+
+     This command is used by potential remote operators.  It
+will ask for your license username and license password.  If
+the user has Remote Print ability, the user will be  flagged
+as  a remote operator.  This command should be issued before
+the remote operator issues a STATUS, REPORT or LIST  command
+as  it  will allow the operator to see the pages and type of
+paper needed with each request.
+                                                     Page 10
+
+
+       NOTIFICATION OF REQUESTS WAITING TO BE PRINTED
+
+     In order for the remote operators to find out  if  they
+have  any pending requests to be printed at their site, they
+must log into the IMS system and while at  the  EXEC  level,
+issue  the  command  1NOTIFY.   This program will respond by
+listing all systems that  have  pending  requests  for  that
+site.
+
+
+-1NOTIFY
+
+PRINTER LOCATION 8
+1 REQUEST ON SYSTEM 2
+3 REQUESTS ON SYSTEM 38
+
+                         Example 8
+               1NOTIFY Command on IMS System
+
+
+                        APPENDIX A
+
+          (Revised to reflect Version 7 /16-Aug-82)
+
+                   TRANSPORTATION CHARGES
+
+     Since we are unable to determine transportation charges
+(postage  charges  or  courier  service  charges)  until the
+listing is complete and ready to be sent,  charges  must  be
+entered  by the operator.  The program used to enter charges
+is RCHARG on the TYMCOM-X and 1RCHARGE  on  the  TYMCOM-IX.
+RCHARG  is to be run by the office printing remote requests
+for those  requests  which  are  not  designated  as  pickup
+requests.
+
+     To run the program the operator types
+
+R RCHARG on TYMCOM-X systems
+
+1RCHARGE on TYMCOM-IX systems
+
+     Operation of the  two  programs  is  nearly  identical.
+RCHARG  requires  SP  licence  to be  set  from  within  the
+program.   RCHARG  will ask for the  user name and password.
+
+    RCHARG prints the date and time as in this example:
+
+-R RCHARG
+
+ENTER YOUR NAME:  SAMPRINT
+PASSWORD:
+
+REMOTE SPOOL ENTRY PROGRAM - VERSION 7
+
+8/16/82  10:34
+*QUIT
+
+Commands available are:
+
+LIST PROCESSED
+     UNPROCESSED
+     VOID
+     <number>
+CHARGE ALL
+       <number>
+VOID <number>
+CORRECT
+QUIT
+HELP
+TRANSPORTATION CHARGES                                Page A-2
+
+                       LIST PROCESSED
+
+     This command lists information for  all  requests  that
+have  been  charged using the CHARGE command.  Output may be
+directed to the terminal or to a file.
+
+*LIST PROCESSED
+
+OUTPUT TO: T
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+39688 183   SAMPLE2      TRACK             8-01       7080        2
+   08/04          1.21
+
+END OF FILE.
+TRANSPORTATION CHARGES                                Page A-3
+
+                      LIST UNPROCESSED
+
+     This command lists information for all  requests  which
+have  been  printed  but  not  as yet charged.  The requests
+listed require TRANSPORTATION charges to be posted before the
+information is entered into the accounting.
+
+     If the question ALL?  is answered with a NO, a limiting
+date  is  requested.   All unprocessed requests prior to the
+date specified are printed.
+
+*LIST UNPROCESSED
+
+ALL? Y
+
+OUTPUT TO: T
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+39688 183   SAMPLE2      TRACK             8-01       7080        2
+   08/04
+
+END OF FILE.
+TRANSPORTATION CHARGES                                Page A-4
+
+                        LIST VOIDED
+
+     This command lists information for all  requests  which
+have been voided.  A response of NO to the ALL question will
+cause a request number to be requested.  Only  those  voided
+requests with the specified number are printed.
+
+*LIST VOIDED
+
+ALL? Y
+
+OUTPUT TO: T
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+
+REQUEST VOIDED BY: SAMPRINT
+
+END OF FILE.
+TRANSPORTATION CHARGES                                Page A-5
+
+                       LIST <number>
+
+     This command searches, in order, the unprocessed  list,
+the  processed  list,  and  the  voided list looking for the
+request number specified.  When the request  is  found,  the
+informtaion is printed out in the format which is associated
+with the status of the request.
+*LIST 39502
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+TRANSPORTATION CHARGES                                Page A-6
+
+                      CHARGE Commands
+
+                      CHARGE <number>
+
+     This command searches  the  unprocessed  list  for  the
+request   specified  by  number,  confirms  the  informtaion
+available, and waits for the transportation charges (postage
+charges)  to  be entered.  This information is confirmed and
+the accounting record written.
+
+*CHARGE 39688
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39688 183   SAMPLE2      TRACK             8-01       7080        2
+   08/04
+
+OKAY? Y
+
+ENTER POSTAGE OR TRANSPORTATION CHARGE: .20
+
+POSTAGE CHARGES CORRECT? Y
+
+ANOTHER REQUEST? N
+TRANSPORTATION CHARGES                                Page A-7
+
+                         CHARGE ALL
+
+     This command presents the information for each  request
+in the unprocessed list so that it may be completed.
+
+*CHARGE AL
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+
+OKAY? Y
+
+ENTER POSTAGE OR TRANSPORTATION CHARGE: .00
+
+POSTAGE CHARGES CORRECT? Y
+
+39688 183   SAMPLE2      TRACK             8-01       7080        2
+   08/04
+
+OKAY? Y
+
+ENTER POSTAGE OR TRANSPORTATION CHARGE: 1.40
+
+POSTAGE CHARGES CORRECT? Y
+
+END OF FILE.
+TRANSPORTATION CHARGES                                Page A-8
+
+                  CORRECT <number>
+
+     This command allows the operator to change the  postage
+charge  on  a request that already has been entered into the
+accounting.
+
+*CORRECT 
+REQUEST NO: 39502
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES    0.21
+
+OKAY? Y
+
+ENTER POSTAGE OR TRANSPORTATION CHARGES: 1.36
+
+POSTAGE CHARGES CORRECT? Y
+TRANSPORTATION CHARGES                                Page A-9
+
+                       VOID <number>
+
+     This command removes the  accounting  record  from  the
+unprocessed  lists,  placing  it  into  a  voided list.  The
+information concerning the person who voided the request  is
+retained.   The  name  is the name used when the password is
+set.
+
+VOID 39502
+
+REQ.  DIST  USER NAME    PROJ-CODE    VOLUME-PARTS   CHARS   FILES
+    DATE  DECOLL.  PSTG.
+
+39502  90   SAMPLE1      MONDAY RUN       38-03     135963        4
+   08/02   YES
+
+OKAY? Y
+
+REQUEST CANCELLED
+&@b¿
