@@ -1,0 +1,149 @@
+BEGIN "Wtrunc"
+
+let debug = false;
+require "(sailib)sail.def" source!file;
+require "{}<>" delimiters;
+ifc debug thenc
+   external procedure bail;
+   require "(sys)baipd8.rel" load!module;
+endc
+
+
+	! This is a program to select text from a file or files on a
+column basis.
+;
+
+integer oldch, oldbrk, oldeof,
+   newch, newbrk, neweof,
+   usrinch, usrinbrk, usrineof,
+   filtbl, lintbl, tabtbl,
+   strtcol, lwidth;
+
+string str;
+procedure mnchfil( string file;  integer col, len );
+BEGIN
+   string inline, outline;
+   boolean tmpfil;
+   integer sixfil, sixext, sixppn, i, x;
+   lookup( oldch, file, oldeof );
+   if oldeof then
+   BEGIN
+      print( "Cannot open """ & file & """." & crlf);
+      return;
+   END;
+
+!  Now create a file on the directory we are GFD'd to with the same
+   file name as above but with a numbered extension.
+;
+   sixfil_ cvfil( file, sixext, sixppn );
+   setformat( -3, 0 );  tmpfil_ true;
+   for x_ 1 step 1 until 999 do
+   BEGIN
+      lookup( newch, (file_ cv6str(sixfil) & "." & cvs(x)), neweof );
+      if neweof then done;
+   END;
+   setformat( 0, 0 );
+   if not neweof then tmpfil_ false
+   else BEGIN
+      enter( newch, file, neweof);  if neweof then tmpfil_ false;
+   END;
+   if not tmpfil then
+   BEGIN
+      print( "Unable to open a temporary file for processing" & crlf );
+      return;
+   END;
+
+!  Now read the original file, and write the applicable portion of each
+   line to the new file just opened.  Convert tabs to spaces.
+;
+   while not oldeof do
+   BEGIN "create file"
+      inline_ input( oldch, lintbl );
+      outline_ null;
+      while length( inline ) do
+      BEGIN
+	 outline_ outline & scan( inline, tabtbl, oldbrk );
+	 if oldbrk = #ht then
+	 BEGIN
+	    x_ 8 - (length(outline) mod 8);
+	    for i_ 1 step 1 until x do outline_ outline & " ";
+	 END;
+      END;
+      out( newch, (outline[col for len] & crlf ) );
+   END;
+
+!  Now try to rename the new file to a ".trn" file;
+
+   rename( newch, (str_ cv6str(sixfil) & ".TRN"), 0, neweof );
+   if neweof then print( """" & file &
+      """ could not be renamed to a "".trn"" file." & crlf )
+   else print( str & crlf );
+
+   return;
+END;
+!  Main program begins here;
+
+   ifc debug thenc usererr( 0, 1, "Trying to Bail.", "B" ); endc
+   open( (oldch_ getchan), "dsk", 0, 1, 0, 400, oldbrk, oldeof);
+   if oldeof then
+   BEGIN
+      print( "Cannot initialize the disk." & crlf);
+      call( 0, "exit" );
+   END;
+   open( (newch_ getchan), "dsk", 0, 0, 1, 400, newbrk, neweof);
+   if neweof then
+   BEGIN
+      print( "Cannot initialize the disk." & crlf);
+      call( 0, "exit" );
+   END;
+   open( (usrinch_ getchan), "dsk", 0, 1, 0, 100, usrinbrk, usrineof);
+   if usrineof then
+   BEGIN
+      print( "Cannot initialize the disk." & crlf);
+      call( 0, "exit" );
+   END;
+
+   setbreak( (lintbl_ getbreak), #lf, #cr, "ins" );
+   setbreak( (tabtbl_ getbreak), #ht, null, "ins" );
+   setbreak( (filtbl_ getbreak), #lf, #cr, "kins" );
+
+   while true do
+   BEGIN "get column"
+      print( "Starting column:  " );  str_ inchwl;
+      if (strtcol_ cvd(str)) > 132 then
+	 print( "Enter a number between 1 and 132." & crlf )
+	 else done "get column";
+   END "get column";
+   while true do
+   BEGIN "get width"
+      print( "Width of each line:  ");  str_ inchwl;
+      if (lwidth_ cvd(str)) > (133-strtcol) then
+	 print( "Enter a number between 1 and ", (133-strtcol),
+	    "." & crlf )
+	 else done "get width";
+   END "get width";
+
+   while true do
+   BEGIN "main loop"
+      print( "Input file:  " );  str_ inchwl;
+      if str[1 for 1] = "@" then
+      BEGIN
+	 lop( str );  lookup( usrinch, str, usrineof );
+	 if usrineof then
+	 BEGIN
+	    print( "Cannot open """ & str & """." & crlf );
+	    continue "main loop";
+	 END;
+	 while not usrineof do
+	 BEGIN
+	    str_ input( usrinch, filtbl );
+	    if length( str ) then mnchfil( str, strtcol, lwidth );
+	 END;
+      END
+      else if length( str ) then mnchfil( str, strtcol, lwidth )
+      else done "main loop"
+   END "main loop";
+
+   release( oldch );  release( newch );  release( usrinch );
+END "Wtrunc";
+
