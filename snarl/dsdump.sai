@@ -1,0 +1,438 @@
+ENTRY;
+BEGIN "DSDUMP"
+
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE "sndefs.sai" SOURCE!FILE;
+!get!module (<extend>);
+\  Global storage defined elsewhere;
+
+EXTERNAL INTEGER ARRAY
+   tapblk [1:tape!buf!size];		\ Array for holding one large tape block.;
+
+EXTERNAL INTEGER
+   mtchan, mteof,			\ Mag tape channel stuff;
+   mtstat,				\ sense data,,status bits;
+   mtibuf,				\ number of buffers for buffered input;
+   tapbloc;				\ number of last physical record accessed.;
+
+EXTERNAL STRING mtdev;			\ tape device name;
+
+EXTERNAL STRING ARRAY headsymbols [1:15];	\ Symbolic names for tape logical record headers;
+EXTERNAL INTEGER ARRAY headers [1:15];		\ Numeric record headers actually found on tape;
+\  Global and local storage for this module;
+
+PRESET!WITH
+   0, !hed, !dir, !rcd, !lok,		\ These are the corresponding token values to the tape;
+   !dat, !emp, 0, !bou, !eou,		\ logical record headers that may be entered by the user;
+   0, 0, !dum, 0, 0;			\ as display modes for dumping.;
+INTEGER ARRAY headparams [1:15];
+INTERNAL INTEGER ARRAY
+   rcdmap [1:200,1:2];			\ Holds an internal representation of a block map.;
+INTERNAL BOOLEAN octal;			\ True if display indices in octal, false if decimal;
+INTEGER print!mode,			\ Token value for the display mode.;
+   np!purge,				\ break table for finding non-printing characters;
+   words!read,				\ Number of words actually read from tape.;
+   headtype,				\ current record marker type used for display;
+   lenth,				\ current display length.;
+   word1,				\ "word1" and "word2" and the low and high;
+   word2;				\ of the current range to be typed.;
+\  External procedures;
+
+EXTERNAL BOOLEAN PROCEDURE set!tape!bufs (INTEGER direction);
+EXTERNAL STRING PROCEDURE pr!time (INTEGER time);
+EXTERNAL STRING PROCEDURE pr!date (INTEGER date);
+EXTERNAL BOOLEAN PROCEDURE xeof (INTEGER eofvar);
+EXTERNAL BOOLEAN PROCEDURE xerr (INTEGER eofvar);
+PROCEDURE default;
+BEGIN
+   STRING non!prints;  INTEGER i;
+   octal_ true;  print!mode_ !octal;  word1_ (word2_ -1);
+   non!prints_ 1;							\ Make up a string consisting of;
+   for i_ 2 step 1 until '37 do non!prints_ non!prints & i;		\ of ASCII non-printing characters.;
+   non!prints_ non!prints & '177;
+   np!purge_ getbreak;  setbreak(np!purge,non!prints,0,"ins");		\ Set up break table for "non-prints";
+   return;
+END;
+REQUIRE default INITIALIZATION;
+PROCEDURE dsp!str (INTEGER mode, low, high);
+	\ This routine is for displaying a portion of the current tape
+block in a symbolic format.  "Mode" is the token value corresponding to
+either "ASCII" or "SIXBIT".  "Low" and "high" are a range of words to
+display.;
+
+BEGIN
+   INTEGER row, actrow, brchr, i, j, k;
+   STRING str, pr!str;
+
+   setformat(-4,0);
+   row_ (if mode = !sixbit then 8 else 10);				\ Set maximum width of rows.;
+   for i_ low step row until high do
+   BEGIN
+      actrow_ (row min (high-i+1));					\ Find actual size of this row.;
+      str_ (pr!str_ null);
+      for j_ 1 step 1 until actrow do
+      BEGIN
+	 k_ j+i-1;
+	 str_ str & (if mode=!sixbit then cvxstr(tapblk[k])
+	    else cvstr(tapblk[k]));
+      END;
+      while length(str) neq 0 do
+      BEGIN								\ Get rid of non-printing characters;
+	 pr!str_ pr!str & scan(str,np!purge,brchr);			\ in the display string.  Replace with;
+	 if brchr neq 0 then						\ octal display surrounded by "{}";
+	    pr!str_ pr!str & "{" & cvos(brchr) & "}";
+      END;
+      print(" " & (if octal then cvos(i) else cvs(i)) & "|" &
+	 "  " & pr!str & crlf);
+   END;
+   setformat(0,0);  return;
+END;
+PROCEDURE dsp!num (INTEGER mode, low, high);
+	\ This routine is for displaying a portion of the current tape
+block in a numeric format.  "Mode" is the token value corresponding to
+either "OCTAL" or "DECIMAL".  "Low" and "high" are a range of words to
+display.;
+
+BEGIN
+   INTEGER i;  STRING x;
+   for i_ low step 1 until high do
+   BEGIN
+      setformat((if mode=!octal then -12 else 12),0);
+      x_ (if mode=!octal then cvos(tapblk[i]) else cvs(tapblk[i]));
+      setformat(-4,0);
+      if ((i-low) mod 4) = 0 then
+	 print(crlf & " " & (if octal then cvos(i) else cvs(i)) & "|");
+      print("  " & x);
+   END;
+   print(crlf,crlf);  setformat(0,0);
+   return;
+END;
+PROCEDURE typrec (INTEGER template);
+	\ This procedure types a range of words in "tapblk" according to
+the record type "template".;
+BEGIN
+   INTEGER low, i, time, date, lenth;
+   if (template neq xxx) and (template = headtype) then
+   BEGIN
+      for i_ 1 step 1 until 15 do if headers[i]=headtype then done;
+      print(headsymbols[i] & " record starting at " & (if octal then
+	 cvos(word1) else cvs(word1)) & ", ending at " & (if octal then
+	 cvos(word2) else cvs(word2)) & ".  ");
+      lenth_ word2-word1;
+      print("size=" & (if octal then cvos(lenth) else cvs(lenth)) &
+	 "+1" & crlf & crlf);
+      low_ word1+1;
+   END
+   else BEGIN
+      for i_ 1 step 1 until 15 do if headers[i]=template then done;
+      print("Record being printed as " & headsymbols[i] & " type.  ");
+      lenth_ word2+1-word1;
+      print("size=" & (if octal then cvos(lenth) else cvs(lenth)) &
+	 crlf & crlf);
+      low_ word1;
+   END;
+
+   case (template lsh -18) of BEGIN
+[hed lsh -18]
+      BEGIN
+	 dsp!str(!ascii,low,low);
+	 dsp!num(!decimal,low+1,low+2);
+	 dsp!str(!ascii,low+3,low+4);
+	 dsp!num(!decimal,low+5,low+5);
+	 time_ tapblk[low+6];  date_ tapblk[low+7];
+	 gmt!to!user(<date>,<time>);
+	 print(" 0007|  " & pr!time(time) & crlf);
+	 print((if octal then " 0010" else " 0008") & "|  " &
+	    pr!date(date) & crlf);
+	 dsp!num(!decimal,low+8,low+8);
+	 dsp!num(!decimal,low+9,low+10);
+	 dsp!str(!ascii,low+11,low+15);
+      END;
+[dir lsh -18]
+	 dsp!num(!decimal,low,low);
+[rcd lsh -18]
+      BEGIN
+	 dsp!num(!decimal,low,low+1);
+	 dsp!num(!decimal,low+2,low+2);
+      END;
+[lok lsh -18]
+      BEGIN
+	 dsp!num(!decimal,low,low);
+	 time_ tapblk[low+1];  date_ tapblk[low+2];
+	 gmt!to!user(<date>,<time>);
+	 print(" 0001|  " & pr!time(time) & crlf);
+	 print(" 0002|  " & pr!date(date) & crlf);
+	 dsp!num(!octal,low+3,low+4);
+	 dsp!str(!sixbit,low+5,low+6);
+	 dsp!num(!octal,low+6,low+25);
+	 dsp!str(!sixbit,low+26,low+27);
+	 dsp!num(!octal,low+28,word2);
+      END;
+
+\  [dat lsh -18,dum lsh 18];
+[dat lsh -18]
+[dum lsh -18]
+	 dsp!num(!octal,low,word2);
+[emp lsh -18]
+	 dsp!num(!decimal,low,word2);
+\  [bou lsh -18,eou lsh 18];
+[bou lsh -18]
+[eou lsh -18]
+	 dsp!num(!octal,low,word2);
+[xxx lsh -18]
+	 dsp!num(!octal,word1,word2)
+   END;
+   return;
+END;
+BOOLEAN PROCEDURE search!heads (INTEGER y);
+	\ This procedure searches "tapblk" for a word which appears to
+be a good logical record marker.  "Headtype" is set to the potential
+marker value, whether good or not.;
+BEGIN
+   INTEGER z;
+   headtype_ tapblk[y] land '777777000000;
+   lenth_ tapblk[y] land '777777;
+   if (lenth > 0) and ((y+lenth) leq (tape!buf!size+1)) then
+      for z_ 1 step 1 until 15 do
+	 if headtype = headers[z] then return (true);
+   return (false);
+END;
+INTERNAL PROCEDURE s!indi (INTEGER swval);
+	\ This routine is the service routine for the INDICES command.;
+octal_ (if swval = !octal then true else false);
+INTERNAL PROCEDURE s!bloc (INTEGER rel!pos, abs!pos);
+	\ This routine is the service routine for the BLOCK command.  The
+"rel!pos" parameter refers to relative positioning and may be one of the
+token values !NEXT, !PREVIOUS, or !LAST.  The "abs!pos" parameter referes
+to an absolute block position (the normal SNARL header block is block
+0).  If "rel!pos" is zero, then "abs!pos" is used.
+	"S!bloc" does not usually rewind first when an absolute position
+is given.  If the tape has been moved without the program knowing it,
+then it is up to the user to rewind the tape explicitly before
+positioning.
+	"S!bloc" actually reads the block desired and builds a map of
+the SNARL logical records, if any can be distinguished.  This map is put
+in "rcdmap" and has the following format:
+.
+	rcdmap[x,1] = the header type (value found on tape)
+	rcdmap[x,2] = <beginning word index>,,<ending word index>
+.
+where the indices reference words in "tapblk" which will contain the
+physical block read from tape.;
+
+BEGIN
+   INTEGER i, j, x, maplim;  BOOLEAN goodhead, dskdev;
+
+PROCEDURE create!map (INTEGER index, headval, low, high);
+BEGIN
+   if index > maplim then return;
+   rcdmap[index,1]_ headval;
+   rcdmap[index,2]_ (low lsh 18) + high;
+   return;
+END;
+\ "S!bloc" body starts here;
+
+   dskdev_ (if (calli(cvsix(mtdev),devchr) land dv!dsk) = 0 then false
+      else true);
+   if rel!pos then
+   BEGIN
+      if rel!pos = !next then
+      BEGIN
+	 if dskdev then useti(mtchan,(tapbloc+1)*dsk!index+1);
+      END
+      else if rel!pos = !previous then
+      BEGIN
+	 if dskdev then
+	    if tapbloc < 2 then useti(mtchan,1)
+	    else useti(mtchan,(tapbloc-1)*dsk!index+1)
+	 else BEGIN
+	    mtape(mtchan,"R");  mtape(mtchan,"R");
+	 END;
+	 tapbloc_ tapbloc-2;  if tapbloc < -1 then tapbloc_ -1;
+      END
+      else if rel!pos = !last then
+      BEGIN
+	 mteof_ 0;  while not xeof(mteof) do
+	 BEGIN
+    	    arryin(mtchan,tapbltape!buf!size);
+	    tapbloc_ tapbloc+1;
+	 END;
+	 if dskdev then
+	    if tapbloc < 2 then useti(mtchan,1)
+	    else useti(mtchan,(tapbloc-1)*dsk!index+1)
+	 else BEGIN
+	    close(mtchan);  mtape(mtchan,"R");
+	 END;
+	 tapbloc_ tapbloc-2;  if tapbloc < -1 then tapbloc_ -1;
+      END;
+   END
+   else BEGIN
+      if dskdev then
+      BEGIN
+      	 useti(mtchan,abs!pos*dsk!index+1);
+	 if mteof then print("Bad position given."&crlf)
+	 else tapbloc_ abs!pos-1;
+      END
+      else BEGIN
+	 mteof_ 0;
+	 i_ abs!pos - tapbloc - 1;
+	 if i > 0 then 
+	 BEGIN
+	    for j_ 1 step 1 until i do
+	    BEGIN "forwardspace"
+	       arryin(mtchan,tapblk[1],tape!buf!size);
+	       if xeof(mteof) then
+	       BEGIN
+		  print("Logical end of tape reached." & crlf);
+		  close(mtchan);
+		  mtape(mtchan,"R");  done "forwardspace";
+	       END;
+	       tapbloc_ tapbloc+1;
+	    END "forwardspace";
+	 END
+	 else if i < 0 and -abs!pos < i then
+	 BEGIN								\ halfway back.;
+	    mtape(mtchan,"W");  mtape(mtchan,null);
+	    if abs!pos > 0 then for i_ 1 step 1 until abs!pos do
+	       mtape(mtchan,"F");
+	    tapbloc_ abs!pos;
+	 END
+	 else BEGIN
+	    for j_ -1 step -1 until i do
+	    BEGIN "backspacing"
+	       mtape(mtchan,"R");
+	       if mteof then
+	       BEGIN
+		  tapbloc_ -1;  done "backspacing";
+	       END;
+	       tapbloc_ tapbloc - 1;
+	    END "backspacing";
+	 END;
+      END;
+   END;
+   arryin(mtchan,tapblk[1],(words!read_ tape!buf!size));		\ Now read the desired block.;
+   if mteof then words!read_ mteof land '777777;
+   if xeof(mteof) or xerr(mteof) then if not dskdev then close(mtchan)
+   else tapbloc_ tapbloc+1;
+   if words!read = 0 then
+   BEGIN
+      print("No words read from tape." & crlf);
+      return;
+   END;
+
+\  Now make the internal logical record map.;
+
+   i_ (x_ 0);  goodhead_ true;  arrclr(rcdmap,0);
+   maplim_ arrinfo(rcdmap,2);
+   while true do
+   BEGIN "block map"
+      for j_ 1 step 1 until words!read do				\ Look for next good marker.;
+      BEGIN
+	 if search!heads(j) then
+	 BEGIN
+	    if not goodhead then
+	       create!map((x_ x+1),xxx,(i+1),(i_ j-1));
+	    create!map((x_x+1),headtype,(i+1),
+	       (i_ ((i+lenth) min words!read)));
+	    j_ i;
+	    goodhead_ true;
+	 END
+	 else goodhead_ false;
+	 if i = words!read then done "block map";
+	 if x geq maplim then done "block map";
+      END;
+      if not goodhead then
+      BEGIN
+	 create!map((x_x+1),xxx,(i+1),words!read);
+	 done "block map";
+      END;
+   END "block map";
+
+   return;
+END;
+INTERNAL PROCEDURE s!map;
+	\ This is the service routine for the map command.  It operates
+with the array "rcdmap" which is the internal representation of the map
+of the current block which was built when that block was read.  See the
+description of "s!bloc" for documentation of "rcdmap".;
+
+BEGIN
+   INTEGER i, j, k, x, maplim;
+   STRING low, high, headtype;
+
+   maplim_ arrinfo(rcdmap,2);
+   if rcdmap[1,1] = 0 then
+   BEGIN
+      print("Nothing to print yet."&crlf);
+      return;
+   END;
+   j_ 0;  setformat(-4,0);
+   for i_ 1 step 1 until maplim do
+   BEGIN
+      for k_ 1 step 1 until 15 do
+	 if rcdmap[i,1] = headers[k] then done;
+      headtype_ headsymbols[k];
+      x_ (rcdmap[i,2] lsh -18) land '777777;
+      low_ (if octal then cvos(x) else cvs(x));
+      x_ rcdmap[i,2] land '777777;
+      high_ (if octal then cvos(x) else cvs(x));
+      if (j mod 4) = 0 then print (crlf&cvs(j/4+1)&"| ");
+      print("  " & low & "-" & high & " " & headtype);
+      j_ j+1;  if x = words!read then done;
+   END;
+   print(crlf & crlf);  setformat(0,0);
+   return;
+END;
+INTERNAL PROCEDURE s!typ (INTEGER low, high, mode);
+	\ This procedure is the service routine for the various "T"
+commands which display portions of the current physical tape block.  "Low"
+and "high" are word indices into "tapblk".  The "mode" parameter is
+the mode in which the requested words will be displayed.;
+
+BEGIN
+   INTEGER i;
+
+   if low then BEGIN
+      word1_ low;  word2_ high;
+   END;
+   if mode then print!mode_ mode;
+   if word1 < 0 then
+   BEGIN
+      print("Nothing to type yet." & crlf);
+      return;
+   END;
+   case print!mode of BEGIN
+[!octal]
+[!decimal]
+      dsp!num(print!mode,word1,word2);
+[!sixbit]
+[!ascii]
+      dsp!str(print!mode,word1,word2);
+[!default]
+      BEGIN
+	 if not search!heads(word1) then headtype_ xxx;
+	 typrec(headtype);
+      END;
+[!hed]
+[!dir]
+[!rcd]
+[!lok]
+[!dat]
+[!emp]
+[!bou]
+[!eou]
+[!dum]
+      BEGIN
+	 if not search!heads(word1) then headtype_ xxx;
+	 for i_ 1 step 1 until 15 do
+	    if headparams[i] = print!mode then done;
+	 typrec(headers[i]);
+      END
+   END;
+   return;
+END;
+
+
+END "DSDUMP";
+  &4ë
