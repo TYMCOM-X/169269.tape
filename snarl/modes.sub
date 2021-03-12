@@ -1,0 +1,43 @@
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!mode (BOOLEAN alter);
+.EndHand;
+	This routine handles the MODE command.  The parameter "alter"
+tells whether the ALTER switch was part of the user's MODE command.  If
+so, then the user is allowed to modify the switches interactively.  If
+not, then the current switch settings are simply reported to the user.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!spr (INTEGER swval(0));
+.EndHand;
+	This procedure handles the SPRINT command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!ree (INTEGER swval(0));
+.EndHand;
+	This procedure handles the REELSET command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!old (INTEGER swval(0));
+.EndHand;
+	This procedure handles the OLD command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!sys (INTEGER swval(0));
+.EndHand;
+	This procedure handles the SYS command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!rpr (INTEGER swval(0));
+.EndHand;
+	This procedure handles the RPRINT command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!dsk (INTEGER swval(0));
+.EndHand;
+	This procedure handles the DSKREP command.
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!tty (INTEGER swval(0));
+.EndHand;
+	This procedure handles the TTYREP command.
