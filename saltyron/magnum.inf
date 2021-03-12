@@ -1,0 +1,222 @@
+        MAGNUM changes: version 10.05 780302            March 2, 1978
+        -------------------------------------------------------------
+
+
+    1.  Corrects a problem related to the printing of the page heading on
+        the first page as reported in TSR 55409.
+
+    2.  Corrects an error in exponentiation for multiple precission
+        operands.
+
+    3.  Corrects a problem in processing a confirmation reply as reported
+        in TSR 55418.
+
+
+        MAGNUM changes: version 10.04 780219            February 19, 1978
+        -----------------------------------------------------------------
+
+
+    1.  Corrects a problem where the XEXEC file was not being released
+        by the RESTORE command when the  "RELEASE" option was specified.
+
+    2.  Corrects an ILL INST which occured in certain instances upon return
+        from a called procedure.
+
+    3.  Corrects a bug in double precision multiplication and division.
+        (TSR 55420).
+
+
+        MAGNUM changes: version 10.03 780126            January 26,1978
+        ---------------------------------------------------------------
+
+
+    1.  Corrects a problem in TIOS INIT file processing for such files that
+        were implemented prior to version 10.00 (TSR 55425).
+
+    2.  Corrects @FF processing, by the compiler, for PAGE.TOP (TSR 55426).
+
+    3.  Corrects the case of the missing data block when multiple users
+        were attempting to update the same relation.
+
+    4.  Corrects the problem of a calling procedure not "seeing" a
+        change to a relation that was made by a procedure that it had called.
+
+    5.  Prevents a fatal error from occuring when a non-existant file,
+        due to deletion at XEXEC!!!, is referenced (TSR 55422).
+
+
+
+        MAGNUM changes: version 10.02 780112            January 12, 1978
+        ----------------------------------------------------------------
+
+
+    1.  Corrects channel initialization problem encountered when executing
+        a run statement repetitively.
+
+    2.  Corrects a page inconsistency problem resulting in loss of data in
+        in a relation that is being accessed concurrently.
+
+    3.  Corrects a problem with using a relation name as a parameter to an
+        internal procedure.
+
+
+
+        MAGNUM changes: version 10.01 771209            December 9, 1977
+        ----------------------------------------------------------------
+
+
+    1.  Corrects a problem with code generation that resulted in an
+        ILL INST when the procedure was "RUN".
+
+
+*       MAGNUM changes: version 10.00 771123            November 23,1977
+        ----------------------------------------------------------------
+
+
+  The following is a list of the major changes in MAGNUM for version 10.00.
+  Please refer to the version 10.00 release document, about 45 pages, for
+  complete details.
+
+    1.  Internal and external procedures
+
+    2.  INCLUDE compiler directive.
+
+    3.  Procedure compiler modified to compile arbitrarily large procedures.
+
+    4.  Access Control
+        a.  Allows cross directory file reference at command level.
+        b.  INSTALL command for "new" schemas (i.e. to receiving directory).
+
+    5.  Schema compiler
+        Now deletes relation files when the relation's structure changes
+        and the existing file becomes outdated. Compiled procedures that
+        reference such relations are also deleted.
+
+    6.  New operators
+        EQV - equivalence
+        MOD
+        XOR
+        **  - exponentiation
+
+
+    7.  New functions
+        ABS - absolute value
+        MIN - minimum
+        MAX - maximum
+        SQRT- square root
+
+    8.  New statements
+        a.  Clear terminal input/output
+        b.  PROMPT - same as TYPE but emits data to the prompt port.
+
+    9.  New in commands
+        a.  TYPE - now can reference XEXEC files.
+        b.  DELETE - now differentiates between procedure and text objects.
+        c.  ARCHIVE and RETRIEVE
+            Now available for backup relation files and as with DELETE, these
+            commands can refer to procedure and text objects separately.
+        d.  EXECUTE - allows the user to initiate a process external to
+            MAGNUM and optionally return.
+        e.  New forms of DIRECTORY command
+             DIRECTORY PROCEDURES WITH PARAMETERS for return parameters
+                       RELATIONS BY PROCEDURES
+                       FIELDS BY PROCEDURES
+                       PROCEDURES BY RELATIONS
+                                  BY FIELDS
+
+
+*       MAGNUM changes: version 9.03 771015             October 15,1977
+        --------------------------------------------------------------
+
+
+    1.  Corrects a free memory list integrity check failure asociated with 
+        the use of the "SAVE AS" clause in a Data Base Reference command.
+
+    2.  Corrects a problem with the TYPE statement when @TAB is used to
+        construct the print line. When the @TAB left the line cursor at
+        some character position other than the last character to be printed,
+        only a portion of the line was displayed.
+
+
+*       MAGNUM changes: version 9.02 771008             October 8,1977
+        --------------------------------------------------------------
+
+
+    1.  Corrects an ILL MEM REF during Data Base Reference command
+        processing.
+
+    2.  Corrects a line continuation problem when reading from a command
+        file. The continuation character was not being recognized in certain
+        peculiar situations.
+
+
+*       MAGNUM changes: version 9.01 770930             September 30,1977
+        -----------------------------------------------------------------
+
+
+    1.  Corrects a journal file problem which resulted in the failure of
+        a full keyed DELETE as described in TSR 55428.
+
+    2.  Increases minimum stack size to eliminate "stack overflow" for 
+        certain configurations of large and highly nested procedures.
+
+    3.  Corrects a problem which had resulted in several random occurances
+        of an ILL. MEM. REF. during compilation.
+
+
+*       MAGNUM changes: version 9.00 770801             August 10, 1977
+        ---------------------------------------------------------------
+
+
+    Note: For a more detailed description of the following items, see your
+        Tymshare representative for a copy of the flyer relating to this
+        release of MAGNUM.
+
+    1.  Procedure language functions
+         function       data
+           name        format           description of data returned
+         --------      ------           ----------------------------
+
+        USER.NAME       "12C"   User name entered when the user logged in
+
+        INDIVIDUAL.ID   "12C"   Current project code
+
+        USER.ID         "24C"   Concatenation of USER.NAME with INDIVIDUAL.ID
+
+        WHO             "36C"   Concatenation of USER.ID with the user name
+                                specified by the user in an XEXEC GFD command,
+                                if any.
+        TRU          "7ZN.NN"   Total number of TRUs used, up to the function
+                                execution, during the current login session.
+
+    2.  More efficient processing of XEXEC file input.
+
+    3.  More comprehensive Data Base change analysis by the schema compiler.
+
+    4.  The VERIFY clause in the field declaration statement now allows use
+        of string functions and "IS" data conversion test.
+
+    5.  DIFFERENCES command to compare text objects.
+
+            DIFF[ERENCES] text-object-name-1 AND text-object-name-2
+
+    6.  The procedure compiler can now compile much larger procedures than
+        was possible in earlier versions.
+
+    7.  PROFILE command to specify controls on the use of commands and access
+        to specific objects by commands, on a selective user basis.
+
+    8.  Cross directory XEXEC file access by the BACKUP, RESTORE, COMPILE
+        and RUN commands.
+
+    9.  SET command including:
+
+        a.  SET DEFAULT SCHEMA TO  schema-name 
+                                   NOWHERe
+
+        b.  SET ALLOW    NEW SCHEMAS
+                RESTRICT 
+
+   10.  TIOS INIT COMMANDS [FOR user-id] FROM text-name
+                                              NOWHERE
+    
