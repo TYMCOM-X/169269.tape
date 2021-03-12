@@ -1,0 +1,457 @@
+ENTRY;
+BEGIN "Top-down parser"
+
+
+LET R!C = RECORD!CLASS;  LET R!P = RECORD!POINTER;
+LET n!r = null!record;
+DEFINE \ = "COMMENT";
+REQUIRE 1000 SYSTEM!PDL;
+REQUIRE 1000 STRING!SPACE;
+REQUIRE "tdp001.sai" source!file;
+REQUIRE "{}<>" DELIMITERS;
+
+DEFINE xtkn(wd) = {ldb(point(12,gramr[wd],11))};
+DEFINE xdef(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xrou(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE xerr(wd) = {gramr[wd] land '7777};
+DEFINE xsucc(wd) = {gramr[wd] land '7777};
+DEFINE xfail(wd) = {gramr[wd] land '7777};
+DEFINE nlft(wd) = {ldb(point(11,gramr[wd],23))};
+DEFINE clrsucc(wd) = {gramr[wd] land '777777770000};
+DEFINE psucc(wd,value) = {gramr[wd]_clrsucc(<wd>) lor value};
+
+
+
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+
+
+PRELOAD!WITH
+'000140000001, '400000060003, '000200060000, '400100000000, '000000000000, 
+'000240000000, '400000660010, '000300660012, '000000000000, '000400720014, 
+'000000000000, '000501050016, '000000000000, '000601300020, '000000000000, 
+'000701340022, '000000000000, '001002420024, '000000000000, '001102550026, 
+'000000000000, '001202640030, '000000000000, '001303070032, '000000000000, 
+'001403160034, '000000000000, '001504030036, '000000000000, '001604070040, 
+'000000000000, '001704130042, '000000000000, '002004170044, '000000000000, 
+'002104500046, '000000000000, '002205450050, '000000000000, '002305510052, 
+'000000000000, '002405560054, '000000000000, '002505620056, '000000000000, 
+'002605660060, '000000000000, '002705720062, '000000000000, '003005760064, 
+'000000000000, '003106020000, '000000000000, '000340000002, '400000720070, 
+'401300000000, '000000000000, '000440000002, '400000770074, '401400000000, 
+'003200770000, '000000000000, '003240000003, '400001050101, '401500000103, 
+'000000000000, '401600000000, '000000000000, '000540000002, '400001120107, 
+'401700000000, '003301120000, '000000000000, '003340000004, '400001240114, 
+'402000000116, '000000000000, '402100000120, '000000000000, '402200000122, 
+'000000000000, '003401240000, '000000000000, '003440010000, '400001300126, 
+'402300000000, '000000000000, '000640000002, '400001340132, '402400000000, 
+'000000000000, '000740000002, '400001520136, '003501520142, '402500000142, 
+'003602040142, '000000000000, '003501520145, '402500000145, '000000000000, 
+'402500000150, '003602040150, '000000000000, '402500000000, '000000000000, 
+'003540020005, '400001640154, '003701640160, '400400000160, '004001700160, 
+'000000000000, '004101740000, '400200000000, '004202000000, '000000000000, 
+'003740010000, '400001700166, '402300000000, '000000000000, '004040010000, 
+'400001740172, '402300000000, '000000000000, '004140010000, '400002000176, 
+'402300000000, '000000000000, '004240010000, '400002040202, '402300000000, 
+'000000000000, '003640000000, '400002420206, '401500000210, '000000000000, 
+'401600000212, '000000000000, '402600000214, '000000000000, '402700000216, 
+'000000000000, '403000000220, '000000000000, '403100000222, '000000000000, 
+'403200000224, '000000000000, '403300000226, '000000000000, '403400000230, 
+'000000000000, '403500000232, '000000000000, '403600000234, '000000000000, 
+'403700000236, '000000000000, '404000000240, '000000000000, '404100000000, 
+'000000000000, '001040000002, '400002510244, '404200000247, '004302510247, 
+'000000000000, '404200000000, '000000000000, '004340000000, '400002550253, 
+'404300000000, '000000000000, '001140000002, '400002640257, '404400000262, 
+'004302510262, '000000000000, '404400000000, '000000000000, '001240000002, 
+'400002770266, '404500000272, '004402770272, '004503030272, '000000000000, 
+'404500000275, '004402770275, '000000000000, '404500000000, '000000000000, 
+'004440030006, '400003030301, '404600000000, '000000000000, '004540010007, 
+'400003070305, '402300000000, '000000000000, '001340000002, '400003160311, 
+'404700000314, '004603250314, '000000000000, '404700000000, '000000000000, 
+'001440000002, '400003250320, '400300000323, '004603250323, '000000000000, 
+'400300000000, '000000000000, '004640000010, '400004030327, '401300000331, 
+'000000000000, '401400000333, '000000000000, '401700000335, '000000000000, 
+'402400000337, '000000000000, '402500000341, '000000000000, '404200000343, 
+'000000000000, '404400000345, '000000000000, '404500000347, '000000000000, 
+'404700000351, '000000000000, '400300000353, '000000000000, '405000000355, 
+'000000000000, '405100000357, '000000000000, '405200000361, '000000000000, 
+'405300000363, '000000000000, '405400000365, '000000000000, '405500000367, 
+'000000000000, '405600000371, '000000000000, '405700000373, '000000000000, 
+'406000000375, '000000000000, '406100000377, '000000000000, '406200000401, 
+'000000000000, '406300000000, '000000000000, '001540000002, '400004070405, 
+'405000000000, '000000000000, '001640000002, '400004130411, '405100000000, 
+'000000000000, '001740000002, '400004170415, '405200000000, '000000000000, 
+'002040000002, '400004260421, '405300000000, '004704260000, '400200000000, 
+'005004370000, '000000000000, '004740000011, '400004370430, '005105120433, 
+'005205160433, '000000000000, '005105120435, '000000000000, '005205160000, 
+'000000000000, '005040000011, '400004500441, '005105120444, '005205160444, 
+'000000000000, '005105120446, '000000000000, '005205160000, '000000000000, 
+'002140000002, '400004610452, '405400000456, '005304610456, '406400000456, 
+'000000000000, '405400000000, '005304610000, '000000000000, '005340000012, 
+'400004700463, '005404700466, '005205160466, '000000000000, '005205160000, 
+'000000000000, '005440000013, '400004760472, '005504760474, '000000000000, 
+'005105120000, '000000000000, '005540040000, '400005060500, '401100000000, 
+'005605060000, '400200000000, '005605060000, '401200000000, '000000000000, 
+'005640050000, '400005120510, '402300000000, '000000000000, '005140030000, 
+'400005160514, '406500000000, '000000000000, '005240000000, '400005310520, 
+'005705310524, '400700000524, '006005410524, '000000000000, '005705310527, 
+'400700000527, '000000000000, '005705310000, '000000000000, '005740030000, 
+'400005410533, '406600000535, '000000000000, '404600000537, '000000000000, 
+'402300000000, '000000000000, '006040000000, '400005450543, '005705310000, 
+'000000000000, '002240000002, '400005510547, '405500000000, '000000000000, 
+'002340000002, '400005560553, '405600000000, '406700000000, '000000000000, 
+'002440000002, '400005620560, '405700000000, '000000000000, '002540000002, 
+'400005660564, '406000000000, '000000000000, '002640000002, '400005720570, 
+'406100000000, '000000000000, '002740000002, '400005760574, '406200000000, 
+'000000000000, '003040000002, '400006020600, '406300000000, '000000000000, 
+'003140000002, '400006060604, '407000000000, '000000000000, '006140000000, 
+'400000000610, '407100000612, '000000000000, '407200000000, '000000000000;
+INTERNAL INTEGER ARRAY gramr[1:395];
+
+
+COMMENT *** TOKEN TABLE ***;
+
+PRESET!WITH
+	'12,'4001,
+	'54,'4002,
+	'77,'4003,
+	'72,'4004,
+	'137,'4005,
+	'55,'4006,
+	'56,'4007,
+	'75,'4010,
+	'133,'4011,
+	'135,'4012;
+INTEGER ARRAY deltok[1:20];
+
+
+PRESET!WITH
+	"DUMP","INDICES","OCTAL","DECIMAL","BLOCK",
+	"NEXT","PREVIOUS","LAST","MAP","T",
+	"SIXBIT","ASCII","HED","DIR","RCD",
+	"LOK","DAT","EMP","DUM","BOU",
+	"EOU","DEFAULT","REWIND","WAIT","UNLOAD",
+	"DEVICE","HELP","INSTRUCTIONS","GRIPE","NEWS",
+	"DIFFERENCES","LOG","UNLOG","COMMENT","QUIT",
+	"STOP","CONTINUE","GO","ABORT","ERRORS",
+	"QCHECK","YES","NO";
+STRING ARRAY keywrd[1:43];
+
+PRESET!WITH
+	'4013,'4014,'4015,'4016,'4017,
+	'4020,'4021,'4022,'4024,'4025,
+	'4026,'4027,'4030,'4031,'4032,
+	'4033,'4034,'4035,'4036,'4037,
+	'4040,'4041,'4042,'4043,'4044,
+	'4045,'4047,'4050,'4051,'4052,
+	'4053,'4054,'4055,'4056,'4057,
+	'4060,'4061,'4062,'4063,'4064,
+	'4070,'4071,'4072;
+INTEGER ARRAY keytok[1:43];
+
+
+PRESET!WITH
+	null,
+	"EXTRA INPUT IN COMMAND.",
+	"ILLEGAL COMMAND WORD.",
+	"ILLEGAL INDEX TYPE.",
+	"ILLEGAL BLOCK VALUE.",
+	"BAD RANGE EXPRESSION.",
+	"NOT A MAG-TAPE DEVICE NAME.",
+	"EXPECTED A MAG-TAPE DENSITY.",
+	"EXPECTED A COMMAND WORD.",
+	"NEED A USER OR USER AND FILE NAME.",
+	"NEED A USER OR PPN AND FILE NAME.",
+	"NEED A PPN OR USER NAME.";
+OWN INTERNAL STRING ARRAY messgs[0:11];
+
+EXTERNAL BOOLEAN PROCEDURE INTSAV(R!P (any!class) link);
+EXTERNAL BOOLEAN PROCEDURE RNGCHK(R!P (any!class) link);
+EXTERNAL BOOLEAN PROCEDURE STRSAV(R!P (any!class) link);
+EXTERNAL BOOLEAN PROCEDURE PPNSAV(R!P (any!class) link);
+EXTERNAL BOOLEAN PROCEDURE HOCTSV(R!P (any!class) link);
+
+
+
+INTERNAL SIMPLE PROCEDURE tdinit;
+BEGIN
+   pgrhed_n!r;  tokhed_(toktop_(cursor_n!r));
+   cmdstr_null;  msghgh_(curhgh_0);  RETURN;
+END;
+
+REQUIRE tdinit INITIALIZATION;
+
+
+RECURSIVE R!P (any!class) PROCEDURE reset!cursor (R!P (any!class) link);
+	\ This procedure is used by "free!graph" to reset the "cursor"
+pointer back so that it reflects the position being scanned in the input
+string when the node referenced by "link" was built.  In other words, it
+backtracks in the input string in an analogous fashion to the backtracking
+in the parsing tree done by "backtrack".  It need only search along a
+list of definitions to the first terminal symbol to find the proper
+place, since that terminal would e first one to have been found
+when building the branch.  The "link" parameter points to the position
+in the graph where a branch is to be erased.;
+
+BEGIN
+  R!P (any!class) def;
+  IF (def_pgraph:def[link])=n!r then RETURN (cursor);
+  IF pgraph:tkn[link] < '4000 THEN RETURN (reset!cursor(def));
+  RETURN (def);
+END;
+
+
+RECURSIVE PROCEDURE backtrack (R!P (any!class) link);
+	\ This procedure is used by "free!graph" to get rid of the
+branch of the graph beginning with the node pointed to by "link".  This
+includes all of the tree which defines the given node.  Any intermediate
+results are unlinked also.;
+
+BEGIN
+  R!P (any!class) def, succ;
+  IF link=n!r THEN RETURN;
+  IF (succ_pgraph:succ[link]) neq n!r THEN 
+  BEGIN
+    backtrack(succ);  pgraph:succ[link]_n!r;
+  END;
+  IF (def_pgraph:def[link]) neq n!r THEN
+    IF pgraph:tkn[link] > '4000 then pgraph:def[link]_n!r
+    ELSE BEGIN
+      backtrack(def);  pgraph:def[link]_(pgraph:result[link]_n!r);
+    END;
+  RETURN;
+END;
+
+
+R!P (any!class) PROCEDURE free!graph (R!P (any!class) link);
+	\ This procedure erases a branch of the tree, the definition of
+the node pointed to by "link", by unlinking the node pointers.  The
+input cursor is also put back to the appropriate position.  "Free!graph"
+is called by "parse" and always returns N!R.;
+
+BEGIN
+  cursor_reset!cursor(link);  backtrack(link);  RETURN (n!r);
+END;
+
+
+INTERNAL STRING PROCEDURE messag;
+	\ This routine returns the error message corrsponding to the
+value of "msghgh".  It is available to subroutines in the user's
+program which must access the "messgs" array.;
+RETURN (messgs[msghgh]);
+
+	
+INTERNAL INTEGER PROCEDURE delim (INTEGER char);
+	\ This procedure searches the delimiter array "deltok" for the
+occurrance of "char".  If found, the corresponding token value is
+returned.  Otherwise a zero is returned.;
+BEGIN
+   INTEGER low, high, i;
+   low_arrinfo(deltok,1);  high_arrinfo(deltok,2);
+   FOR i_low step 2 until high DO
+      IF deltok[i]=char THEN RETURN (deltok[i+1]);
+   RETURN (0);
+END;
+
+
+INTERNAL INTEGER PROCEDURE keychk (STRING find);
+	\ This routine checks to see whether "find" is in the keyword
+table and returns the correct token number if it is.  If not a keyword,
+the procedure returns a zero.;
+BEGIN
+  EXTERNAL SIMPLE INTEGER PROCEDURE strsrc (STRING ARRAY names;
+    STRING look;  REFERENCE BOOLEAN exact);
+  BOOLEAN exact;  INTEGER i;
+  IF (i_strsrc(keywrd,find,exact))=0 THEN RETURN (0)
+  ELSE RETURN (keytok[i]);
+END;
+
+
+INTERNAL STRING PROCEDURE getkey (INTEGER toknum);
+	\ This routine searches "keytok" for the given token number
+"toknum".  If it succeeds, then the corresponding keyword string from
+"keywrd" is returned.  A null string is returned on failure.;
+BEGIN
+   INTEGER low,high,i;
+   low_arrinfo(keytok,1);  high_arrinfo(keytok,2);
+   FOR i_low step 1 until high DO
+      IF keytok[i]=toknum THEN RETURN (keywrd[i]);
+   RETURN (null);
+END;
+
+
+INTERNAL INTEGER PROCEDURE getdel (INTEGER toknum);
+	\ This routine searches "deltok" for the given token number
+"toknum".  If it succeeds, then the corresponding delimiter character
+is returned.  A zero is returned on failure.;
+BEGIN
+   INTEGER low,high,i;
+   low_arrinfo(deltok,1);  high_arrinfo(deltok,2);
+   FOR i_low step 2 until high DO
+      IF deltok[i+1]=toknum THEN RETURN (deltok[i]);
+   RETURN (0);
+END;
+
+
+INTERNAL R!P (any!class) PROCEDURE check!sym (INTEGER toknum, key!id);
+	\ This procedure functions as the scanner and symbol
+matcher.  "Toknum" is the token number needed for a match.  If the next
+symbol called for in a parsing rule is a terminal, then this routine is
+called to get the next input token and check if it matches "toknum",
+the one required.  If successful, "check!sym" returns a pointer to the
+token entry in "pgraph".  If unsuccessful, it returns n!r.
+	The "key!id" parameter, if it is the same as "toknum", will
+cause a keyword symbol to be treated as a match even if its assigned
+token value is not the same as "toknum".  This can be used to cause
+keyword symbols to match an alphanumeric identifier (for example) if
+such an identifier is the desired symbol.  A "key!id parameter of zero
+causes "check!sym" to match only when the current token value is exactly
+the same as the one required.;
+
+BEGIN
+  INTEGER token, i, fst!key, lst!key;
+  fst!key_arrinfo(keytok,1);  lst!key_arrinfo(keytok,2);
+  IF cursor=n!r THEN RETURN (n!r);
+  IF (token_tokent:token[cursor])=toknum THEN RETURN (cursor)
+  ELSE IF toknum=key!id THEN FOR i_fst!key STEP 1 UNTIL lst!key DO
+    IF keytok[i]=token THEN RETURN (cursor);
+  RETURN (n!r);
+END;
+
+
+INTERNAL RECURSIVE R!P (any!class) PROCEDURE parse (INTEGER dict(1), msglst(0));
+	\ This is the routine which builds the parsing graph including
+all necessary linking to complete the tree structure.  It ultimately
+returns to the caller a pointer to the first element of the structure
+if the parse was successful.  If unsuccessful, it returns N!R.
+	The parameter "dict" is an array index to the rule of the
+grammar that parse should begin with (usually the goal symbol
+production).
+	"msglst" is usually not supplied by the caller.  It is used
+to keep track of the current message which is associated with the
+rule being checked.  When "parse" calls itself, it will pass the
+value of "msglst" to the next level.;
+
+BEGIN "parsing"
+
+  EXTERNAL R!P (any!class) PROCEDURE chksym (INTEGER token);
+  INTEGER spcsub, token;
+  R!P (any!class) link;
+  BOOLEAN spcret;
+
+  IF gramr[dict]=0 THEN RETURN (n!r);
+  if (gramr[dict] lsh 12) < 0 then
+  BEGIN									\ Left-hand-side;
+    if (token_xerr(<dict>)) then msglst_token;				\ Save ptr. to error message;
+    spcsub_xrou(<dict>);						\ Save ptr. to special subroutine;
+    if (dict_xsucc(<dict+1>))=0 then return (n!r);
+    WHILE (link_parse(dict,msglst))=n!r DO				\ While rule portion fails,;
+      IF (dict_xfail(<dict>))=0 THEN RETURN (n!r);
+
+   CASE spcsub of BEGIN
+[0]   RETURN (link);
+[1]	spcret_INTSAV(link);
+[2]	spcret_RNGCHK(link);
+[3]	spcret_STRSAV(link);
+[4]	spcret_PPNSAV(link);
+[5]	spcret_HOCTSV(link)
+   END;
+    IF spcret THEN RETURN (pgrhed_link)
+    ELSE BEGIN
+      free!graph(link);  curhgh_tokent:pos[cursor];  RETURN (n!r);
+    END;
+  END;
+
+  link_new!record(pgraph);						\ Right-hand-side element.;
+  pgraph:tkn[link]_(token_xtkn(<dict>));					\ Build new graph element.;
+  IF token > '4000 THEN
+  BEGIN									\ If terminal symbol, ;
+    pgraph:def[link]_chksym(token);					\ try to match with ;
+    IF cursor neq n!r THEN IF tokent:pos[cursor] > curhgh THEN		\ symbol from input.;
+    BEGIN								\ If the cursor is farther ;
+      curhgh_tokent:pos[cursor];					\ than it has been before, ;
+      msghgh_msglst;							\ then keep track of ;
+    END;								\ latest message.;
+  END
+  ELSE pgraph:def[link]_parse(xdef(<dict>),msglst);			\ If non-terminal, must ;
+									\ parse using definition.;
+  IF pgraph:def[link]=n!r THEN RETURN (free!graph(link))		\ Match or parse failed - backtrack.;
+  ELSE BEGIN								\ Success.;
+    IF token > '4000 THEN cursor_tokent:next[cursor];			\ If symbol match, bump cursor.;
+    IF gramr[dict+1]=0 THEN RETURN (pgrhed_link);			\ If no successor, done.;
+    pgraph:succ[link]_parse(dict+1,msglst);				\ Parse successor - save ptr.;
+    IF pgraph:succ[link]=n!r THEN RETURN (free!graph(link))		\ If succ. parse failed, backtrack.;
+    ELSE RETURN (pgrhed_link);
+  END;
+
+END "parsing";
+
+
+INTERNAL PROCEDURE init!graph;
+	\ This procedure resets the parsing graph "pgraph" and the
+token entry list "tokent" back to their initial states and puts the
+other pointers to either structure back to their initial values.;
+
+BEGIN
+  backtrack(pgrhed);
+  WHILE tokhed neq n!r DO tokhed_tokent:next[tokhed];
+  tdinit;
+END;
+
+
+INTERNAL PROCEDURE cmdset (INTEGER ARRAY tknlst; BOOLEAN match(true));
+	\ This procedure fixes the right-hand-side links in the grammar
+so that the designated rules are removed from the set of grammar
+rules.  "Tknlst" is an array of token values each representing the
+left-hand-side of a rule.  If "match" is TRUE, then all rules whose
+left-hand-sides match an entry in "tknlst" will be removed from the
+command set.  If "match" is FALSE, then all rules whose left-hand-sides
+do not match any entry in "tknlst" will be removed.  If the "tknlst"
+array contains a 0 value in the first word, then the whole set of rules
+is set to be used (no elements removed, and removed ones put back).;
+
+BEGIN
+  INTEGER tknlow, tknup, i, j;
+  BOOLEAN compar;
+
+  i_arrinfo(gramr,1);  tknlow_arrinfo(tknlst,1);
+  tknup_arrinfo(tknlst,2);
+  IF tknlst[tknlow]=0 THEN
+    WHILE i neq 0 DO BEGIN
+      i_i+1;  j_i+1;
+      psucc(<i>,<j>);  i_nlft(<i>);
+    END;
+  WHILE i neq 0 DO BEGIN
+    compar_false;
+    FOR j_tknlow step 1 until tknup DO BEGIN
+      IF xtkn(<i>)=tknlst[j] THEN compar_true;
+      IF compar THEN DONE;
+    END;
+    compar_not(compar xor match);
+    i_i+1;  IF compar THEN gramr[i]_clrsucc(<i>);  i_nlft(<i>);
+  END;
+  RETURN;
+END;
+
+
+INTERNAL INTEGER PROCEDURE fndgrm (INTEGER toknum);
+	\ This procedure searches the stored grammar representation for
+the beginning of the rule which defines the token "toknum".  If
+successful, the array index in "gramr" of the rule is returned.  Zero
+is returned otherwise.  The value "toknum" must represent a non-terminal
+symbol.
+	This routine is used when a program needs to call "parse" on a
+branch or subset of the grammar.  It can use "fndgrm" to locate the
+array index which must be used as a parameter to "parse".;
+
+BEGIN
+  INTEGER i;
+  i_arrinfo(gramr,1);
+  WHILE i neq 0 DO BEGIN
+    IF xtkn(<i>)=toknum THEN RETURN (i);
+    i_nlft(<i+1>);
+  END;
+  RETURN (0);
+END;
+
+END "Top-down parser";
+ {) Ž
