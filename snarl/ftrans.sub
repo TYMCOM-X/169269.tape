@@ -1,0 +1,453 @@
+.Skip 2;
+.ByHand;
+R!P (map1) PROCEDURE set!map!space;
+.EndHand;
+	This procedure sets up a ring of private pages for mapping.
+.Skip 2;
+.ByHand;
+PROCEDURE erase!pages (REFERENCE R!P (map1) rp);
+.EndHand;
+	This procedure clears the internal page storage.
+
+.Skip 2;
+.ByHand;
+R!P (map1) PROCEDURE write!pages (R!P (map1) maprp;  INTEGER chan);
+.EndHand;
+	This routine makes sure that the pages in the ring have been
+posted to the scratch directory file open on "chan" before the file
+is closed.
+.Skip 2;
+.ByHand;
+R!P (map1) PROCEDURE dirpagchk(R!P (map1) maprp);
+.EndHand;
+	This procedure is a companion to "dirout" which checks whether
+a directory file page is complete.  When it is, a "validate" is started
+on the page, so that it will be written.
+.Skip 2;
+.ByHand;
+PROCEDURE dirincr (R!P (map1) maprp; INTEGER chan);
+.EndHand;
+	This procedure is a companion to "dirout" which puts directory
+entries into a paging ring for output.  This routine increments the word
+counter and creates and maps a new file page when necessary.
+.Skip 2;
+.ByHand;
+PROCEDURE dirinit;
+.EndHand;
+	Initializes variables to start "dirout" with a fresh page.
+.Skip 2;
+.ByHand;
+R!P (map1) PROCEDURE dirout (R!P (map1) maprp; INTEGER chan);
+.EndHand;
+	This routine writes a directory entry into a page in the ring
+for posting to the current scratch directory file open on "chan".
+.Skip 2;
+.ByHand;
+PROCEDURE write!directory;
+.EndHand;
+	This procedure writes the tape resident directory from the
+file "snarl.tmp" which has been built during the storage operation.
+.Skip 2;
+.ByHand;
+INTEGER PROCEDURE loklud (STRING username);
+.EndHand;
+	This procedure looks up the "username" in the LUD and returns
+the corresponding PPN.  A zero is returned if the lookup failed.
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE gan!search (INTEGER gan);
+.EndHand;
+	This procedure searches the "ganlst" for "gan" and returns
+"true" if "gan" is within one of the ranges.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE pos!search (INTEGER pos);
+.EndHand;
+	This procedure searches the "poslst" for "pos" and returns
+"true" if "pos" is within one of the ranges.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE filequ (STRING name1, ext1, name2, ext2);
+.EndHand;
+	This procedure matches two file names and extensions and
+returns "true" when the sets are equal and "false" otherwise.  "Name2"
+and "ext2" may be wild in the TYMCOM-X sense with some additional
+capability.  A "*" in any position in either name or extension causes
+the remainder of that piece to be interpreted as containing "#" 
+characters.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE filmatch (STRING fname, fext;  INTEGER ppn, lsttyp;
+   REFERENCE R!P (any!class) usrptr, filptr);
+.EndHand;
+	This procedure searches the designated file list for the
+one used by the current command (which may be RETRIEVE, GET, or
+DIRECTORY) and returns "true" if it is found and "false" otherwise.  The
+list being searched may contain wild card file names.  The file name
+given is taken as is.
+	"Fname" is the file name to search for.
+	"Fext" is the file extension to search for.
+	"Ppn" is the corresponding PPN to search for.
+	"Lsttyp" is the type of the list to search.
+	"Usrptr" and "filptr" are record pointers used to search the
+user list and file list respectively for the entry which matches the
+given file and ppn values.  If this procedure succeeds, then these two
+pointers will be pointing at the desired entries upon return.
+
+.Skip 2;
+.ByHand;
+SIMPLE INTEGER PROCEDURE remndr (reference integer val;  integer dvsr);
+.EndHand;
+	Returns the remainder and reduces the base by dividing "val"
+by "dvsr".
+
+.Skip 2;
+.ByHand;
+STRING PROCEDURE cksum (INTEGER ckwd);
+.EndHand;
+	This routine takes an integer checksum from "ckwd" and put it
+into a 6-character form.  Characters 2 and 5 are vowels, and the others
+are consonants (eg. "CEKSUM").
+
+.Skip 2;
+.ByHand;
+SIMPLE INTEGER PROCEDURE consonant (reference integer x);
+.EndHand;
+	Get the next character as a consonant and reduce the base.  If
+the remainder yields a vowel, then change it to a consonant according to
+the formula:  A=>V, E=>W, I=>X, O=>Y, U=>Z
+
+.Skip 2;
+.ByHand;
+PROCEDURE ds!clean (INTEGER lsttyp);
+.EndHand;
+	This routine deallocates the current data structure used by
+either the "s!sto" or "s!ret" service routines.
+
+.Skip 2;
+.ByHand;
+PROCEDURE df!close;
+.EndHand;
+	This procedure closes any disk files being transferred which
+are left open upon return from "s!sto" or "s!ret".  Create/supersede is
+inhibited.  This would be the normal case during a "s!sto" and would be
+necessary if aborting from "s!ret".  The only reason these files would
+be left open is if "df!close" is called as a result of an abort.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE get!users;
+.EndHand;
+	This procedure converts the "ganlst" into a user list residing
+in the structure "allst".  The pointer "filist" is changed to point to
+"allst", and the "ganlst" structure is deleted.
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE sort!users (STRING first!user(null), last!user(null));
+.EndHand;
+	This procedure reads the MFD and builds a sorted user list in
+the record structure "allst".  Beginning and ending user names,
+"first!user" and "last!user", are optional and will set bounds on the
+list returned.  User "SYS" is the exception and always appears first
+in a complete user list.
+
+.Skip 2;
+.ByHand;
+PROCEDURE st!fill;
+.EndHand;
+	This procedure makes a pass through the "stusrs" list and fills
+in either the ppn or user, whichever is required.  Errors are reported
+and bad records thrown out.
+.Skip 2;
+.ByHand;
+PROCEDURE re!fill;
+.EndHand;
+	This procedure makes a pass through the "reusrs" list and fills
+in either the ppn or user, whichever is required.  Errors are reported
+and bad records thrown out.
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE dorepl;
+.EndHand;
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE init!counts;
+.EndHand;
+	Initializes variables for data transfer commands if starting
+from the "beginning" of the tape.
+.Skip 2;
+.ByHand;
+PROCEDURE dtprint ( STRING outstr );
+.EndHand;
+	This procedure does the normal report output for the data
+transfer commands according to the current COF settings.
+
+.Skip 2;
+.ByHand;
+PROCEDURE report!file (STRING filstr;  INTEGER swval;
+   REFERENCE INTEGER filcnt, filtot);
+.EndHand;
+	This routine counts files being processed by one of the data
+transfer commands and reports them if the user requested the FILES
+option of the given switch.
+.Skip 2;
+.ByHand;
+PROCEDURE report!user (STRING user; INTEGER ppn, swval;
+   REFERENCE INTEGER filcnt, usrtot);
+.EndHand;
+	This routine counts the number of whole users processed by one
+of the data transfer commands and reports the totals if the user has
+requested either the FILES or the USERS option of the given switch.
+.Skip 2;
+.ByHand;
+PROCEDURE report!total (STRING phrase(null));
+.EndHand;
+	This routine reports the totals for the STORE command just
+completed.
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE pr!totals (STRING phrase(null);
+   INTEGER cmdtkn(!retr!c));
+.EndHand;
+	This routine reports the totals for the files just processed
+by one of the commands:  GET, DIRECTORY, or RETRIEVE.
+
+.Skip 2;
+.ByHand;
+R!P (any!class) PROCEDURE spec!cr (INTEGER lb(1), ub(1));
+.EndHand;
+	This procedure creates a new "map1" record which will be used
+to mark a special tape record and will not be used to map a page.
+
+.Skip 2;
+.ByHand;
+R!P (any!class) PROCEDURE opnch!cr;
+.EndHand;
+	This procedure creates a new "opn!chan" record which will be
+used to save information about a file which is currently represented in
+the mapping structure.
+
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!sto (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+.EndHand;
+	This procedure is the service routine for the STORE
+command.  Its parameters are as follows.
+	Parameter "lsttyp" is the file list type of the <file list>
+argument supplied by the user in the STORE command.  It is expressed as
+as a token value (referenced by a symbol definition word) and may be
+one of three values:  !allst, !ganlst, or !filist.  These values
+correspond to user parameters of "ALL", a list of ranges of global
+account numbers (GAN's), or the user/file list which is legal for the
+STORE command.
+	Parameter "afttim" corresponds to the AFTER user modifier.  It
+is a one-word date/time code whose default is 0 which represents the
+earliest possible time.
+	Parameter "beftim" corresponds to the BEFORE modifier.  It is
+a one-word date/time code whose default is the largest possible time.
+	The "modbts" word expresses the state of the remaining legal
+STORE modifiers whose values are either TRUE or FALSE.  The bit
+corresponding to the desired modifier is set if the modifier was
+supplied (TRUE).  The interesting bits are as follows:
+.ByHand;
+	   bit 32 - TODAY
+	   bit 33 - INCREMENTAL
+	   bit 34 - CHANGED
+	   bit 35 - TWICE
+.EndHand;
+	The "stusr", "stnam", and "stext" parameters correspond
+to the starting user, filename, and extension which maspecified
+by the STARTING WITH modifier.  The "stnam" and "stext" strings may
+not contain wild-card characters.
+	The "endusr", "endnam", and "endext" parameters correspond
+to the ending user, filename, and extension which may be specified
+by the ENDING WITH modifier.  The "endnam" and "endext" strings may
+not contain wild-card characters.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE page!rdy;
+.EndHand;
+	This procedure readies a page to be mapped for reading.  It
+returns "true" if the page was completely free (such as at start-up
+time), and "false" otherwise.
+
+.Skip 2;
+.ByHand;
+PROCEDURE outfil;
+.EndHand;
+	This routine opens up the current file which will potentially
+be stored to tape and checks to see whether it meets the conditions
+stated by the user command.  If so, it dumps the current file to
+tape.  In the process, the file is mapped to a ring of pages set up
+earlier by "set!map!space".  The pages are part of a mapping structure,
+and it is used for reading files as follows:
+.ByHand;
+
+	RECORD!CLASS map1		\ The mapping structure
+	   (INTEGER ARRAY a		\ Holds a mapped file page
+	   INTEGER ui			\ Page status indicator
+	   R!P (any!class) up)		\ Pointer to next page in ring
+
+where:
+	If (ui land '37000000) neq 0 then put out to tape the special
+		record whose header is defined by the ui word and whose
+		data (if any) is in map1:a.
+	If ui > 0 and lh(ui) = 0 then ui contains the page number of a
+		mapped file page.
+	If ui = 0 then there is nothing mapped.  Page is available.
+.EndHand;
+
+.Skip 2;
+.ByHand;
+PROCEDURE outufd;
+.EndHand;
+	*** more to come ***
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE open!ufd (INTEGER ppn);
+.EndHand;
+	This routine opens a ufd and checks the ignore bit to see
+whether any files in this directory should be dumped.  If successful
+and the ignore bit is off, then "true" is returned.  Otherwise "false"
+is returned.
+.Skip 2;
+.ByHand;
+PROCEDURE sto!clean;
+.EndHand;
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE sto!end;
+.EndHand;
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE user!in!range (STRING user, stusr, endusr);
+.EndHand;
+	This procedure checks whether the given username in "user" is
+in the range defined by "stusr" and "endusr", starting and ending users
+respectively.  It takes account of the fact that "SYS" is considered to
+be first in a sorted user list.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE hed!ok (INTEGER rtype, rlen);
+.EndHand;
+	This procedure checks the reasonableness of a potential tape
+logical record header.  "Rtype" is the record type, and "rlen" is the
+length portion of the record header.
+
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE repostn;
+.EndHand;
+	This procedure attempts to reposition the tape for reading
+at the block beyond the supposed current one which caused the trouble.
+
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE messg;
+.EndHand;
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!ret (INTEGER comnd, lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+.EndHand;
+	This procedure is the service routine for the RETRIEVE, GET,
+and DIRECTORY commands.  It's parameters are as follows.
+	"Comnd" is a token value which identifies the actual command
+which is being processed by this procedure.  It may be either !retr!c,
+!get!c, or !dire!c.
+	Parameter "lsttyp" is the file list type of the <file list>
+argument supplied by the user's command.  It is expressed as a token
+value (referenced by a symbol definition word).  If a RETRIEVE command,
+"lsttyp" may be either !allst, !ganlst, !poslst, or !rtrlst.  These values
+correspond to user parameters of "ALL", a list of ranges of global
+account numbers (GAN's), a list of file positions, or the user/file list
+which is legal for the RETRIEVE command.  If a GET or DIRECTORY command,
+then itmay be either !allst, !ganlst, !poslst, or !filist.  !Filist
+refers to the legal user/file list for the GET and DIRECTORY commands.
+	Parameter "afttim" corresponds to the AFTER user modifier.  It
+is a one-word date/time code whose default is 0 which represents the
+earliest possible time.
+	Parameter "beftim" corresponds to the BEFORE modifier.  It is
+a one-word date/time code whose default is the largest possible time.
+	The "modbts" word expresses the state of the remaining legal
+RETRIEVE modifiers whose values are either TRUE or FALSE.  The bit
+corresponding to the desired modifier is set if the modifier was
+supplied (TRUE).  The interesting bits are as follows:
+.ByHand;
+	   bit 29 - CHECKSUM   (used by DIRECTORY command)
+	   bit 30 - LIMITED    (used by DIRECTORY command)
+	   bit 31 - SETDUMPED  (used by GET and RETRIEVE commands)
+.EndHand;
+	The "stusr", "stnam", "stext", "endusr", "endnam", and "endext"
+parameters are the same as for the routine "s!sto".
+
+	Within "s!ret", page mapping is used for writing files to
+disk.  The pages used are part of a mapping structure which is treated
+as follows:
+.ByHand;
+
+	RECORD!CLASS map1		\ The mapping structure
+	   (INTEGER ARRAY a		\ Holds a mapped file page
+	   INTEGER ui			\ Page status indicator
+	   R!P (any!class) up)		\ Pointer to next page in ring
+
+where:
+	If (ui land 37000000) neq 0 then ui denotes a record header.  If
+		needed, the actual record will be in map1:a.  If an feo
+		record then map1:a[1] will contain the number of a file
+		page to delete before closing the file or 0 if none.
+	If ui < 0 then inhibit supercede/create when closing this file.
+	If ui > 0 (bit0=0) then ui contains the page number of a mapped
+		file page.
+	If ui = 0 then there is nothing mapped.  Page is available.
+.EndHand;
+
+.Skip 2;
+.ByHand;
+PROCEDURE rdy!page;
+.EndHand;
+	This routine gets a page in the mapping structure ready to be
+re-mapped.  This will usually involve un-mapping the page or closing a
+file.
+
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE dir!report;
+.EndHand;
+	This procedure prints the standard directory information for
+each file referenced by "s!ret" for the DIRECTORY command.
+
+.Skip 2;
+.ByHand;
+PROCEDURE ret!clean;
+.EndHand;
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE ret!end;
+.EndHand;
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!tra (BOOLEAN typeit);
+.EndHand;
+	This procedure is the service routine for the TRANSLATE
+command.  The "typeit" parameter tells the procedure to display the
+contents of the translate table if its value is TRUE.  If "typeit"
+is FALSE, then "s!tra" will verify correctness of user names in the
+translate list and fill in the translate record structure.
+
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE s!unt;
+.EndHand;
+	This is the service routine for the UNTRANSLATE command.  This
+procedure clears the translate table structure and releases the storage.
+
+~ 8ˆ
