@@ -1,0 +1,1122 @@
+
+
+
+
+
+       i.  general information
+
+
+
+
+
+       a.  intended program use
+
+
+
+       mtdump is designed to be used as  a  general  purpose
+
+       magnetic  tape dump program.  the motive for creating
+
+       it is the need  for  a  diagnostic  tool  to  use  in
+
+       debugging  the  fstar  program.  it may eventually be
+
+       used to examine unknown tapes in  order  to  do  some
+
+       sleuthing to find the format.
+
+
+
+
+
+       b.  references
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   2
+
+
+
+       ii.  operating characteristics
+
+
+
+
+
+       a.  command overview
+
+
+
+       mtdump will read tapes and dump records according  to
+
+       operating  modes  which  may be set by the user.  the
+
+       commands relating to operating modes are as follows:
+
+
+
+       prompt  displays  and  sets  switches  interactively.
+
+       options displays current global values.  input resets
+
+       input device name and characteristics.  output resets
+
+       output  device and file.  format sets the report type
+
+       to be used.  symbolics sets up the character type for
+
+       analysis.
+
+
+
+       commands  relating  to  tape  positioning   are   the
+
+       following:
+
+
+
+       rewind rewinds the tape on the current input  device.
+
+       advance  advances  the  tape  over records and files.
+
+       backspace backspaces the tape over records and files.
+
+       skip skips to logical end of tape.
+
+
+
+       one command is used to  obtain  information  about  a
+
+       tape.
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   3
+
+
+
+       dump reads the tape and dumps out a report.
+
+
+
+       the remaining commands:
+
+
+
+       help types out operating instructions.   ?  shortened
+
+       form of help.  quit exit from the program.
+
+
+
+
+
+       b.  getting started
+
+
+
+       from the exec level, type "r  mtdump"  to  start  the
+
+       program.   mtdump  will  type  a  short  heading  and
+
+       proceed directly to the prompt dialog (as if the user
+
+       had  typed the prompt command).  when the values have
+
+       been supplied,  the  program  will  type  the  prompt
+
+       character  "*"  to  indicate it is ready for the next
+
+       command.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   4
+
+
+
+       iii.  command formats
+
+
+
+       in the command descriptions  in  this  document,  the
+
+       following  conventions  will be observed.  upper case
+
+       letters will  denote  commands  and  key  words  that
+
+       should  be  typed exactly as they appear.  lower case
+
+       phrases  enclosed  by  "<  >"  will  denote  variable
+
+       information.   quantities  enclosed in brackets "[ ]"
+
+       are optional parameters.  choices will  appear  as  a
+
+       column  or  will be described separately in the text.
+
+       keywords may be abbreviated to the  least  number  of
+
+       characters which still assures uniqueness.
+
+
+
+
+
+       a.  mode manipulation commands
+
+
+
+       the operating modes  and  selection  of  devices  are
+
+       controlled  by  the  user.  the values may be entered
+
+       individually  with  the   appropriate   commands   or
+
+       interactively.   certain  values  have defaults which
+
+       are in effect when the program is  started.   others,
+
+       such as the current device values are left unassigned
+
+       until the user sets them.  an attempt to  do  a  tape
+
+       dump  with  any  device  unassigned  will  cause  the
+
+       program to object strongly.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   5
+
+
+
+       1.  options
+
+
+
+       this command allows the user to display  all  current
+
+       modes (or options).
+
+
+
+       ______________________________________________________
+
+       ___________     |    |    |    options    |    |    |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       example: *options tape input: fta2 9 track odd parity
+
+       6250  bpi  output file: mtdump.tmp report size: large
+
+       echo to tty: yes analysis: octal fstar
+
+
+
+
+
+       2.  prompt
+
+
+
+       the  prompt  command  displays  current  options  and
+
+       allows  the  user to change the values (where choices
+
+       are possible).
+
+
+
+       ______________________________________________________
+
+       ___________     |     |    |    prompt    |    |    |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   6
+
+
+
+       example:   *prompt    tape    input:    fta0    _fta2
+
+       density(6250,1600): 6250 parity: odd tracks: 9 output
+
+       to file? y file name:  mtdump.tmp  report  size:  tty
+
+       _large  echo  to  tty: yes _no symbolic mode: octal _
+
+       fstar tape: yes _
+
+
+
+       to leave a value  the  same,  a  carriage  return  is
+
+       typed.   for  more information on the possible values
+
+       for  each  answer,  see  the  descriptions   of   the
+
+       individual mode setting commands.
+
+
+
+
+
+       3.  input
+
+
+
+       the input command is for resetting the  input  device
+
+       and its characteristics.
+
+
+
+       ______________________________________________________
+
+       ___________  |  |  |  input  [device  name] [density]
+
+       [parity]              |              |              |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       the user may input all the values if  sure  of  them.
+
+       the program will prompt for values not supplied where
+
+       there is a choice to be made.  the command name  only
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   7
+
+
+
+       causes the device characteristics to be displayed.
+
+
+
+
+
+       4.  output
+
+
+
+       to set up the output for the dump:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       output [tty] [file name]                     
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       the command name by itself displays the current
+
+        values.  use
+
+       of this command clears the old values and resets to
+
+        the values
+
+       given.
+
+
+
+
+
+       5.  format
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   8
+
+
+
+       this command sets the report size to the type of
+
+        paper to be
+
+       used for displaying.
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       format [statistics]                          
+
+                  |
+
+       |              [tty]                                 
+
+                  |
+
+       |              [large]                               
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |       where statistics = statistics only (any size
+
+        paper)     |
+
+       |             tty = full dump on tty size paper      
+
+          |
+
+       |             large = full dump on large (132 column)
+
+        paper     |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE   9
+
+
+
+       use of the format command without a parameter
+
+        displays
+
+       the current value.
+
+
+
+
+
+       6.  symbolics
+
+
+
+       to set up the proper analysis mode for the input
+
+        tape:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       symbolics [<character set type> [fstar]]     
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       the command word alone causes the current values to
+
+        be
+
+       displayed.
+
+
+
+       at present, the only character set defined is octal
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  10
+
+
+
+        which
+
+       causes a dump to show whole file words as octal
+
+        values.  at
+
+       a future time, the program should be extendable to
+
+       various character sets and formats.  the notation
+
+        fstar would
+
+       indicate interpretation of the various logical record
+    types
+
+       for symbolic reporting of any meaningful data, and
+
+        octal
+
+       reporting of non-symbolic information.
+
+
+
+
+
+       b.  positioning commands
+
+
+
+
+
+       1.  rewind
+
+
+
+       to rewind the tape on the current input device:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       rewind                                       
+
+                  |
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  11
+
+
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+
+
+       2.  advance
+
+
+
+       to advance over the specified number of file marks
+
+        and records:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       advance [[<number>]files] [[<number>]records]
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       when a file and record count are both supplied, the
+
+        file
+
+       advance is done first.  the numbers default to 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  12
+
+
+
+       3.  backspace
+
+
+
+       to backspace the tape:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       backspace [[<number>]files]
+
+        [[<number>]records]         |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       when both a file and record count are supplied, the
+
+        file backspace
+
+       is done first.  the numbers default to 1.
+
+
+
+
+
+       4.  skip
+
+
+
+       to skip to logical end of tape (where defined):
+
+
+
+       ______________________________________________________
+
+       ___________
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  13
+
+
+
+       |                                                    
+
+                  |
+
+       |       skip                                         
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       the definition of the logical end depends upon the
+
+        type
+
+       of tape being searched.  if there is no clear
+
+        definition,
+
+       the skip will terminate at the physical end of tape.
+
+
+
+
+
+       c.  dumping command
+
+
+
+       the dump command is the one which does the actual
+
+        work of
+
+       reading the tape and reporting the contents according
+
+        to
+
+       the user's specificaiions.
+
+
+
+       ______________________________________________________
+
+       ___________
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  14
+
+
+
+       |                                                    
+
+                  |
+
+       |       dump [<number>files] [<number>records]       
+
+                  |
+
+       |                 [all]                              
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       if file and record counts are both specified, mtdump
+
+        will dump the
+
+       number of records specified from each file that it
+
+        dumps.  it
+
+       will dump from the number of files specified starting
+
+        with
+
+       the current positioning.  note that this is a
+
+        different use
+
+       of file and record counts than that used with the
+
+        advance and
+
+       backspace commands.
+
+
+
+
+
+       d.  miscellaneous commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  15
+
+
+
+       1.  help
+
+
+
+       to get a brief set of operating instructions for
+
+        mtdump:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       help                                         
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+       will not be implemented initially.
+
+
+
+
+
+       2.  ?
+
+
+
+       this command is a shortened form of help listing
+
+        commands
+
+       without explanations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  16
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       ?                                            
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+
+
+       3.  quit
+
+
+
+       to exit from the program:
+
+
+
+       ______________________________________________________
+
+       ___________
+
+       |                                                    
+
+                  |
+
+       |       quit                                         
+
+                  |
+
+       |                                                    
+
+                  |
+
+       |_____________________________________________________
+
+       __________|
+
+
+
+
+
+
+
+
+
+
+
+                                                    PAGE  17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   +å
