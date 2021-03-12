@@ -1,0 +1,327 @@
+ENTRY;
+BEGIN "TAPCOM"
+
+REQUIRE "sndsn.sai" SOURCE!FILE;
+ck!sn
+REQUIRE "snsym.sai" SOURCE!FILE;
+elsec
+REQUIRE "dsnsym.sai" SOURCE!FILE;
+endc
+REQUIRE "sndefs.sai" SOURCE!FILE;
+
+EXTERNAL STRING snstat;				\ SNARL or DSNARL status vector;
+
+ck!sn
+EXTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];	\ For holding a whole physical tape record.;
+endc
+
+EXTERNAL INTEGER mtchan, mteof,			\ mag tape channel stuff;
+   mtstat,					\ sense data,,status bits;
+   mtdens,					\ currently set density;
+   mtrec,					\ number of last physical record accessed;
+   mtpos,					\ number of last file accessed;
+   mtibuf,					\ number of buffers for buffered input;
+   mtobuf;					\ number of buffers for buffered input;
+
+EXTERNAL STRING mtdev,				\ mag tape device name;
+   mtfile;					\ name of last file accessed;
+
+ck!sn
+EXTERNAL INTEGER ree!sw;			\ REELSET switch value;
+
+EXTERNAL BOOLEAN stor!sw,			\ true if last file accessed was stored, false if retrieved;
+   new!sw,					\ True if NEW TAPE command just done;
+   app!sw;					\ True if APPEND command just done;
+
+EXTERNAL STRING PROCEDURE curdt (REFERENCE INTEGER time, date);
+EXTERNAL STRING PROCEDURE pr!time (INTEGER time);
+EXTERNAL STRING PROCEDURE pr!date (INTEGER date);
+EXTERNAL STRING PROCEDURE pr!reel (INTEGER reelno);
+EXTERNAL PROCEDURE gmt!to!user (REFERENCE INTEGER time, date);
+EXTERNAL PROCEDURE user!to!gmt (REFERENCE INTEGER time, date);
+endc
+EXTERNAL BOOLEAN PROCEDURE readint (STRING prompt; INTEGER rule;
+   REFERENCE INTEGER result);
+EXTERNAL BOOLEAN PROCEDURE readstr (STRING prompt; INTEGER rule);
+EXTERNAL INTEGER PROCEDURE readkey (STRING prompt; INTEGER rule);
+
+PRELOAD!WITH 6250,1600,800,556,200;
+INTEGER ARRAY dens[1:5];
+INTEGER ARRAY dposbl[1:3];
+INTEGER ARRAY addr[1:2];
+INTEGER ARRAY taphed[1:17];
+
+BOOLEAN dskdev;					\ True if disk device substituted for tape;
+INTERNAL PROCEDURE s!devi (STRING devnam(null); INTEGER densty(0));
+	\ This procedure is the service routine for the DEVICE
+command.  "Devnam" is the device name, if supplied, and "densty" is the
+desired density, if supplied.;
+BEGIN
+   INTEGER devchr!wd,temp,i,j;  STRING str;
+   devchr!wd_calli(cvsix(devnam),devchr);
+   IFC debug THENC
+   IF (temp_devchr!wd land (dv!mta+dv!dsk))=0 THEN
+      print("""" & devnam & """ is not a legal device." & crlf)
+   ELSEC
+   IF (temp_devchr!wd land dv!mta)=0 THEN
+      print("""" & devnam & """ is not a legal magtape device." & crlf)
+   ENDC
+   ELSE IF (devchr!wd land dv!avl)=0 THEN
+      print("""" & devnam & """ is not available" & crlf);
+   IF temp=0 THEN RETURN;
+   if mtchan = -1 then mtchan_ getchan;
+   open (mtchan,devnam,'17,0,0,0,mteof,mteof);
+   if mteof then
+   BEGIN
+      print("Cannot open device """ & devnam & """." & crlf);
+      release(mtchan);  mtchan_ -1;  return;
+   END;
+   lookup(mtchan,"snarl.tap",mteof);
+   enter(mtchan,"snarl.tap",mteof);
+   IF temp=dv!dsk THEN RETURN;
+   addr[1]_!ugsts;  temp_chnior(mtchan,addr[1],!chugf);
+   mtstat_addr[2];  temp_mtstat lsh 12;  j_3;
+   FOR i_1 step 1 until 5 DO
+      IF (temp_temp lsh 1)<0 THEN BEGIN
+	 dposbl[j]_dens[i];  j_j-1;
+      END;
+   IF dposbl[1]=0 THEN BEGIN
+      dposbl[1]_dposbl[2];  dposbl[2]_0;
+   END;
+   if densty then							\ If a density has been specified;
+      for i_ 1 step 1 until 3 do					\ do not interact with user.;
+      BEGIN
+	 if dposbl[i] neq densty then continue;				\ Check supplied density;
+	 mtdens_ densty;  done;						\ for correctness;
+      END
+   else BEGIN
+      temp_false;
+      print("TRACKS:  ",(IF (mtstat lsh 12)<0 THEN 7 ELSE 9),crlf);
+      IF dposbl[1]=0 THEN print("DENSITY:  " &				\ If only one density is possible;
+	 cvs(mtdens_ dposbl[3]) & crlf)					\ then report it and use it.;
+      ELSE BEGIN
+	 str_"DENSITY (" & cvs(dposbl[1]) & ",";
+	 if dposbl[2] neq dposbl[1] then str_str & cvs(dposbl[2]) & ",";
+ 	 str_str & cvs(dposbl[3]) & ")  >>";
+	 temp_false;
+	 while not temp do BEGIN
+            temp_readint(str,!dens,densty);
+            if not (temp and densty) then continue;
+            temp_false;
+            for i_1 step 1 until 3 do
+	    BEGIN
+	       if dposbl[i] neq mtdens then continue;
+	       temp_true;  mtdens_ densty;  done;
+            END;
+         END;
+      END;
+   END;
+   setsts(mtchan,(getsts(mtchan) lor (i lsh 7)));			\ Set the selected density.;
+   IF mtstat<0 THEN print("TAPE NOT WRITE PROTECTED." & crlf);
+   IF (mtstat lsh 12) > 0 THEN temp_chniov(mtchan,'100,!chmta);		\ If 9-track, set DEC 9-track mode.;
+   temp_chnior(mtchan,addr[1],!chugf);  mtstat_addr[2];			\ Save current status bits.;
+   RETURN;
+END;
+
+
+INTERNAL PROCEDURE s!rewi (BOOLEAN wait);
+	\ This procedure is the service routine for the REWIND command.  If
+the "wait" parameter is "true", then "s!rewi" will wait for completion
+before returning.;
+BEGIN
+   dskdev_ (if (calli(cvsix(mtdev),devchr) land dv!dsk) = 0 then false
+      else true);
+   if dskdev then useti(mtchan,1)
+   else BEGIN
+      mtape(mtchan,"W");  if wait then mtape(mtchan,null);
+   END;
+   mtrec_ -1;  ck!sn app!sw_ (new!sw_ false); endc
+   return;
+END;
+
+
+INTERNAL PROCEDURE s!unlo (BOOLEAN wait);
+	\ This procedure is the service routine for the REWIND command.  If
+the "wait" parameter is "true", then "s!rewi" will wait for completion
+before returning.;
+BEGIN
+   IFC debug THENC s!rewi(wait)
+   ELSEC  mtape(mtchan,"U");  IF wait THEN mtape(mtchan,null);  ENDC;
+   RETURN;
+END;
+ck!sn INTERNAL PROCEDURE s!wher;
+	\ This is the service routine for the WHERE command.  It reports
+the latest access information about the current tape using the status
+information in global storage.
+;
+BEGIN
+   if mtfile = null then
+      print("No files have been read or written to the current tape." & crlf)
+   else BEGIN
+      print("The last complete file " & (if stor!sw then "written to"
+	 else "read from") & " tape was" & crlf);
+      print(mtfile & " at file position ",mtpos,"." & crlf);
+   END;
+   return;
+END;
+endc
+ck!sn INTERNAL PROCEDURE s!new (STRING tidval(null));
+	\ This procedure is the service routine for the NEW TAPE
+command.  The "tidval" parameter, if supplied, is the value to be stored
+on the tape.
+;
+BEGIN
+   BOOLEAN snarl!sw;  STRING str;
+   INTEGER tid, verif!tid, timval, datval;
+
+PROCEDURE create!header;
+	\ This routine creates or re-initializes the header record of a
+SNARL tape and makes room for the directory blocks which will follow.
+;
+BEGIN
+   INTEGER i;
+   dskdev_ (if (calli(cvsix(mtdev),devchr) land dv!dsk) = 0 then false
+      else true);
+   taphed[1]_ hed+17;  taphed[2]_ cvasc("SNARL");			\ Identify the tape as SNARL tape;
+   taphed[3]_ memory['137];  taphed[4]_ 0;				\ SNARL version and tape version;
+   if tidval neq null then
+   BEGIN
+      taphed[5]_ cvasc(tidval[1 for 5]);				\ Put in new TID if supplied.;
+      taphed[6]_ cvasc(tidval[6 for 5]);
+   END
+   else if not snarl!sw then taphed[5]_ (taphed[6]_ 0);
+   taphed[7]_ (ree!sw lsh 18) + 1;					\ Reel number.;
+   curdt(taphed[8],taphed[9]);
+   timval_ taphed[8];  datval_ taphed[9];				\ Save current time and date;
+   user!to!gmt(taphed[8],taphed[9]);					\ Current date and time in GMT;
+   taphed[10]_ 0;  taphed[11]_ mtdens;  taphed[12]_ tape!buf!size;	\ Tape type, density, record size;
+   for i_ 0 step 1 until 4 do						\ Get 5 words of system;
+      taphed[13+i]_ calli((i lsh 18)+'11,'41);
+   arrclr(tapblk);  arrtran(tapblk,taphed);
+   tapblk[18]_ dum+tape!buf!size-17;
+   if dskdev then useto(mtchan,1)					\ On disk, position to beginning of file;
+   else
+   BEGIN
+      mtape(mtchan,"W");  mtape(mtchan,null);				\ Rewind and wait;
+   END;
+   arryout(mtchan,tapblk[1],tape!buf!size);				\ a full tape block;
+   if not dskdev then for i_ 1 step 1 until 3 do mtape(mtchan,"S");	\ Put out some blank tape.;
+   mtrec_ mtrec+1;
+   arrclr(tapblk,'464646464646);					\ Put out a check record.;
+   arryout(mtchan,tapblk[1],tape!buf!size);  arrclr(tapblk);		\ Put out 10 blank records;
+   mtrec_ mtrec+1;
+   for i_ 1 step 1 until 10 do 
+   BEGIN
+      arryout(mtchan,tapblk[1],tape!buf!size);  mtrec_ mtrec+1;		\ to reserve directory room.;
+   END;
+   if not dskdev then for i_ 1 step 1 until 3 do mtape(mtchan,"S");	\ Put out blank tape.;
+   arrclr(tapblk,'464646464646);
+   arryout(mtchan,tapblk[1],tape!buf!size);  mtrec_ mtrec+1;		\ Put out a check record.;
+   snstat_ "C" & snstat;  new!sw_ true;
+   print("Tape #" & pr!reel(taphed[7]) & " created at " &
+      pr!time(timval) & " on " & pr!date(datval) & " with ");
+   if not taphed[5] then print ("no TID.")
+   else print ("TID """ & cvastr(taphed[5]) & cvastr(taphed[6]) & """.");
+   print(crlf);
+   return
+END;
+
+STRING PROCEDURE get!tid;
+	\ This procedure gets a TID value from the user for verification;
+return (readstr("Please enter the tape TID for verification.  >>",!tidval));
+endc
+ck!sn  \ Body of "s!new" starts here;
+
+   dskdev_ (if (calli(cvsix(mtdev),devchr) land dv!dsk) = 0 then false
+      else true);
+   if mtdev=null then
+   BEGIN
+      print("Tape device must be initialized first." & crlf);
+      return;
+   END;
+   if getsts(mtchan) land '77 neq '17 then
+   BEGIN
+ open(mtchan,mtdev,'17,0,0,0,mteof,mteof);				\ Make sure and set unbuffered mode;
+      if mteof then
+      BEGIN
+	 print("Cannot open device """ & mtdev & """." & crlf);
+	 release(mtchan);  mtchan_ -1;  return;
+      END;
+      lookup(mtchan,"snarl.tap",mteof);
+      enter(mtchan,"snarl.tap",mteof);
+   END;
+   if dskdev then useti(mtchan,1) else
+   BEGIN
+      mtape(mtchan,null);  mtape(mtchan,"W");  mtape(mtchan,null);	\ Wait, rewind, and wait.;
+   END;
+   arryin(mtchan,tapblk[1],tape!buf!size);				\ Read 1st tape record;
+   if snstat[1 for 1]="H" then
+   BEGIN
+      snarl!sw_ false;  mtape(mtchan,"W");
+   END
+   else if (mteof land '777767777777) = 0 then				\ Ignore "larger record" error;
+   BEGIN
+      if ((tapblk[1] land '777777000000) = hed) and			\ Check to see if SNARL tape.;
+	 (tapblk[2] = cvasc("SNARL")) then
+      BEGIN
+	 timval_ tapblk[8];  datval_ tapblk[9];
+	 gmt!to!user(timval,datval);					\ If so, print some information;
+	 print("This SNARL tape #" & pr!reel(tapblk[7]));		\ about the tape;
+	 print(" was created on " & cvstr(tapblk[13]) & cvstr(tapblk[14]));
+	 print(" at " & pr!time(timval) & " on ");
+	 print(pr!date(datval) & "." & crlf);
+	 snarl!sw_ true;
+      END
+      else snarl!sw_ false;
+   END
+   else BEGIN
+      snstat_ "A" & snstat;
+      print("Tape read error - try another density." & crlf);
+      return;
+   END;
+   if not snarl!sw then BEGIN
+      print("This tape is not a SNARL tape." & crlf);
+      tid_ null;
+   END
+   else tid_ cvastr(tapblk[5]) & cvastr(tapblk[6]);
+
+   if tidval=null then							\ Go through the TID;
+   BEGIN
+      if tid=null then
+      BEGIN
+	 str_ "Initializing with no TID assigned.  ";
+	 if snarl!sw then str_ "Re-" & str;
+	 print(str);
+      END
+      else BEGIN
+	 verif!tid_ get!tid;
+	 if not equ(verif!tid,tid) then
+	    print("TID on tape is """ & tid & """.  ");
+	 print("Re-initializing.  ");
+      END;
+   END
+   else BEGIN
+      if tid=null then
+      BEGIN
+	 str_ "Initializing tape with TID " & tidval &
+	    " assigned for the first time." & crlf;
+	 if snarl!sw then str_ "Re-" & str;
+	 print(str);
+      END
+      else BEGIN
+	 if not equ(tidval,tid) then
+	    print("Tape TID is """ & tid &
+	       """.  Re-initializing with TID """ &
+	       tidval & """." & crlf)
+	 else print ("Re-initializing.  ");
+      END;
+   END;
+   if readkey("OK to continue?  >>",!yes!or!no) = !yes then create!header
+   else snstat_ "A" & snstat;
+   return;
+END;
+endc
+
+
+END "TAPCOM";
+ .&?R
