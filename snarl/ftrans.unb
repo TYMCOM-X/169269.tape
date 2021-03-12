@@ -1,0 +1,955 @@
+ENTRY;
+BEGIN "FTRANS"
+
+REQUIRE "sndefs.sai" SOURCE!FILE;
+REQUIRE "snsym.sai" SOURCE!FILE;
+REQUIRE "(sailib)maplib.req" SOURCE!FILE;
+REQUIRE "{}<>" DELIMITERS;
+
+\ This module contains the service routines and supporting procedures
+for the commands:  STORE, RETRIEVE, GET, DIRECTORY, TRANSLATE, and
+UNTRANSLATE.
+;
+\ External subroutines;
+
+EXTERNAL STRING PROCEDURE lokdul (INTEGER ppn);
+EXTERNAL R!P (any!class) PROCEDURE iniufr (STRING name, extension;
+   INTEGER channel, bits(0), size(102));
+EXTERNAL BOOLEAN PROCEDURE nxtufr (REFERENCE INTEGER ARRAY data;
+   R!P (any!class) record);
+EXTERNAL INTEGER PROCEDURE cmpstr (STRING str1, str2);
+EXTERNAL PROCEDURE curdt (REFERENCE INTEGER time, date);
+EXTERNAL PROCEDURE user!to!gmt (REFERENCE INTEGER time, date);
+EXTERNAL STRING PROCEDURE pr!ppn (INTEGER ppn);
+EXTERNAL PROCEDURE tapout (INTEGER channel, rcdtyp, count, offset(1);
+   INTEGER ARRAY tapbuf);
+EXTERNAL PROCEDURE to!begin;
+EXTERNAL PROCEDURE to!end;
+EXTERNAL BOOLEAN PROCEDURE set!tape!bufs (INTEGER direction);
+\ Global storage defined in other modules;
+
+EXTERNAL INTEGER !skip!;		\ SAIL system error location;
+
+EXTERNAL STRING snstat;			\ SNARL status vector;
+
+EXTERNAL INTEGER spr!sw, ree!sw,	\ mode switch values;
+   sys!sw, old!sw, rpr!sw;
+
+EXTERNAL BOOLEAN new!sw,		\ True if NEW TAPE command just done;
+   app!sw;				\ True if APPEND command just done;
+
+EXTERNAL INTEGER mtchan,		\ mag tape channel number;
+   mteof,				\ tape channel eof and error word;
+   mtstat,				\ sense data,,status bits;
+   mtdens,				\ currently set density;
+   mtrec,				\ number of last physical record accessed;
+   mtpos,				\ position number of last file accessed;
+   mtppn,				\ ppn of last file accessed;
+   otchan,				\ old tape channel (if changed);
+   otdens;				\ old tape density;
+EXTERNAL STRING mtfile,			\ name of last file accessed;
+   mtuser,				\ user name containing last file accessed;
+   mtdev,				\ name of current mag tape device;
+   otdev;				\ name of last most recent mag tape device;
+
+EXTERNAL INTEGER look!size;		\ size of lookup block to use;
+EXTERNAL INTEGER spec!size;		\ the size of the specrec array (computed in the main);
+EXTERNAL INTEGER ARRAY tapblk[1:tape!buf!size];
+\ Global storage defining some of the file list structures.;
+
+INTERNAL R!P (any!class) filist;	\ pointer to the beginning of a user list in use;
+
+INTERNAL R!C stfil			\ Used as a list of single file names;
+   (STRING name,			\ a file name;
+   ext;					\ file extension;
+   R!P (stfil) next);			\ next file in this list;
+
+INTERNAL R!C stusrs			\ The user list for STORE, GET, DIRECTORY;
+   (STRING user;			\ a user name;
+   INTEGER ppn;				\ the corresponding ppn;
+   R!P (stfil) files;			\ pointer to a list of single file names;
+   R!P (stusrs) next);			\ the next user in this list;
+
+INTERNAL R!C repusr			\ Holds replacement user names for RETRIEVE command;
+   (STRING user;			\ the user name;
+   INTEGER ppn);			\ the corresponding ppn;
+
+INTERNAL R!C repfil			\ Holds replacement file names for the RETRIEVE command;
+   (STRING name,			\ file name;
+   ext);				\ file extension;
+
+INTERNAL R!C retfil			\ Forms a file or file pair list for RETRIEVE;
+   (STRING name,			\ file name;
+   ext;					\ file extension;
+   R!P (repfil) repl;			\ pointer to replacement file;
+   R!P (retfil) next);			\ pointer to next file or file pair in this list;
+
+INTERNAL R!C reusrs			\ Used as a list of users or user pairs for RETRIEVE command;
+   (STRING user;			\ a user name;
+   INTEGER ppn;				\ the corresponding ppn;
+   R!P (repusr) repl;			\ pointer to replacement user name;
+   R!P (retfil) files;			\ pointer to file or file pair list;
+   R!P (reusrs) next);			\ pointer to next user in this list;
+
+INTERNAL R!C ganlst			\ Holds a list of gan number ranges;
+   (INTEGER lower,			\ lower bound of the range;
+   upper;				\ upper bound of the range;
+   R!P (ganlst) next);			\ next range entry;
+
+INTERNAL R!C trusrs			\ User pairs for TRANSLATE command;
+   (STRING orig,			\ original user name;
+   repl;				\ replacement user name;
+   INTEGER oppn,			\ originial ppn;
+   rppn;				\ replacement ppn;
+   R!P (trusrs) next);			\ pointer to next user pair in this list;
+\ Local file list structure storage;
+
+R!C allst				\ The sorted user list for a "STORE ALL";
+   (STRING user;			\ the user name;
+   INTEGER ppn,				\ the corresponding ppn;
+   stbits;				\ UFD status bits;
+   R!P (allst) next);			\ the next user in this list;
+\ Other local storage;
+
+INTEGER dircount,			\ word count of directory file page;
+   dirpage,				\ current directory page number;
+   cur!ppn,				\ current ppn value;
+   filcnt,				\ count of files for current user;
+   filtot,				\ total file count;
+   usrtot,				\ total user count;
+   direct;				\ direction for buffer setup;
+
+STRING cur!user;			\ current user name;
+
+BOOLEAN dskdev;				\ switch - true if disk substituted for tape;
+R!P (map1) PROCEDURE set!map!space;
+	\ This procedure sets up a ring of private pages for mapping;
+BEGIN
+   R!P (map1) rp1, rp2, rp3;
+   INTEGER i;
+   rp1_ (rp2_ (rp3_ n!r));
+   for i_ 1 step 1 until num!pages DO
+      BEGIN
+	 rp1_ map1cr(1,512);
+	 if rp3=n!r then rp3_ rp1 else map1:up[rp2]_ rp1;
+	 rp2_ rp1;
+      END;
+   return (map1:up[rp1]_ rp3);
+END;
+PROCEDURE erase!pages (R!P (map1) rp);
+	\ This procedure clears the internal page storage.;
+BEGIN
+   R!P (any!class) rp1;
+   while rp neq n!r do
+   BEGIN
+      rp1_ rp;  rp_ map1:up[rp];  map1:up[rp1]_ n!r;
+   END;
+   return;
+END;
+R!P (map1) PROCEDURE write!pages (R!P (map1) maprp;  INTEGER chan);
+	\ This routine makes sure that the pages in the ring have been
+posted to the file open on "chan" before the file is closed.;
+	\ Note -- need enhancements to do "holes";
+BEGIN
+   INTEGER i;
+   while (i_ map1:ui[maprp]) neq 0 do
+   BEGIN
+      getmap (maprp,"Y",0,0);						\ Validate pages with wait;
+      maprp_ map1:up[maprp];
+   END;
+   getmap(maprp,"N",chan,-1);						\ Write eof;
+   return (maprp);
+END;
+R!P (map1) PROCEDURE dirpagchk(R!P (map1) maprp);
+	\ This procedure is a companion to "dirout" which checks whether
+a directory file page is complete.  When it is, a "validate" is started
+on the page, so that it will be written.;
+BEGIN
+   if dircount=512 then
+   BEGIN
+      getmap(maprp,"V",0,0);  maprp_ map1:up[maprp];  dircount_ 0;
+   END;
+   return (maprp);
+END;
+PROCEDURE dirincr (R!P (map1) maprp; INTEGER chan);
+	\ This procedure is a companion to "dirout" which puts directory
+entries into a paging ring for output.  This routine increments the word
+counter and creates and maps a new file page when necessary.;
+BEGIN
+   if dircount=0 then							\ If starting a new page;
+   BEGIN								\ (if any) that was occupying the;
+      dirpage_ getmap(maprp,"N",chan,-1);
+      if dirpage > 0 then map1:ui[maprp]_ dirpage;
+   END;
+   dircount_ dircount + 1;
+   return;
+END;
+PROCEDURE dirinit;
+	\ Initializes variables to start off "dirout" with a fresh page;
+BEGIN
+   dircount_ (dirpage_ 0);
+   return;
+END;
+R!P (map1) PROCEDURE dirout (R!P (map1) maprp; INTEGER chan);
+	\ This routine writes a directory entry into a page in the ring
+for posting to the current scratch directory file open on "chan";
+BEGIN
+   dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ mtpos;  maprp_ dirpagchk(maprp);
+   dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ mtrec;  maprp_ dirpagchk(maprp);
+   dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ 0;  maprp_ dirpagchk(maprp);		\ Should be word index ***;
+   dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ mtppn;  maprp_ dirpagchk(maprp);		\ The PPN;
+   dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ cvsix(mtuser[1 for 6]);			\ First half of user name;
+   maprp_ dirpagchk(maprp);  dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ cvsix(mtuser[7 for 6]);			\ Second half of user name;
+   maprp_ dirpagchk(maprp);  dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ cvsix(mtfile[1 for 6]);			\ First half of file name;
+   maprp_ dirpagchk(maprp);  dirincr(maprp,chan);
+   map1:a[maprp][dircount]_ cvsix(mtfile[7 for 6]);			\ Second half of file name;
+   maprp_ dirpagchk(maprp);
+   return (maprp);
+END;
+PROCEDURE write!directory;
+	\ This procedure writes the tape resident directory from the file
+"snarl.tmp" which has been built during the storage operation;
+BEGIN
+   INTEGER array dirblock[1:tape!buf!size];
+   INTEGER dirchanl, direof,		\ Channel stuff for "snarl.tmp";
+      i, j, wordcount, phyrec;
+
+   print("Writing directory -- please wait." & crlf & crlf);
+   open(mtchan,mtdev,'17,0,0,0,mteof,mteof);
+   if mteof then
+   BEGIN
+      print("Cannot open device to write directory."&crlf);
+      return;
+   END;
+   lookup(mtchan,"snarl.tap",mteof);
+   enter(mtchan,"snarl.tap",mteof);
+   phyrec_ 1;  to!begin;
+   open((dirchanl_ getchan),"dsk",binary!mode,1,0,0,direof,direof);
+   lookup(dirchanl,"snarl.tmp",direof);
+   if direof then
+   BEGIN
+      print("Cannot open directory scratch file for writing directory." & crlf);
+      return;
+   END;
+   if dskdev then useto(mtchan,2*dsk!index+1)
+   else BEGIN
+      mtape(mtchan,"W");  mtapean,null);				\ Position the tape to the;
+      mtape(mtchan,"F");  mtape(mtchan,"F");  mtape(mtchan,null);	\ directory area.;
+   END;
+   while (not direof) and (filtot neq 0) do				\ Read the directory entries;
+   BEGIN								\ and write them to tape.;
+      dirblock[1]_ dir+2;
+      dirblock[2]_ (phyrec_ phyrec+1);					\ Put in the record #;
+      if filtot leq max!dirs then i_ filtot else i_ max!dirs;		\ Get as many entries as will fit;
+      filtot_ filtot-i;							\ in the physical block.;
+      arryin(dirchanl,dirblock[3],(wordcount_ i*8));			\ Do the read.;
+      if direof then wordcount_ direof land '777777;			\ If eof, find how much we got.;
+      arryout(mtchan,dirblock[1],tape!buf!size);			\ Send the stuff to tape.;
+   END;
+   i_ 11-phyrec;							\ Fill in the remainder of the;
+   if i > 0 then							\ directory blocks.;
+   BEGIN
+      arrclr(dirblock,0);
+      for j_ 1 step 1 until i do arryout(mtchan,dirblock[1],tape!buf!size);
+   END;
+   release(dirchanl);  return;
+END;
+INTEGER PROCEDURE loklud (STRING username);
+	\ This procedure looks up the "username" in the LUD and returns
+the corresponding PPN.  A zero is returned if the lookup failed.;
+
+BEGIN
+   INTEGER ludchan, ludeof,		\ For opening the LUD;
+      huname, hloc,			\ Hashed username and search location;
+      un1, un2,				\ first and second halves of "username";
+      curppn, i;
+   INTEGER ARRAY ludent[1:'200];	\ for holding LUD blocks;
+   LABEL hash, rnd, rnd1, rnd2, big, c, d, e;
+
+   un1_ cvsix(username[1 for 6]);
+   un2_ cvsix(username[7 for 6]);
+
+   start!code								\ This start!code section is;
+		jrst	hash;						\ the hasher for the LUD;
+	rnd:	add	4,6;
+		rotc	6,-18;
+		movei	1,5;
+	rnd1:	move	8,4(2);
+		mul	8,big;
+		addm	9,5(2);
+		aoje	2,rnd2;
+		movni	2,1;
+		trne	4,1;
+		skipl	5;
+		movei	2,0;
+		exch	3,5;
+	rnd2:	sojg	1,rnd1;
+		jrst	@'13;
+
+	c:	'555555555555;
+	d:	'361275431652;
+	e:	'612754316523;
+	big:	5*5*5*5*5*5*5*5*5*5*5*5*5*5*5;
+
+	hash:	move	6,un1;
+		move	7,un2;
+		movei	2,0;
+		move	3,c;
+		move	4,d;
+		move	5,e;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		jsp	'13,rnd;
+		xor	5,4;
+		move	6,5;
+		tlz	6,'400000;
+		idivi	6,887;
+		addi	7,1;
+		xor	3,5;
+		move	6,3;
+		movem	6,huname;
+		movem	7,hloc;
+   END;
+
+   open((ludchan_ getchan),"dsk",'16,0,0,ludeof,ludeof,ludeof);
+   if ludeof neq 0 then
+   BEGIN
+      print("Cannot initialize disk for LUD lookup." & crlf);
+      return (0);
+   END;
+   lookup(ludchan,"LUD.SYS[1,4]",ludeof);
+   if ludeof neq 0 then
+   BEGIN
+      print("Cannot open the LUD." & crlf);
+      return (0);
+   END;
+   curppn_ -1;
+   while curppn neq 0 do
+   BEGIN "find user"
+      useti(ludchan,hloc);
+      arryin(ludchan,ludent[1],'200);
+      for i_ 1 step '11 until '167 DO
+      BEGIN "block search";
+	 curppn_ ludent[i];
+	 if curppn = 0 then done "find user";
+	 if huname = ludent[i+4] then done "find user";
+	 if curppn < 0 then
+	 BEGIN
+	    hloc_ curppn land '777777; done "block search";
+	 END;
+      END "block search";
+   END "find user";
+   return (curppn);
+END;
+BOOLEAN PROCEDURE gan!search (INTEGER gan);
+	\ This procedure searches the "ganlst" for "gan" and returns
+"true" if "gan" is within one of the ranges;
+
+BEGIN
+   R!P (any!class) grp;
+   grp_ filist;
+   while grp neq n!r DO
+   BEGIN
+      if (ganlst:lower[grp] leq gan) and (gan leq ganlst:upper[grp])
+	 then return (true);
+      grp_ ganlst:next[grp];
+   END;
+   return (false);
+END;
+BOOLEAN PROCEDURE get!users;
+	\ This procedure converts the "ganlst" into a user list residing
+in the structure "allst".  The pointer "filist" is changed to point to
+"allst", and the "ganlst" structure is deleted.;
+BEGIN
+   INTEGER array mfdent[0:2];			\ for MFD entries read;
+   INTEGER mfdchan,mfdeof;
+   STRING username;
+   R!P (any!class) mfdptr,filhed,rp1,rp2;
+
+   open((mfdchan_ getchan),"dsk",binary!mode,2,0,mfdeof,mfdeof,mfdeof);
+   if mfdeof neq 0 then
+      BEGIN
+	 print("Cannot initialize disk for MFD lookup." & crlf);
+	 return(false);
+      END;
+   lookup(mfdchan,'1&cvxstr('1000001)&".UFD[1,1]",mfdeof);
+   if mfdeof neq 0 then
+      BEGIN
+	 print("Cannot open MFD." & crlf);
+	 return(false);
+      END;
+   filhed_ n!r;
+   mfdptr_ iniufr("*","UFD",mfdchan,4);
+   while nxtufr(mfdent,mfdptr) DO
+   BEGIN "read MFD"
+      if gan!search((mfdent[0] lsh -18) land '777777) then
+      BEGIN
+	 rp1_ new!record(allst);
+	 allst:ppn[rp1]_ mfdent[0];
+	 username_ lokdul(mfdent[0]);
+	 allst:user[rp1]_ username[2 to (length(username)-1)];
+	 allst:stbits[rp1]_ mfdent[2];
+	 if filhed=n!r then filhed_ rp1 else allst:next[rp2]_ rp1;
+	 rp2_ rp1;
+      END;
+   END;
+   filist_ filhed;  release(mfdchan);
+   return (true);
+END;
+BOOLEAN PROCEDURE sort!users (STRING first!user(null), last!user(null));
+	\ This procedure reads the MFD and builds a sorted user list in
+the record structure "allst".  Beginning and ending user names, "first!user
+and "last!user", are optional and will set bounds on the list returned.  User
+"SYS" is the exception and always appears first in a complete user list.;
+
+BEGIN
+   INTEGER ARRAY mfdent[0:2];			\ For MFD entries read;
+   R!P (any!class) mfdptr,rp1,rp2,rp3, sysrp;
+   STRING username;
+   INTEGER mfdchan,mfdeof;			\ Channel info. for reading MFD;
+
+   open((mfdchan_ getchan),"dsk",binary!mode,2,0,mfdeof,mfdeof,mfdeof);
+   if mfdeof neq 0 then
+   BEGIN
+      print("Cannot initialize disk for MFD lookup." & crlf);
+      return(false);
+   END;
+   lookup(mfdchan,'1&cvxstr('1000001)&".UFD[1,1]",mfdeof);
+   if mfdeof neq 0 then
+   BEGIN
+      print("Cannot open MFD." & crlf);
+      return(false);
+   END;
+   sysrp_ (filist_ n!r);
+   mfdptr_ iniufr("*","UFD",mfdchan,4);
+   while nxtufr(mfdent,mfdptr) DO
+   BEGIN "read MFD"
+      username_ lokdul(mfdent[0]);					\ Get username corresponding to ppn;
+      username_ username[2 to (length(username)-1)];			\ Remove parentheses;
+      if cmpstr(username,"SYS") neq 0 then				\ If a user other than "SYS";
+      BEGIN								\ then see if it fits into;
+	 if cmpstr(username,first!user) < 0 and 			\ the range.;
+	    cmpstr(first!user,"SYS") neq 0 then continue "read MFD";
+	 if (length(last!user) neq 0) then
+	    if cmpstr(username,last!user) > 0 then continue "read MFD";
+      END;
+      rp1_ filist;  rp3_ new!record(allst);
+      allst:user[rp3]_ username;
+      allst:ppn[rp3]_ mfdent[0];
+      allst:stbits[rp3]_ mfdent[2];
+      if cmpstr(username,"SYS") = 0 then
+      BEGIN
+	 sysrp_ rp3;  continue "read MFD";
+      END
+      ELSE BEGIN
+	 rp2_ n!r;
+	 while (rp1 neq n!r) and (cmpstr(username,allst:user[rp1])>0)
+	 DO BEGIN
+	    rp2_ rp1;  rp1_ allst:next[rp1];
+	 END;
+	 if filist=n!r then filist_ rp3
+	 else if rp2 neq n!r then
+	 BEGIN
+	    allst:next[rp2]_ rp3;
+	    if rp1 neq n!r then allst:next[rp3]_ rp1;
+	 END
+	 else BEGIN
+	    allst:next[rp3]_ filist;  filist_ rp3;
+	 END;
+      END;
+   END "read MFD";
+   if sysrp neq n!r then
+      if (length(first!user)=0) or (first!user="SYS") then
+      BEGIN
+	 allst:next[sysrp]_ filist;  filist_ sysrp;
+      END;
+   release(mfdchan);  return (true);
+END;
+PROCEDURE fill!in;
+	\ This procedure makes a pass through the "stusrs" list and fills
+in either the ppn or user, whichever is required.  Errors are reported
+and bad records thrown out.;
+
+BEGIN
+
+   INTEGER ppn;  R!P (any!class) urp,rpsave;  STRING user;
+
+   urp_ filist;  rpsave_ n!r;
+   while urp neq n!r DO
+   BEGIN
+      if (ppn_ stusrs:ppn[urp]) then
+      BEGIN
+	 user_ (stusrs:user[urp]_ lokdul(ppn));
+	 if user[1 for 1] = "[" then
+	 BEGIN
+	    print("PPN " & user & " is illegal." & crlf);
+	    if rpsave = n!r then filist_ stusrs:next[urp]
+	    else stusrs:next[rpsave]_ stusrs:next[urp];
+	    urp_ stusrs:next[urp];
+	 END
+	 else BEGIN
+	    stusrs:user[urp]_ user[2 to (length(user)-1)];
+	    rpsave_ urp;  urp_ stusrs:next[urp];
+	 END;
+      END
+      ELSE BEGIN
+	 ppn_ (stusrs:ppn[urp]_ loklud(stusrs:user[urp]));
+	 if not ppn then
+	 BEGIN
+	    print("User (" & stusrs:user[urp] & ") is illegal." & crlf);
+	    if rpsave = n!r then filist_ stusrs:next[urp]
+	    else stusrs:next[rpsave]_ stusrs:next[urp];
+	    urp_ stusrs:next[urp];
+	 END
+	 else BEGIN
+	    rpsave_ urp;  urp_ stusrs:next[urp];
+	 END;
+      END;
+   END;
+   return;
+END;
+PROCEDURE report!file (STRING filstr);
+	\ This routine counts files being processed by one of the data
+transfer commands and reports them if the user requested the FILES
+option of the SPRINT switch.;
+BEGIN
+   if spr!sw = !files then print (filstr & crlf);
+   filcnt_ filcnt + 1;  filtot_ filtot + 1;
+   return;
+END;
+PROCEDURE report!user (STRING user; INTEGER ppn);
+	\ This routine counts the number of whole users processed by one
+of the data transfer commands and reports the totals if the user has
+requested either the FILES or the USERS option of the SPRINT switch.;
+BEGIN
+   if spr!sw neq !totals then print("(" & user & ")  " & pr!ppn(ppn) &
+      "   ",filcnt," files." & crlf & crlf);
+   filcnt_ 0;  usrtot_ usrtot+1;
+   return;
+END;
+PROCEDURE report!total (STRING phrase);
+	\ This routine reports the totals for the data transfer command
+just completed.;
+BEGIN
+   print("Last file at position ",mtpos,"." & crlf);
+   print(phrase,usrtot," users, ",filtot," files." & crlf & crlf);
+   return;
+END;
+INTERNAL PROCEDURE s!sto (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+	\ This procedure is the service routine for the STORE
+command.  Its parameters are as follows.
+	Parameter "lsttyp" is the file list type of the <file list>
+argument supplied by the user in the STORE command.  It is expressed as
+as a token value (referenced by a symbol definition word) and may be
+one of four values:  !all, !ganlst, !poslst, or !rtrlst.  These values
+correspond to user parameters of "ALL", a list of ranges of global
+account numbers (GAN's), a list of file positions, or the file list
+which is legal for the RETRIEVE command.
+	Parameter "afttim" corresponds to the AFTER user modifier.  It
+is a one-word date/time code whose default is 0 which represents the
+earliest possible time.
+	Parameter "beftim" corresponds to the BEFORE modifier.  It is
+a one-word date/time code whose default is the largest possible time.
+	The "modbts" word expresses the state of the remaining legal
+STORE modifiers whose values are either TRUE or FALSE.  The bit
+corresponding to the desired modifier is set if the modifier was
+supplied (TRUE).  The interesting bits are as follows:
+	   bit 32 - TODAY
+	   bit 33 - INCREMENTAL
+	   bit 34 - CHANGED
+	   bit 35 - TWICE
+	The "stusr", "stnam", and "stext" parameters correspond
+to the starting user, filename, and extension which may be specified
+by the STARTING WITH modifier.  The "stnam" and "stext" strings may
+not contain wild-card characters.
+	The "endusr", "endnam", and "endext" parameters correspond
+to the ending user, filename, and extension which may be specified
+by the ENDING WITH modifier.  The "endnam" and "endext" strings may
+not contain wild-card characters.
+;
+BEGIN
+   BOOLEAN direc!sw,			\ Error switch for error detected dumping current directory.;
+      err!sw;				\ True if fatal error on file in current UFD;
+   INTEGER ARRAY ufdlook[-4:'17],	\ Lookup block for UFD's;
+      ufdinf[1:6],
+      filinf[0:5],
+      specrec[1:spec!size];		\ To hold special records (mostly LOK's) for output;
+   INTEGER filchan, fileof,		\ Channel stuff for handling individual files;
+      ufdchan, ufdeof,			\ Channel stuff for handling ufd's;
+      spec!index,			\ For indexing record holder buffer;
+      spec!base,			\ To mark the beginning of records in specrec;
+      spec!top;				\ To mark the end of a record in specrec;
+   R!P (any!class) urp, frp1, frp2,
+      srp,				\ Map pointer to ring for storing files to tape;
+      drp;				\ Map pointer to ring for writing scratch directory file;
+R!P (map1) PROCEDURE clear!pages (R!P (map1) maprp);
+	\ This procedure makes sure any "dangling" pages are written to
+tape at the end of a "STORE" operation.;
+BEGIN
+   INTEGER i, j;
+   while (i_ map1:ui[maprp]) neq 0 do
+   BEGIN
+      if (j_ (i lsh -18) land '777) neq 0 then				\ If a special record to be output;
+      BEGIN								\ then do it.;
+	 j_ j-4;
+	 tapout(mtchan,(specrec[j] land '777777000000),
+	    (specrec[j] land '777777),(j+1),specrec);
+	 i_ i land '777000777777;
+      END;
+      if i > 0 then
+      BEGIN
+	 tapout(mtchan,dat,513,1,map1:a[maprp]);  getmap(maprp,"U",0,0);	\ If a mapped page, write it out.;
+      END
+      else BEGIN
+	 j_ i land '777777;
+	 if j > 0 then tapout(mtchan,emp,2,1,tapblk)			\ If a "hole", then mark it.;
+	 else tapout(mtchan,feo,1,1,tapblk);				\ If eof, mark it.;
+      END;
+      map1:ui[maprp]_ 0;  maprp_ map1:up[maprp];
+   END;
+   return (maprp);
+END;
+PROCEDURE outfil;
+	\ This routine opens up the current file which will potentially
+be stored to tape and checks to see whether it meets the conditions
+stated by the user command.  If so, it dumps the current file to
+tape.  In the process, the file is mapped to a ring of pages set up
+earlier by "set!map!space".  The pages are part of a mapping structure,
+and it is used as follows:
+
+	RECORD!CLASS map1		\ The mapping structure
+	   (INTEGER ARRAY a		\ Holds a mapped file page
+	   INTEGER ui			\ Page status indicator
+	   R!P (any!class) up)		\ Used as pointer to next page in ring
+
+where:
+	If ui > 0 (bit0=0) then ui contains the page number of a mapped
+		file page.
+	If ui = 0 then there is nothing mapped.  Page is available.
+	If ui < 0 (bit0=1) then there is a hole in the file or this is
+		an eof marker.
+		If rh(ui) = 0 then this record marks the eof.
+		If rh(ui) > 0 then rh(ui) = size of the hole in pages.
+	If (ui land '777000000) neq 0 then put out to tape the special
+		record which begins at specrec[(ui lsh -18) land '777].
+;
+BEGIN
+   BOOLEAN ignore!if!entered, eof,
+      special,				\ True if a special record must be marked;
+      startup,				\ True if just started stuffing pages;
+      fatal!sw;				\ Set true if fatal error while dumping file.;
+   INTEGER fpage,			\ File page number;
+      filsiz,				\ To hold file size in pages;
+      i, j, page!error;
+   STRING filstr;
+   DEFINE file!dumped =
+      {((filinf[4] lsh 19) < 0)};	\ Checks the file dumped bit.;
+   DEFINE changed!sw =
+      {(modbts land mod!chngd)};	\ Checks the CHANGED switch.;
+   DEFINE ignore!file =
+      {((specrec[!rbsts+spec!base] lsh 21) < 0)};	\ Checks the ignore file bit.;
+   DEFINE today!sw =
+      {(modbits land mod!today)};	\ Checks the TODAY switch.;
+
+   ignore!if!entered_ (eof_ (fatal!sw_ false));
+   if changed!sw then if file!dumped then return;
+   if filinf[3] leq afttim then return;					\ Does file creation date fall;
+   if filinf[3] geq beftim then return;					\ within the specified date range?;
+   spec!index_ spec!index+1;						\ Delimit the next area in specrec;
+   spec!base_ spec!index*(look!size+5)+5;				\ where the "lok" record will go.;
+   spec!top_ spec!base+look!size;
+
+   for i_ spec!base step 1 until spec!top do specrec[i]_ 0;		\ Clear the "lok" area;
+   specrec[-4+spec!base]_ lok+5+look!size;
+   specrec[0+spec!base]_ look!size;
+   lookup(filchan,(filstr_ "(" & stusrs:user[urp] & ")" &		\ Open the file to be dumped.;
+      cv6str(filinf[0]) & "." & cv6str(filinf[1])),fileof);
+   if fileof then
+   BEGIN
+	\ *** more to come ***;
+      return;
+   END;
+   mtfile_ cv6str(filinf[0])&"."&cv6str(filinf[1]);
+   specrec[1+spec!base]_ stusrs:ppn[urp];
+   specrec[2+spec!base]_ filinf[0];
+   specrec[3+spec!base]_ filinf[1];
+   chnior(filchan,specrec[0+spec!base],5);				\ Now get the whole lookup block;
+   if lsttyp=!allst then if ignore!file then
+   BEGIN								\ If the ignore bit is set in the;
+      print("Ignoring file " & filstr & "." & crlf);			\ lookup block and this is an;
+      return;								\ "ALL" files transfers, then;
+   END;									\ don't dump this file.;
+   specrec[-3+spec!base]_ (mtpos_ mtpos+1);
+   curdt(specrec[-2+spec!base],specrec[-1+spec!base]);
+   user!to!gmt(specrec[-2+spec!base],specrec[-1+spec!base]);
+\  if today!sw then
+      *** more to come *** ;
+\   filsiz_    *** calculate file size in pages *** ;
+   fpage_ 0;  special_ true;
+   while not eof do							\ Now dump the file to tape.;
+   BEGIN
+      i_ map1:ui[srp];  startup_ (if not i then true else false);
+      if (j_ (i lsh -18) land '777) neq 0 then				\ If there is a special record;
+      BEGIN								\ to be put to tape, then find;
+	 j_ j-4;
+	 tapout(mtchan,(specrec[j] land '777777000000),			\ where it is, and send it.;
+	    (specrec[j] land '777777),(j+1),specrec);
+	 i_ i land '777000777777;
+      END;
+      if i > 0 then							\ If this page has been mapped;
+      BEGIN
+	 tapout(mtchan,dat,513,1,map1:a[srp]);  getmap(srp,"U",0,0);	\ then send it to tape.;
+	 map1:ui[srp]_ 0;
+      END;
+      if i < 0 then
+      BEGIN
+	 j_ i land '777777;						\ If we have a "hole" to mark;
+	 if j > 0 then tapout(mtchan,emp,2,1,tapblk)			\ then put the marker to tape.;
+	    else tapout(mtchan,feo,1,1,tapblk);				\ Else we have an eof;
+	 map1:ui[srp]_ 0;
+      END;
+      i_ getmap(srp,"R",filchan,(fpage_ fpage+1));			\ Now map in a new page;
+      if i > 0 then 
+      BEGIN
+	 if startup then getmap(srp,"P",0,0);				\ Pre-reference if just started up.;
+	 map1:ui[srp]_ fpage;						\ Mark the page just mapped;
+      END
+      else BEGIN							\ If there is an error return . . .;
+	 if (page!error_ !skip! land '777777) = 6 then eof_ true
+	 else if page!error = '15 then					\ If we found a "hole";
+	 BEGIN								\ then find how big it is.;
+	    i_ getmap(srp,"E",filchan,fpage);				\ Look for next existing page.;
+	    if i < 0 then
+	       if (!skip! land '777777 = '30) then			\ If there is none, then the;
+	       BEGIN							\ remainder of the file must be a;
+		  map1:ui[srp]_ '400000000000 lor (filsiz-fpage+1);	\ hole.  Figure out its size.;
+		  eof_ true;
+	       END
+	       else eof_ (fatal!sw_ (err!sw_ true));			\ Unexplained error.;
+	    if i > 0 then						\ If we located an existing page,;
+	    BEGIN							\ then figure out how many zero;
+	       map1:ui[srp]_ '400000000000 lor (i-fpage);		\ pages there were in between.;
+	       fpage_ i-1;
+	    END;
+	 END
+	 else eof_ (fatal!sw_ (err!sw_ true));				\ Unexplained error.;
+      END;
+      if eof then map1:ui[srp]_ '400000000000;
+      if special then
+      BEGIN
+	 map1:ui[srp]_ map1:ui[srp] lor (spec!base lsh 18);
+	 special_ false;
+      END;
+      srp_ map1:up[srp];
+   END;
+   close(filchan);  report!file(filstr);  drp_ dirout(drp,dirchan);
+   if spec!index=(num!tape!bufs-1) then spec!index_ -1;
+   return;
+end;
+PROCEDURE outufd;
+	\  *** more to come ***;
+return;
+BOOLEAN PROCEDURE open!ufd (INTEGER ppn);
+	\ This routine opens a ufd and checks the ignore bit to see
+whether any files in this directory should be dumped.  If successful
+and the ignore bit is off, then "true" is returned.  Otherwise "false"
+is returned.;
+BEGIN
+   DEFINE ignore!ufd =
+      {((ufdlook[!rbsts] lsh 21) < 0)};	\ Checks the ignore directory bit.;
+
+   lookup(ufdchan,'1&cvxstr(ppn)&".UFD[1,1]",ufdeof);
+   if ufdeof then
+   BEGIN
+      print("Cannot open UFD for user (" & stusrs:user[urp] & ")   [" &
+	 pr!ppn(ppn) & "]." & crlf);
+      close(ufdchan);  return (false);
+   END;
+   fileinfo(ufdinf);
+   arrclr(ufdlook,0);  ufdlook[0]_ '17;
+   ufdlook[1]_ '1000001;  ufdlook[2]_ ufdinf[1];  ufdlook[3]_ ufdinf[2];
+   chnior(ufdchan,ufdlook[0],4);
+   if lsttyp = !allst then if ignore!ufd then
+   BEGIN
+      print("Ignoring files for user (" & stusrs:user[urp] & ")   [" &
+	 pr!ppn(ppn) & "]." & crlf);
+      close(ufdchan);  return (false);
+   END;
+   return (true);
+END;
+\ The body of s!sto begins here;
+
+   dskdev_ (if (calli(cvsix(mtdev),devchr) land dv!dsk) = 0 then false	\ Find out what kind of device;
+      else true);							\ we have.;
+   if not (new!sw or app!sw) then
+   BEGIN
+      print("You must execute a ""NEW TAPE"" or ""APPEND"" command first." & crlf);
+      return;
+   END;
+   if (length(stusr) neq 0) or (length(endusr) neq 0) then
+      if lsttyp neq !allst then
+	 print("*** WARNING ***" & crlf &
+	    "     The starting and/or ending point specified will be ignored," & crlf &
+	    "     since the file list is other than ""ALL""" & crlf);
+   srp_ set!map!space;  drp_ set!map!space;  dirinit;
+   if opfile("snarl.tmp","VRWM",dirchan) < 0 then			\ Open a scratch directory file;
+   BEGIN								\ for mapping operations.;
+      print("Cannot open scratch directory file." & crlf);
+      return;
+   END;
+\  if not set!tape!bufs(direct_ "O") then return;			\ Temporarily removed ******* ;
+   if dskdev then useto(mtchan,(mtrec+1)*dsk!index+1);
+   open ((ufdchan_ getchan),"dsk",binary!mode,1,0,ufdeof,ufdeof,ufdeof);
+   if ufdeof neq 0 then
+   BEGIN
+      print("Cannot initialize disk for UFD lookup." & crlf);
+      return;
+   END;
+   open((filchan_ getchan),"dsk",binary!mode,1,0,fileof,fileof,fileof);
+   if fileof neq 0 then
+   BEGIN
+      print("Cannot initialize disk for file lookup." & crlf);
+      return;
+   END;
+   if lsttyp=!allst then if not sort!users(stusr,endusr) then
+   BEGIN
+      print("Cannot make sorted user list." & crlf);
+      return;
+   END;
+   if lsttyp = !filist then fill!in;
+   if lsttyp = !ganlst then if not get!users then
+   BEGIN
+      print("Cannot convert gan list to user list." & crlf);
+      return;
+   END;
+
+   if app!sw then to!end else to!begin;
+   app!sw_ false;  spec!index_ -1;
+   filcnt_ (filtot_ (usrtot_ 0));
+   urp_ filist;
+   if lsttyp = !filist then
+   BEGIN
+      while urp neq n!r do
+      BEGIN
+	 cur!user_ stusrs:user[urp];
+	 if not open!ufd (cur!ppn_ stusrs:ppn[urp]) then done;
+	 mtuser_ cur!user;  mtppn_ cur!ppn;
+	 tapout(mtchan,bou,2,!rbnam,ufdlook);				\ Put out beginning-of-user marker;
+	 frp1_ stusrs:files[urp];
+	 if frp1 = n!r then						\ If a user with no files is;
+	 BEGIN
+	    frp2_ iniufr("*","*",ufdchan,'56);				\ given, then treat file option;
+	    while nxtufr(filinf,frp2) do outfil;			\ as "*.*";
+	 END
+	 else while frp1 neq n!r do
+	 BEGIN
+	    frp2_ iniufr(stfil:name[frp1],stfil:ext[frp1],ufdchan,'56);
+	    while nxtufr(filinf,frp2) do outfil;
+	    frp1_ stfil:next[frp1];
+	 END;
+	 report!user (cur!user,cur!ppn);				\ Report totals for this user;
+	 srp_ clear!pages(srp);						\ Write remaining file pages to tape.;
+	 tapout(mtchan,eou,2,!rbnam,ufdlook);				\ Put out an end-of-user marker.;
+	 urp_ stusrs:next[urp];
+      END;
+   END
+   ELSE BEGIN
+      while urp neq n!r do
+      BEGIN
+	 cur!user_ allst:user[urp];
+	 if not open!ufd(cur!ppn_ allst:ppn[urp]) then done;
+	 frp1_ iniufr("*","*",ufdchan,'56);
+	 while nxtufr(filinf,frp1) do outfil;
+	 outufd;  srp_ clear!pages(srp);				 \ Write ufd and make sure all pages written.;
+	 report!user (cur!user, cur!ppn);
+	 tapout(mtchan,eou,2,!rbnam,ufdlook);
+	 urp_ allst:next[urp];
+      END;
+   END;
+   erase!pages(srp);  tapout(mtchan,eot,1,0,filinf);
+   closo(mtchan);  release(filchan);  release(ufdchan);
+   drp_ write!pages(drp,dirchan);  chniov(dirchan,0,0);
+   report!total ("STORE complete:  ");
+   write!directory;							\ Write the tape-resident directory;
+   close(mtchan);
+   return;
+END;
+INTERNAL PROCEDURE s!ret (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+	\ This procedure is the service routine for the RETRIEVE
+command.  It's parameters are as follows.
+	Parameter "lsttyp" is the file list type of the <file list>
+argument supplied by the user in the RETRIEVE command.  It is expressed
+as a token value (referenced by a symbol definition word) and may be
+one of four values:  !all, !ganlst, !poslst, or !rtrlst.  These values
+correspond to user parameters of "ALL", a list of ranges of global
+account numbers (GAN's), a list of file positions, or the file list
+which is legal for the RETRIEVE command.
+	Parameter "afttim" corresponds to the AFTER user modifier.  It
+is a one-word date/time code whose default is 0 which represents the
+earliest possible time.
+	Parameter "beftim" corresponds to the BEFORE modifier.  It is
+a one-word date/time code whose default is the largest possible time.
+	The "modbts" word expresses the state of the remaining legal
+RETRIEVE modifiers whose values are either TRUE or FALSE.  The bit
+corresponding to the desired modifier is set if the modifier was
+supplied (TRUE).  The interesting bits are as follows:
+	   bit 31 - SETDUMPED
+	The "stusr", "stnam", "stext", "endusr", "endnam", and "endext"
+parameters are the same as for the routine "s!sto".
+;
+return;
+INTERNAL PROCEDURE s!get (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+	\ This procedure is the service routine for the GET
+command.  It's parameters are as follows.
+	Parameter "lsttyp" is the file list type of the <file list>
+argument supplied by the user in the GET command.  It is expressed
+as a token value (referenced by a symbol definition word) and may be
+one of four values:  !all, !ganlst, !poslst, or !filist.  These values
+correspond to user parameters of "ALL", a list of ranges of global
+account numbers (GAN's), a list of file positions, or a user and file
+list respectively.
+	The remaining parameters are the same as for "s!ret".
+;
+return;
+INTERNAL PROCEDURE s!dir (INTEGER lsttyp, afttim(-1),
+  beftim('377777777777), modbts(0);  STRING stusr(null), stnam(null),
+  stext(null), endusr(null), endnam(null), endext(null));
+	\ This procedure is the service routine for the DIRECTORY
+command.  It's parameters are as follows.
+	The "lsttyp" parameter is the same as for the GET command.
+	All the other parameters except "modbts" are the same as for
+STORE.  The interesting bits in the "modbits" parameter are as follows:
+	   bit 29 - CHECKSUM
+	   bit 30 - LIMITED
+;
+return;
+INTERNAL PROCEDURE s!tra (BOOLEAN typeit);
+	\ This procedure is the service routine for the TRANSLATE
+command.  The "typeit" parameter tells the procedure to display the
+contents of the translate table if its value is TRUE.  If "typeit"
+is FALSE, then "s!tra" will verify correctness of user names in the
+translate list and fill in the translate record structure.
+;
+return;
+INTERNAL PROCEDURE s!unt;
+	\ This is the service routine for the UNTRANSLATE command.  This
+procedure clears the translate table structure and releases the storage.
+;
+return;
+
+END "FTRANS";
+    -k'ƒ
