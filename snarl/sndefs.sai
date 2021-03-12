@@ -1,0 +1,58 @@
+LET R!P = RECORD!POINTER;
+LET R!C = RECORD!CLASS;
+LET n!r = null!record;
+DEFINE charin = "wordin";
+DEFINE \ = "COMMENT";
+DEFINE i!type=1, s!type=2;	\ Integer and string types.;
+DEFINE gmt='20;		  	\ Monitor code for GMT time zone;
+DEFINE binary!mode= '760014;
+DEFINE devchr=4, dv!mta='20000000,
+   dv!avl='40000000, dv!dsk='200000000000,
+   !ugsts=2, !chugf='10, !chmta='12,
+   settim=-'37, !chren= '11, !chftr= '45,
+   !chopn= '13, !chent= '5, !chlk= 4,
+   !gtppn= 2, !gtunm= -'22, !gtun1= -'21;
+DEFINE ch!attn=5, ch!hung=6, ch!mag=7,
+   ch!time='10;
+
+\  The following are bit settings for passing switch information to the
+   file transfer command service routines.;
+
+DEFINE mod!today='10, mod!incr= 4;
+DEFINE mod!chngd=2, mod!twice=1;
+DEFINE mod!setdmpd= '20, mod!chksum= '40;
+DEFINE mod!limited= '100;
+
+\  The following definitions are indexes to the extended lookup block.;
+
+DEFINE !rbppn= 1, !rbnam= 2,
+   !rbext= 3, !rbprv= 4, !rbsiz= 5,
+   !rblic= '14, !rbsts='17,
+   !rbaut= '26, !rbtru= '31, !rbalp= '33;
+
+\  The following definitions pertain to snarl tapes;
+
+DEFINE num!pages= 8;			\ Pages in paging ring;
+DEFINE num!tape!bufs= 2;		\ Number of tape buffers;
+DEFINE tape!buf!size= 3968;		\ Size of physical tape blocks;
+DEFINE check!wd= '464646464646;		\ Value in each check block wordk;
+DEFINE dsk!index= 31;			\ # disk blocks in a tape block;
+DEFINE max!dirs= 495;	\ Max. # of directory entries in a tape block;
+DEFINE dir!index= 8;			\ Size of directory entries;
+DEFINE num!dir!blocks= 10;		\ # directory blocks on tape;
+
+\ Tape record header equates;
+
+DEFINE hed='1000000, dir='2000000;		\ Definitions for the logical;
+DEFINE rcd='3000000, lok='4000000;		\ tape record types.;
+DEFINE dat='5000000, emp='6000000,
+   feo='7000000, bou='10000000, eou='11000000,
+   eot='12000000, con='13000000, dum='14000000,
+   ufd='15000000, mfd='16000000,
+   xxx='77000000;
+
+REQUIRE "{}<>" DELIMITERS;
+DEFINE user!to!gmt (datwd, timwd) = {cnvdtim (datwd,timwd,'40,'60)};
+DEFINE gmt!to!user (datwd, timwd) = {cnvdtim (datwd,timwd,'60,'40)};
+DEFINE chnioi( channel, arg, function ) = 
+   {chnior( channel, memory[arg], function)};
