@@ -1,0 +1,46 @@
+WEEKLY SPOOL MAINTENANCE
+
+Once a week in the morning:
+log in as sppoper on :36  
+
+.r (mpl)mhx
+ 
+
+hosts:@clean.cmd
+commands:  
+@clean
+^D
+record?y
+file name: clean.rpt
+detach: n
+
+After it is completed run spmhx, file name clean.rpt (turn on printer for
+pending information).  
+
+Late in the afternoon,run mhx:
+r(mpl)mhx
+host:...  ; the host numbers are the systems which are in the output
+	  ; of the previous spmhx job
+commands:
+run spfix
+pend
+quit
+^d
+record?n (turn on printer)
+
+If requests are found in PROC or TAPE that are old, run spfix on that
+system and charge off using command charge.
+
+Print out (SPPOPER:36)pend.rpt on 350.
+Give pend.rpt along with list of old requests to Lois.
+
+
+note:
+1) when using spfix's charge command, if the terminal prints out: "1 XXX
+   record missing, continue anyway?", answer with "yes".
+2) file CLEAN has the following content:
+	run spfix
+	clean
+	pending
+	quit
+
