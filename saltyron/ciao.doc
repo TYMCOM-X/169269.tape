@@ -1,0 +1,212 @@
+
+
+
+	CIAO - Circuit (or Child) Input And Output
+
+
+CIAO is used to do I/O either to whatever is at the end of an
+auxiliary circuit or to a child frame on the same system.  The
+latter case allows command files to be executed without using up
+a port on the base or getting the Supervisor involved.
+
+CIAO accepts commands from the command port (hereafter refered to as
+TTY) or from a command file.  Input to the created circuit or
+child frame (hereafter called PORT) may come from the TTY, the
+command file or an input file.  Output from the PORT may go to
+the TTY an output file or be trashed.  If CIAO is running detatched, all TTY
+output will go to a file xxxCIO.OUT where xxx is the current "job" number.
+
+CIAO may be started from the TTY in monitor command mode or from a
+program by executing a RUN UUO.
+
+If started by a RUN UUO with an offset of 1, CIAO expects a
+command file on the file xxxCIO.TMP, where xxx is the current "job" number.
+
+If started by user command, a command line may be entered
+on the monitor command line following a semicolon.  When the command
+ends, control will return to the TTY unless a command file
+was ended by a QUIT command.
+
+A command to CIAO consists of a verb, optionally one or more blanks
+followed by arguments, and a carriage return.  Within the argument
+field a special escape character (user definable with the SET command
+(default ^P) and hereafter refered to as ESC) causes the next
+character to be interpreted as follows.
+
+	D	Display everything until the next ESC&D to the TTY
+		(ESCs will still be recognized within the string)
+	F	turn TTY echo ofF
+	N	turn TTY echo oN
+	I	Input from TTY until a <CR>
+	U	represents the current GFDed Username
+	S	represents the system number CIAO is running on
+
+all other characters are just passed as if the ESC was not present.
+ESC<CR> has a special affect after the INPUT or RESUME commands
+have been entered (see below).
+
+COMMANDS (uppercase indicates minimum specification) -
+
+Nest <file-name>	execute commands from <file-name>. A command file
+	will be searched for as follows:
+	(<GFDed Username>)<file-name>
+	(<Logged in Username>)<file-name>
+	(<GFDed username>)CIAO.COM
+	(<Logged in Username>)CIAO.COM
+	(<CIAO's Username>)CIAO.COM
+	If a file named CIAO.COM is used then a line of the form
+	@<file-name><CR> will be searched for on that file and
+	commands will be read starting with the next line.
+	A command file is terminated when either 1) an @ starts a line,
+	2) a QUIT command is seen, or 3) the end of file is reached.
+	When <file-name> ends, the next command in the current
+	command file (if any) is read.  Nesting may be up to 10 deep.
+
+Creaux <login-string>	build an auxiliary circuit to the given username
+	and system.  If executed from a TTY, a RESUME command is implied
+	after the Creaux.  If <login-string> is null then the current
+	system and the GFDed Username are implied.
+
+Pty <username>	works like Creaux except that a child frame will be
+	created with a Pseudo tTY instead of an aux circuit.  This
+	saves a base port and a network supervisor call.
+	The child will have the same licenses as the parent frame.
+	If no <username> is given the GFDed name is used.
+
+Dial <phoneno>	dial out using <phoneno> as number
+
+Force <string>	outputs <string> on PORT.  A <CR> will follow <string>
+	unless it ends with the ascii character <esc>.  In this case
+	neither the <cr> or the <esc> is sent.
+
+Wait <n>	wait for n seconds or for event
+	n=0	send yellow ball and wait for an orange ball
+	n>0	wait for n seconds or until PORT zapped
+	n<0	wait for n seconds or until character from PORT or zapped
+
+Time <n>	wait for n seconds of no characters from PORT or
+	PORT zapped, n=0 or null implies n=20
+
+Output <file-spec>	declare file for PORT output
+	if a file is already open, close and release it.
+	If <file-spec> exists, rename it to file.BAK.
+	Open <file-spec> in Update mode thus allowing another process
+	to read the file while it is being written.  The file
+	will be updated at least every UPD seconds (see SET command).
+	The COPY flag will be set to true (see SET command).
+
+Input <file-spec>	copies a file to PORT
+	if <file-spec> is null, input will start with the next line
+	of the command-file.  Input without a <file-spec> entered
+	at the TTY is the same as the RESUME command.
+	ESC sequences will be processed on the input file.
+	ESC<cr> will end input mode and return to commandmode,
+	An end-of-file acts as an ESC<cr>.  On a separate input file
+	(i.e. <file-spec> not null) everything passed an ESC<cr> is ignored.
+
+	If SENDLF (see SET command) then <lf>s from input will be
+	sent to PORT.
+	If YELLOWBALL (see SET command) then a yellow ball will be sent
+	after each <lf> is seen from input and an orange ball is expected
+	from PORT before continuing, else (LINEFEED), a <lf> is expected
+	from the PORT before continuing.
+
+Resume	send characters transparently from TTY to PORT
+	starts reading from TTY, all characters are passed
+	except that the ESC sequences will be processed. ESC<cr> will
+	return to command mode (next line of command file if any or TTY).
+	In transparent mode all output from PORT is sent to TTY
+	regardless of the SEE flag (see SET command).
+
+ZAP	sends zapper on PORT
+
+Hang	sends yellowball followed by hang character on PORT
+
+Unattach <file-name> If <file-name> is null just detach current frame
+	else create a detached frame belonging to the GFDed username
+	and execute the command file <file-name> in that frame.  The frame
+	will have the same licenses that the parent frame had.  The frame
+	will be destroyed when the command file completes.
+
+SET <arg1>{ <arg2>...}	sets arguments as follows
+	ESCape=<esc-char>	sets ESC to <esc-char> (default ESCape=^P)
+			If <esc-char> is <cr>, <lf> or <blank> then ESC will
+			not be defined and the circuit will be transparent.
+			Lower case a-z are not allowed ESC characters.
+	UPD=<sec>	number of seconds of no PORT output before
+		flushing OUTPUT file buffers to disk.
+		Initially 3600 seconds, i.e. 1 hour.
+	COPY/NOCOPY	turns on/off recording of PORT output to
+		OUTPUT file, set to COPY automatically by the
+		OUTPUT command
+	SEE/NOSEE	turns on/off copying of PORT output to TTY
+		starts out NOSEE except that during a RESUME command
+		it is ignored (always assumed on)
+	BLANK/NOBLANK	turns off/on blank line supression from PORT,
+		initially BLANK, i.e. no suppression.
+	LINEFEED/YELLOWBALL select handshake for INPUT command (see) (def YB)
+	LF/YB	same as LINEFEED/YELLOWBALL
+	SENDLF/OMITLF	select whether <lf> from input file is sent
+		on PORT (see INPUT command) default OMITLF
+	CAPTAIN=<string>	set outdial captain username
+
+List	List settings for SET args, also OUTPUT filename and PORT username
+The following is listed when ?<cr> is entered on a command line.
+
+Valid commands are:
+? CIAO.DOC		print CIAO documentation
+Creaux <user>:<sys>	build circuit over Tymnet
+Dial <phone#>		dialout 
+Force <string>		send string to host followed by <cr>
+Hang			sends yellowball and hang character
+Input <file-spec>	send contents of file over circuit
+List			display current settings and connections
+Nest <file-spec>	transfer to new command file, return when done
+Output <file-spec>	record all chars from host in file
+Pty <user>		creates child frame <user> default is GFDed name
+Resume			resume transparent connection
+Set <arg>		sets <arg>, enter SET ? for details
+Time <seconds>		wait until no chars rec'd for n secs (20)
+Unattach		detach job
+Unattach <file-spec>    run command file as a detached frame
+Wait <seconds>		wait for n seconds to elapse or event
+Zap			disconnect auxiliary connection
+
+The following is listed when SET ?<cr> is entered on a command line.
+
+
+Valid SET arguments are:
+Set ESCape=<char>	set escape character (default is ^P)
+Set UPD=<sec>		set output file flush time (def 3600 sec)
+Set COPY | NOCOPY	turn on and off recording
+Set SEE | NOSEE		turn on and off Port output to TTY
+Set BLANK | NOBLANK	turn on and off blank line suppression
+Set LineFeed | YellowBall select handshake (wait for lf or orangeball)
+Set SENDlf | OMITlf	send lfs on aux circuit
+Set Captain=<uname>	set captain username for outdial
+	Known Bugs --
+
+1.	Child does not have parents licenses on Unatt and Pty.
+2.	If a circuit is zapped during RESUME processing (i.e.,
+	the TTY is talking over the aux circuit) a [circuit zapped]
+	message is typed at the TTY but the user must enter a
+	carriage return to return to the command file or the
+	CIAO prompt level.
+3.	The <ESC>D (display characters at terminal) does not work.
+
+
+The author of a previous incarnation of this program documented
+it as follows.
+
+"This program does not work (unless by chance).  That is,  the
+way it does interrupts is guarenteed to break sooner or later.
+This program has been maintained from its birth (when it
+was called TOUT and only had one feature) until now with the
+philosophy that all new features are implemented without any
+knowledge of existing features.  This holds down to the routines
+used to do the work.  Do not be confused therefore if you find 12
+different routines all doing the same thing.  Also, be wa
+it isn't very well indented or structured.  It is NOT supported!
+By the way none of the original features of this program still
+exist, if that tells you anything about how its written."
+   q@Y‘
