@@ -1,0 +1,563 @@
+BEGIN "TABGEN"
+
+REQUIRE "(sailib)sail.def" SOURCE!FILE;
+REQUIRE 10000 SYSTEM!PDL;
+REQUIRE 20000 STRING!SPACE;
+REQUIRE 2500 STRING!PDL;
+REQUIRE "tbgsym.sai" SOURCE!FILE;
+
+DEFINE \ = "COMMENT";
+
+REQUIRE "{}<>" DELIMITERS;
+
+!get!module (<extend>);
+!get!module (<brkfns>);
+
+DEFINE gtkn(wd) = {ldb(point(12,grammr[wd],11))};
+DEFINE gdef(wd) = {ldb(point(12,grammr[wd],23))};
+DEFINE ptkn(wd1,wd2) = {dpb(wd1,point(12,grammr[wd2],11))};
+DEFINE pdef(wd1,wd2) = {dpb(wd1,point(12,grammr[wd2],23))};
+DEFINE psucc(wd1,wd2) = {grammr[wd2]_(grammr[wd2] land '777777770000) lor wd1};
+
+LET R!P = RECORD!POINTER;  LET R!C = RECORD!CLASS;
+LET N!R = NULL!RECORD;
+
+EXTERNAL R!C pgraph			\ The parsing graph;
+   (INTEGER tkn,			\ token number;
+   type;				\ type of result, if any;
+   R!P (any!class) def,			\ definition of node;
+   succ,				\ successor node;
+   result);				\ result, if any;
+
+EXTERNAL R!P (pgraph) pgrhed;		\ beginning of pgraph;
+
+EXTERNAL R!C intres			\ storage for integer results;
+   (INTEGER intval);			\ the value;
+EXTERNAL R!C strres			\ storage for string results;
+   (INTEGER strval);			\ the value;
+
+EXTERNAL R!C tokent			\ The token entry list;
+   (INTEGER token,			\ the token value;
+   pos,					\ position in "cmdstr";
+   len;					\ length of token string;
+   R!P (tokent) next);			\ ptr. to next tokent record;
+
+EXTERNAL PROCEDURE init!graph;
+EXTERNAL BOOLEAN PROCEDURE pre!scan;
+EXTERNAL PROCEDURE prserr;
+EXTERNAL RECURSIVE R!P (any!class) PROCEDURE fndtok
+   (R!P (any!class) link;  INTEGER toknum);
+EXTERNAL R!P (any!class) PROCEDURE parse (INTEGER dict(1), msglst(0));
+EXTERNAL STRING cmdstr;
+
+\ TABGEN storage;
+
+R!C gram				\ structure for building the grammar;
+   (INTEGER tkn,			\ token entry;
+   def,					\ definition or subroutine entry;
+   fail;				\ fail or error message entry;
+   R!P (gram) next);			\ next entry in gramc;
+
+R!P (gram) grfrst,			\ ptr. to first gramc record;
+   grrule,				\ temporary pointer;
+   grlast;				\ ptr. to last gramc record;
+INTEGER grcnt;				\ count of gramc records;
+
+R!C deltok				\ delimiter token storage;
+   (STRING sym;				\ the character;
+   INTEGER tkn;				\ the corresponding token;
+   R!P (deltok) next);			\ next deltok record;
+
+R!P (deltok) defrst,			\ ptr. to first deltok record;
+   delast;				\ ptr. to last deltok record;
+INTEGER decnt;				\ count of deltok records;
+
+R!C nontrm				\ non-terminal symbol storage;
+   (STRING sym;				\ the symbol reference name;
+   INTEGER tkn;				\ the corresponding token value;
+   R!P (nontrm) next);			\ next nontrm record;
+
+R!P (nontrm) ntfrst,			\ ptr. to first nontrm record;
+   ntlast;				\ ptr. to last nontrm record;
+INTEGER ntcnt;				\ count of nontrm records;
+
+R!C term				\ terminal symbol storage;
+   (STRING sym;				\ the symbol reference name;
+   INTEGER tkn;				\ the corresponding token value;
+   R!P (term) next);			\ next term record ptr.;
+
+R!P (term) tfrst,			\ ptr. to first term record;
+   tlast;				\ ptr. to last term record;
+INTEGER tcnt;				\ count of term records;
+
+R!C errmsg				\ storage for error messages;
+   (STRING sym;				\ the error message text;
+   INTEGER tkn;
+   R!P (errmsg) next);			\ ptr. to next errmsg record;
+
+R!P (errmsg) erfrst,			\ ptr. to first errmsg record;
+   erlast;				\ ptr. to last errmsg record;
+INTEGER ercnt;				\ count of errmsg records;
+
+R!C spcsyn				\ special syntax routine storage;
+   (STRING sym;				\ the subroutine name;
+   INTEGER tkn;
+   R!P (spcsyn) next);			\ ptr. to next spcsyn record;
+
+R!P (spcsyn) spfrst,			\ ptr. to first spcsyn record;
+   splast;				\ ptr. to last spcsyn record;
+INTEGER spcnt;				\ count of spcsyn records;
+
+R!C keywrd				\ storage for keywords;
+   (STRING sym;				\ the keyword string;
+   INTEGER tkn;
+   R!P (keywrd) next);			\ ptr. to next keywrd record;
+
+R!P (keywrd) kyfrst,			\ ptr. to first keywrd record;
+   kylast;				\ ptr. to last keywrd record;
+INTEGER kycnt;				\ count of keywrd records;
+
+INTERNAL INTEGER gchan, geof, gbreak;
+INTEGER pchan, peof, pbreak, schan, seof, sbreak, tdchan, tdeof, tdbrk,
+   rdcnt, lineno, pageno, sosno, tval, ntval, subval, errval, token,
+   line!brk, var!brk;
+BOOLEAN opnsw;
+STRING tdfile,gfile, pfile, sfile, progline;
+R!P (any!class) lnklst, temprp, cmdptr;
+
+
+PROCEDURE xctcmd (R!P (any!class) link);
+	\ This routine executes the commands read from the grammar file,
+the rules of the grammar, and stores the information in tabular form in
+the record structures "gram", "deltok", "nontrm", "term", "errmsg",
+"spcsyn", and "keywrd".  These structures are read later by "bldtab" in
+order to produce the actual source code.;
+
+BEGIN "execute commands"
+   INTEGER temp,len,pos,curtok;
+   R!P (any!class) loc;
+   STRING symbol;
+
+DEFINE strlook(srcstr,clasnm,claspt) =
+   {BEGIN
+      temprp_claspt;  temp_0;
+      WHILE temprp neq n!r DO BEGIN "search loop"
+         IF equ(clasnm:sym[temprp],srcstr) THEN BEGIN
+	    temp_clasnm:tkn[temprp];  DONE "search loop"
+         END;
+         temprp_clasnm:next[temprp];
+      END "search loop";
+   END;};
+
+DEFINE new!sym(clsnam,rpfrst,rplast,clscnt,nwval) = 
+   {BEGIN
+      strlook(<symbol>,<clsnam>,<rpfrst>);
+      IF not temp THEN BEGIN
+         temp_(nwval_nwval+1);  temprp_new!record(clsnam);
+         clscnt_clscnt+1;  IF rpfrst = n!r THEN rpfrst_temprp
+         ELSE clsnam:next[rplast]_temprp;
+         rplast_temprp;  clsnam:sym[rplast]_symbol;
+         clsnam:tkn[rplast]_temp;
+      END;
+   END;};
+
+DEFINE ent!sym(clsnam,rpfrst,rplast,clscnt) = 
+   {BEGIN
+      temprp_new!record(clsnam);  clscnt_clscnt+1;
+      IF rpfrst = n!r THEN rpfrst_temprp
+      ELSE clsnam:next[rplast]_temprp;
+      rplast_temprp;  clsnam:sym[rplast]_symbol;
+      clsnam:tkn[rplast]_temp;
+   END;};
+
+PROCEDURE fndtrm;
+BEGIN
+   loc_fndtok(loc,token);
+   pos_tokent:pos[pgraph:def[loc]];
+   len_tokent:len[pgraph:def[loc]];
+   symbol_cmdstr[pos for len];
+END;
+
+PROCEDURE newgr;
+BEGIN
+   temprp_new!record(gram);  grcnt_grcnt+1;
+   IF grfrst=n!r THEN grfrst_temprp
+   ELSE gram:next[grlast]_temprp;
+   grlast_temprp;  gram:tkn[grlast]_temp;
+END;
+
+\ Body of subroutine "xctcmd" starts here;
+
+   loc_link;
+   CASE pgraph:tkn[loc] of BEGIN
+
+[!del!def]
+      BEGIN
+	 token_!identifier;  fndtrm;  grrule_n!r;  symbol_"!"&symbol;
+	 new!sym(<term>,<tfrst>,<tlast>,<tcnt>,<tval>);
+	 loc_fndtok(link,(token_!integer));
+	 IF loc=n!r THEN loc_fndtok(link,(token_!string));
+	 loc_pgraph:def[loc];  pos_tokent:pos[loc];
+	 len_tokent:len[loc];  symbol_cmdstr[pos for len];
+	 IF token=!string THEN symbol_(cvos(curtok_symbol));
+	 ent!sym(<deltok>,<defrst>,<delast>,<decnt>);
+      END;
+
+[!lhs!rule]
+      BEGIN
+	 grrule_n!r;  loc_link;  token_!identifier;  fndtrm;
+	 symbol_"!"&symbol;
+	 new!sym(<nontrm>,<ntfrst>,<ntlast>,<ntcnt>,ntval);
+	 newgr;	 
+	 IF lnklst neq n!r then gram:def[lnklst]_grcnt;
+	 temp_0;  IF (loc_fndtok(link,!sub!name)) THEN BEGIN
+	   token_!identifier;  fndtrm;
+	   new!sym(<spcsyn>,<spfrst>,<splast>,<spcnt>,<subval>);
+	 END;
+	 gram:def[grlast]_temp lor '4000;
+	 IF (loc_fndtok(link,!error!string)) THEN BEGIN
+	   token_!string;  fndtrm;
+	   new!sym(<errmsg>,<erfrst>,<erlast>,<ercnt>,<errval>);
+	   gram:fail[grlast]_temp;
+	 END;
+	 temp_'4000;  newgr;
+	 gram:fail[grlast]_grcnt+1;  lnklst_grlast;
+      END;
+
+[!rhs!rule]
+      BEGIN
+	 temprp_grrule;
+	 IF temprp neq n!r THEN
+	    WHILE gram:tkn[temprp] neq 0 DO BEGIN
+	       gram:fail[temprp]_grcnt+1;
+	       temprp_gram:next[temprp];
+	    END;
+	 grrule_n!r;  link_fndtok(link,!symbol);
+	 WHILE link neq n!r DO BEGIN
+	    curtok_pgraph:tkn[loc_pgraph:def[link]];
+	    IF curtok=!nt!symbol THEN BEGIN "non-terminal"
+	       token_!identifier;  fndtrm;  symbol_"!"&symbol;
+	       new!sym(<nontrm>,<ntfrst>,<ntlast>,<ntcnt>,<ntval>);
+	       newgr;  IF grrule=n!r THEN grrule_grlast;
+	    END "non-terminal"
+	    ELSE BEGIN "terminal"
+	       curtok_pgraph:tkn[loc_pgraph:def[loc]];
+	       IF curtok=!keyword THEN BEGIN "keyword"
+		  pos_tokent:pos[loc_pgraph:def[loc_pgraph:def[loc]]];
+		  len_tokent:len[loc];  symbol_"!"&cmdstr[pos for len];
+		  token_tval;
+		  new!sym(<term>,<tfrst>,<tlast>,<tcnt>,<tval>);
+		  IF token neq tval THEN BEGIN	     
+		     symbol_symbol[2 for len];
+		     ent!sym(<keywrd>,<kyfrst>,<kylast>,<kycnt>);
+		  END;
+		  newgr;  IF grrule=n!r THEN grrule_grlast;
+	       END "keyword"
+	       ELSE BEGIN "user-def-term"
+		  token_!identifier;  fndtrm;  symbol_"!"&symbol;
+		  new!sym(<term>,<tfrst>,<tlast>,<tcnt>,<tval>);
+		  newgr;  IF grrule=n!r THEN grrule_grlast;
+	       END "user-def-term";
+	    END "terminal";
+	    link_pgraph:succ[link];
+	    IF link neq n!r THEN link_fndtok(link,!symbol);
+	 END;
+	 gram:fail[grlast]_0;
+	 temprp_new!record(gram);  grcnt_grcnt+1;
+	 gram:next[grlast]_temprp;  grlast_temprp;
+      END
+   END;
+END "execute commands";
+
+
+BOOLEAN PROCEDURE sail!var (STRING vname);
+BEGIN
+   INTEGER brk;
+   scan(vname,var!brk,brk);
+   IF not brk THEN RETURN (true) ELSE RETURN (false);
+END;
+
+
+PROCEDURE bldtab;
+	\ This procedure builds the actual source files from the
+tabular form of thr's grammar.;
+BEGIN
+   INTEGER i,j;  BOOLEAN temp;
+   STRING strtmp;
+
+   DEFINE symdefs(clsnam,clscnt,clsfrst) =
+      {temprp_clsfrst;  temp_false;
+      WHILE temprp neq n!r DO BEGIN
+	 out(schan,(IF not temp THEN "DEFINE  " ELSE '11));
+	 FOR j_1 step 1 until 3 DO BEGIN
+	    WHILE temprp neq n!r DO
+	       IF sail!var(clsnam:sym[temprp]) THEN DONE
+	       ELSE temprp_clsnam:next[temprp];
+	    IF temprp neq n!r THEN BEGIN
+	       strtmp_clsnam:sym[temprp]&"='"&cvos(clsnam:tkn[temprp]);
+	       temprp_clsnam:next[temprp];
+	       IF temp THEN out(schan,",");  out(schan,strtmp);
+	       temp_true;
+	    END
+	 END;
+	 out(schan,crlf);
+      END;
+      out(schan,";"&crlf);};
+
+PROCEDURE bldgr;
+	\ This routine builds the source for the grammar array.;
+BEGIN
+   INTEGER ARRAY grammr[1:grcnt];
+   INTEGER ARRAY defloc[1:ntcnt];
+
+   temprp_grfrst;  i_1;
+   WHILE temprp neq n!r DO BEGIN
+      ptkn(<gram:tkn[temprp]>,<i>);
+      pdef(<gram:def[temprp]>,<i>);
+      psucc(<gram:fail[temprp]>,<i>);
+      IF gram:def[temprp] geq '4000 THEN defloc[gram:tkn[temprp]]_i;
+      temprp_gram:next[temprp];  i_i+1;
+   END;
+   temprp_grfrst;
+   FOR I_1 step 1 until grcnt DO
+      IF grammr[i] neq 0 THEN IF (j_gtkn(<i>)) < '4000 THEN
+	 IF gdef(<i>)=0 THEN pdef(<defloc[j]>,<i>);
+   out(pchan,"PRELOAD!WITH"&crlf);
+   setformat(-12,0);
+   FOR i_1 step 5 until grcnt DO BEGIN
+      FOR j_i step 1 until (i+4) DO BEGIN "grammar"
+	 IF j>grcnt THEN DONE "grammar";
+	 strtmp_"'"&cvos(grammr[j]);
+	 strtmp_strtmp&(IF j=grcnt THEN ";" ELSE ", ");
+	 out(pchan,strtmp);
+      END "grammar";
+      out(pchan,crlf);
+   END;
+   setformat(0,0);
+   out(pchan,"INTERNAL INTEGER ARRAY gramr[1:"&cvs(grcnt)&"];"&crlf);
+   RETURN;
+END;
+
+\ The body of the procedure "bldtab" begins here.;
+
+   line!brk_getbreak;  setbreak(line!brk,'12,null,"ian");
+   progline_input(tdchan,line!brk);
+   WHILE not equ(progline[1 for 12],"COMMENT <I1>") DO BEGIN
+      out(pchan,progline);  progline_input(tdchan,line!brk);
+   END;
+   out(pchan,crlf&crlf&"REQUIRE """&sfile&""" SOURCE!FILE;"&crlf);
+
+   out(schan,"COMMENT *** NON-TERMINAL SYMBOLS ***;"&crlf&crlf);
+   symdefs(<nontrm>,<ntcnt>,<ntfrst>);
+   out(schan,crlf&"COMMENT *** TERMINAL SYMBOLS ***;"&crlf&crlf);
+   symdefs(<term>,<tcnt>,<tfrst>);
+   out(schan,crlf&"DEFINE !grlow="&cvs(1)&", !grhgh="&cvs(grcnt)&";"&crlf);
+   release(schan);
+
+   out(pchan,crlf&crlf);
+   bldgr;
+
+   out(pchan,crlf&crlf&"COMMENT *** TOKEN TABLE ***;"&crlf);
+   out(pchan,crlf&"PRESET!WITH"&crlf);
+   temprp_defrst;
+   WHILE temprp neq n!r DO BEGIN
+      strtmp_'11&"'"&deltok:sym[temprp]&",'"&cvos(deltok:tkn[temprp]);
+      strtmp_strtmp&(IF deltok:next[temprp]=n!r THEN (";"&crlf)
+	 ELSE (","&crlf));
+      out(pchan,strtmp);
+      temprp_deltok:next[temprp];
+   END;
+   out(pchan,"INTEGER ARRAY deltok[1:"&cvs(decnt ash 1)&"];"&crlf);
+   out(pchan,crlf&crlf);
+
+   IF kycnt=0 THEN BEGIN
+      out(pchan,"PRESET!WITH null;"&crlf);
+      out(pchan,"STRING ARRAY keywrd[0:0];"&crlf&crlf);
+      out(pchan,"PRESET!WITH 0;"&crlf);
+      out(pchan,"INTEGER ARRAY keytok[0:0];"&crlf&crlf&crlf);
+   END
+   ELSE BEGIN
+      out(pchan,"PRESET!WITH"&crlf);
+      temprp_kyfrst;
+      FOR i_1 step 5 until kycnt DO BEGIN
+	 strtmp_'11;
+	 FOR j_i step 1 until (i+4) DO BEGIN
+	    strtmp_strtmp&""""&keywrd:sym[temprp]&""""&
+	       (IF j=kycnt THEN ";" ELSE ",");
+	    IF j=kycnt THEN DONE;
+	    temprp_keywrd:next[temprp];
+	 END;
+	 out(pchan,strtmp&crlf);
+      END;
+      out(pchan,"STRING ARRAY keywrd[1:"&cvs(kycnt)&"];"&crlf);
+      out(pchan,crlf&"PRESET!WITH"&crlf);
+      temprp_kyfrst;
+      FOR i_1 step 5 until kycnt DO BEGIN
+	 strtmp_'11;
+	 FOR j_i step 1 until (i+4) DO BEGIN
+	    strtmp_strtmp&"'"&cvos(keywrd:tkn[temprp])&
+	       (IF j=kycnt THEN ";" ELSE ",");
+	    IF j=kycnt THEN DONE;
+	    temprp_keywrd:next[temprp];
+	 END;
+	 out(pchan,strtmp&crlf);
+      END;
+      out(pchan,"INTEGER ARRAY keytok[1:"&cvs(kycnt)&"];"&crlf&crlf);
+   END;
+
+   out(pchan,crlf&"PRESET!WITH"&crlf);
+   temprp_erfrst;
+   out(pchan,'11&"null"&(IF ercnt=0 THEN ";" ELSE ",")&crlf);
+   FOR i_1 step 1 until ercnt DO BEGIN
+      strtmp_'11&""""&errmsg:sym[temprp]&""""&
+	 (IF i=ercnt THEN ";" ELSE ",")&crlf;
+      out(pchan,strtmp);
+      temprp_errmsg:next[temprp];
+   END;
+   strtmp_"OWN INTERNAL STRING ARRAY messgs[0:"&cvs(ercnt)&"];"&crlf;
+   out(pchan,strtmp);
+
+   out(pchan,crlf);  temprp_spfrst;
+   WHILE temprp neq n!r DO BEGIN
+      out(pchan,"EXTERNAL BOOLEAN PROCEDURE "&spcsyn:sym[temprp]&
+	 "(R!P (any!class) link);"&crlf);
+      temprp_spcsyn:next[temprp];
+   END;
+   out(pchan,crlf&crlf);
+   progline_input(tdchan,line!brk);
+   WHILE not equ(progline[1 for 12],"COMMENT <I2>") DO BEGIN
+      out(pchan,progline);  progline_input(tdchan,line!brk);
+   END;
+
+\  Put out the special syntax case statement;
+
+   temprp_spfrst;
+   out(pchan,"   CASE spcsub of BEGIN"&crlf);
+   out(pchan,"[0]"&"   RETURN (link)");
+   WHILE temprp neq n!r DO BEGIN
+      out(pchan,";"&crlf);
+      out(pchan,"["&cvs(spcsyn:tkn[temprp])&"]"&'11&"spcret_"&
+	 spcsyn:sym[temprp]&"(link)");
+      temprp_spcsyn:next[temprp];
+   END;
+   out(pchan,crlf&"   END;"&crlf);
+
+\ Put out remainder of parser file;
+
+   progline_input(tdchan,line!brk);
+   WHILE tdeof=0 DO BEGIN
+      out(pchan,progline);  progline_input(tdchan,line!brk);
+   END;
+   RETURN;
+END;
+
+RECURSIVE PROCEDURE grprnt (R!P (any!class) link;  INTEGER index(0));
+BEGIN
+   STRING tmpstr;  INTEGER i;
+   IF link neq n!r THEN BEGIN
+      tmpstr_null;
+      FOR i_1 step 1 UNTIL index DO tmpstr_tmpstr&" ";
+      print(tmpstr,cvos(pgraph:tkn[link]),crlf);
+      IF pgraph:tkn[link] < '4000 THEN grprnt(pgraph:def[link],index+3);
+      grprnt(pgraph:succ[link],index);
+   END;
+   RETURN;
+END;
+
+
+PROCEDURE tkprnt;
+BEGIN
+   EXTERNAL R!P (tokent) tokhed;
+   R!P (any!class) rp;
+   rp_tokhed;
+   WHILE rp neq n!r DO BEGIN
+      print(cvos(tokent:token[rp]),"    pos=",tokent:pos[rp],"  len=",
+	 tokent:len[rp],crlf);
+      rp_tokent:next[rp];
+   END;
+   RETURN;
+END;
+
+
+SIMPLE PROCEDURE inits;
+BEGIN
+   STRING alphas, digits;
+   alphas_"ABCDEFGHIJKLMNOPQRSTUVWXYZ";  digits_"1234567890";
+   grcnt_(decnt_(ntcnt_(tcnt_(ercnt_(spcnt_(kycnt_0))))));
+   ntval_(subval_(errval_0));  tval_'4000;
+   grfrst_(grrule_(grlast_n!r));
+   defrst_(delast_n!r);  ntfrst_(ntlast_n!r);
+   spfrst_(splast_n!r);  kyfrst_(kylast_n!r);
+   tfrst_(tlast_n!r);  erfrst_(erlast_n!r);
+   rdcnt_132;
+   line!brk_getbreak;  setbreak(line!brk,'12,null,"ian");
+   var!brk_getbreak;  setbreak(var!brk,alphas&digits&"!",null,"kx");
+   RETURN;
+END;
+
+
+BOOLEAN PROCEDURE opnfil (STRING prompt;  REFERENCE STRING filnam;
+   REFERENCE INTEGER chan,eof,break,count;  INTEGER inbufs,outbufs);
+BEGIN
+   IF prompt neq null THEN BEGIN
+      print(prompt);  filnam_inchwl;
+   END;
+   open((chan_getchan),"dsk",0,inbufs,outbufs,count,break,eof);
+   IF eof THEN BEGIN
+      print("Cannot init the disk.",crlf);
+      RETURN (false);
+   END;
+   IF outbufs THEN enter(chan,filnam,eof)
+   ELSE lookup(chan,filnam,eof);
+   IF eof THEN BEGIN
+      print("Cannot open file ",filnam,crlf);
+      RETURN (false);
+   END;
+   RETURN (true);
+END;
+
+
+\ **********************************************************************
+  *	Main program starts here                                       *
+  **********************************************************************
+;
+   REQUIRE inits INITIALIZATION;
+
+   opnsw_opnfil("Grammar definition file:  ",gfile,gchan,geof,gbreak,
+      rdcnt,2,0);
+   IF opnsw THEN opnfil("Parser file:  ",pfile,pchan,peof,pbreak,
+      rdcnt,0,2);
+   IF opnsw THEN opnfil("Symbol definition file:  ",sfile,schan,seof,
+      sbreak,rdcnt,0,2);
+   IF opnsw THEN opnfil(null,(tdfile_"tdpars.sai"),tdchan,tdeof,tdbrk,
+      rdcnt,2,0);
+   setpl(gchan,lineno,pageno,sosno);
+   WHILE not geof DO BEGIN
+      init!graph;  cmdstr_null;
+      IF not pre!scan THEN BEGIN
+	 IF not geof THEN BEGIN
+	    geof_true;  cmdptr_n!r;
+	    print("Last line read:  p.",cvstr(pageno)," l.",
+	       cvstr(lineno)," (",cvstr(sosno),")",crlf);
+	    print(cmdstr,#cr);
+	 END
+	 ELSE print("Pass 1 is complete.",crlf);
+      END
+      ELSE IF cmdstr=#lf THEN CONTINUE
+      ELSE IF not (cmdptr_parse) THEN BEGIN
+	 geof_true;  cmdptr_n!r;
+	 print("Can't parse line:  p.",cvstr(pageno)," l.",
+	      cvstr(lineno)," (",cvstr(sosno),")");
+	 prserr;
+      END
+      ELSE xctcmd(cmdptr);
+   END;
+   release (gchan);
+   IF cmdptr neq n!r then BEGIN
+      bldtab;  print("Pass 2 is complete",crlf);
+   END;
+   release (pchan);  release (schan);  release(tdchan);
+
+END "TABGEN";
+
+  Es?>
