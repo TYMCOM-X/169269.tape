@@ -1,0 +1,551 @@
+MODULE BJSM(STACK=OWN(STACK),DEBUG,DEBUGGER=EXTERNAL(SIX12))= BEGIN
+
+FORWARD PLAYER;
+OWN CARD[208];
+OWN NUMDECKS,VEGAS,PRINT,TOTCARDS,SRES,DNC,ENDCARD,NUMCARDS;
+OWN NUMCR,RN,RES,TOT,BET,HNM,SPLITFL,DBLFACTOR,DBLS,DBLH,ANS;
+OWN PTV,PHC,PUC,DTV,DHC,DUC,I,PHT,DHT,PNM,TOTCOUNT,SNUM,STOT[16],NUMH;
+OWN TWO3RDSTCARDS,FIVE8THSCARDS,ONE4THSCARDS;
+OWN EGSTAND,EGHIT,EGDOUB,IDNM,IPHT,IPTV,FREQ[23],CARDSLEFT;
+OWN OLDTOT,TRUECOUNT,BETS,PNC,IDTV,IDHT,IDHC;
+OWN COUNT,PLAYCOUNT,BETCOUNT,TENSLEFT,NONTENSLEFT,ACESSEEN,PRINTFREQ;
+OWN RANK[10];
+BIND SCALE=10000000;
+BIND CASC= PLIT('A','2','3','4','5','6','7','8','9','10','J','Q','K');
+BIND CVAL= PLIT(1,2,3,4,5,6,7,8,9,10,10,10,10);
+BIND POINTCOUNT=PLIT(-10,5,10,10,15,10,5,0,-5,-10,-10,-10,-10);
+
+BIND DEBUG=1;
+BIND S=1,
+     H=2,
+     P=4,
+     D=3;
+BIND ALL=-9999,
+     NEV=9999;
+
+BIND BETARRAY= PLIT(
+%LOSS OR PUSH%
+%OLDBET=>% % 1 %  % 2 %  % 3 %  % 4 %
+% COUNT %
+%  2    %    2,     2,     2,     2,
+%  3    %    2,     2,     3,     3,
+%  4    %    2,     2,     3,     4,
+%  WIN  %
+%OLDBET=>% % 1 %  % 2 %  % 3 %  % 4 %
+% COUNT %
+%  2    %    2,     2,     2,     2,
+%  3    %    2,     3,     3,     3,
+%  4    %    2,     4,     4,     4);
+
+BIND STANDHARD=PLIT(
+%       A     2     3     4     5     6     7     8     9     X    %
+%12%    NEV,  3,    2,    0,    -1,   -3,   NEV,  NEV,  NEV,  NEV,
+%13%    12,   -1,   -1,   -3,   -4,   -6,   NEV,  NEV,  NEV,  NEV,
+%14%    8,    -3,   -4,   -6,   -6,   -8,   12,   19,   15,   NEV,
+%15%    5,    -6,   -6,   -8,   -9,   -11,  11,   12,   7,    3,
+%16%    3,    -9,   -9,   -11,  -12,  -12,  9,    10,   4,    0,
+%17%    -4,   ALL,  ALL,  ALL,  ALL,  ALL,  ALL,  -17,  ALL,  ALL);
+
+
+BIND STANDSOFT=PLIT(
+%        A     2     3     4     5     6     7     8     9     X   %
+%18%    NEV,  -13,  -13,  -11,  -12,  -12,  -20,  -8,   NEV,  NEV);
+
+
+BIND SPLITPAIR=PLIT(
+%        A     2     3     4     5     6     7     8     9     X   %
+%A%     -4,   -10,  -10,  -11,  -11,  -12,  -7,   -7,   -7,   -7,
+%2%     NEV,  7,    4,    0,    -5,   -7,   ALL,  NEV,  NEV,  NEV,
+%3%     NEV,  8,    4,    -1,   ALL,  -18,  ALL,  NEV,  NEV,  NEV,
+%4%     NEV,  NEV,  15,   10,   9,    7,    NEV,  NEV,  NEV,  NEV,
+%5%     NEV,  NEV,  NEV,  NEV,  NEV,  NEV,  NEV,  NEV,  NEV,  NEV,
+%6%     NEV,  0,    -1,   -4,   -6,   -7,   NEV,  NEV,  NEV,  NEV,
+%7%     NEV,  -11,  -11,  -13,  -15,  -18,  ALL,  NEV,  NEV,  NEV,
+%8%     -4,   ALL,  ALL,  ALL,  ALL,  ALL,  ALL,  ALL,  ALL,  ALL,
+%9%     ALL,  -3,   -3,   -4,   -5,   -6,   6,    ALL,  ALL,  NEV,
+%X%     NEV,  11,   8,    6,    5,    4,    13,   20,   NEV,  NEV);
+
+
+BIND DOUBLEHARD=PLIT(
+%       A     2     3     4     5     6     7     8     9     X    %
+%10%    3,    -8,   -9,   -10,  -11,  -12,  -6,   -4,   -2,   4,
+%11%    0,    -10,  -10,  -11,  -12,  -13,  -6,   -5,   -4,   -4);
+
+MACHOP TTCALL =#51,
+       MUL =#224,
+       CALLI =#47;
+
+MACRO   INC= (REGISTER Q; TTCALL(4,Q);.Q)$,
+        INCW= (REGISTER Q; TTCALL(0,Q); .Q)$,
+        MSTIME= (REGISTER Q; CALLI(Q,#23);.Q)$,
+        OUTC(Z)= (REGISTER Q; Q := (Z); TTCALL(1,Q))$,
+        OUTSA(Z)=IF NOT DEBUG THEN .VREG ELSE (IF .PRINT THEN TTCALL(3,Z))$,
+        OUTCARD(Z)=(OUTSA(CASC[.Z]); IF .Z GTR 9 THEN Z := 9)$,
+        OUTS(Z)= OUTSA(PLIT ASCIZ Z)$,
+        OUTP(Z)= TTCALL(3,PLIT ASCIZ Z)$,
+        CRLFP = TTCALL(3,PLIT ASCIZ '?M?J?0?0')$,
+        OUTSR(Z)= (OUTS(Z);CRLF)$,
+        OUTM(C,N)= DECR I FROM (N)-1 TO 0 DO OUTC(C)$,
+        CR= OUTC(#15)$, LF= OUTC(#12)$, NULL= OUTC(0)$,
+        CRLF= OUTS('?M?J?0?0')$,
+        TAB= OUTC(#11)$;
+
+MACRO OUTRES(W,L)=IF NOT DEBUG THEN .VREG ELSE (IF .DTV NEQ 0 AND .PRINT
+                        THEN ( OUTD(W); OUTS('-');
+                               OUTD(L); CRLF)
+                        ELSE CRLF)$;
+
+ROUTINE OUTN(NUM,BASE,REQD)=
+    BEGIN OWN N,B,RD,T;
+        ROUTINE XN=
+            BEGIN LOCAL R;
+                IF .N EQL 0 THEN RETURN OUTM("0",.RD-.T);
+                R := .N MOD .B; N := .N/.B; T := .T+1; XN();
+                OUTC(.R+"0")
+            END;
+
+        IF .NUM LSS 0 THEN OUTC("-");
+        B := .BASE; RD := .REQD; T := 0; N := ABS(.NUM); XN()
+     END;
+
+MACRO   OUTD(Z)= OUTN(Z,10,1)$,
+        BOUTD(Z)=IF NOT DEBUG THEN .VREG ELSE (IF .PRINT THEN OUTD(Z))$,
+        OUTO(Z)= OUTN(Z,8,1)$,
+        OUTDR(Z,N)= OUTN(Z,10,N)$,
+        OUTOR(Z,N)= OUTN(Z,8,N)$;
+
+MACRO BETSIZE(WIN,B,C)=
+   .BETARRAY[B+4*(C-2)+12*(WIN)-1]$;
+
+MACRO INSUR=
+BEGIN
+        NONTENSLEFT := .NONTENSLEFT+.RANK[0];
+        INCR I FROM 1 TO 8
+          DO NONTENSLEFT := .NONTENSLEFT+.RANK[.I];
+        IF DEBUG THEN
+        INCR I FROM 0 TO 9
+          DO (BOUTD(.RANK[.I]); OUTS(' '));
+        IF .NONTENSLEFT/.RANK[9] LSS 2 THEN "Y" ELSE "N"
+END$;
+
+MACRO HITSTAND=
+BEGIN LABEL HITST;
+HITST:
+   BEGIN
+        INCR I FROM 17 TO 22
+          DO FREQ[.I] := 0;
+        DEALERPROB(.DUC+1,IF .DUC EQL 0 THEN 11 ELSE .DUC+1,SCALE,1);
+        ANS := 0;
+        INCR I FROM 17 TO 22
+          DO (BOUTD(.FREQ[.I]); OUTS(' '); ANS := .ANS+.FREQ[.I]);
+        BOUTD(.ANS); CRLF;
+        IF .PNM EQL 2
+          THEN IF .UC EQL .HC
+            THEN IF .PLAYCOUNT GEQ .SPLITPAIR[.UC*10+.DUC]
+              THEN LEAVE HITST WITH P
+              ELSE .VREG
+            ELSE IF .PHT EQL .PTV
+              THEN IF .PHT GEQ .DBLEHARD
+                THEN IF .PHT LEQ 11
+                  THEN IF .PLAYCOUNT GEQ .DOUBLEHARD[(.PHT-10)*10+.DUC]
+                    THEN LEAVE HITST WITH D;
+
+        IF .PHT EQL .PTV
+          THEN IF .PHT LEQ 11
+            THEN LEAVE HITST WITH H
+            ELSE IF .PHT GEQ 18
+              THEN LEAVE HITST WITH S
+              ELSE IF .PLAYCOUNT GEQ .STANDHARD[(.PHT-12)*10+.DUC]
+                THEN LEAVE HITST WITH S
+                ELSE LEAVE HITST WITH H
+          ELSE IF .PTV LEQ 17
+            THEN LEAVE HITST WITH H
+            ELSE IF .PTV GEQ 19
+              THEN LEAVE HITST WITH S
+              ELSE IF .PLAYCOUNT GEQ .STANDSOFT[.DUC]
+                THEN LEAVE HITST WITH S
+                ELSE LEAVE HITST WITH H
+   END
+END$;
+
+ROUTINE COUNTCARD(CRD)=
+BEGIN
+        COUNT := .COUNT+.POINTCOUNT[.CRD];
+        IF .CRD EQL 0
+          THEN ACESSEEN := .ACESSEEN + 1;
+        BETCOUNT := .COUNT*.NUMCARDS/(.NUMCARDS-.NUMCR);
+        PLAYCOUNT := ((.COUNT+(10*.ACESSEEN-(40*.NUMCR/.NUMCARDS)))*
+                        .NUMCARDS/(.NUMCARDS-.NUMCR))/10;
+        IF .CRD GEQ 9
+          THEN RANK[9] := .RANK[9]-1
+          ELSE RANK[.CRD] := .RANK[.CRD]-1;
+        .CARD[.NUMCR]
+END;
+
+ROUTINE INNUM=
+BEGIN OWN NUM,D,FIR;
+        NUM := 0;
+        D := INC;
+        IF .D GEQ "0" AND .D LEQ "9" THEN FIR := .D-"0";
+        WHILE .NUM EQL 0 DO
+        BEGIN
+                NUM := .FIR;
+                WHILE (D := INC) NEQ #15 DO
+                IF .D GEQ "0" AND .D LEQ "9" THEN
+                NUM := .NUM*10+(.D-"0");
+                INC;
+                IF .NUM GTR 0 THEN RETURN .NUM;
+                OUTS('WHAT??');
+        END
+END;
+
+MACRO RANDOM(N)=
+BEGIN REGISTER AC[2];
+        AC := RN := (.RN^23+.RN^14+.RN^2+.RN+1) AND (1^35-1);
+        MUL(AC,N<0,0>)
+END$;
+
+ROUTINE RAND(N)= RANDOM(N);
+
+MACRO SHUFFLEPOINT=((.NUMCARDS*4)/5-10)$;
+
+ROUTINE SHUFFLE(N)=
+BEGIN REGISTER K,T;
+        MACHOP EXCH=#250;
+        COUNT := BETCOUNT := ACESSEEN := 0;
+        INCR J FROM 0 TO 8
+          DO RANK[.J] := 4;
+        RANK[9] := 16;
+        DECR J FROM .N TO 0
+           DO
+              BEGIN
+              K := RANDOM(NUMCARDS);
+              T := .CARD[.K];
+              EXCH(T,CARD[.J]);
+              CARD[.K] := .T
+              END;
+        NUMCR := 0;
+        ENDCARD := SHUFFLEPOINT;
+        OUTS('Cards are shuffled.  ');CRLF
+END;
+
+ROUTINE TWO3RDSHUFFLE=
+BEGIN REGISTER K,T;
+        MACHOP EXCH=#250;
+        DECR J FROM .TOTCARDS TO 0
+           DO
+              BEGIN
+              K := RANDOM(NUMCARDS);
+              T := .CARD[.K];
+              EXCH(T,CARD[.J]);
+              CARD[.K] := .T
+              END;
+        NUMCR := 0;
+        COUNT := BETCOUNT := PLAYCOUNT := ACESSEEN := 0;
+        INCR J FROM 0 TO 8
+          DO RANK[.J] := 4;
+        RANK[9] := 16;
+        OUTS('Cards are shuffled.  ');CRLF
+END;
+
+MACRO NEXTC=
+   BEGIN
+   IF .NUMCR LSS .TOTCARDS THEN NUMCR := .NUMCR+1 ELSE SHUFFLE(.HNM);
+   .CARD[.NUMCR]
+   END$;
+
+MACRO NEXTCR=
+   COUNTCARD(NEXTC)$;
+
+MACRO INITDL=
+BEGIN
+        OUTS('DEALERS UP CARD:  ');
+        DUC := NEXTCR; OUTCARD(DUC);CRLF;
+        OUTS('YOUR CARDS:  '); PHC := NEXTCR; OUTCARD(PHC); OUTS('  ');
+        DHC := NEXTC;
+        PUC := NEXTCR; OUTCARD(PUC); OUTS('  ');
+        PTV := .CVAL[.PHC]+.CVAL[.PUC];
+        DTV := .CVAL[.DHC]+.CVAL[.DUC];
+        PHT := .PTV; IF .PHC EQL 0 OR .PUC EQL 0 THEN PTV := .PTV+10;
+        DHT := .DTV; IF .DHC EQL 0 OR .DUC EQL 0 THEN DTV := .DTV+10;
+        RES := SNUM := 0;
+        IF .DUC EQL 0
+           THEN
+              BEGIN
+              OUTS('INS??');
+              ANS := INSUR;IF DEBUG THEN IF .PRINT THEN OUTC(.ANS); OUTS('  ');
+              IF .ANS EQL "Y"
+                 TOT := .TOT+.BETA*(IF .DTV EQL 21 THEN 100 ELSE -50)
+              END;
+END$;
+
+ROUTINE DEALERPROB(DHT,DTV,WEIGHT,IDNM)=
+BEGIN LABEL PROB;
+      LOCAL CARDSLEFT;
+        CARDSLEFT := .NUMCARDS-.NUMCR-.IDNM+2;
+        IF .IDNM EQL 1
+          THEN IF .DHT EQL 1
+            THEN CARDSLEFT := .CARDSLEFT-.RANK[9]
+            ELSE IF .DHT EQL 10
+              THEN CARDSLEFT := .CARDSLEFT-.RANK[0];
+        INCR I FROM 0 TO 9
+          DO
+PROB:
+            BEGIN
+            IF .RANK[.I] EQL 0
+              THEN LEAVE PROB;
+            IF .IDNM EQL 1
+              THEN IF .DHT EQL 1
+                THEN IF .I EQL 9
+                  THEN LEAVE PROB  % NO NATURALS %
+                  ELSE .VREG
+                ELSE IF .I EQL 0
+                  THEN IF .DHT EQL 10
+                    THEN LEAVE PROB;  % NO NATURALS %
+
+            IDHT := .DHT+.I+1;
+            IDTV := .DTV+.I+1;
+            IF .I EQL 0
+              THEN IDTV := .IDTV+10;
+            IF .IDTV GTR 21
+              THEN IDTV := .IDHT;
+
+            IF .IDTV GEQ 22
+              THEN FREQ[22] := .RANK[.I]*.WEIGHT/.CARDSLEFT+.FREQ[22]
+              ELSE IF .IDTV LEQ 21 AND (.IDTV GEQ 18 OR .IDHT GEQ 17)
+                THEN FREQ[.IDTV] := .RANK[.I]*.WEIGHT/.CARDSLEFT
+                                  +.FREQ[.IDTV]
+                ELSE     % TAKE A CARD %
+                  BEGIN
+                  RANK[.I] := .RANK[.I]-1;
+                  DEALERPROB(.IDHT,.IDTV,(.RANK[.I]+1)*.WEIGHT/.CARDSLEFT,.IDNM+1);
+                  RANK[.I] := .RANK[.I]+1
+                  END
+            END
+END;
+
+ROUTINE PLAY(CRD)=
+BEGIN OWN PNC;
+                PNM := 2;
+                PNC := NEXTCR; OUTCARD(PNC); OUTS('  ');
+                PTV := .CVAL[.PNC]+.CVAL[.CRD];
+                PHT := .PTV; IF .PNC EQL 0 OR .CRD EQL 0 THEN PTV := .PTV+10;
+                IF .CRD NEQ 0 THEN PLAYER(0,12,.CRD,.PNC) ELSE CRLF;
+                IF .PTV GTR 21 THEN (OUTSR('YOU BUST');PTV := 0;);
+END;
+
+ROUTINE SPLIT=
+BEGIN
+      LOCAL SAVESNUM;
+        CRLF;
+        BOUTD(.SNUM+1); OUTS(': ');OUTCARD(PHC);OUTS('  ');
+        SAVESNUM := .SNUM;
+        PLAY(.PHC);
+        IF .SNUM EQL .SAVESNUM
+           THEN STOT[.SNUM] := .PTV;
+        SNUM := .SNUM+1; BOUTD(.SNUM+1); OUTS(': '); OUTCARD(PHC);OUTS('  ');
+        SAVESNUM := .SNUM; PLAY(.PUC);
+        IF .SNUM EQL .SAVESNUM
+           THEN STOT[.SNUM] := .PTV;
+END;
+
+ROUTINE PLAYER(DBLESOFT,DBLEHARD,HC,UC)=
+BEGIN OWN PNC,ANS;
+        PNM := 2;
+        WHILE .PTV LEQ 21 DO
+          BEGIN
+             CASE HITSTAND OF
+                SET
+%0%             0;
+%STAND%         BEGIN CRLF; RETURN END;
+%HIT%           BEGIN
+                  PNC := NEXTCR; OUTCARD(PNC); OUTS('  ');
+                  PTV := .PTV+.CVAL[.PNC];
+                  PNM := .PNM+1;PHT := .PHT+.CVAL[.PNC];
+                  IF .PNC EQL 0 AND .PTV LEQ 11 THEN PTV := .PTV+10;
+                  IF .PTV GTR 21 THEN PTV := .PHT;
+                END;
+%DOUBLE%        BEGIN
+                   OUTS(' DOUBLE ');
+                   DBLFACTOR := .DBLFACTOR+1; PNC := NEXTCR;PNM := 3;
+                   OUTCARD(PNC);PTV := .PTV+.CVAL[.PNC];
+                   PHT := .PHT+.CVAL[.PNC];
+                   CRLF;
+                   IF .PNC EQL 0 AND .PTV LEQ 11 THEN
+                   PTV := .PTV+10;
+                   IF .PTV GTR 21 THEN PTV := .PHT;
+                   RETURN
+                END;
+%SPLIT%         (SPLIT(); CRLF; RETURN)
+                TES;
+          END;
+        CRLF;
+        RETURN
+END;
+
+MACRO DEALER=
+BEGIN
+        OUTS('DEALERS CARDS: ');OUTCARD(DUC);OUTS('  ');
+        OUTCARD(DHC);OUTS('  ');
+        WHILE .DTV LSS (IF .VEGAS THEN 17 ELSE 18) AND .DHT LSS 17 DO
+        BEGIN
+                DNC := NEXTCR; OUTCARD(DNC); OUTS('  ');
+                DTV := .DTV+.CVAL[.DNC];
+                DHT := .DHT+.CVAL[.DNC];
+                IF .DNC EQL 0 AND .DTV LEQ 11 THEN DTV := .DTV+10;
+                IF .DTV GTR 21 THEN DTV := .DHT;
+        END;
+        CRLF;
+END$;
+
+ROUTINE HAND(BETA)=
+BEGIN
+   LABEL LOOP;
+        IF DEBUG
+          THEN
+            BEGIN
+            CRLF
+            END;
+        DBLFACTOR := 1;
+        HNM := .NUMCR;
+        INITDL;
+        IF .DTV EQL 21 THEN IF .PTV EQL 21 THEN
+        BEGIN
+         CRLF;  OUTS('DOUBLE BLACKJACK!!  THIS IS A PUSH.');CRLF;RES := 0
+        END
+        ELSE BEGIN
+         CRLF;OUTS('DEALER HAS BLACKJACK. HOLE CARD:  ');
+                OUTCARD(DHC);CRLF;RES := -100;
+        END
+      ELSE BEGIN
+        PLAYER(.DBLS,.DBLH,.PHC,.PUC);
+       IF .SNUM EQL 0 THEN BEGIN
+        IF .PTV EQL 21 AND .PNM EQL 2 THEN
+        BEGIN
+                OUTS('YOU HAVE BLACKJACK.  THE DEALERS HOLE CARD IS:  ');
+                OUTCARD(DHC);CRLF;RES := 150;
+        END
+        ELSE
+        IF .PTV LEQ 21 THEN
+        BEGIN
+                DEALER;
+                IF .DTV LEQ 21
+                  THEN
+                    BEGIN
+                    RES := SIGN(.PTV-.DTV)*100;
+                    IF DEBUG THEN
+                      SELECT SIGN(.DTV-.PTV) OF
+                        NSET
+                        1:BEGIN
+                                OUTS('DEALER WINS  ');
+                                OUTRES(.DTV,.PTV);
+                        END;
+                        0:BEGIN
+                                OUTS('THE HAND IS A PUSH  ');
+                                OUTRES(.DTV,.PTV);
+                        END;
+                        -1:BEGIN
+                                OUTS('YOU WIN  ');
+                                OUTRES(.PTV,.DTV);
+                        END;
+                        TESN
+                    END
+                ELSE
+                BEGIN
+                        OUTS('DEALER BUSTS. YOU WIN.');CRLF;RES := 100
+                END
+        END
+        ELSE
+        BEGIN
+                OUTS('YOU BUST. DEALERS HOLE CARD IS:  ');
+                OUTCARD(DHC); CRLF;RES := -100
+        END
+       END
+      ELSE   %  SPLIT  %
+       BEGIN  % RESULT %
+LOOP:
+        INCR I FROM 0 TO .SNUM
+           DO IF .STOT[.I] NEQ 0
+              THEN
+                 BEGIN
+                 DEALER;
+                 IF .DTV GTR 21 THEN OUTSR('DEALER BUSTS.');
+                 LEAVE LOOP
+                 END;
+       IF .DTV GTR 21 THEN DTV := 0;
+       INCR I FROM 0 TO .SNUM
+          DO IF .STOT[.I] EQL 0
+             THEN RES := .RES - 1
+             ELSE (BOUTD(.I+1); RES := .RES-(SRES := SIGN(.DTV-.STOT[.I]));
+             IF DEBUG THEN
+               SELECT .SRES OF
+                   NSET
+
+        -1:     (OUTS(': IS A WIN  '); OUTRES(.STOT[.I],.DTV));
+
+         0:     (OUTS(': IS A PUSH  '); OUTRES(.DTV,.DTV));
+
+         1:     (OUTS(': IS A LOSS  '); OUTRES(.DTV,.STOT[.I]));
+                   TESN);
+        RES := .RES*100
+        END
+      END;
+COUNTCARD(.DHC);
+TOT := .TOT+.RES*.BETA*.DBLFACTOR;
+IF .NUMCR GTR .ENDCARD THEN TWO3RDSHUFFLE();
+END;
+
+ROUTINE PRTOT=
+BEGIN
+        OUTP('YOUR TOTAL '); IF .TOT LSS 0 THEN OUTP('LOSS IS ')
+        ELSE OUTP('WINNINGS ARE '); OUTD(ABS(.TOT/100));OUTC(".");
+        OUTD(ABS(.TOT MOD 100)); CRLFP
+END;
+
+ROUTINE GAME=
+BEGIN
+        OUTP('Reno or Las Vegas (R/L)?? ');
+        UNTIL (ANS := INC) EQL "L" OR .ANS EQL "R"
+          DO (INC; INC; OUTP('WHAT??'));
+        INC; INC;
+        DBLS := FALSE; DBLH := 10;
+        IF .ANS EQL "L"
+           THEN (DBLS := TRUE; DBLH := 3; VEGAS := TRUE);
+        OUTP('Number of decks(1-4): ');
+        UNTIL (ANS := INC) GEQ "1" AND .ANS LEQ "4"
+          DO (INC; INC; OUTP('WHAT??'));
+        INC; INC; NUMDECKS := .ANS-"0"; TOTCARDS := .NUMDECKS*52-1;
+        TWO3RDSTCARDS := 2*.TOTCARDS/3;
+        FIVE8THSCARDS := 5*.TOTCARDS/8;
+        ONE4THSCARDS := .TOTCARDS/4;
+        NUMCARDS := .TOTCARDS+1;
+        DECR I FROM .TOTCARDS TO 0 DO CARD[.I] := .I MOD 13;
+        OUTP('Number of hands to play: ');
+        NUMH := INNUM();
+        OUTP('Frequency of results: ');
+        PRINTFREQ := INNUM();
+        OUTP('Starting number: ');
+        RN := INNUM();
+        IF DEBUG THEN
+        (OUTP('PRINT?? ');
+        IF INC EQL "N" THEN PRINT := FALSE ELSE PRINT := TRUE; INC; INC);
+        SHUFFLE(.TOTCARDS);
+        DECR I FROM .NUMH-1 TO 0
+           DO
+              BEGIN
+              IF .I MOD .PRINTFREQ EQL 0
+                THEN (OUTD(.NUMH-.I); OUTP(' '); OUTD(.TOT/100); OUTP('?M?J'));
+              BOUTD(.PLAYCOUNT); OUTS('  '); BOUTD(.BETCOUNT);
+              OUTS(' '); BOUTD(.COUNT); OUTS(' '); BOUTD(.ACESSEEN);
+              OUTS(' '); BOUTD(.NUMCR); CRLF;
+              BOUTD(.TOT); CRLF;
+              HAND(IF .BETCOUNT GEQ 10 THEN 2 ELSE 1)
+              END;
+        PRTOT();
+        RETURN
+END;
+
+        TOT := 0;
+        GAME();
+END ELUDOM
+    ABBCÎ
