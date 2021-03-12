@@ -1,0 +1,33 @@
+schema HOT
+begin
+
+    fields
+	RES.ID	as "4C",	% resource id %
+	RES.NAME as "20C",	% resource name %
+	HOME	as "12C",	% their home phone %
+	OFFICE	as "12C",	% their office phone %
+	PAGER	as "12C",	% their pager number %
+	POS	as "N",		% their relative position in the list %
+	JOUR	as date "ZM/ZD/YY",
+	DEJOUR	as "C"		% call list of the day %
+	
+    relation SCHEDULE is
+	key	JOUR
+	data	DEJOUR
+	
+    relation BODY is
+	key	RES.ID
+	data	RES.NAME,
+		OFFICE,
+		HOME,
+		PAGER
+
+    relation WIZARD is
+	key	POS
+	data	RES.ID
+
+    relation CONSULTANT is
+	key	POS
+	data	RES.ID
+
+end
