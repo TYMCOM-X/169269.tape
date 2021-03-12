@@ -1,0 +1,78 @@
+begin
+ require "settrm.sai" source!file;
+
+ simple integer procedure Number!Jobs;
+  Return( Gettab('15,'11) -1 );
+
+simple integer procedure HGH!FRM!NUM;
+ Return( Gettab ('20,'12) );
+
+simple integer procedure PER!IDLE;
+ Return( (Gettab('34,'12)/Gettab('15,'12)) * 100 );
+
+simple integer procedure PER!IDLE!MIN;
+ Return( (Gettab('35,'12)/Gettab('27,'11)) * 100);
+
+simple integer procedure Num!Users;
+  begin "num!jobs"
+  integer Num!Jobs!logged!in;
+   integer jj;
+   Num!Jobs!Logged!In _ 0;
+   for jj _ 1 step 1 until HGH!FRM!NUM do
+    if gettab(jj,0) land bit(15) then
+     Num!Jobs!Logged!In _ Num!Jobs!Logged!in + 1;
+   return(Num!Jobs!logged!in);
+  end "num!jobs";
+
+
+
+
+simple procedure systat;
+begin "sy"
+  own integer j;
+ for j _ 1 step 1 until Number!Jobs do
+   if gettab(j,0) land bit(15) then
+    print ( cvs(j), " ", queue(j), " ", cv6str(gettab(j,3)),
+    " ", cv6str( gettab(j,-'22)) & cv6str(gettab(j,-'21)), nl);
+end "sy";
+
+
+
+ simple string procedure Up!Time;
+  begin "uptime"
+   Integer Up!Hours, Up!Minutes, Up!Seconds, Upsecs;
+   string HMS;
+
+   Upsecs _ gettab('15, '12)/gettab('26, '11);
+   Up!Hours _ Upsecs/3600;
+   Up!Minutes _ (Upsecs - Up!Hours*3600)/60;
+   Up!Seconds _ (Upsecs - Up!Hours*3600 - Up!Minutes*60);
+  HMS _ CVS(Up!hours);
+  SETFORMAT(-2,0);
+  HMS _ HMS & ":" & cvs(Up!minutes) & ":" & cvs(Up!seconds);
+  SETFORMAT(0,0);
+  return(HMS);
+  end "uptime";
+
+
+ Stall;
+ Backspace;
+ Erase;
+ Lc;
+ Form;
+ Width(80);
+
+ IF TIC = TIC!AUX THEN EXIT;
+
+ print(nl, Hardware, " running ", Software, " with ", Num!users, "/", 
+     Number!Jobs, " jobs", nl,nl, "Up Time: ", Up!Time, " Idle: ", Per!Idle,
+      "% Idle/Min: ", Per!Idle!Min, "%", nl,nl,
+     "Cpu: ", Load!Average, "%    Network response: ", Response!Time, " ms",
+   nl,nl,
+   "Terminal: Stall, Erase, Backspace, Width(80), Form, Lc", nl,nl);
+
+
+ systat;
+
+ exit;
+end;
