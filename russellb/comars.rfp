@@ -1,0 +1,56 @@
+
+ Larry, Don and Jack:
+
+  I have reviewed your Comars II proposals to the OTCs.  The following
+are my comments:
+
+  . Section II B Phase I - Trial
+     In the third paragraph you mention, the trial will be run in an on-
+     line environment on Tymshare's Dec 2020.  We do not have a Tymshare 
+     System XX available for any trials.  The only 20 available is the one
+     we use for demos and check out of released code.  This system is also
+     used by the Tymcare project for check out and testing.  You can res-
+     erve the system for demos of a week or less in length. Please keep in
+     that the system does not have any operations staff.  You therefore can
+     not deliver what you stated in this paragraph.
+
+  . Section II D Phase III - Migration etc
+     In the last paragraph you mention that you will be integrating Repair
+     Force Administration and Special Services IFM on the installed System
+     XX's.  Since it looks like that Comars II consumes a XX, I do not think
+     that it is wise to promise this capability until it has been tested
+     and implemented it on the Tymcom X service first.
+ 
+  Section III  B. Phase II - Production Environment
+   There seems to be a miss understanding as to the number of modems required
+   for each site.  Modems have to be provided for both the terminals and the
+   communications processor.  The modems for the communications processor
+   must have auto answer capiblity.  The Tymshare 912 can be strapped for
+   capability.  I therefore think that in each of your bids, you are off
+   by a factor of 2 for the total number of modems required.
+
+ Appendix B 
+  II System operations features section B
+  Data can be transmitted from a Tymshare System XX to a Tymcom X by the
+  use of the Telecopy program.  There is no need for a DCS system.
+
+  III Maintenance
+   Dec does not maintain the Tymshare System XX out of the same sites as it
+   does the 11/23's.  Therefore most of your maintenance sites listed are in-
+   correct.  I will furnish you a complete list of maintenance sites by Wed-
+   nesday.  Also the maintenance coverage is 8 to 5 Monday thru Friday with
+   no call response minimum.  Additional maintenance coverage can be purchased
+   as an additional percentage of the monthly maintenance.  You and I 
+   discussed this over the phone the other day.
+
+
+  I've noticed that you have proposed that consolidations be done on a
+Tymcom X.  I think that this is a great idea.  There however is a problem
+with the pricing we did for you.  I did not price the systems as network 
+systems.  The price I quoted you is therefore low by a few hundred dollars
+per month.  Also there would be a connect charge of $5.50/hr for connect
+over 50 hours per month.  I will reprice the XXs in the morning for you.
+
+ I will call in the morning so we can discuss the above.
+
+ Ben Russell
