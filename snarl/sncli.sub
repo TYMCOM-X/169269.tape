@@ -1,0 +1,326 @@
+.Skip 2;
+.ByHand;
+INTERNAL R!P (any!class) PROCEDURE chksym (INTEGER toknum);
+.EndHand;
+	This procedure is called by "parse" and is a link to
+"check!sym" which resides within "snpars".  It causes the symbol matcher
+to match a keyword in the input string with an identifier in the grammar.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE cmdstk;
+.EndHand;
+	This procedure initializes the command stack and makes the
+user's console the top level entry in the stack.
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE unstak;
+.EndHand;
+	This routine pops the command file stack, setting up to
+continue processing with the previous command file.
+.Skip 2;
+.ByHand;
+INTERNAL SIMPLE PROCEDURE bailout;
+.EndHand;
+	This routine bails out of all opened command files and closes
+outstanding TTY input.
+.Skip 2;
+.ByHand;
+SIMPLE PROCEDURE free!lin;
+.EndHand;
+	This routine clears the "linptr" list.
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE stack (STRING filnam;  BOOLEAN rep!err);
+.EndHand;
+	This routine opens a new command file, saves the information
+on the stack, and makes the appropriate success or failure return.  The
+"filnam" parameter is a file name string for a SAIL lookup call.  The
+"rep!err" parameter indicates whether or not "stack" should print any
+error messages to the logging device(s).
+.Skip 2;
+.ByHand;
+SIMPLE INTERNAL INTEGER PROCEDURE c!chan;
+.EndHand;
+	This procedure returns the channel number of the current
+command file.
+.Skip 2;
+.ByHand;
+INTERNAL SIMPLE PROCEDURE brkset;
+.EndHand;
+	This procedure initializes the break tables needed by the
+"pre!scan" and "strsav" routines.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE pre!scan (BOOLEAN tty(false), cmd!ok(true),
+  rep!err(true));
+.EndHand;
+	This procedure reads and tokenizes a user command, producing
+the structure "tokent" which is later checked by the symbol matching
+routine "chksym".  A return of "true" indicates the success of the
+pre!scan.
+	If "tty" is true, the input will be read from the console, and
+command file references are illegal.  Otherwise, input will be read
+from the current command file (which may be the TTY).
+	If "cmd!ok" is true, then a command file reference is legal.  If
+"tty" is true, then "cmd!ok" is made false by "pre!scan".
+	If "rep!err" is true, then "pre!scan" will report errors to the
+current log device(s).
+	"Pre!scan" identifies the following user-defined terminals:
+An {identifier} is a combination of alphabetic and numeric characters
+which is terminated by a delimiter other than "#" or "*" and begins
+with an alphabetic character.  A {usrnam} is a Tymcom-X username
+enclosed in parentheses.  An {integer} is a delimited set of numeric
+characters.  A {filpc} is a delimited set of characters which is legal
+for a file name or extension.  It may contain alphanumerics.  A {wldpc}
+is a delimited set of characters which is legal for a wild-card file
+name or extension.  It may contain alphanumerics or "#" or "*".  {Text}
+is a set of characters comprising the comment portion of the COMMENT
+command, which must be handled specially by the "pre!scan".
+	When reporting an error in a multi-line command, only the
+applicable line will be displayed.
+
+.Skip 2;
+.ByHand;
+PROCEDURE scnerr (STRING errmsg);
+.EndHand;
+.Skip 2;
+.ByHand;
+STRING PROCEDURE cmdin (INTEGER brtab);
+.EndHand;
+.Skip 2;
+.ByHand;
+PROCEDURE make!stlist (R!P (pgraph) link);
+.EndHand;
+	This procedure constructs the store list record structure
+from the pgraph tree structure.
+.Skip 2;
+.ByHand;
+PROCEDURE make!relist (R!P (pgraph) link);
+.EndHand;
+	This procedure constructs the "retrieve" list record
+structure from the pgraph tree structure.
+.Skip 2;
+.ByHand;
+PROCEDURE make!ganlist (R!P (pgraph) link);
+.EndHand;
+	This procedure constructs the "ganlst" record structure (a
+list of GAN number ranges) from the pgraph tree structure
+.Skip 2;
+.ByHand;
+PROCEDURE make!poslist (R!P (pgraph) link);
+.EndHand;
+	This procedure constructs the "poslst" record structure (a
+list of file position ranges) from the pgraph tree structure.
+.Skip 2;
+.ByHand;
+STRING PROCEDURE make!filstr( R!P (any!class) link );
+.EndHand;
+	This procedure puts together a file string from the parse
+graph branch <fildes>.  "Link" should point to the <fildes> branch.
+
+.Skip 2;
+.ByHand;
+PROCEDURE xctcmd (R!P (pgraph) link);
+.EndHand;
+	This is the procedure which is executed after a completed
+parse of the input command (successful application of the rule for
+<command>).  In "xctcmd" any final work which is needed to change the
+parsing graph into a service routine call is done.  Some consistency
+checking may also be done here.  Then, the appropriate service routine
+is called.
+	"Xctcmd" will check system status for an abort request before
+calling a service routine.  It will also check for a mag tape device
+change, and, if the the command about to be executed is not proper (if
+not NEW TAPE or APPEND), it will reinstate the old device.  Following a
+service routine call, it will check system status and report unusual
+conditions to the user.  In addition, "xctcmd" requests the proper
+clean-up from SNPARS where necessary.
+
+.Skip 2;
+.ByHand;
+PROCEDURE prserr;
+.EndHand;
+	This procedure reports parsing errors to the user and bails
+out of all opened command files.
+
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE do!cmnd (BOOLEAN tty(false), cmd!ok(true));
+.EndHand;
+	This routine does the necessary calls to "pre!scan", "parse",
+"prserr", and "xctcmd" in order to scan, interpret, execute, and report
+syntax errors found in the standard user commands.  "Do!cmnd" always
+calls "parse" with the goal symbol of the grammar (ie. it handles whole
+commands).
+
+.Skip 2;
+.ByHand;
+INTERNAL PROCEDURE prtalt (INTEGER index);
+.EndHand;
+	This procedure prints out a list of keyword choices given a
+grammar rule which requires one of a list of keywords to satisfy it.  The
+"index" parameter is the index in "gramr" of the beginning of the rule.
+.Skip 2;
+.ByHand;
+INTERNAL INTEGER PROCEDURE readkey (STRING prompt;  INTEGER rule);
+.EndHand;
+	This procedure does the appropriate parsing in order to
+retrieve a keyword from the user and return its token value.  This will
+work only for a grammar rule which is a simple choice among keywords of
+the language.  "Prompt" is a string to be typed at the user.  "Rule" is
+the token number of the left-hand-side of the desired rule to use.  No
+command file references are allowed in the input.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE readint (STRING prompt;  INTEGER rule;
+   REFERENCE INTEGER result);
+.EndHand;
+	This procedure does the appropriate parsing to retrieve an
+integer value from the user.  The string "prompt" is to be typed at the
+user.  The "rule" parameter should be a token value for the left-hand-
+side of a rule whose right-hand-side requires an {integer}.  The result
+is obtained from the intermediate result structure "intres" and is
+returned in "result".  This procedure has the value "false" only when
+the user hit the carriage return, entering no value.
+.Skip 2;
+.ByHand;
+INTERNAL STRING PROCEDURE readstr (STRING prompt;  INTEGER rule);
+.EndHand;
+	This procedure does the appropriate parsing to retrieve a
+string value from the user.  The string "prompt" is to be typed at the
+user.  The "rule" parameter should be a token value for the left-hand-
+side of a rule whose right-hand-side requires a value which will be
+saved as a string by an intermediate routine.  The string result is
+obtained from the intermediate result structure "strres".  This
+procedure will return a null string when the user hit the carriage
+return, entering no value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE tidsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure saves the TID value as a
+string intermediate result.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE possav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure saves an individual
+position list item.  The item may be an octal number or "E".  If the
+latter, then the item is entered as '377777777777, the largest
+theoretically possible value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE gitsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure saves an individual GAN
+item.  The item may be an octal number or "E".  If the latter, then the
+item is entered as '777777, the largest possible GAN value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE gansav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure saves a GAN range
+expression.  A single GAN is converted to a range with both parts of
+the range equal to the single GAN.  A range is stored with the first
+GAN in the left-half, and the second GAN in the right half.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE ppnsav (R!P (any!class) link);
+.EndHand;
+	This special syntax procedure computes and saves a PPN as an
+integer value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE strsav (R!P (any!class) link);
+.EndHand;
+	This special syntax procedure retrieves and stores a string
+value as an intermediate result.
+.Skip 2;
+.ByHand;
+INTEBOOLEAN PROCEDURE dtsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax routine saves the date and time as a
+single word with the date in the left half and the time in the right
+half.  The date is DEC format, and the time is expressed as seconds
+since midnight.  The time zone is GMT.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE datsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure computes the date from the
+user-supplied date information.  If the year is not specified, then the
+current one is used.  If the month is not specified, then the current
+one is used.
+.Skip 2;
+.ByHand;
+BOOLEAN PROCEDURE chkint (R!P (any!class) link;  BOOLEAN octval;
+  INTEGER lb('400000000000),ub('377777777777));
+.EndHand;
+	This special syntax procedure is called by other routines
+which wish to save an integer value if a range check succeeds.  "Lb" is
+the lower bound to be checked with the "geq" relation.  "Ub" is the
+upper bound to checked with the "leq" relation.  If "octval" is true,
+then the symbolic input is treated as octal, otherwise decimal.
+
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE daysav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax routine checks and possibly stores
+the <day> value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE yrsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax routine checks and possibly stores
+the <year> value.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE hrsav (R!P (any!class) link);
+.EndHand;
+	Analogous routine to "yrsav" for hour values.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE minsav (R!P (any!class) link);
+.EndHand;
+	Analogous routine to "yrsav" for minute values.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE timsav (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure computes the time from
+hour and minute values, and stores it in terms of seconds since
+midnight.
+.Skip 2;
+.ByHand;
+ck!sn INTERNAL BOOLEAN PROCEDURE fposck( R!P (any!class) link );
+.EndHand;
+	This procedure checks the legality of a file position number
+to assure that it falls within a possible range.
+
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE intsav (R!P (any!class) link);
+.EndHand;
+	This special syntax procedure checks and stores a full-word
+positive integer value expressed in decimal.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE hoctsv (R!P (any!class) link);
+.EndHand;
+	This special syntax procedure checks and stores a half-word
+integer value expressed in octal.
+.Skip 2;
+.ByHand;
+INTERNAL BOOLEAN PROCEDURE halfsv (R!P (any!class) link);
+.EndHand;
+	This SNARL special syntax procedure checks and stores a
+half-word integer value expressed in decimal.
+.Skip 2;
+.ByHand;
+ck!dsn INTERNAL BOOLEAN PROCEDURE rngchk (R!P (any!class) link);
+.EndHand;
+	This DSNARL special syntax procedure checks the range
+parameters to the "T" command and saves them as a word range in
+"tapblk".
+   , cñ
