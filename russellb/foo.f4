@@ -1,0 +1,4 @@
+        i = "1000000
+        type 100, i
+100     format(i)
+        end
