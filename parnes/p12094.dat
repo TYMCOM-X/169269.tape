@@ -1,0 +1,682 @@
+BEGIN "COPYPC"
+
+  REQUIRE 1 VERSION;
+  REQUIRE "DEBUG.SAI" SOURCE!FILE;
+
+  DEFINE MODE!IMAGE = 0, MODE!TEXTE = 1;
+  INTEGER MODE!TRANSFERT; COMMENT Resultat de l'option IMAGE. Par defaut MODE!TEXTE;
+
+  DEFINE REMPLACE = 0, NON!REMPLACE = 1;
+  INTEGER DISPOSITION;  COMMENT Resultat de l'option REPLACE. Par defaut NON!REMPLACE;
+
+  DEFINE DATE!A!CREER = 0, DATE!EXISTANTE = 1;
+  INTEGER MODE!DATE;      COMMENT Resultat de l'option OLDDATE. Par defaut DATE!A!CREER;
+
+  DEFINE FAIRE!RUN = 0, PAS!FAIRE!RUN = 1;
+  INTEGER OPTION!RUN;     COMMENT Resultat de l'option RUN. Par defaut PAS!FAIRE!RUN;
+  STRING RUN!PROGRAMME;
+
+  DEFINE FAIRE!STACK = 0, PAS!FAIRE!STACK = 1;
+  INTEGER OPTION!STACK;   COMMENT Resultat de l'option STACK. Par defaut PAS!FAIRE!STACK;
+
+  INTERNAL STRING LSTACK;
+  DEFINE FAIRE!TRACE = 0, PAS!FAIRE!TRACE = 1;
+  INTEGER MODE!TRACEIN, MODE!TRACEOUT; COMMENT Les traces sont par defaut a PAS!FAIRE!TRACE;
+
+
+  DEFINE PC!VERS!HOST = 0, HOST!VERS!PC = 1;
+  INTEGER SENS!TRANSFERT; COMMENT Sens du transfert. Pas de valeur par defaut significative;
+  STRING FICHIER!HOST, FICHIER!PC;
+
+
+  STRING LIGNE!COMMANDE;
+  PRELOAD!WITH "IMAGE","REPLACE","OLDDATE","RUN","STACK","TRACEIN","TRACEOUT";
+  STRING ARRAY LISTE!OPTIONS[1:7];
+
+  DEFINE COMMANDES!PAR!FICHIER = 0, COMMANDES!PAR!LIGNE = 1
+        ,COMMANDES!PAR!CONVERSATION = 2;
+
+  INTEGER CANAL!COMMANDES; COMMENT Moyen par lequel les commandes sont obtenues
+                                   Initialement: COMMANDES!PAR!FICHIER;
+
+  INTEGER DEB!SECONDES,DEB!JOUR;    COMMENT Moment du Debut du transfert ;
+  INTEGER FIN!SECONDES,FIN!JOUR;    COMMENT Moment de la fin du transfert ;
+  INTERNAL INTEGER STAT!CARACTERES;  COMMENT Compteur de caracteres emis et recus (Transport);
+  INTEGER VITESSE!CARACTERE;  COMMENT Vitesse de la transmission;
+
+
+  PROCEDURE INITIALISATIONS!GLOBALES; BEGIN "DONNER LEURS VALEURS PAR DEFAUT A TOUTES LES VARIABLES GLOBALES"
+
+
+   MODE!TRANSFERT := MODE!TEXTE;
+   DISPOSITION    := NON!REMPLACE;
+   MODE!DATE      := DATE!A!CREER;
+   OPTION!RUN     := PAS!FAIRE!RUN;   RUN!PROGRAMME := "";
+   OPTION!STACK   := PAS!FAIRE!STACK; LSTACK   := "";
+   CANAL!COMMANDES:= COMMANDES!PAR!FICHIER;
+   MODE!TRACEIN   := PAS!FAIRE!TRACE;
+   MODE!TRACEOUT  := PAS!FAIRE!TRACE;
+
+   END "DONNER LEURS VALEURS PAR DEFAUT A TOUTES LES VARIABLES GLOBALES";
+
+   REQUIRE INITIALISATIONS!GLOBALES INITIALIZATION;
+   REQUIRE "(SAILIB)SAILIB.REQ" SOURCE!FILE;
+   EXTERNAL SIMPLE INTEGER PROCEDURE STRSRC(STRING ARRAY NAMES; STRING LOOK; REFERENCE BOOLEAN EXACT);
+
+   STRING PROCEDURE CVSFMT(INTEGER WIDTH, LENGTH, TO!CONVERT);
+   BEGIN "Convertir en fonction de specifications de format"
+
+     STRING CONVERTI;
+     INTEGER RWIDTH, RLENGTH;
+     GETFORMAT(RWIDTH,RLENGTH);
+     SETFORMAT(WIDTH,LENGTH);
+     CONVERTI := CVS(TO!CONVERT);
+     SETFORMAT(RWIDTH, RLENGTH);
+     RETURN(CONVERTI);
+
+   END "Convertir en fonction de specifications de format";
+
+ PROCEDURE CVT!STRING!ARRAY(STRING TO!CVT; REFERENCE INTEGER ARRAY CVT!RES; REFERENCE INTEGER ARY!LEN);
+ BEGIN "Convertir une chaine de caracteres en tableau d'entier"
+   INTEGER PTR;
+   FOR PTR := 1 STEP 1 UNTIL LENGTH(TO!CVT) DO
+      CVT!RES[PTR] := TO!CVT[PTR FOR 1];
+   ARY!LEN := LENGTH(TO!CVT);
+ END "Convertir une chaine de caracteres en tableau d'entier";
+
+
+  INTERNAL PROCEDURE SIGNAL(INTEGER NIVEAU!ERREUR, NUMERO!ERREUR; STRING MESSAGE!ERREUR);
+     BEGIN "Imprimer message d'erreur"
+
+     PRELOAD!WITH "I","W","E","S","T";
+     OWN STRING ARRAY CODE!ERREUR[0:4];
+     INTEGER RWIDTH, RLENGTH;
+
+     GETFORMAT(RWIDTH, RLENGTH); SETFORMAT(-3,0);
+     OUTSTR("?COPYPC " & CVSFMT(-3,0,NUMERO!ERREUR) & CODE!ERREUR[NIVEAU!ERREUR] & " "
+           & MESSAGE!ERREUR & '15 & '12);
+     SETFORMAT(RWIDTH,RLENGTH);
+     END "Imprimer message d'erreur";
+
+ INTERNAL PROCEDURE SIG!I(INTEGER N; STRING S); SIGNAL(0,N,S);
+ INTERNAL PROCEDURE SIG!W(INTEGER N; STRING S); SIGNAL(1,N,S);
+ INTERNAL PROCEDURE SIG!E(INTEGER N; STRING S); SIGNAL(2,N,S);
+ INTERNAL PROCEDURE SIG!S(INTEGER N; STRING S); SIGNAL(3,N,S);
+ INTERNAL PROCEDURE SIG!T(INTEGER N; STRING S); SIGNAL(4,N,S);
+
+
+   PROCEDURE SORTIE!ERREUR(INTEGER NUMERO!ERREUR; STRING MSG!ERREUR);
+     BEGIN "Imprimer message d'erreur puis abandon du programme"
+
+    INTEGER RETOUR;
+
+    SIG!T(NUMERO!ERREUR,MSG!ERREUR);
+
+    RETOUR:=CALLI(1,'12);
+
+   END "Imprimer message d'erreur puis abandon du programme";
+
+     INTEGER CANAL!SYSTEME, MODE!ES, COMPTE!CAR, CAR!CASSE, FIN!FICHIER, TABLE!CASSE;
+
+   PROCEDURE LIRE!LIGNE!COMMANDE!NON!VIDE; 
+   BEGIN "Lecture de la prochaine ligne non vide d'un fichier de commande"
+
+     LIGNE!COMMANDE:= INPUT(CANAL!SYSTEME,TABLE!CASSE);
+     WHILE NOT FIN!FICHIER AND (LENGTH(LIGNE!COMMANDE) = 0
+                                OR EQU(LIGNE!COMMANDE,
+"                                                                                                  "
+                                                             [1 FOR LENGTH(LIGNE!COMMANDE)]
+                                                             ))
+         DO LIGNE!COMMANDE:= INPUT(CANAL!SYSTEME,TABLE!CASSE);
+    END "Lecture de la prochaine ligne non vide d'un fichier de commande";
+
+   BOOLEAN PROCEDURE PRELEVER!FICHIER!HOST;
+    BEGIN "Prelevement d'un nom de fichier host correct dans la ligne de commande"
+
+      INTEGER CASSE!FICHIER, CAR!CASSE;
+      PROCEDURE NETTOYAGE; RELBREAK(CASSE!FICHIER);
+      CLEANUP NETTOYAGE;
+
+      SETBREAK (CASSE!FICHIER:=GETBREAK, '11 & '12 & '13 & '14  & '15 & '40 & "/"
+                                       , '11 & '12 & '13 & '14  & '15 & '40 & "/"
+                                       , "ISBTK");
+      FICHIER!HOST := SCAN(LIGNE!COMMANDE, CASSE!FICHIER, CAR!CASSE);
+      IF LENGTH(FICHIER!HOST) = 0
+      THEN BEGIN
+           SIG!E(10,"Host file name expected after FROMHOST or TOHOST");
+           RETURN(FALSE);
+           END
+      ELSE RETURN(TRUE);
+
+   END "Prelevement d'un nom de fichier host correct dans la ligne de commande";
+   BOOLEAN PROCEDURE PRELEVER!FICHIER!PC;
+   BEGIN "Prelevement d'un nom de fichier PC correct dans la ligne de commande"
+
+    INTEGER CASSE!FICHIER, CAR!CASSE;
+    PROCEDURE NETTOYAGE; RELBREAK(CASSE!FICHIER);
+
+    SETBREAK(CASSE!FICHIER:=GETBREAK, '11 & '12 & '13 & '14 & '15 & '40 & "/"
+                                    , '11 & '12 & '13 & '14 & '15 & '40 & "/"
+                                    , "ISBTK");
+    FICHIER!PC := SCAN(LIGNE!COMMANDE,CASSE!FICHIER,CAR!CASSE);
+    IF LENGTH(FICHIER!PC) = 0
+    THEN BEGIN
+         SIG!E(11,"PC file name expected after FROMPC or TOPC");
+         RETURN(FALSE);
+         END
+    ELSE RETURN(TRUE);
+
+   END "Prelevement d'un nom de fichier PC correct dans la ligne de commande";
+
+   BOOLEAN PROCEDURE ANALYSER!DIRECTION;
+   BEGIN "Analyser dans la ligne de commande la direction de transfert"
+
+     STRING MOT!DIRECTION; INTEGER CASSE!MOT!DIRECTION, CARACTERE!CASSE;
+     PROCEDURE NETTOYAGE; RELBREAK(CASSE!MOT!DIRECTION);
+     CLEANUP NETTOYAGE;
+     SETBREAK(CASSE!MOT!DIRECTION:=GETBREAK, '11 & '12 & '14 & '15 & '40, " =","INS");
+
+         "Obtenir et valider un FROMPC ou un FROMHOST et calculer SENS!TRANSFERT"
+
+     MOT!DIRECTION:=SCAN(LIGNE!COMMANDE,CASSE!MOT!DIRECTION, CARACTERE!CASSE);
+     IF EQU(MOT!DIRECTION,"FROMPC")
+     THEN BEGIN
+          SENS!TRANSFERT := PC!VERS!HOST;
+          IF NOT PRELEVER!FICHIER!PC
+          THEN RETURN (FALSE);
+          END
+     ELSE IF EQU(MOT!DIRECTION,"FROMHOST")
+          THEN BEGIN
+               SENS!TRANSFERT := HOST!VERS!PC;
+               IF NOT PRELEVER!FICHIER!HOST
+               THEN RETURN(FALSE);
+               END
+          ELSE BEGIN
+               SIG!E(4,"Word " & MOT!DIRECTION & " is not recognized. Should be either FROMHOST or FROMPC");
+               RETURN(FALSE);
+               END;
+
+         "Obtenir et valider un TOHOST ou un TOPC en fonction du SENS!TRANSFERT"
+
+      MOT!DIRECTION := SCAN(LIGNE!COMMANDE,CASSE!MOT!DIRECTION,CARACTERE!CASSE);
+      IF EQU(MOT!DIRECTION,"TOPC")
+      THEN BEGIN
+           IF SENS!TRANSFERT = HOST!VERS!PC
+           THEN BEGIN
+                IF NOT  PRELEVER!FICHIER!PC
+                THEN RETURN(FALSE);
+                END
+           ELSE BEGIN
+                SIG!E(5,"A file transfer FROMPC was requested. Use TOHOST instead of TOPC");
+                RETURN(FALSE);
+                END;
+           END
+      ELSE IF EQU(MOT!DIRECTION,"TOHOST")
+           THEN BEGIN
+                IF SENS!TRANSFERT = PC!VERS!HOST
+                THEN BEGIN
+                     IF NOT PRELEVER!FICHIER!HOST
+                     THEN RETURN(FALSE);
+                     END
+                ELSE BEGIN
+                     SIG!E(6,"A file transfer FROMHOST was requested. Use TOPC instead of TOHOST");
+                     RETURN(FALSE);
+                     END
+                END
+           ELSE BEGIN
+                IF SENS!TRANSFERT = HOST!VERS!PC
+                THEN SIG!E(7,"Word " & MOT!DIRECTION & " is not recognized. Word TOPC was expected")
+                ELSE SIG!E(8,"Word " & MOT!DIRE & " is not recognized. Word TOHOST was expected");
+                RETURN(FALSE);
+                END;
+
+      RETURN(TRUE);
+
+   END "Analyser dans la ligne de commande la direction de transfert";
+
+   PROCEDURE ANALYSER!OPTION;
+    BEGIN "Analyse des options contenues dans une ligne de commande"
+
+     STRING TEXTE!OPTION;
+     INTEGER CASSE!TEXTE!OPTION, CASSE!RUN, CASSE!STACK, CAR!CASSE, DRAPEAU!EXACT, NUMERO!OPTION;
+
+     PROCEDURE NETTOYAGE; 
+     BEGIN "Veuillez laisser cet endroit aussi propre que vous l'avez trouve en entrant"
+       RELBREAK(CASSE!TEXTE!OPTION);
+       RELBREAK(CASSE!RUN);
+       RELBREAK(CASSE!STACK);
+     END "Veuillez laisser cet endroit aussi propre que vous l'avez trouve en entrant";
+
+     SETBREAK(CASSE!TEXTE!OPTION:=GETBREAK, '11 & '12 & '13 & '14 & '15 & '40 & "/"
+                                          , '11 & '12 & '13 & '14 & '15 & '40 & "/"
+                                          , "ISBTK");
+     SETBREAK(CASSE!RUN:=GETBREAK, '11 & '12 & '13 & '14 & '15 & "/"
+                                 , '11 & '12 & '13 & '14 & '15 & "/"
+                                 , "ISBTK");
+     SETBREAK(CASSE!STACK:=GETBREAK, '11 & '12 & '13 & '14 & '15 & "/"
+                                   , '11 & '12 & '13 & '14 & '15 & "/"
+                                   , "ISBTK");
+
+     WHILE LENGTH(LIGNE!COMMANDE) NEQ 0 DO BEGIN "Analyse d'une option"
+ 
+         TEXTE!OPTION := SCAN(LIGNE!COMMANDE, CASSE!TEXTE!OPTION, CAR!CASSE);
+         NUMERO!OPTION := STRSRC(LISTE!OPTIONS, TEXTE!OPTION, DRAPEAU!EXACT);
+         IF NUMERO!OPTION = 0 OR NOT DRAPEAU!EXACT
+         THEN BEGIN
+              SIG!E(12,"Word " & TEXTE!OPTION & " not recognized as an option keyword. Ignored");
+              CONTINUE "Analyse d'une option";
+              END;
+         CASE NUMERO!OPTION OF BEGIN "Positionner l'option"
+         [1] BEGIN "IMAGE"
+               MODE!TRANSFERT := MODE!IMAGE
+             END   "IMAGE";
+         [2] BEGIN "REPLACE"
+               DISPOSITION := REMPLACE;
+             END   "REPLACE";
+         [3] BEGIN "OLDDATE"
+               MODE!DATE := DATE!EXISTANTE
+             END   "OLDDATE";
+         [4] BEGIN "RUN"
+               RUN!PROGRAMME := SCAN(LIGNE!COMMANDE, CASSE!RUN, CAR!CASSE);
+               IF LENGTH(RUN!PROGRAMME) = 0
+               THEN BEGIN
+                    SIG!E(13,"After option keyword RUN a program name was expected. Option RUN ignored");
+                    END
+               ELSE OPTION!RUN := FAIRE!RUN
+             END   "RUN";
+         [5] BEGIN "STACK"
+               LSTACK := SCAN(LIGNE!COMMANDE, CASSE!STACK, CAR!CASSE);
+               IF LENGTH(LSTACK) = 0
+               THEN BEGIN
+                    SIG!E(14,"After option keyword STACK a sequence of characters to be stacked was expected. Option STACK ignored");
+                    END
+               ELSE OPTION!STACK := FAIRE!STACK;
+             END   "STACK";
+         [6] BEGIN "TRACEIN"
+               MODE!TRACEIN := FAIRE!TRACE
+             END   "TRACEIN";
+         [7] BEGIN "TRACEOUT"
+               MODE!TRACEOUT := FAIRE!TRACE
+             END   "TRACEOUT";
+         ELSE SORTIE!ERREUR(15,"Program error: option number " & CVS(NUMERO!OPTION) & " unexpected. Contact support personnel")
+       END "Positionner l'option";
+
+     END "Analyse d'une option";
+
+  END "Analyse des options contenues dans une ligne de commande";
+
+
+
+   BOOLEAN PROCEDURE ANALYSE!PAR!FICHIERS; BEGIN "ANALYSER LES COMMANDES VIA UN FICHIER DE COMMANDES"
+
+     STRING FICHIER!COMMANDES;
+
+     BOOLEAN PROCEDURE FICHIER!COMMANDES!EXISTE; BEGIN "VOIR SI FICHIER COMMANDE EXISTE"
+
+       INTEGER FRAME!NUMBER, DRAPEAU!ERREUR;
+          "Construire le nom du fichier de commande a l'aide du Frame Number"
+
+       FRAME!NUMBER := CALLI(0,'30);
+       FICHIER!COMMANDES := "COP" & CVSFMT(-3,0,FRAME!NUMBER) & ".TMP";
+
+         "Tenter l'ouverture du fichier en lecture"
+
+       COMPTE!CAR := 255;
+       OPEN(CANAL!SYSTEME:=GETCHAN,"DSK",0,2,0,COMPTE!CAR,CAR!CASSE,FIN!FICHIER);
+       LOOKUP(CANAL!SYSTEME,FICHIER!COMMANDES,DRAPEAU!ERREUR);
+       IF DRAPEAU!ERREUR THEN BEGIN
+              RELEASE(CANAL!SYSTEME)
+              END;
+       RETURN (NOT DRAPEAU!ERREUR); COMMENT En cas de succes le fichier est ouvert sur le CANAL!SYSTEME;
+
+       END "VOIR SI FICHIER COMMANDE EXISTE";
+
+
+     IF NOT FICHIER!COMMANDES!EXISTE
+     THEN RETURN(FALSE);
+
+     SETBREAK(TABLE!CASSE:=GETBREAK, '12 & '14 & '11, '15, "INS");
+     LIRE!LIGNE!COMMANDE!NON!VIDE;
+     IF FIN!FICHIER
+     THEN BEGIN
+          SIG!W(2,"File " & FICHIER!COMMANDES & " is either empty or contains no significant lines");
+          SIG!W(3,"Command file not considered as valid input");
+          RETURN(FALSE);
+          END;
+     ANALYSER!DIRECTION;
+     LIRE!LIGNE!COMMANDE!NON!VIDE;
+     WHILE NOT FIN!FICHIER DO BEGIN "ANALYSER LES OPTIONS"
+       ANALYSER!OPTION;
+       LIRE!LIGNE!COMMANDE!NON!VIDE;
+       END "ANALYSER LES OPTIONS";
+
+     RETURN(TRUE);
+     END "ANALYSER LES COMMANDES VIA UN FICHIER DE COMMANDES";
+
+
+   PROCEDURE PRESENTER!COMMANDES;
+   BEGIN "Presenter les commandes telles que comprises par COPYPC"
+
+     IF SENS!TRANSFERT = PC!VERS!HOST
+     THEN SIG!I(998,"Transfer from PC file " & FICHIER!PC & " to host file " & FICHIER!HOST)
+     ELSE IF SENS!TRANSFERT = HOST!VERS!PC THEN  SIG!I(997,"Transfer from host file " & FICHIER!HOST & " to PC file " & FICHIER!PC)
+          ELSE SIG!S(997,"??? Transfer information not found ???");
+
+     IF MODE!TRANSFERT      = MODE!IMAGE       THEN SIG!I(996,"IMAGE")
+                                               ELSE SIG!I(995,"no IMAGE");
+     IF DISPOSITION         = REMPLACE         THEN SIG!I(994,"REPLACE")
+                                               ELSE SIG!I(993,"no REPLACE");
+     IF MODE!DATE           = DATE!EXISTANTE    THEN SIG!I(992,"OLDDATE")
+                                               ELSE SIG!I(991,"no OLDDATE");
+     IF OPTION!RUN          = FAIRE!RUN        THEN SIG!I(990,"RUN " & RUN!PROGRAMME)
+                                               ELSE SIG!I(990,"no RUN");
+     IF OPTION!STACK        = FAIRE!STACK      THEN SIG!I(989,"STACK " & LSTACK)
+                                               ELSE SIG!I(988,"no STACK");
+     IF MODE!TRACEIN        = FAIRE!TRACE      THEN SIG!I(987,"TRACEIN")
+                                               ELSE SIG!I(986,"no TRACEIN");
+     IF MODE!TRACEOUT       = FAIRE!TRACE      THEN SIG!I(985,"TRACEOUT")
+                                               ELSE SIG!I(984,"no TRACEOUT")
+  END "Presenter les commandes telles que comprises par COPYPC";
+
+   PROCEDURE ANALYSE!COMMANDES; BEGIN "ANALYSER CE QUE VEUT L'UTILISATEUR"
+
+     BOOLEAN PROCEDURE ANALYSE!PAR!LIGNE;
+     BEGIN "Analyser a partir de la ligne de commande systeme"
+
+      INTEGER CASSE!POINT!VIRGULE, CASSE!CAR;
+      PROCEDURE NETTOYAGE; RELBREAK(CASSE!POINT!VIRGULE);
+      CLEANUP   NETTOYAGE;
+      STRING NOM!PROGRAMME;
+
+      DEFINE TTCALL = '051000000000;
+      START!CODE "Code repositionnant la ligne commande systeme"
+        TTCALL '10,0;
+      END        "Code repositionnant la ligne commande systeme";
+
+      LIGNE!COMMANDE := INCHWL;
+      SETBREAK(CASSE!POINT!VIRGULE := GETBREAK, ";",NULL, "INS");
+      NOM!PROGRAMME := SCAN(LIGNE!COMMANDE, CASSE!POINT!VIRGULE, CASSE!CAR);
+
+      IF LENGTH(LIGNE!COMMANDE) = 0 THEN RETURN(FALSE);
+      ANALYSER!DIRECTION;
+      ANALYSER!OPTION;
+
+     END "Analyser a partir de la ligne de commande systeme";
+
+     BOOLEAN PROCEDURE ANALYSE!PAR!CONVERSATION; BEGIN OUTSTR("Not implemented yet"); RETURN(FALSE) END;
+
+     
+       IF NOT ANALYSE!PAR!FICHIERS
+       THEN IF NOT ANALYSE!PAR!LIGNE
+            THEN IF NOT ANALYSE!PAR!CONVERSATION
+                 THEN SORTIE!ERREUR(1,"No work to be done");
+     END "ANALYSER CE QUE VEUT L'UTILISATEUR";
+
+
+  INTEGER CANAL!OUT!HOST, CANAL!IN!HOST, DRAPEAU!HOST, COMPTE!HOST, CASSE!HOST, TABLE!CASSE!HOST; COMMENT tout ce qui a trait aux i/o du fichier a transmettre;
+  STRING DATE!FICHIER;
+
+  STRING PROCEDURE CVT!ARRAY!STRING(REFERENCE INTEGER ARRAY TO!CVT; INTEGER ARY!LEN);
+  BEGIN "Convertir un tableau en chaine de caracteres"
+    STRING CONVERTI; INTEGER PTR;
+    CONVERTI := "";
+    FOR PTR := 1 STEP 1 UNTIL ARY!LEN DO
+       CONVERTI := CONVERTI & CVSTR(TO!CVT[PTR] LSH 29);
+    RETURN(CONVERTI);
+  END "Convertir un tableau en chaine de caracteres";
+
+  PROCEDURE PREPARE!TRAVAIL;
+  BEGIN "Les options demandees sont connues. Initialiser tout avant appel a AE"
+
+    IF SENS!TRANSFERT = HOST!VERS!PC
+    THEN BEGIN "Tester la presence du fichier host et l'ouvrir"
+           INTEGER MODE, DRAPEAU!ERREUR;
+
+           IF MODE!TRANSFERT = MODE!IMAGE
+           THEN MODE := '10
+           ELSE MODE := '0;
+
+           FIN!FICHIER := -1; COMMENT Ne pas donner les possibilites SAIL de correction de l'OPEN;
+           OPEN(CANAL!IN!HOST:=GETCHAN, "DSK", MODE, 2, 0, COMPTE!HOST, CASSE!HOST, FIN!FICHIER);
+           IF FIN!FICHIER NEQ 0
+           THEN SORTIE!ERREUR(16,"Cannot open channel for FROMHOST file " & FICHIER!HOST & ". Contact support personnel");
+
+           LOOKUP(CANAL!IN!HOST, FICHIER!HOST, DRAPEAU!ERREUR);
+           IF DRAPEAU!ERREUR
+           THEN BEGIN
+                  INTEGER CAUSE!ERREUR;
+                  CAUSE!ERREUR := '000000777777 LAND DRAPEAU!ERREUR;
+                  IF CAUSE!ERREUR := '10
+                  THEN SORTIE!ERREUR(17, "Invalid host file " & FICHIER!HOST)
+                  ELSE SORTIE!ERREUR(18, "Host file " & FICHIER!HOST &
+                        " cannot be read-accessed. Error code: " &CVS(CAUSE!ERREUR));
+                END;
+           END "Tester la presence du fichier host et l'ouvrir"
+      ELSE BEGIN "Ouvrir le fichier host en mode sortie"
+             INTEGER MODE, DRAPEAU!ERREUR, CAUSE!ERREUR;
+
+           IF MODE!TRANSFERT = MODE!IMAGE
+           THEN MODE := '10
+           ELSE MODE := '0;
+
+          FIN!FICHIER := -1;
+          OPEN(CANAL!OUT!HOST := GETCHAN, "DSK", MODE, 0, 2, COMPTE!HOST, CASSE!HOST, FIN!FICHIER);
+          IF FIN!FICHIER NEQ 0
+          THEN SORTIE!ERREUR(18,"Cannot open channel for TOHOST file "
+                               & FICHIER!HOST & ". Contact support personnel");
+          ENTER(CANAL!OUT!HOST, FICHIER!HOST, DRAPEAU!ERREUR);
+          IF DRAPEAU!ERREUR
+          THEN BEGIN
+               CAUSE!ERREUR := '000000777777 LAND DRAPEAU!ERREUR;
+               IF CAUSE!ERREUR = '10
+               THEN SORTIE!ERREUR(19,"Invalid host file " & FICHIER!HOST)
+               ELSE SORTIE!ERREUR(20,"Host file " & FICHIER!HOST & " cannot be write-accessed."
+                                    & " Error code: " & CVS(CAUSE!ERREUR));
+               END;
+          END "Ouvrir le fichier host en mode sortie";
+
+
+    " Obtenir une table de casse pour le fichier host"
+    SETBREAK(TABLE!CASSE!HOST:= GETBREAK, '15 ,'15 &'12, "INS");
+    COMPTE!HOST := 500;
+    " Obtenir la date et l'heure du jour "
+    BEGIN "Utilisation de l'appel moniteur DATE"
+      INTEGER DATE!DEC, NB!JOURS, NB!ANNEES, NB!MOIS, SECONDES, HEURES, MINUTES
+             ,ANNEE, MOIS, JOUR;
+      DATE!DEC := CALLI(0,'14);
+      DEB!JOUR := DATE!DEC;  COMMENT On conserve l'info pour les statistiques de la fin;
+      "Nombre de jours depuis debut du mois - 1" NB!JOURS := DATE!DEC MOD 31;
+      "Nombre d'annees depuis 1964" NB!ANNEES := (DATE!DEC - NB!JOURS) / (12*31);
+      "Nombre de mois depuis debut annee -1" NB!MOIS := (DATE!DEC - NB!JOURS - NB!ANNEES*12*31) / 31;
+      "Annee en cours" ANNEE := 1964 + NB!ANNEES;
+      "Mois  en cours" MOIS  :=    1 + NB!MOIS;
+      "Jour  en cours" JOUR  :=    1 + NB!JOURS;
+      SECONDES := CALLI(0,'23)/1000;
+      DEB!SECONDES := SECONDES;  COMMENT On conserve l'info pour les statistiques de la fin;
+      HEURES := SECONDES / 3600;
+      MINUTES := (SECONDES - 3600 * HEURES) / 60;
+      SECONDES := (SECONDES - 3600 * HEURES - 60 * MINUTES);
+    DATE!FICHIER := CVSFMT(-4,0,ANNEE) & "-"
+                  & CVSFMT(-2,0,MOIS)  & "-"
+                  & CVSFMT(-2,0,JOUR)  & " "
+                  & CVSFMT(-2,0,HEURES) & ":"
+                  & CVSFMT(-2,0,MINUTES) & ":"
+                  & CVSFMT(-2,0,SECONDES);
+    END "Utilisation de l'appel moniteur DATE";
+
+  END "Les options demandees sont connues. Initialiser tout avant appel a AE";
+
+
+ EXTERNAL INTEGER !SKIP!;
+
+ BOOLEAN PROCEDURE RUNPRG(STRING PROGNAME; REFERENCE STRING  RETURNED!ERROR!MESSAGE; INTEGER ENTRY!POINT(0));
+ BEGIN "Executer un programme en chainant"
+   INTEGER FNAME6, EXTEN6, PPN6, TABLE!CASSE!PAREN, CASSE!PAREN, RUN!ERROR!CODE, ADDRESS!WORD;
+   INTEGER ARRAY RUN!BLOCK[1:6], UNAME6[1:2];
+   LABEL ERR!RUN, RET;
+   PRELOAD!WITH "File not found or illegal file name"
+               ,"Username or PPN for file to RUN not found"
+               ,"Protection failure"
+               ,"File beeing modified"
+               ,"Already existing file"
+               ,"Illegal sequence of UUOs"
+               ,"Transmission, data or device error while reading file"
+               ,"Not a saved file"
+               ,"Not enough core"
+               ,"Device not available"
+               ,"No such device"
+               ,"Error code 13 from RUN uuo: should never happen"
+               ,"No room left on disk or quota exceeded"
+               ,"Error code 15 from RUN uuo: should never happen"
+               ,"Insufficient space in monitor free core to perform the operation"
+               ,"Error code 17 from RUN uuo: should never happen"
+               ,"Error code 20 from RUN uuo: should never happen"
+               ,"Error code 21 from RUN uuo: should never happen"
+               ,"Error code 22 from RUN uuo: should never happen"
+               ;
+    OWN STRING ARRAY RUN!ERROR!TEXTS[0:18];
+   STRING UNAME, PGM;
+   SETBREAK(TABLE!CASSE!PAREN:=GETBREAK, ")", "()", "INS");
+   PGM := PROGNAME;
+   IF PROGNAME = "" THEN RETURN(FALSE);
+   UNAME := SCAN(PGM,TABLE!CASSE!PAREN,CASSE!PAREN);
+   IF LENGTH(UNAME) NEQ 0 AND LENGTH(PGM) = 0
+   THEN BEGIN
+        PGM := UNAME;
+        UNAME := "";
+        END;
+   IF UNAME = ""
+   THEN BEGIN UNAME6[1] := 0; UNAME6[2] := 0; END
+   ELSE IF LENGTH(UNAME) <= 6
+        THEN BEGIN
+             UNAME6[1] := CVSIX(UNAME);
+             UNAME6[2] := 0;
+             END
+        ELSE BEGIN
+             UNAME6[1] := CVSIX(UNAME[1 FOR 6]);
+             UNAME6[2] := CVSIX(UNAME[7 FOR LENGTH(UNAME)-6]);
+             END;
+   FNAME6:=CVFIL(PGM,EXTEN6, PPN6);
+   RUN!BLOCK[1] := CVSIX("DSK   ");
+   RUN!BLOCK[2] := FNAME6;
+   RUN!BLOCK[3] := EXTEN6;
+   RUN!BLOCK[4] := 0;
+   IF PPN6 NEQ 0
+   THEN RUN!BLOCK[5] := PPN6
+   ELSE RUN!BLOCK[5] := '000000777777 LAND MEMORY[LOCATION(UNAME6)];
+   RUN!BLOCK[6] := 0;
+   ADDRESS!WORD := (ENTRY!POINT LSH 18) LOR ('000000777777 LAND MEMORY[LOCATION(RUN!BLOCK)]);
+   START!CODE "Code chainant a un autre programme"
+     SETOM !SKIP!;
+     SETZM RUN!ERROR!CODE;
+     MOVE  3,ADDRESS!WORD;
+     '047140000035;
+     JRST ERR!RUN;
+     JRST RET;
+ERR!RUN: SETZM !SKIP!;
+     MOVEM 3,RUN!ERROR!CODE;
+RET: SETMM 0;
+   END "Code chainant a un autre programme";
+   IF NOT !SKIP!
+   THEN RETURNED!ERROR!MESSAGE := RUN!ERROR!TEXTS[RUN!ERROR!CODE];
+   RETURN(!SKIP!);
+ END "Executer un programme en chainant";
+
+  PROCEDURE TERMINE!TRAVAIL;
+  BEGIN "Nettoyage general en fin de transfert de fichier"
+
+     INTEGER SECONDES,VITESSE!CARACTERES;
+
+    IF SENS!TRANSFERT = HOST!VERS!PC
+    THEN RELEASE(CANAL!IN!HOST)
+    ELSE RELEASE(CANAL!OUT!HOST);
+
+  "Message statistique" BEGIN
+      FIN!JOUR := CALLI(0,'14);
+      FIN!SECONDES := CALLI(0,'23)/1000;
+      SECONDES := (FIN!JOUR-DEB!JOUR)*86400+(FIN!SECONDES-DEB!SECONDES);
+      VITESSE!CARACTERES := STAT!CARACTERES/SECONDES;
+      OUTSTR(CVS(STAT!CARACTERES) & " CHARS     " & CVS(SECONDES) & " SECS     " & 
+              CVS(VITESSE!CARACTERES) & " CPS" & '15 & '12);
+  END "Message statistique";
+
+
+    IF OPTION!STACK = FAIRE!STACK
+    THEN BEGIN "Placer LSTACK dans le buffer d'entree du terminal"
+          DEFINE AUXCAL = '042000000000, !AXSI = '777777000033;
+          LABEL ERR!RET,RET; EXTERNAL INTEGER !SKIP!;
+          STRING PSTACK;
+          PSTACK := LSTACK & '15;
+          START!CODE "Code placant la ligne dans le buffer"
+
+            MOVE 3,[!AXSI];  
+            AUXCAL 3,PSTACK;
+            JRST ERR!RET;
+            SETOM !SKIP!;
+            JRST RET;
+       ERR!RET:SETZM !SKIP!;
+        RET:SETMM 0;
+          END "Code placant la ligne dans le buffer";
+          IF NOT !SKIP!
+          THEN SIG!E(25,"Stack refused by system. STACK option ignored");
+
+         END "Placer LSTACK dans le buffer d'entree du terminal";
+    IF OPTION!RUN = FAIRE!RUN
+    THEN BEGIN "Tenter de chaine au programme suivant"
+         STRING RUNPRG!ERROR;
+         IF NOT RUNPRG(RUN!PROGRAMME, RUNPRG!ERROR,0)
+         THEN SORTIE!ERREUR(30,"Program " & RUN!PROGRAMME & " could not be run because: " & RUNPRG!ERROR);
+         END "Tenter de chaine au programme suivant";
+
+
+  END "Nettoyage general en fin de transfert de fichier";
+
+  INTEGER CARACTERE!LU, RESULTAT!LECTURE;
+  DEFINE FIN!ENREG = 1, FIN!FICHIER!HOST = 2, LECTURE!OK =3;
+  INTEGER LUPTR; PROCEDURE INIT!LUPTR; LUPTR := 99999;
+  REQUIRE INIT!LUPTR INITIALIZATION;
+
+  PROCEDURE LECTURE!FICHIER!HOST!TEXTE;
+  BEGIN "Lecture fichier host"
+    OWN STRING SLU;
+    OWN INTEGER ENTREE!FICHIER;
+    IF ENTREE!FICHIER=0 THEN 
+    BEGIN
+        SLU := INPUT(CANAL!IN!HOST, TABLE!CASSE!HOST);
+        LUPTR := 0;
+        ENTREE!FICHIER := 1;
+        IF FIN!FICHIER
+        THEN BEGIN
+            RESULTAT!LECTURE := FIN!FICHIER!HOST;
+            RETURN;
+        END;
+    END;
+    IF LUPTR >= LENGTH(SLU)
+    THEN BEGIN
+         IF FIN!FICHIER
+         THEN BEGIN
+              RESULTAT!LECTURE := FIN!FICHIER!HOST;
+              RETURN;
+              END;
+         SLU := INPUT(CANAL!IN!HOST, TABLE!CASSE!HOST);
+         LUPTR := 0;
+         RESULTAT!LECTURE := FIN!ENREG;
+         RETURN;
+         END;
+    LUPTR := LUPTR+1;
+    CARACTERE!LU := SLU [LUPTR FOR 1];
+    RESULTAT!LECTURE := LECTURE!OK;
+  END "Lecture fichier host";
+  REQUIRE "APPC.SAI" SOURCE!FILE;
+  PROCEDURE APPLICATION!COPYPC;
+          REQUIRE "PRGMHM.SAI" SOURCE!FILE;
+
+  ANALYSE!COMMANDES;
+COMMENT   PRESENTER!COMMANDES;
+  PREPARE!TRAVAIL;
+  APPLICATION!COPYPC;
+  TERMINE!TRAVAIL;
+  CALLI(1,'12);
+
+END "COPYPC"
+    inó
