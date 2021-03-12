@@ -1,0 +1,244 @@
+! doc	data structure pictorial
+    
+    Lexical   ----->   Lexical      ...   Lexical   
+    Descriptor	       Descriptor	  Descriptor
+    (current)		   | (not shown)      | (not shown)
+	|
+LD:SD[]	+----->   Source   ----->   Source      ...   Source   
+        |	  Descriptor	    Descriptor	      Descriptor
+	|	  (current)
+	|
+LD:CD[]	+----->   Context  ----->   Context     ...   Context  
+		  Descriptor	    Descriptor        Descriptor
+		  (local)                             (global)
+		      |	
+        CD:Sym[]["A"] +-----> Symbol --> Symbol --> Symbol ... Symbol
+		      |	
+        CD:Sym[]["B"] +-----> Symbol --> Symbol --> Symbol ... Symbol
+		      |	
+	CD:Sym[]["C"] +-----> Symbol --> Symbol --> Symbol ... Symbol
+		     ...
+	CD:Sym[]["Z"] +-----> Symbol --> Symbol --> Symbol ... Symbol
+
+;
+! doc	Lexical Descriptor
+
+This data block defines the lexical state of the exec.  It has
+pointers to a scanner descriptor stack and a context stack.  It is
+passed to all syntax routines and most semantic routines.  As the
+state of the lexical scanner is nested, LD's are pushed on the LD 
+stack which is linked through LD:link.  The state is typically pushed
+only when procedures are called.  New blocks merely push the Context
+Descriptor (see below).
+;
+
+record!class	LD (
+	integer	Depth;		! nesting depth;
+	integer Break;		! break character from last scan;
+	boolean	White;		! true if last scan saw trailing white;
+	boolean EoB;		! End of Block flag;
+	boolean	EoS;		! End of Statement flag;
+	string	BName;		! block name;
+	r!p(a!c) Link;		! link to the previous frame;
+	r!p(a!c) SD;		! link to the Source Descriptor;
+	r!p(a!c) CD );		! link to the Context Descriptor; 
+
+! doc	Source Descriptor
+
+Whenever the scanner source is changed to a new entity, a new SD is
+created and pushed onto the list of SD's which are pointed to by
+the Lexical Descriptor.  The Source Descriptor contains all storage
+necessary to service the source of the input (buffers, flags, channel
+numbers, etc.).
+
+The scanner always reads from the top SD pointed to by LD.  When an 
+end of file is reached, the SD is poped off of the stack and thrown
+away.  (in the case of disk, the channel is closed first)
+;
+
+record!class	SD (
+	integer Chan;		! channel number (-1=tty, -2=string);
+	integer EoF;		! End of File flag;
+	string	Buffer;		! buffer area;
+	string	Prompt;		! prompt (if terminal);
+	string	File;		! file name if disk;
+	r!p (a!c) Link );	! link to next SD;
+
+! doc	Context Descriptor
+
+Holds data concerning access to local variables and procedures.
+;
+
+record!class	CD (
+	r!p (a!c) sym;		! list of symbols defined in this block;
+	r!p (a!c) Link );	! link to next CD;
+
+! doc	Frame Descriptor
+
+The Frame Descriptor describes a child frame which is under the
+control of the exec.  The variable F is usually used to point to the 
+current FD.  The sets AllFrames, BusyFrames, and FreeFrames contain 
+items whose datum points to an FD.  The HSB (halt status block) is
+updated at deffered interrupt level by the HALTservice routine.
+;
+
+record!class FD (
+	integer	j;		! frame descriptor;
+	r!p(FD) itemvar fi;	! frame item;
+	boolean	rf;		! run flag (is it expected to run);
+	integer	hc;		! halt count;
+	integer sts;		! frame status word (JBTSTS);
+	integer	hsb;		! beginning of HSB;
+	integer	hsbType;	! halt type and class;
+	integer	hsbCount;	! halt count;
+	integer	hsbPC;		! pc of halt or exit;
+	integer	hsbUUOPC;	! pc of last uuo;
+	integer	hsbDev;		! sixbit device name;
+	integer	hsb1;		! halt type dependent data (1);
+	integer	hsb2 );		! halt type dependent data (2);
+define	hsbSize	=7;		! # data words in hsb;
+
+define	frame	= {record!pointer(FD)};
+
+! doc	semantic modes
+
+These values represent the mode of the semantic interpreter.  The value
+indicates what type of symbol is currently expected.  This is actually 
+only used to look up symbols.
+;
+
+define	SemDef (a) = {
+    redefine !!SEM = (!!SEM lsh 1);
+    evaldefine a = !!SEM };
+define	!!SEM = 1;
+
+SemDef 	(sem!Stmt);		! anything is valid except sym!InFix;
+SemDef 	(sem!Oper);		! infix operator expected;
+SemDef 	(sem!Value);		! sym!InFix, Proc, RunTime are illegal;
+SemDef 	(sem!Text);		! scanning for text;
+
+! doc	symbol record definitions
+
+There is a group of record classes which are used to describe symbols.
+They all share the first N fields, where the remaining fields may be
+varient.  The record class SYM describes only those fields which are
+common to all symbol type record classes.  The class SYM is used when
+accessing fields of a record describing an unknown type of symbol.
+;
+
+define	symbol = {record!pointer(any!class)};
+
+define	semtab! = 0;
+define	semtab!s = sem!stmt;
+define	semtab!o = sem!oper;
+define	semtab!sv = sem!stmt+sem!value;
+define	semtab!sov = sem!stmt+sem!oper+sem!value;
+define	semtab!svt = sem!stmt+sem!value+sem!text;
+define	semtab!sovt = sem!stmt+sem!oper+sem!value+sem!text;
+
+define	SDef (typ,sem) = {
+    redefine !!ST = !!ST + 1;
+    redefine !!SN = {sym!}&cvps(typ);
+    evaldefine !!SN = !!ST;
+    redefine !!SL = cvms(!!SL) & {
+	memory[location(class[sym!}&{typ])] _ location(typ); };
+	! store r!p($class)typ into class[sym!typ];
+    redefine !!SP = cvms(!!SP) & {,semtab!} & cvps(sem);
+    record!class typ (
+	string	Text;
+	integer	Type;
+	integer	Prec;
+	symbol	Link
+};
+define 	!!ST = 0;
+define	!!SL = {};
+define	!!SN = {};
+define	!!SP = {};
+
+! doc	non varient fields ;
+
+record!class SYM (
+	string	Text;		! original text of symbol;
+	integer	Type;		! sym!* from below, type of symbol;
+	integer	Prec;		! precedence: lh=input, rh=stack;
+	symbol	Link );		! next symbol in symbol table;
+
+
+! doc	varient fields ;
+
+SDef (err,	);	symbol 	Sym);	! error detected;
+SDef (undef,	)	);		! undefined symbol;
+SDef (help,	svt)	);		! help symbol ^E;
+SDef (default,	svt)	);		! default symbol ^F;
+SDef (SVal,	);	string 	Val);	! string value;
+SDef (SVar,	sv);	string 	Val);	! string variable;
+SDef (SCons,	svt);	string 	Val);	! string constant;
+SDef (RSVar,	sv);	integer	Adr);	! reference string variable;
+SDef (IVal,	);	integer	Val);	! integer value;
+SDef (IVar,	sv);	integer Val);	! integer variable;
+SDef (ICons,	sv);	integer	Val);	! integer constant;
+SDef (RIVar,	sv);	integer Adr);	! reference integer variable;
+SDef (FVal,	);	frame	Val);	! frame value;
+SDef (FVar,	sv);	frame	Val);	! frame variable;
+SDef (RFVar,	sv);	integer Adr);	! reference frame variable;
+SDef (Proc,	s);	string 	Body);	! user procedure;
+SDef (RunTime,	s);	integer Adr);	! runtime procedure;
+SDef (InFix,	o);	integer Adr);	! infix operator;
+SDef (Unary,	sv);	integer Adr);	! unary operator;
+SDef (block,	svt)	);		! block begin "{";
+SDef (eob,	sovt)	);		! block end "}";
+SDef (CExpr,	sv)	);		! expresion begin "(";
+SDef (eoe,	sov)	);		! expresion end ")";
+SDef (eos,	sovt)	);		! statement end "\";
+SDef (UnText,	)	);		! unevaluated text;
+SDef (MulTok,	sovt);	symbol	Tok2;	! multi token symbol;
+			symbol	TokD);
+
+
+! doc	record class map ;
+
+safe r!p(a!c) array class [1:!!ST];
+simple procedure classini;
+begin !!SL end;
+require classini initialization[0];
+
+
+! doc	semantic mode map ;
+
+redefine !!SP = cvms(!!SP)[2 to inf];
+preload!with !!SP;
+safe integer array SemTab [1:!!ST];
+
+! doc	symbol precedence definitions ;
+
+! cvPrec (#)	- left associative
+  cvPrec (#,+)	- left associative
+  cvPrec (#,-)	- right associative
+  cvPrec (#,#)	- input,stack precedence
+;
+define	cvPrec (A,B) = {(
+    ifcr length("B")=0 or "B"="+"
+	thenc ( ((A*3)lsh 18) lor ((A*3+1)land '777777) )
+	elsec ifcr "B"="-"
+	    thenc ( ((A*3)lsh 18) lor ((A*3-1)land '777777) )
+	    elsec ( ((A*3)lsh 18) lor ((B*3)land '777777) )
+	endc
+    endc)};
+
+! define precedence for all variables and constants, etc.
+;
+define	VarPrec	= cvPrec(700);
+
+! doc	create records for top level LD
+
+This is done at initialization level 0 because it is used at levels
+1 and 2 (perhaps);
+
+r!p (LD)	L;		! global pointer to top level LD;
+
+procedure LDIni;
+begin
+    L _ new!record(LD);
+    LD:cd[l] _ new!record(CD);
+end;
+require LDIni initialization[0];
