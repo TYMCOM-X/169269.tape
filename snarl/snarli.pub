@@ -1,0 +1,753 @@
+.StandardSpacing_1;
+.WantFigDef_true;
+.Journal;
+.FullContents_True;
+.MarginHeadings_True;
+.UnderlineBetween (~~,~);
+.Indent 5;
+.Device TTY;
+.Single Space;
+.Preface 1;
+.TitlePage $(
+.Begin Center;
+******************************
+.skip 1;
+SNARL
+(Store Now And Retrieve Later)
+.skip 1;
+Internal Specifications for a
+Proposed TITO Replacement
+.skip 1;
+{Month} {Day}, {Year}
+Adele Gadol
+.skip 1;
+******************************
+.End;
+.)$
+.Library |(adele)snblok.pub|;
+.Library |(adele)snlist.pub|;
+.Library |(adele)sncmdl.pub|;
+.Sec General information;
+.Ss Document description;
+	This document is intended as an explanation of the internal
+design of SNARL.  It began as a plan for implementation, and it is
+evolving into an internal maintenance specification as the work
+proceeds.
+	As it will be evident from the load command files and listings,
+SNARL and its companion maintenance program, DSNARL, share quite a bit
+of code.  The general structure of both programs is the same, and there
+are modules in SNARL which have an analogous, similar module in
+DSNARL.  The similar modules are constructed with conditional
+compilation ("ck!sn" sections are SNARL, "ck!dsn" are DSNARL only).  For
+example, SNCLI and DSNCLI differ only in terms of the
+special syntax routines which are included to handle the particular
+grammar of each program.  Of course, some of the modules in each program
+have no counterpart in the other.  This document describes both
+programs; in most cases, a reference to SNARL applies also to DSNARL.
+	I attempted to structure this paper in a "top down" fashion,
+describing first the overall structure of SNARL and proceeding to
+a detailed discussion of the processes, individual modules, and the
+data structures.  However, some reference between sections may be
+necessary.
+.Ss References;
+.ByHand;
+
+SNARL External Specifications
+DSNARL External Specifications
+TYMCOM-X Reference Manual
+TYMCOM-X Monitor Reference Manual
+TDPARS Description
+TABGEN Description
+SAIL Manuals
+MAPLIB Documentation (SAIL paging procedures)
+SAILIB Documentation (SAIL library procedures)
+.EndHand;
+.Ss Special debugging or test versions;
+	Several flavors of SNARL may be constructed by using the
+switches "debug" and "production!version" to alter the compilation.
+	If "debug" is made "true", then the following differences in
+operation will be noted:
+.List (-4,4,0,"a)");
+.Item;
+UNLOAD will be treated as a REWIND command.
+.Item;
+A keyboard interrupt will be fielded by SNARL as an immediate interrupt,
+and the user will be prompted by the phrase:
+.ByHand;
+	Int or Xit?
+.EndHand;
+If "I" is entered, then the interrupt is deferred as it would have been
+in the normal SNARL.  If "X" is entered, SNARL is immediately
+exited.  The user is quizzed until one of these letters is entered.
+.Item;
+A TRACE statement will be available if the debugging version of the
+grammar has been used.  The "TRACE ON" command will set a switch
+which causes a trace of the finished parsing graph to be printed
+instead of doing the command executions.  "TRACE OFF" turns off this
+mode.
+.EndList;
+	If "production!version" is made "false", then the following
+differences in operation will be noted.
+.List (-4,4,0,"a)");
+.Item;
+It will be possible to run SNARL using a disk file as the simulated
+tape device and then to operate without GD license.  The initial device
+prompt should be answered with the string "DSK".  The file "SNARL.TAP"
+is used for tape I/O.
+.Item;
+LOOKUP rather than ENTER access is made to files which are to be
+STORED.  This is a courtesy during debug stages and allows SNARL to be
+run with minimal license.  Beware -- other access may be made to files
+while SNARL is working on them.
+.EndList;
+.Sec Program structure and flow of control;
+.Ss Modules;
+	SNARL will consist of the following major types of procedures.
+.List (-4,4,0,"A.");
+.Item;
+~~The Main program~
+.List (-4,4,0,"1.");
+.Item;
+The main initializes the command device and introduces itself.
+.Item;
+It reads commands from the user.
+.Item;
+It parses the commands.
+.Item;
+It executes the appropriate service function.
+.Item;
+The main checks and will reset system status.
+.Item;
+It reports results.
+.EndList;
+.Item;
+~~Parser~
+.List (-4,4,0,"1.");
+.Item;
+The parser translates a user request into a function call on one of
+the service procedures which carries out the work.
+.Item;
+It reports syntax errors.
+.EndList;
+.Item;
+~~Service routines~
+.List (-4,4,0,"1.");
+.Item;
+Each procedure implements a command verb.  Procedures which must share
+data structures or functions will be grouped as a "module".
+.Item;
+Those service routines which are interruptable will have the
+responsibility for checking system status during appropriate times
+in the processing and doing whatever handling is necessary, such as
+aborting itself neatly or calling the command interpreter to process
+a command at interrupt time.
+.Item;
+Certain service routines may also set some system status conditions.
+.EndList;
+.Item;
+~~Interrupt handlers~
+.List (-4,4,0,"1.");
+.Item;
+There will be a process for each abnormal hardware condition and one
+for user interrupt.  Special handlers may be applicable for abnormal
+software conditions also.
+.Item;
+At interrupt time, the appropriate process is called.
+.Item;
+These procedures communicate with the rest of the system using
+a status vector and device status words held in global storage.
+.Item;
+The types of status which must be set are the interrupt type and a
+command status vector indicating which commands may be accessed at
+interrupt time.
+.EndList;
+.EndList;
+.AtPage_ false;
+{FigQ blockdiagram,Full,snarlblock,SNARL Block Diagram}
+.DoNow;
+.AtPage_ true;
+.Ss Communication;
+.Sss System status vector;
+	The main and the various service, interrupt, and error
+routines communicate their progress through a status vector called
+"snstat".  "Snstat" is a string which is treated somewhat like a
+pushdown stack.  The first character is always the latest piece of
+information.
+	Any of the following pieces of information may appear in
+the string.
+.ByHand;
+"K"	keyboard interrupt received (set by "attn!i")
+"A"	abort the current task (set by ABORT command)
+"S"	stop the current task (set by STOP command)
+"C"	service routine completed successfully
+"D"	mag tape device error detected
+"H"	hung device condition detected
+.EndHand;
+.Sss Magnetic tape device status;
+	Magnetic tape device status is kept in global storage with
+the main program so that it will be accessible to the other
+modules.  Initially, information will be kept for only one device; it
+could be expanded later to a list of devices.
+.Sec SNARL and DSNARL - The main program;
+.Ss Function;
+	The main is the master control for all the other functions
+which SNARL performs.  Also found in this module are most of the
+global storage, initialization procedures for the global storage,
+and subroutines associated with the main program.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)snarl.sub|;
+.Preface 1;
+.Ss Sequence of steps - main program;
+.List (-4,4,0,"a)");
+.Item;
+Check user license and throw user off unless user has GD license.
+.Item;
+Print out SNARL announcement.
+.Item;
+Initialize variables including set up of standard command set token
+array based upon user license.
+.Item;
+Set up for deferred interrupt handling.
+.Item;
+Get initial device assignment; this is done by executing the DEVICE
+command service routine.
+.Item;
+~~Main loop~:  This is ended when "quitsw" (set by QUIT command) is
+TRUE.  Send out the prompt; make the proper calls to read, parse, and
+execute a command.  Check the status vector and report unusual
+conditions according to the following table of entries.
+.ByHand;
+    ~~vector contains~		~~report~
+	"C"			no report
+	"CA" or "CS"		report command completion
+	"A" or "S"		report command aborted
+	"AD" or "AH"		report abort and cause
+.EndHand;
+.Continue;
+Clear the status vector.
+.Item;
+Before exiting the program, close and release all opened files.
+.EndList;
+.Ss Global storage defined;
+	Most of the global storage for SNARL is found in this
+module.  This includes the arrays used to tailor the grammar according
+to user license or other restrictions, the magnetic tape status
+information, and the system status vector.
+.Turn Off "#";
+.ByHand;
+
+.Library |(adele)sna010.sai|;
+.EndHand;
+.Turn On "#";
+.Ss Algorithms;
+.Sss Changing command sets;
+	Using the "cmdset" subroutine (from TDPARS library), the
+grammar may be restricted.  At SNARL initialization time, an array
+is constructed to use with "cmdset" to create the normal set of
+commands for the current user.  This is influenced by the user's
+license or, if a debug version, whether a tape device has been
+assigned.  This array is stored in "std!g" and can be used at any
+time to reset the normal command mode.  If using a debug version, a
+device assignment may cause "std!g" to change.  Other arrays are also
+defined which may be used to restrict the command set at keyboard
+interrupt time, when requesting continuation tape information, or
+when looking for a particular phresponse.  This eliminates the
+need for special scanning and parsing.
+.Sec SNCLI and DSNCLI - The parser or command language interpreter;
+.Ss Function;
+	This module consists of routines which pre-scan the user's
+command line and call the standard TDPARS functions in order to
+translate SNARL commands into service routine calls.  The special
+syntax and semantic routines which may be called during the parsing
+reside here too.
+.Ss Special syntax routine structure;
+	If specified by the grammar, a special syntax routine is called
+during parsing after successful application of its corresponding
+rule.  For all of these routines, the "link" parameter is actually a
+pointer to the node in the parsing graph representing the non-terminal
+token value of the left-hand side of a rule which has been applied
+successfully.  Each of the special syntax or semantic routines are
+boolean procedures.  If they find no errors in the items they check,
+then the value "true" is returned.  A return of "false" will cause the
+current rule being applied to fail.  For more information about the use
+of these procedures, see the TDPARS documentation.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Turn Off "{}";
+.Library |(adele)sncli.sub|;
+.Turn On "{}";
+.Preface 1;
+.Ss Global storage used;
+	This module uses the record structure definitions for the
+parsing graph, the system status information, and the parsing error
+information.
+.Ss Storage structures defined in this module;
+.AtPage_ false;
+{FigQ commandstructures, Full, snarlcmdlines, Command Tracking Structures}
+	The following record structures are the patterns for the lists
+shown in {FigRef commandstructures}.
+.ByHand;
+
+.Library |(adele)sna030.sai|;
+.EndHand;
+.DoNow;
+.AtPage_ true;
+.Ss Algorithms;
+.Sss Command file handling;
+	The record structure, "comfil" will keep track of opened
+command files (including the TTY).  As a new command file is opened,
+its name is reported to the TTY and log, and the information is saved
+in an entry in "comfil".  A pointer is set to identify the current
+file.  When SNARL gets to the end of a command file, it unlinks the
+record structure entry after closing the file.  Input will
+generally be done through "pre!scan" to assure that commands are
+being read from the proper place.
+.Sss Keeping track of multiple line commands;
+	For the purpose of locating and reporting parsing errors,
+multiple line commands are described by the structure "linptr".  As the
+current command is assembled in "cmdstr", the continuation characters
+and CR-LF sequences are removed, so that the command can be treated as if
+it were a single line.  Each record in "linptr" represents a fragment of
+the command terminated by a CR-LF.  The text is obtained from "cmdstr"
+using the position pointer in each record of "linptr".
+.Sss Parse error printing;
+	The procedure "prserr reports parsing errors.  In addition to
+printing the applicable message, which is accomplished simply by a call
+to "messag" in SNPARS, the procedure pinpoints the offending portion of
+the command.  The original command (or command fragment in the case of a
+multiple line command) is printed with an "^" pointing to the offending
+piece.  The command file is also identified.  The cursor position at
+failure, "curhgh" is located in the "linptr" list to get the portion of
+the command to print.  The record found will point to the file in
+"comfil".
+.Sec SNPARS;
+	This module consists of the configured TDPARS source which is
+produced by TABGEN using the SNARL grammar.  For a complete
+description of its contents and function, please see the TDPARS
+documentation.
+.Sec DSPARS;
+	This module consists of the configured TDPARS source which is
+produced by TABGEN using the DSNARL grammar.  For a complete
+description of its contents and function, please see the TDPARS
+documentation.
+.Sec SNIO - I/O and interrupts and other general routines;
+.Ss Function;
+	This module consists of general I/O routines and the interrupt
+handlers.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)snio.sub|;
+.Preface 1;
+.Ss Global storage used;
+	The system status vector and magnetic tape status information
+are accessed from this module.
+.Ss Interrupt philosophy;
+	SNARL will not have regularly spaced polling points from which
+the normal processing may be interrupted in order to schedule a
+deferred interrupt routine.  Since there will be specific points
+in the main and service routines where interrupts will be checked, the
+polling will be done at these points also.  The explicit polling will
+cause the appropriate deferred routine(s) to be scheduled; then SNARL
+can check to see what has happened.
+.Ss Reason for alternate channel procedures;
+	The alternate "getchan" procedure, "getmchan", is intended for
+obtaining disk channels for files which are not be opened with the
+normal SAIL "open".  The mapped files (being STORED and RETRIEVEd) fall
+into this category, since the extended lookup blocks will be needed, and
+it would be wasteful to do extra "chanio" calls.  The "relchan"
+procedure will release any channel, so that it may be used for generalityy
+throughout.  It must be used to release a channel assigned by "getmchan".
+.Sec MODES - mode switch setting;
+.Ss Function;
+	The procedures in this module are the service routines for
+the mode switch setting commands:  MODE, OLD, SYS, RPRINT, SPRINT,
+REELSET, DSKREP, and TTYREP.
+.Ss Entry points;
+	There is an entry point (actually a separate procedure) to
+handle each command named above.  They are as follows.
+.Preface 0;
+.Library |(adele)modes.sub|;
+.Preface 1;
+.Ss Global storage used;
+	The mode switch service routines must access the switch
+locations which are stored with the main program.
+.Sec FTRANS - file transfer and related commands;
+.Ss Function;
+	This code is included in SNARL only.  The procedures in this
+module are the service routines for the commands:  STORE, RETRIEVE, GET,
+DIRECTORY, TRANSLATE, and UNTRANSLATE.  The grouping allows for sharing
+of code among the commands whose functions are similar and for
+localizing the file list structures to one module.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)ftrans.sub|;
+.Preface 1;
+.Ss Global storage used;
+	The service routines for the data transfer commands use the
+mode switches and global tape position information.
+.Ss Global storage structures defined in this module;
+.AtPage_ false;
+{FigQ filists,Full,filelists,File Transfer Lists}
+	The following record structures are the patterns for the
+file lists shown in {FigRef filists}.
+.ByHand;
+
+.Library |(adele)sna020.sai|;
+.EndHand;
+.DoNow;
+.Ss Local storage structures;
+{FigQ ftransstorage, Full, ftranslocal, FTRANS Local Storage Structures}
+	The following record class descriptions are the patterns for the
+structures shown in {FigRef ftransstorage}.
+.ByHand;
+
+.Library |(adele)sna040.sai|;
+.EndHand;
+.DoNow;
+.AtPage_ true;
+.Ss Algorithms;
+.Sss Creating a sorted list for a STORE ALL transfer;
+	A STORE ALL transfer, with or without a starting or ending point,
+is done on the basis of usernames in sorted alphabetical order.  The
+exception is (SYS) which always comes first.  In order to do this,
+the list of usernames obtained from reading the MFD must be sorted.
+	The algorithm that will be used is a simple selection sort with
+a merge.  The sorted file list is built up in the record structure
+"allst".  To start, a group of entries is read from the MFD.  By
+selection, that first group is entered in "allst" in increasing
+alphabetic order.  For each of the remaining groups read from the MFD,
+individual entries selected must be merged with the "allst".  Since the
+"allst" is in sorted order, only a portion of it must be compared
+for each entry to be merged, starting with the last record
+entered.  Usernames which are alphabetically less than the starting
+username, if given, or greater than the ending username are discarded.
+.Sss Creating a username list for a STORE with GAN list parameter;
+	The MFD is be read
+the same as for a "STORE ALL", and the GAN of each entry will be
+compared with the GAN list.  If the MFD GAN is found in the user's GAN
+list, then the associated username will be selected for storage.  This
+yields a list of usernames which will be in MFD order and will reside
+in the record structure "allst".
+.Sss Storage order when writing files to tape;
+	Explicitly named files will be written to tape in the order
+they appear in the user command.  SNARL does not do a UFD
+search on a file name which has no wild card characters.  A wild
+card file name will cause a UFD search which may generate one or more
+file names; these will be in UFD order.
+.Sss Opening a file for storage to tape;
+	In order to use the extended lookup block without doing more
+than the necessary calls, the files are accessed with the system "open"
+and "enter" calls.  SAIL's channel management is not used; in its place,
+the "getmchan" and "relchan" alternate procedures are utilized to assign
+and release file channels.  The use of "enter is intentional in order to
+"busy" the file while processing it.  Files must be closed with the
+option bit '40 (inhibit create/supersede).
+.Sss Storing a file to tape - the data flow;
+	Each page in the ring of pages described by the class
+"map1" will be mapped to a page in the current file being
+stored to tape.  As each file page is mapped, it is also
+pre-referenced so that the disk transfer may be started.  This
+mapping and disk transfer can take place in parallel with the
+transfer to tape of the assembled file pages.
+	As each page is written to tape, then the core page may be
+mapped to a new file page, the next one in succession, and
+pre-referenced.  The mapping of file pages continues until there
+are no more pages in the current file.  In order to keep the page
+buffers filled, additional files may be opened and mapped to the
+core pages as space permits.  A disk file is closed
+when all its pages have been written to the tape buffers.
+	When a "hole" is found in the disk file, SNARL will search
+ahead (using a mapping call) to the next existent page.  The number
+of empty pages is calculated from the page number returned by the
+call and the page number of the previous existent page.  Then
+the "hole" marker (EMP) can be linked into the assembled page list and
+put out to tape in the proper sequence.
+.Sss Retrieval order when reading files from tape;
+	Files are retrieved from tape in the order in which they
+appear on the tape.  As the lookup information for each file is read,
+it is checked against the stored form of the user or file request to
+see if there is a match.  If the other conditions stated in the user
+command are met, then the file is read.
+.Sss Opening a file for retrieval;
+	This method is the same as for STORE except that the inhibit
+create/supersede option is only needed to close problem files which will
+not be permanently saved.
+.Sss Retrieving a file - the data flow;
+	As file data is read from tape, it is moved into the page
+holder arrays described by the class "map1".  As each array is filled,
+it is mapped to a new page in the disk file being written.  The
+write operation is initiated so that the data transfer can be done in
+parallel with the tape reading.
+	When each array page is written to disk, it can accomodate a
+new one coming from tape.  The mapping continues until the end-of-file
+(EOF record) on tape is reached.  In order to keep the core pages
+filled, additional files may be opened and tape read as space
+permits.  A disk file is closed when all its page buffers have been
+posted on disk.
+	A new disk file is opened (and the information saved in "opn!chan")
+as soon as a "lok" record is read from tape.  The reasons this is done
+are:
+.Preface 0;
+.List( -4, 4, 0, "a)" );
+.Item;
+The mapping routines allocate space when a page map request is
+processed.  A channel and file must be open in order to effect the
+write page mapping.  If the data pages following were simply stored
+in the structure, then it would be necessary to map them later when the
+file was created (wasting time).  In the mean time, the data fills
+space in the mapping structure.
+.Item;
+For error recovery, it is best to find the errors in file creation or
+mapping immediately before information is moved into the mapping
+structure which must be cleaned up later.
+.EndList;
+.Preface 1;
+	When a hold marker (EMP) is found on tape, then the disk file
+page count is increased by the appropriate amount such that the next
+page of data is written with the correct page number; this creates the
+"hole" on disk.
+.Sss Tape resident directory - when used;
+	~~DIRECTORY command~.  The tape resident directory is always
+used for a LIMITED directory.  It is not used otherwise.
+	~~RETRIEVE and GET commands~.  The tape resident directory
+is read and compared with the file list given in the command to
+produce a list of file positions (which may be stored in a temporary
+file).  Then the command service routine operates using the list of
+file positions.  If the resident tape directory appears to be bad,
+then this fact will be reported to the user and an ordinary search
+of the tape files from front to back will be done instead.  For the
+first coding and testing pass on the data transfer commands, only
+the ordinary search will be done.
+	~~STORE command~.  The STORE command creates the tape resident
+directory after storing the files onto tape.  The directory is built
+in a temporary file while the command is executing.
+.Sss Management of data pages and other tape markers;
+	For speed, it is desirable to overlap I/O operations during a
+a data transfer.  In order to do this during a STORE, it is necessary
+to continue reading new files without stopping the tape to finish
+outputting a file.  During a RETRIEVE, the file page mapping should
+continue even if the previous file has not been posted and closed.  In
+order to do this, there must be a method to keep track of special tape
+records that are being read or written (such as the "lok" records) so
+that they may be written in the proper order to the tape (if STORing)
+or so that the proper file-handling decisions be made when reading
+tape (if RETRIEVing).  The logical way to do this was to link these
+special records into the mapping list.  Since the mapping procedures
+create the "map1" array space only when a page map request is processed,
+it was necessary for SNARL to manage the creation of records and array
+space for the special records.  There, the structure "map1x" is defined
+to match the structure of "map1".  When SNARL creates a special record
+and links it into the mapping list, it allocates the array storage
+needed.  When one of these specials is processed, it is unlinked from
+list.  "Map1" and "Map1x" are both referenced in the program as "map1".
+.Sss Keeping track of opened files;
+	"Opn!chan" is used to keep track of opened disk files during
+a data transfer.  It is a FIFO list; newly opened files are added to the
+end, and files which are closed are removed from the front.  There are
+several reasons to justify a separate structure to
+keep track of opened disk files during a data transfer.
+.Preface 0;
+.List( -4, 4, 0, "a)" );
+.Item;
+If the information were kept only in the special record that links into
+the mapping structure, it might disappear before the file can be
+completely procesed.
+.Item;
+If several files are opened at once, a class structure is a convenient
+way to keep track of the newest and oldest for the purpose of knowing
+which file to close or in order to find the place on tape where the
+current file began.
+.EndList;
+.Preface 1;
+.Sss Statistics reporting during data transfers;
+	The statistics reported reflect what was actually completed on
+the destination device.  For
+instance, the report on a file during a RETRIEVE is done following the
+closing of the created disk file by the "rdy!page" routine.
+.Sec DSDUMP - DSNARL dump routines;
+	This module contains the service routines for the DSNARL
+commands:  TYPE or T, MAP, and  BLOCK.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)dsdump.sub|;
+.Preface 1;
+.Ss Algorithms;
+.Sss Treatment of tape;
+	In this module, the tape is treated in an unbuffered fashion and
+is oriented toward the physical blocks on tape.  This allows for easier
+"random" access to various portions of the tape.
+.Sec DSCHEC - testing and checking routines
+	This module contains the service routines for the DSNARL
+commands:  DIFFERENCES and QCHECK.
+.Ss Entry points and subroutines
+.Preface 0;
+.Library |(adele)dschec.sub|;
+.Preface 1;
+.Ss Algorithms
+.Sec TAPCOM - tape related commands;
+.Ss Function;
+	This module contains the service routines for the tape-related
+commands:  WHERE, CUT AFTER, REWIND, UNLOAD, DEVICE, TID, NEW TAPE,
+and APPEND.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)tapcom.sub|;
+.Preface 1;
+.Ss Algorithms;
+.Sss Managing tape device reassignment restrictions;
+	A tape device change is not allowed to take effect unless the
+next command following the DEVICE command is either a NEW TAPE or
+APPEND command.  If the use tries another command, then the old tape
+device will be reinstated with notification.
+	When a device change is requested, the new device is
+initialized, but the old one is not released.  The information is
+retained for both.  The procedures, "new!c" and "appe!c", will check
+to see if a device change has occurred; if so, they will release the
+old one and make the new one the current device.
+	Within the routine "xctcmd" (in SNCLI), a check is made for
+a device change.  If the command which is about to be executed is
+not one of the two proper ones, then the new mag tape device will be
+released, the old one will be made current, and the user will be
+notified.
+.Sec SNHELP - Help and program information commands;
+.Ss Function;
+	This module contains the service routines for the
+commands:  HELP, ?, INSTRUCTIONS, GRIPE, and NEWS.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)snhelp.sub|;
+.Preface 1;
+.Ss Algorithms;
+.Sss Printing long and short help text;
+	The help text for both the "?" and "HELP" commands is located
+in an external file described in {AppRef snarlhelp}.  The text in that
+file is delimited such that the service routines can distinguish the
+appropriate information to be printed for either a short or long help
+request.  The assistance for individual commands is also delimited, so
+that a simple search will locate the portion of text needed to give
+help for a single command.
+.Sec SNMISC - Miscellaneous commands;
+.Ss Function;
+	This module contains the service routines for the
+commands:  COF, LOG, UNLOG, COMMENT, and QUIT.
+.Ss Entry points and subroutines;
+.Preface 0;
+.Library |(adele)snmisc.sub|;
+.Preface 1;
+.Sec Building SNARL and DSNARL from Source, building:
+.Ss Command files;
+	SNARL is written in SAIL.  The following compiler-loader build
+files are applicable to the construction of SNARL and DSNARL.
+.ByHand;
+	snarl.cmd	standard SNARL build file
+	snarl.deb	one-segment SNARL load (used for debugging)
+	dsnarl.cmd	standard DSNARL build file
+	dsnarl.deb	one-segment DSNARL load (used for debugging)
+.EndHand;
+.Ss Customizing the modules;
+	As was mentioned previously, a number of the module sources are
+shared between the two programs.  They must be customized when they are
+compiled.  In addition, there are other options to select which require
+conditional compilation.
+	Each module source which is shared requires another source file
+called "sndsn.sai".  A listing follows:
+.ByHand;
+
+.Library |sndsn.sai|;
+.EndHand;
+	If compiling or loading SNARL, then set !snarl to "true" and
+!dsnarl to "false".  Do the reverse if compiling or loading DSNARL.
+	To use the BAIL debugger and other SNARL or DSNARL debugging
+options, then set debug to "true" and use the command the appropriate
+command file.
+	To select the test version of SNARL or DSNARL make
+production!version "false".
+	Remember that the /compile XEXEC option must be used to assure
+that the desired modules are compiled when a change is made to a source
+which is "required" by one of the modules.  The system will not know
+about these "requires".
+.Ss Changing the Help Text;
+	If the help text is changed for either program, then the program
+BLDHLP must be run to create the indices into the text for either SNHELP
+or DSHELP.  Then the "help" module must be recompiled.
+.Ss Changing the SNARL or DSNARL command syntax;
+	The syntax is changed by altering the BNF description of the
+appropriate command language and configuring a new parser module using
+the TABGEN program.  You must be familiar with the parsing technique
+and the TABGEN program.
+	The grammar change may also involve a change to the related
+module if the syntax difference represents a functional difference.  In
+addition, the pre-processing of the command (following parsing) may be
+affected.  The places in the program to check are the "xctcmd" routine
+in SNCLI or DSNCLI and the associated command executor.
+.Appendix SNARL software list, snarlsoft:
+	
+	*** more to come ***
+.Appendix DSNARL software list, dsnarlsoft:
+	
+	*** more to come ***
+.Appendix SNARL Grammar, sngrammar:
+.TurnOff "#{}";
+	The following grammar is the BNF description which is used
+by TABGEN to produce the tables and parser for SNARL.  Therefore,
+it includes error messages and references to special syntax or
+semantic routines.
+	There are several exception conditions handled by the
+scanner.  One is the COMMENT command.  The user-defined terminal
+{text} is determined by the scanner when it finds the command word
+COMMENT.  It "tokenizes" the remainder of the command as {text} to
+make the parsing routines happy.
+	Another exception is the handling of command files.  A call
+to a command file is detected during scanning, and the file name is
+determined at that point.  Prior to parsing, the complete command
+sentence is assembled by the scanner.
+.ByHand;
+
+.Library |(adele)snarl.bnf|;
+.Turn On "#{}";
+.EndHand;
+.Appendix DSNARL Grammar, dsngrammar:
+.TurnOff "#{}";
+	The following grammar is the BNF description which is used
+by TABGEN to produce the tables and parser for DSNARL.  Therefore,
+it includes error messages and references to special syntax or
+semantic routines.
+	There are several exception conditions handled by the
+scanner.  One is the COMMENT command.  The user-defined terminal
+{text} is determined by the scanner when it finds the command word
+COMMENT.  It "tokenizes" the remainder of the command as {text} to
+make the parsing routines happy.
+	Another exception is the handling of command files.  A call
+to a command file is detected during scanning, and the file name is
+determined at that point.  Prior to parsing, the complete command
+sentence is assembled by the scanner.
+.ByHand;
+
+.Library |(adele)dsnarl.bnf|;
+.Turn On "#{}";
+.EndHand;
+.Appendix SNARL and DSNARL Help File Format, snarlhelp:
+	The help file contains the information which will be accessed
+by the "HELP" and "?" commands.  In order for the long and short
+help information to be distinguished and to separate the text for
+the various commands, a simple file format must be used.
+	Help text is interleaved with text separator commands which
+begin with "{" and are terminated by "}".  Each should contain the
+symbol for the token value of the SNARL or DSNARL command word followed
+by either "s" or "l" or both, all separated by commas.  For example:
+.ByHand;
+	{!rewind,s,l}
+.EndHand;
+.Continue;
+The "s" denotes the beginning of "short" text which is typed in response
+to the "?" command.  the "l" denotes the beginning of "long" text which
+is typed in response to the "HElP" command.  The end of the block of
+text which follows is determined by either the next separator command
+or the end-of-file.
+	~~Possible enhancement~.  It may be desirable to create
+an additional level of text separation for parameter descriptions.  This
+would enable the expansion of the help facility to include portions
+of commands.
+.Standard Back;
+  ba- ×
