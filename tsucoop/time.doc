@@ -1,0 +1,320 @@
+
+Time Sheet Procedures          June 1982                          Page 1
+
+
+                       MTS TIME SHEET PROCEDURES
+                          
+
+
+
+     Time sheets for the Tymcom-X  section are in a MAGNUM data  base on
+system  36 under  user  tymxmts.  Individual  time sheets  are  in files
+written  in  each user's  directory  by the  "generate"  command  in the
+procedure  time.sheets and  loaded into  the data  base  when completed.
+Projects and tasks  are added to  the lists by  the managers, or  can be
+inserted  by  the  user  when  filling  out  the  time  sheet.   Further
+information on preparing time sheets  can be found in "How to  Prepare a
+MTS Time Sheet".
+
+              WEEKLY LOADING AND GENERATING OF TIME SHEETS
+                    
+
+     Every Monday (or the first working  day of the week if Monday  is a
+holiday) all time sheets should be loaded at 1 p.m., and time sheets for
+the next week should be generated.
+
+     To  do  this log  into  36, set  write  files license,  and  gfd to
+tymxmts.   Run  ftmagnum,  run  procedure  time.sheets.   The  procedure
+time.sheets has  basically three commands  other than "help"  or "quit".
+"load" (which can be "l"), "generate" (or "gen" or "g") and "status" (or
+"outstanding" or "out" or "o" or "s").  You will be using only the first
+two.
+
+     The command  "load all  {filename}" will load  all time  sheets for
+"resources" in the data base who do not have a termination date entered.
+If a file name is not given following "all", the next prompt will be for
+a  week ending  date, with  the  default to  be used  in  brackets.  The
+default  date will  be the  date of  the previous  Friday,  and carriage
+return will use that date. If you want another date in the  current year
+enter it in the format mmmdd as "apr05".  The file name can  be included
+in the command line  as in "l loil apr05.tim";  this is the only  way to
+reload a time sheet from the previous year as the program checks  to see
+if a  date given  is indeed  a Friday in  the current  year and  if not,
+changes the date used to the following Friday.
+
+     If a time sheet has no errors, and the total hours are at least 40,
+the time sheet will load without comment.
+
+     If there are  any errors, MAGNUM will  report them.  Any  line that
+contains an error will not have the hours loaded.  Either edit  the file
+and  correct the  error, or  send  mail with  the error  message  to the
+originator of the time sheet and  ask them to correct the error  and let
+you know so it can be reload.
+
+     If  anyone  has  a time  sheet  with  less than  40  hours,  a file
+"time.msg"  will  be written  in  their directory  reporting  that fact.
+MAGNUM will  ask if it  is all right  to create this  new file  with the
+question "New  file - OK?"  or "Existing file  - OK?".  In  either case,
+respond with "yes"  or "y".  If any  such files have been  written, upon
+exiting the time.sheets command module, the file err.cmd will be written
+
+
+
+                                   1
+Time Sheet Procedures          June 1982                          Page 2
+
+
+(again MAGNUM will ask if it all right to ceate the file) and a reminder
+will be given to send mail @err.cmd.  In this case after leaving MAGNUM,
+while  still  in  directory  (tymxmts),  send  mail   @err.cmd,  message
+@time.msg.  If any time sheets  are blank, a message will be  printed at
+the end of the loading reporting the names of those who have  blank time
+sheets.  Send  mail to  the manager of  anyone with  a blank  time sheet
+reporting that fact.
+
+     After  loading  the  time  sheets,  issue  the  command   "gen  all
+{filename}".  Again, if a file name is not given, there will be a prompt
+for the date with the default  date given in brackets; in this  case the
+default date will be the following Friday.  A carriage return  uses that
+date, if you wish  another type it in.   If the time sheet  file already
+exists,  another  file  called "mmmddx.tim"  will  be  written  into the
+directory and a message will report that fact (and therefore you  do not
+have to worry about overwriting a completed time sheet).
+
+     After that, exit the command "quit" or "q".  
+
+     If any time sheets are redone, load them individually.  The command
+is "load loil {filename}"; again a default date can be used.
+If you are reloading a time sheet that did not have 0 hours the
+first time, use the command "reload loil {filename}" which has the 
+additional capability to delete all the old records for the given date
+and person.
+
+                                REPORTS
+                                
+
+     Many reports can be generated using the procedure mtx.   The report
+routinely generated each week  is the pc70 personnel status  report.  To
+produce this  report run  the procedure mtx.  Give the  command "pc70.rs
+<date>" where <date> is the date of the last Saturday before  the report
+date in the form  mm/dd/yy.  For example, if  the report is for  May 14,
+the command would be "pc70.rs 5/8/82".  Have this report written  into a
+file on your directory.  Exit  this module and then print two  copies of
+the report on the 350.  Give one complete copy to Mike Hinckley and give
+Todd Corenson and Adele Newman copies  of their time sheets and of  all the
+people in their units.
+
+
+        Todd Corenson                Adele Newman
+
+        Greg Matoka		  Carl Baltrunas
+        Darren Price              Ken Dawson
+                                  Vivian Hiatt
+                                  Lois Lindley
+				  Zonnie Williamson
+
+
+     If  there are  any outstanding  time sheets  that get  done between
+Monday at 2 and the  following afternoon, they should be  loaded Tuesday
+afternoon and the pc70.rs report regenerated to the same file.
+
+
+
+
+                                   2
+Time Sheet Procedures          June 1982                          Page 3
+
+
+     Print out  another copy of  the report and  burst and give  to each
+person (except for Mike, Adele  and Bill).  If there have  been changes,
+print another copy of the whole report for Mike.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   3
+Time Sheet Procedures          June 1982                          Page 4
+
+
+                                SCHEDULE
+                                
+
+Weekly time sheet procedure:
+
+Monday:
+
+   1:00 p.m.    load, generate all
+                mail to managers of any blank time sheets on 930
+                mail to those with < 40 hours
+
+   2:00         reload any time sheets necessary
+                generate pc70.rs report
+                make two copies on 350 of report
+                   one copy to Mike
+                   one copy burst and to appropriate managers
+
+Tuesday:
+
+   1:00         load any time sheets that have been redone and
+                    generate pc70.rs report
+                print report on 350 - two copies if changed
+                   one copy to Mike if changed
+                   one burst to individuals
+                   if any have been reloaded, give copies to
+                     appropriate manager
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   4
+Time Sheet Procedures          June 1982                          Page 5
+
+
+                             SAMPLE SESSION
+                              
+    .o wf$
+    .gf tymxmts
+    .ftmagnum
+    9-JUN-1982  15:36:04
+    =:SCHEMA MTS
+    User: LOIS         in TYMXMTS
+    :run time.sheets
+    LOADING TIME.SHEETS
+    EXECUTION
+    >>load all
+    week ending [Jun04]:
+    (ADELE)JUN04.TIM ADEN Jun04     40.0 hours
+    (CARL)JUN04.TIM CARB Jun04     42.0 hours
+    (DARREN)JUN04.TIM DARP Jun04     29.0 hours
+    (DARREN)TIME.MSG Existing file - OK? y
+    (DELANEY)JUN04.TIM MARD Jun04     40.0 hours
+    (DWS)JUN04.TIM DAVS Jun04
+    (KEN)JUN04.TIM KEND Jun04     40.0 hours
+    (LENKOV)JUN04.TIM DMIL Jun04     40.0 hours
+    (LOIS)JUN04.TIM LOIL Jun04     40.5 hours
+    (MCH)JUN04.TIM MIKH Jun04     52.0 hours
+    (SDANIELS)JUN04.TIM SCOD Jun04     40.0 hours
+    (TJB)JUN04.TIM TIMB Jun04     41.3 hours
+    (TODD)JUN04.TIM TODC Jun04     41.0 hours
+    (WRS)JUN04.TIM BILS Jun04     68.9 hours
+    The following people have blank time sheets:
+    Dave Smith
+    >>gen loil
+    week ending [Jun11]:
+    PASS 1: current projects =    220, current tasks =      463
+    LOIL (LOIS)Jun11.TIM
+    >>q
+    ERR.CMD Existing file - OK? y
+    Be sure to send mail @ERR.CMD
+    EXECUTION COMPLETED
+    :run mtx
+    LOADING MTX
+    EXECUTION
+    TYMXMTS>pc70.rs 5/29/82
+    efault node for resource LOIL does not exist:
+    Enter the file name for the REPORT : (lois)rs0528.rpt
+     New file - OK? y
+    TYMXMTS>q
+    efault node for resource LOIL does not exist:
+    EXECUTION COMPLETED
+    :q
+    9-JUN-1982  15:39:21
+    EXIT
+    .send @err.cmd
+    TYPE LETTER:
+    @time.msg
+    .k
+
+
+
+                              5
+WEEKLY MTS MAINTENANCE
+
+Every Thursday afternoon:
+log in as tsucoop on :36
+
+.gf tymxmts
+.ftmagnum
+:do backup.all
+   .
+   .
+   .
+:q
+.k
+ |@Yí
