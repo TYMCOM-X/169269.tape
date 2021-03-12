@@ -1,0 +1,295 @@
+
+REQUIRE "" DELIMITERS; COMMENT TEMPORARILY OVERRIDE ANY FANCIES;
+    DEFINE DSCR="COMMENT ";
+    DEFINE #=" "; #
+DSCR SCNCMD.SAI -- a package for scanning CUSP-like commands.
+
+DES This package provides a function COMMAND!SCAN, and a set
+ of variables and defined values with the following proerties:
+PAR The following values must be DEFINEd:
+  SRCMODE, LSTMODE, RELMODE the data modes for the approp. files
+   (define them all, even if you don't use them)
+  SRCEXT, LSTEXT, RELEXT default extension names (they should
+   expand to string constants) for the appropriate files.  Blank
+   will also be checked as a possible extension for source files.
+  PROCESSOR should expand to a string constant.  The first three
+   characters will be the name of the TMPCOR command file if started
+   in RPG mode.  nnnprocessor.TMP is the alternate if TMPCOR fails.
+  SWTSIZ is the maximum number of switches recognized by the PROCESSOR.
+  GOODSWT is a string which contains the characters which are valid
+   switches.
+
+ The following variables must be set:
+  ON!ETIME should be made 0 once only, to force opening of
+   the command file.
+  NX!TFIL should be made 0 to force COMMAND!SCAN to expect
+   a new FILE_FILE command next, instead of more source files.
+  WANTBIN should be made true if a `.REL' file is to be
+   opened if a file is specified for it.
+  WANTLST should be made true if a `.LST' file is to be
+   opened if a file is specified for it.
+  SOURCECOUNT, after the call on COMMAND!SCAN, may be changed,
+   either permanently or temporarily, to control input.
+RES on returning from COMMAND!SCAN, the following are available:
+ WANTBIN, WANTLST -- true if a file was opened in the approp.
+  position, false if false coming in, or no file specified.
+ BINFIL, SRCFIL -- the file, extension, and PPN for the approp.
+  files (strings).
+ SRC, BIN, LST, CMND, DELCHNL (1-5) are channels reserved for
+  the obvious functions.  You should use these names.
+ CMDTBL, LINTBL, RBRK (15-17) are break tables used by
+  COMMAND!SCAN.  Use them if you wish, but don't expect
+  them to be there when you get back.
+ CRLF,DSCR, and BLANKS are the obvious macros.  Redefine any but DSCR
+  if you wish.
+SID Channels 1-5, Break Tables 15-17 are reserved by
+ COMMAND!SCAN.  Do GETCHANs to obtain channels, or
+ be careful.
+CAL call COMMAND!SCAN with no parameters.  The first time, and
+ any time subsequently that it is called with NX!TFIL=0, it
+ will expect optional LST and REL specs, separated by comma,
+ followed by a left arrow in the command file, then one or
+ more source file names separated by commas, terminated by
+ a CRLF.  Only one source file is read the first time.  Subse-
+ quent calls on COMMAND!SCAN (without touching NX!TFIL) will
+ cause subsequent source files to be looked up--if no more exist
+ an error message will be printed.  Set this to FALSE when you
+ want a brand new command.  Set ON!ETIME once for every time
+ the entire program is restarted.
+;
+REQUIRE "<><>" DELIMITERS;
+IFC EQU(COMPILER!BANNER[LENGTH(SCANC(COMPILER!BANNER,"-",NULL,
+	"IA"))+1 FOR 8],"TYMSHARE") THENC
+   DEFINE TYMSWSC=<TRUE>; ELSEC DEFINE TYMSWSC=<FALSE>; ENDC;
+REQUIRE UNSTACK!DELIMITERS;
+
+    EXTERNAL INTEGER RPGSW;
+    INTEGER WANTBIN,WANTLST,SRCBRK,SRCEOF,CMDBRK,ON!ETIME,NX!TFIL;
+    INTEGER SOURCECOUNT,SWTP;
+    STRING BINFIL,SRCFIL,SWTSTR;
+    INTEGER ARRAY SWTVAL[1:SWTSIZ];
+	INTEGER ARRAY BUF[0:'377];
+    DEFINE CRLF="('15&'12)", BLANKS="(""                       "")";
+    DEFINE SRC="1",BIN="2",LST="3",CMND="4",DELCHNL="5";
+    DEFINE LINTBL="17",	CMDTBL="16", RBRK="15";
+
+    PROCEDURE COMMAND!SCAN;
+    BEGIN "COMMAND SCAN"
+       INTEGER EOF,FG,TIA,TIB,TIC,TID,SPCFIL,TIE,TIF;
+       STRING CMNDFIL,LSTFIL,LINE,TSA,TSB,TSC,BKSTRNG,TSD,CMNDSTR;
+
+	SIMPLE INTEGER PROCEDURE TMPCORSTR
+	    (INTEGER CODE; STRING FIL; REFERENCE STRING TEXT);
+	BEGIN COMMENT Performs TMPCOR function CODE on FIL, transfering 
+		TEXT.  Only functions 1 (read), 2 (read and delete), 
+		3 (write) are legal.  Value returned is that returned 
+		in AC by the UUO, !SKIP! is zero if no error, else 
+		!SKIP! is -1;
+	EXTERNAL INTEGER !SKIP!;
+	START!CODE LABEL FOOEY,WRLUP,WRBOT,WRCLR,NOTWRITE;
+	DEFINE P="'17",SP="'16",!="COMMENT";
+		skiple	1,CODE;		! CHECK VALID CODES;
+		CAILE	1,3;
+		 JRST	FOOEY;		! YOU LOSE;
+		MOVE	2,BUF;		! FWA;
+		MOVEI	2,-1(2);	! FWA-1 FOR IOWD;
+		HRLI	2,-'400;	! COMPLETE THE IOWD;
+		PUSHJ	P,CVSIX;	! CONVERT FIL TO SIXBIT IN AC1;
+		TRZ	1,-1;		! PUT ZEROES IN RIGHT HALF;
+				! FILE NAME AND IOWD NOW IN 1 AND 2;
+		MOVSI	5,'440700;
+		HRRI	5,1(2);		! BP TO BUF;
+		MOVE	3,CODE;
+		MOVE	4,-1(P);! PTR TO WD2;
+		CAIE	3,3;
+		 MOVEM	5,(4);		! SET RESULT BP IF SOME SORT OF READ;
+		CAIE	3,3;
+		 JRST	NOTWRITE;
+		HRRZ	3,-1(4);	! LENGTH(TEXT);
+		CAILE	3,'400*5;	! CHECK MAX LENGTH;
+		 JRST	FOOEY;
+		MOVE	4,(4);		! COUNT IN 3, BP IN 4;
+		JRST	WRBOT;
+	WRLUP:	ILDB	6,4;
+		IDPB	6,5;
+	WRBOT:	SOJGE	3,WRLUP;
+		TDZA	6,6;	! CLEAR REMAINDER OF LAST WORD;
+	WRCLR:	IDPB	6,5;
+		TLNE	5,'760000;
+		 JRST	WRCLR;
+	NOTWRITE:MOVS	3,CODE;
+		HRRI	3,1;	! PARAM AC FOR TMPCOR;
+		SETZM	!SKIP!;
+		CALLI	3,'44;
+	FOOEY:	 SETOB	3,!SKIP!;
+		SKIPGE 1,3;
+		MOVEI 3,0;!	SET TO 0 IF NEGATIVE;
+		IMULI	3,5;	! CONVERT TO CHAR COUNT;
+		MOVE	2,CODE;
+		MOVE	4,-1(P);! PTR TO WD 2;
+		CAIE	2,3;
+		 MOVEM	3,-1(4);! STORE CHAR COUNT IF SOME SORT OF READ;
+		SUB	P,['3000003];
+		JRST	@3(P);
+	END; END;
+
+       PROCEDURE FILENAME(REFERENCE STRING DEVICE,FILE);
+       BEGIN "FILENAME"
+	  PROCEDURE SWTGET;
+	  BEGIN	"SWTGET"
+	     SETBREAK(RBRK,"0123456789",NULL,"XAK");
+	     TSC_SCAN(LINE,RBRK,CMDBRK);
+	     SWTVAL[SWTP_SWTP+1]_CVD(TSC[1 TO inf-1]);
+	     TID_TSC[inf FOR 1];
+	     TSD_GOODSWT;
+	     FOR TIE_1 STEP 1 WHILE (TIF_LOP(TSD))TIDTIF DO;
+	     SWTSTR_SWTSTR&TIE;
+	     IF	(CMDBRK_LINE)="/" or CMDBRK=")" THEN CMDBRK_LOP(LINE)
+	  END "SWTGET";
+
+	  SPCFIL_FALSE;
+	  FILE_SCAN(LINE,CMDTBL,CMDBRK);COMMENT GET DEVICE OR FILENAME;
+	  IF CMDBRK = ":" THEN BEGIN
+	     DEVICE_FILE; SPCFIL_TRUE; COMMENT FILE SPECIFIED, NOT INVENTED;
+	     FILE_SCAN(LINE,CMDTBL,CMDBRK)
+	  END ELSE DEVICE_ IF EQU(FILE,"LPT") or EQU(FILE,"LPT.") 
+				THEN "LPT" ELSE "DSK";
+	  IF CMDBRK="["	THEN BEGIN
+	     SETBREAK(RBRK,"]",NULL,"IA");
+	     FILE_FILE&"["&SCAN(LINE,RBRK,CMDBRK);
+	     FILE_FILE&SCAN(LINE,CMDTBL,CMDBRK)
+	  END;
+	  WHILE	CMDBRK="/" DO SWTGET;
+	  IF CMDBRK="("	THEN BEGIN
+	     DO	SWTGET UNTIL CMDBRK=")";
+	     CMDBRK_LOP(LINE)
+	  END;
+END "FILENAME";
+
+       LABEL NXTIME;
+       SWTP_0; SWTSTR_NULL;
+       IF NX!TFIL THEN GO TO NXTIME;
+       SETBREAK(CMDTBL,"_:,(!/["&'12,'15&'40&'11,"I");
+       SETBREAK(LINTBL,'12,'15,"INA"); SETBREAK(RBRK,"]",NULL,"IA");
+       RELEASE(BIN); RELEASE(LST);
+
+    COMMENT FIRST GET COMMAND DEVICE;
+
+       IF not RPGSW THEN OUTSTR(CRLF&"*");
+       TSA_ IF RPGSW THEN "DSK"	ELSE "TTY";
+
+       IF not ON!ETIME THEN BEGIN
+	  EOF_0;
+	  COMMENT TRY TMPCOR FIRST BEFORE FILE, USE LENGTH OF CMNDSTR
+		AS FLAG THAT COMMAND IS IN CMNDSTR RATHER THAN FILE;
+	  CMNDSTR_NULL;
+	  IF RPGSW THEN TMPCORSTR(2,PROCESSOR,CMNDSTR);
+	  IF NOT(LENGTH(CMNDSTR)) THEN BEGIN
+	    OPEN(CMND,TSA,0,1,1,100,CMDBRK,EOF_-1);
+	    IF EOF THEN USERERR(0,0,"COMMAND DEVICE NOT AVAILABLE");
+	    TSB_("000"&CVS(CALL(0,"PJOB")))[INF-2 FOR 3]&PROCESSOR&".TMP";
+	    LOOKUP(CMND,TSB,FG);
+	    IF FG	THEN USERERR(0,0,"COMMAND FILE NOT FOUND");
+	  END;
+
+	  IF RPGSW AND NOT LENGTH(CMNDSTR) THEN	BEGIN "DELETE COMMAND FILE"
+	     OPEN(DELCHNL,"DSK",0,2,0,100,TIA,TIA);
+	     LOOKUP(DELCHNL,TSB,FG);
+	     RENAME(DELCHNL,NULL,0,FG);
+	     RELEASE(DELCHNL)
+	  END "DELETE COMMAND FILE";
+
+	  CMNDFIL_TSA&":"&(IF RPGSW THEN TSB ELSE NULL);
+	  ONETIME_TRUE;
+       END;
+       LINE_NULL;
+       WHILE not EOF 
+	and (LENGTH(LINE) leq 1 
+		or LENGTH(LINE)<5 and
+			EQU (LINE,BLANKS[1 FOR LENGTH(LINE)-1]&'12)) DO
+	 BEGIN COMMENT HANDLE TMPCOR VS. FILE;
+	  IF LENGTH(CMNDSTR) THEN BEGIN
+	    LINE_SCAN(CMNDSTR,LINTBL,CMDBRK);
+	    EOF_NOT(LENGTH(CMNDSTR)) END
+	  ELSE LINE_INPUT(CMND,LINTBL); COMMENT GET RID OF BLANK LINES;
+	 END;
+       IF EOF THEN TIA_CALL(0,"EXIT");
+
+       FILENAME(TSA,TSB);
+
+       IF CMDBRK = "!" THEN BEGIN "NEW!PROGRAM"
+			INTEGER ARRAY  SWPTBL[1:6];
+				comment need all 6 for tymshare;
+	  SWPTBL[4]_SWPTBL[6]_0; 
+	  SWPTBL[1]_CVSIX(TSA);
+	  SWPTBL[2]_CVFIL(TSB,SWPTBL[3],SWPTBL[5]);
+	  TIA_ location(SWPTBL[1]);
+IFCR TYMSWSC THENC  
+	  IF not SPCFIL THEN SWPTBL[1]_CVSIX("SYS");
+	  CALL( (IF RPGSW then 1 else 0) lsh 18 + tia, "RUN");
+ELSEC
+	  IF not SPCFIL THEN SWPTBL[5]_CVSIX("  1  3");
+	  IF RPGSW THEN	SWPTBL[4]_1; 
+	  CALL (TIA,"SWAP"); 
+ENDC
+       END "NEW!PROGRAM"
+
+       ELSE IF CMDBRK =	"_" OR CMDBRK =	"," THEN
+	IF SPCFIL or LENGTH(TSB) THEN BEGIN "BINARY"
+	   TIA_CVFIL(TSB,TIB,TIC);
+	   IF TIB=0 THEN TSB_CV6STR(TIA)&"."&RELEXT;
+	   TID_-1;
+	   IF WANTBIN THEN BEGIN "OPNBIN"
+	      OPEN(BIN,TSA,RELMODE,0,2,0,TIC,TID);
+	      IF TID THEN USERERR(0,0,RELEXT&" DEVICE NOT AVAILABLE");
+	      ENTER(BIN,TSB,FG);
+	      IF FG THEN USERERR(0,0,"CANT ENTER "&RELEXT&" FILE");
+	   END "OPNBIN";
+	   BINFIL_TSA&":"&TSB;
+	END "B" ELSE WANTBIN_0  ELSE USERERR(0,0,PROCESSOR&
+	 " COMMAND ERROR");
+
+       IF CMDBRK = "," THEN BEGIN "LISTING"
+	  FILENAME(TSA,TSB);
+	  TIA_CVFIL(TSB,TIB,TIC);
+	  IF TIB = 0 THEN TSB_CV6STR(TIA)&"."&LSTEXT;
+
+	  IF WANTLST THEN BEGIN
+	     OPEN(LST,TSA,LSTMODE,0,2,0,TIC,TIC);
+	     ENTER(LST,TSB,FG);
+	     IF	FG THEN	USERERR(0,0,"CAN'T ENTER "&LSTEXT&" FILE");
+	  END;
+	  LSTFIL_TSA&":"&TSB;
+	  IF CMDBRK neq "_" THEN USERERR(0,0,PROCESSOR & " COMMAND ERROR");
+       END "LISTING" ELSE WANTLST_0;
+       FILENAME(TSA,TSB);
+       OPEN(SRC,TSA,SRCMODE,2,0,SOURCECOUNT_200,SRCBRK,SRCEOF);
+
+       WHILE TRUE DO BEGIN "SOURCE FILE LOOP"
+	  IF CMDBRK neq '12 AND CMDBRK neq ","
+		 THEN USERERR(0,0,PROCESSOR& " COMMAND ERROR");
+	  CLOSE(SRC);
+	  TID_CVFIL(TSB,TIC,TIE);
+	  TSC_CVXSTR(TID)&"."&SRCEXT&
+	   (IF TIE THEN "["&(TSC_CVXSTR(TIE))[1 FOR 3]&","&TSC[4 FOR 3]&"]"
+	    ELSE NULL);
+	  FG_-1;
+	  IF TIC=0 THEN	LOOKUP(SRC,TSC,FG);
+	  IF FG	THEN LOOKUP(SRC,TSB,FG);
+	  IF FG	THEN USERERR(0,0,TSB &" FILE NOT FOUND");
+	  SRCFIL_TSA&":"&TSB;
+	  IF RPGSW THEN
+	   OUTSTR(PROCESSOR&":	"&
+		(IF EQU(TSA,"DSK") THEN NULL ELSE TSA)&TSB& '15&'12);
+	  NX!TFIL_TRUE;	  RETURN;
+
+	  NXTIME:
+
+	   IF CMDBRK='12  THEN USERERR(0,0,"END OF FILE ON SOURCE FILE");
+	  FILENAME(TSA,TSB);
+       END "SOURCE FILE LOOP";
+    END	"COMMAND SCAN";
+
+REQUIRE UNSTACK!DELIMITERS; COMMENT REVERT;
+
+   .cM0
