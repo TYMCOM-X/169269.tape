@@ -1,0 +1,30 @@
+BEGIN
+
+require "mylib.sai" source!file;
+
+Print("     Begin Program TT.SAI ");Print(crlf&crlf);
+
+Print("     GetDate Returns:     ");
+Print(">>",S_GetDate,"<<");Print(crlf);
+Print("     GetTime Returns:     ");
+Print(">>",S_GetTime,"<<");Print(crlf);
+Print("     GetUserName Returns: ");
+Print(">>",S_GetUserName,"<<");Print(crlf);
+
+Print(crlf);
+Print("Enter a call",crlf);
+i_inchrw;
+While true do
+  Begin
+    Print("calli(0,",cvos(i),") = ",calli(0,i),crlf);
+
+    Print("Enter a call",crlf);i_inchrw;
+  End;
+
+Print("     End Program TT.SAI");
+Print(crlf);
+
+
+
+
+End;
