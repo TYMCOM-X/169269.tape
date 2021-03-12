@@ -1,0 +1,36 @@
+snarl .sai	;SNARL main
+sncli .sai	;SNARL command language interpreter
+snpars.sai	;configured TDPARS for SNARL
+snio  .sai	;I/O and interrupt routines
+modes .sai	;mode setting service routines
+ftrans.sai	;data transfer service routines
+tapcom.sai	;tape related service routines
+snmisc.sai	;miscellaneous service routines
+snarl .bnf	;SNARL grammar
+------------------------------------------------------------------------
+	*** Files which are needed for the internal specification ***
+
+snarli.pub	;main text source for the document
+snblok.pub	;SNARL block diagram
+snlist.pub	;diagrams for data transfer list structures
+sncmdl.pub	;diagrams for command interpretation list structures
+
+	The following are storage definitions which are copied from the
+	SNARL and DSNARL source files.  Currently, these files must be
+	created by hand using the available editors.
+
+sna010.sai	;global storage in the main (from snarl.sai)
+sna020.sai	;data transfer list structures (from ftrans.sai)
+sna030.sai	;command interpretation list structures (from sncli.sai)
+sna040.sai	;other local storage in ftrans (from ftrans.sai)
+
+	The following text files are produced from the SNARL source
+	files by the PROCOM and are referenced by "snarli.pub".
+
+snarl .sub	;entry point descriptions for "snarl" module
+sncli .sub	;entry point descriptions for "sncli" module
+snio  .sub	;entry point descriptions for "snio"
+modes .sub	;entry point descriptions for "modes"
+ftrans.sub	;entry point descriptions for "ftrans"
+tapcom.sub	;entry point descriptions for "tapcom"
+snmisc.sub	;entry point descriptions for "snmisc"
