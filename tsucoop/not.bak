@@ -1,0 +1,274 @@
+BEGIN
+
+require "(sailib)sail.def" source!file;
+require "(sailib)xtend.dcl" source!file;
+
+integer inchan,
+        outchan,
+        LineBr,
+        inbrchar,
+        inEOF,
+        i,
+        FileNotFound,
+        flag;
+
+string  Str,S,UserName; 
+
+Internal Simple Boolean Procedure SubSet(String STR, SubStr);
+! SubSet returns true If all the characters in string STR;
+! are some SubSet of those in string SubStr;
+begin "SubSet"
+  own boolean array Chars[0:'177];
+
+    if ( length( STR ) = 0  or  length( SubStr ) = 0 )
+     then return( false );
+
+    arrclr( Chars );
+    while ( length( SubStr ) )
+     do Chars[ lop( SubStr ) ]_ true;
+
+    while ( length( STR ) )
+     do if not( Chars[ lop( STR ) ] )
+	 then return( false );
+
+    return( true );
+
+end "SubSet";
+ 
+
+String Procedure GetText             !  Returns a string typed at terminal;
+               (String Terminators); !    until "terminator" is encountered.;
+                                     !  Terminator is supplied when proc- ;
+begin "GetText"                      !    edure is called.;
+    String S;
+    Integer C;
+  S_Null;
+  While not( SubSet( C_INCHRW, Terminators ) ) do
+    begin "#create string"
+      If (C = '177) or (C = #bs) then
+        begin "backup a bit"
+          If (length(S)) then  ! true If S has length > 0;
+            begin "something there"
+              If ((S[inf-11 for 1] = #cr) and
+                 (S[inf-10 for 1] = #lf)) then
+                begin "do last line"
+                  S_S[1 to inf-10];
+                  print(#cr);
+                  S_S[1 to inf-2];
+                                         ! S gets SubString from 1st
+                                                 char to 3rd from last;
+                  For c_Length(S) step -1 until 1 do
+                                         ! C gets length of the string
+                                           then steps back to last #lf;
+                    begin "find last #lf"
+                      If (S[C for 1] = #lf) then
+                        begin "show line"
+                                         ! Print from last #lf to end;
+                          Print(S[C+1 to inf]);
+                                         ! since S[C] was found to be the
+                                           last #lf, Print all from S[C+1];
+                          Done;  ! terminates "For" loop;
+                                    end "show line"
+                      else
+                        If (C = 1) then
+                          Print("          "&S);
+                    end "find last #lf";
+                end "do last line"
+              else
+                begin "erase one character"
+                  S_S[1 to inf-1];
+                  If (c NEQ #bs) then
+                    Print(#bs);
+                  Print(" " & #bs);  ! cursor now under a blank;
+                end "erase one character";
+            end "something there"
+          else
+             If c = '177 then
+               print(null & #bel)
+             else
+               print(" "&#bel)
+        end "backup a bit"
+      else
+        begin "add to str"
+          s_S & C; ! add new char onto end of S;
+          If C = #lf then
+            begin "tab 10"
+              S_S & "          ";
+              print("          ");
+            end "tab 10";
+        end "add to str";
+    end "#create string";
+  If C = #lf then
+    S_S[1 to inf-1];
+  Return(S);
+end "GetText";
+ 
+
+Simple Procedure InitFiles;
+Begin "InitFiles"
+  open (inchan_getchan,"DSK",0,2,0,500,inbrchar,inEOF);
+  open (outchan_getchan,"DSK",0,0,2,0,0,0);
+  lookup(inchan,"Notes",FileNotFound);
+  enter(outchan,"Notes",flag);
+  setbreak(LineBr_getbreak,#lf,#cr,"is");
+end "InitFiles";
+
+
+Simple Procedure DateTimeUser;
+Begin "DateTimeUser"
+  Integer Result,Month,Day,Year,Hours,Minutes;
+  Result_calli(0,'14);
+  Print(((Result DIV 31)MOD 12)+1);Print("-");
+  Print(Result MOD 31 + 1);Print("-");
+  Print(Result DIV 365 + 64);Print(" ");
+  Result_calli(0,'23);
+  Hours_((Result DIV 1000) DIV 3600);
+  If Hours < 10 then 
+    Print("0");
+  Print(Hours);Print(":");
+  Minutes_(((Result Div 1000) - (Hours * 3600)) Div 60);
+  If Minutes < 10 then
+    Print("0");
+  Print(Minutes);
+  Print(".   Good ");
+  If Hours < 12 then
+    Print("morning, ")
+  Else
+    If hours < 17 then
+      Print("afternoon, ")
+    Else
+      Print("evening, ");
+  Print(UserName_cv6str(calli(-'22,'41)) & cv6str(calli(-'21,'41)));
+  Print(".");
+End "DateTimeUser";
+
+
+Simple Procedure InsertTimeDate;
+Begin "InsertTimeDate"
+  integer Result,HOURS,MINUTES,MONTH,DAY,YEAR;
+  Result_calli(0,'14);
+  MONTH_((Result DIV 31)MOD 12)+1;
+  cPrint(outchan,MONTH);cPrint(outchan,"-");
+  DAY_(Result MOD 31) + 1;
+  cPrint(outchan,DAY);cPrint(outchan,"-");
+  YEAR_(Result DIV 365) + 64;
+  cPrint(outchan,YEAR);cPrint(outchan," ");
+  Result_calli(0,'23);
+  HOURS_((Result div 1000) div 3600);
+  If HOURS < 10 then
+    cPrint(outchan,"0");
+  cPrint(outchan,Hours);cPrint(outchan,":");
+  MINUTES_(((Result div 1000)-(HOURS * 3600)) Div 60);
+  If Minutes < 10 then
+    cPrint(outchan,"0");
+  cPrint(outchan,Minutes);cPrint(outchan,"/");
+End "InsertTimeDate";
+
+
+Procedure ListSubjects;
+Begin "ListSubjects"
+  Print("   List Subjects:  "&crlf);
+  While not inEOF and not FileNotFound do
+    Begin
+      Str_input(inchan,LineBr);
+      If EQU(Str[1 to 10],"Subject:  ") then
+        Print(Str[11 to inf]&crlf);
+      cPrint(outChan,Str&crlf);
+    End;
+  IF FileNotFound then
+    Print("FileNotFound, Cannot search");
+End "ListSubjects";
+
+
+Procedure TypeRequest;
+Begin "Type Request"
+  String Temp,ReqStr;
+  Print("   Type Request.");
+  Print(crlf);
+  ReqStr_GetText(#lf);
+  While (not inEOF) and (Not EQU(Temp[11 to 20],ReqStr[1 to 10])) do
+    Begin "Find Begin"
+      Temp_input(inchan,LineBr);
+      cPrint(outchan,Temp&crlf);
+    End "Find Begin";
+  If not inEOF then
+    Begin "Write the note"
+      Print(temp&crlf);
+      cPrint(outchan,temp&crlf);
+      While Not EQU(Str[1 to 10],"SUBJECT:  ") do
+        Begin
+          Str_Input(inchan,linebr);
+Print(">>> in loop",crlf);
+          Print(Str&crlf);
+          cPrint(outchan,Str&crlf);
+        End;
+      While Not inEOF do
+        cPrint(outchan,Str_input(inchan,LineBr),crlf);
+
+    End "Write the note";
+
+End "Type Request";
+
+
+Simple Procedure NewHeading;
+Begin "NewHeading"
+  print(crlf&"Old note file not found,"&crlf);
+  print("Starting New File."&crlf&crlf);
+  cPrint(outchan,"TSUCOOP notes.        (reverse ");
+  cPrint(outchan,"chronological order).");
+  cPrint(outchan,crlf&"========================"&crlf&crlf);
+end "NewHeading";
+
+!               *****     main     *****               ;
+
+Print(crlf);
+Print("    Note File.  ");DateTimeUser;
+Print(crlf);
+
+
+Do
+Begin "GetSubject"
+  DO
+    begin
+      print(crlf&"Enter subject <cr>"&crlf&"Subject:  ");
+      Str_GetText(#lf);
+    end
+  Until Not EQU(Str[1 to 1],null);
+  InitFiles;
+  If Not EQU(Str[1 to 1],null)
+    and Not EQU(Str[1 to 4],"list")
+    and Not EQU(Str[1 to 4],"quit")
+    and Not EQU(Str[1 to 4],"type") then
+    BEGIN
+      If FileNotFound then
+          NewHeading  ! #create new file with new heading;
+      else
+          for i_1 step 1 until 3 do  ! Copy heading from existing file;
+            cPrint(outchan,S_input(inchan,LineBr),crlf);
+      InsertTimeDate;
+      cPrint(outchan,UserName&crlf);
+      cPrint(outchan,"Subject:  ",Str&crlf&crlf);
+      print(crlf&crlf&"Enter Text of Note <esc>"&crlf&"Note:     ");
+      Str_GetText(#sub&#esc&#eot);
+      If Not EQU(Str[1 to 1],null) then
+        cPrint(outchan,"Note:     ",Str&crlf&crlf); 
+      cPrint(outchan,crlf&crlf); !  Space between note entries;
+      If not FileNotFound then         ! If new file not #created then   ;
+        while not inEOF do             !   re-attach rest of old file   ;
+          cPrint(outchan,Str_input(inchan,LineBr),crlf);
+                                       ! else that's it;
+    END
+  Else
+    If EQU(Str[1 to 1],"l" ) then
+      ListSubjects
+    Else
+      If EQU(STR[1 to 1],"t") then
+        TypeRequest;
+  release(inchan);
+  release(outchan);
+print("Bottom of loop, Str[1 to 1]=",Str[1 to 1]);
+End "GetSubject"
+
+Until (EQU(Str[1 to 1],"q"));
+
+end;   
