@@ -1,0 +1,145 @@
+!;---------------------------------------------------------------------
+!;
+!;                       Build PEAK.SAV for Tymcom-X
+!;
+!;                (SYS)PEAK.SAV has protection ALL RUN RUN.
+!;                (SYS)PEAK.SAV should have no license.
+!;
+!;                (SYS)PEAK.HLP has protection ALL RD RD.
+!;                (SYS)PEAK.HLP should have no license.
+!;
+!;                (SYSNEWS)PEAK.CHT has protection ALL RD RD.
+!;                (SYSNEWS)PEAK.KEY has protection ALL RD RD.
+!;                (SYSNEWS)PEAK.NEW has protection ALL RD RD.
+!;                (SYSNEWS)PEAK.SUM has protection ALL RD RD.
+!;                (SYSNEWS)PEAK.TUT has protection ALL RD RD.
+!;                (SYSNEWS)PEAK.TXT has protection ALL RD RD.
+!;
+!;       Note that in succeeding releases, the name of the FDM file
+!;       will change.
+!;
+!;---------------------------------------------------------------------
+!
+!
+!daytime
+7-AUG-1984 14:54:36 PDT
+
+!delete *.rel
+
+Files "deleted":
+AUXWIN  REL       4   7-AUG-84 1117.19 ALL RD  NO      1348           (KEN)
+COMAND  REL      58   7-AUG-84 1243.42 ALL RD  NO     29018           (KEN)
+DED     REL       2   7-AUG-84 1110.16 ALL RD  NO       326           (KEN)
+REDISP  REL      11   7-AUG-84 1118.28 ALL RD  NO      4671           (KEN)
+UTIL    REL       2   7-AUG-84 1119.06 ALL RD  NO       288           (KEN)
+WINDOW  REL       9   7-AUG-84 1118.13 ALL RD  NO      3736           (KEN)
+XBUFF   REL      12   7-AUG-84 1117.29 ALL RD  NO      5146           (KEN)
+XFILE   REL      15   7-AUG-84 1117.51 ALL RD  NO      6918           (KEN)
+
+!
+!; com warpld
+!; load warpld
+!; save warpld
+!; save peak
+!
+!ctest setp sail=(sys)sail
+
+!
+!com ded,comand,auxwin,xbuff,xfile,window,redisp,util
+SAIL: DED.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3
+COMAND.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+  COMSUB.REQ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+  COMM1.REQ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
+  COMM2.REQ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+  COMM3.REQ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+  COMM4.REQ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+  COMM5.REQ 1 2 3 4 5
+  COMM6.REQ 1 2 3 4 5 6 7
+  COMM7.REQ 1 2 3
+  COMM8.REQ 1 2 3
+ 20 21 22 23 24 25 [Expanding Command Tables]
+ 26 27 [Expanding Variable Tables]
+ 28 29 30 31 32 33 34 35
+AUXWIN.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11
+XBUFF.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58
+XFILE.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+WINDOW.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+REDISP.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
+UTIL.SAI 1
+  DED.DEF 1
+    HOST.DEF 1
+   2 3 4 5 6
+ 2 3 4 5 6 7 8 9 10 11
+
+
+EXIT
+
+!
+!r link
+*ded,comand,xbuff,xfile,window,redisp,util,auxwin
+*[sys]libsaa/s
+*peak/save/u/g
+[LNKUGS	No undefined global symbols]
+
+EXIT
+
+!
+!; r link
+!; ded,comand,xbuff,xfile,window,redisp,util,auxwin
+!; [sys]libsaa/s
+!; peak1/save/u/g
+!
+!; ru peak1
+!; !^C
+
+!
+!
+!declare all run run peak.sav
+
+
+!daytime
+7-AUG-1984 15:02:36 PDT
+
+!
+!
+!;---------------------------------------------------------------------
+!SEND KEN
+TYPE LETTER:
+; PCOM v1.63 - processed: (PEAK)PEAK.LOG = (PEAK)PEAK.CTL
+; Options: DETACH  LOG NOAPPEND SUPERSEDE LICENSE 
+; Limits: TIME:60 TRULIMIT:0 
+; Status: completed.
+; Output recorded in file (PEAK)PEAK.LOG.
+
+mail waiting
+!LOGOUT
+189.61 tru
+terminal time: 0:08:08
